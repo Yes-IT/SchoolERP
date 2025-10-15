@@ -265,7 +265,7 @@ class StudentController extends Controller
         $user = Auth::user();
         $student = DB::table('students')->where('user_id', $user->id)->first();
         // dd($student);
-        
+
 
         $assignments = DB::table('assignments')
             ->leftJoin('subjects', 'assignments.subject_id', '=', 'subjects.id')
@@ -367,18 +367,34 @@ class StudentController extends Controller
             return redirect()->back()->withErrors(['error' => 'Student not found.']);
         }
 
-        $leaves = Apply_Leave::where('student_id', $student->id)
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+        $yearOptions = DB::table('school_years')->pluck('name', 'id')->toArray();
+        $semesteroptions = DB::table('semesters')->pluck('name', 'id')->toArray();
 
-        $yearOptions = DB::table('school_years')
-            ->pluck('name', 'id')
-            ->toArray();
+        $query = Leave::where('student_id', $student->id)
+            ->orderBy('created_at', 'desc');
+
+        if ($request->filled('year')) {
+            $yearName = DB::table('school_years')->where('id', $request->year)->value('name');
+            if ($yearName) {
+                [$yearStart, $yearEnd] = explode('-', $yearName);
+                $startOfYear = \Carbon\Carbon::createFromDate($yearStart, 6, 1)->startOfMonth();
+                $endOfYear   = \Carbon\Carbon::createFromDate($yearEnd, 5, 31)->endOfMonth();
+                $query->whereBetween('from_date', [$startOfYear, $endOfYear]);
+            }
+        }
+
+        if ($request->filled('semester')) {
+            $query->where('semester_id', $request->semester);
+        }
+
+
+        $leaves = $query->paginate($perPage);
 
         return view('student.apply_leave', [
             'leaves' => $leaves,
             'perPage' => $perPage,
-            'yearOptions' => $yearOptions
+            'yearOptions' => $yearOptions,
+            'semesteroptions' => $semesteroptions
         ]);
     }
 
@@ -398,7 +414,7 @@ class StudentController extends Controller
             return redirect()->back()->withErrors(['error' => 'Student not found.']);
         }
 
-        $overlap = Apply_Leave::where('student_id', $student->id)
+        $overlap = Leave::where('student_id', $student->id)
             ->where(function ($query) use ($request) {
                 $query->whereBetween('from_date', [$request->from_date, $request->to_date])
                     ->orWhereBetween('to_date', [$request->from_date, $request->to_date])
@@ -415,12 +431,13 @@ class StudentController extends Controller
                 ->withInput();
         }
 
-        Apply_Leave::create([
+        Leave::create([
             'student_id' => $student->id,
             'from_date'  => $request->from_date,
             'to_date'    => $request->to_date,
             'reason'     => $request->reason,
-            'status'     => 'pending',
+            'is_approved'     => 0,
+            'apply_date' => now(),
         ]);
 
         return redirect()
@@ -432,7 +449,7 @@ class StudentController extends Controller
 
     public function editLeave($id)
     {
-        $leave = Apply_Leave::findOrFail($id);
+        $leave = Leave::findOrFail($id);
         return response()->json($leave);
     }
 
@@ -450,9 +467,9 @@ class StudentController extends Controller
             return redirect()->back()->withErrors(['error' => 'Student not found.']);
         }
 
-        $leave = Apply_Leave::where('student_id', $student->id)->findOrFail($id);
+        $leave = Leave::where('student_id', $student->id)->findOrFail($id);
 
-        $overlap = Apply_Leave::where('student_id', $student->id)
+        $overlap = Leave::where('student_id', $student->id)
             ->where('id', '!=', $id)
             ->where(function ($query) use ($request) {
                 $query->whereBetween('from_date', [$request->from_date, $request->to_date])
@@ -482,7 +499,7 @@ class StudentController extends Controller
             return redirect()->back()->withErrors(['error' => 'Student not found.']);
         }
 
-        $leave = Apply_Leave::where('student_id', $student->id)->findOrFail($id);
+        $leave = Leave::where('student_id', $student->id)->findOrFail($id);
         $leave->delete();
 
         return redirect()->route('student.apply_leave')->with('success', 'Leave request deleted successfully.');
@@ -510,30 +527,71 @@ class StudentController extends Controller
 
     // late curfew request----------------------------------------------------------------------
 
-    public function studentLateCurfewRequest()
+    public function studentLateCurfewRequest(Request $request)
     {
         $student = Student::where('user_id', Auth::id())->firstOrFail();
 
-        $requested = LateCurfew::where('student_id', $student->id)
+        $startDate = null;
+        $endDate = null;
+
+        if ($request->filled('dates')) {
+            $dates = explode(' - ', $request->dates);
+
+            try {
+                $startDate = \Carbon\Carbon::createFromFormat('m/d/Y', trim($dates[0]))->format('Y-m-d');
+                $endDate   = \Carbon\Carbon::createFromFormat('m/d/Y', trim($dates[1]))->format('Y-m-d');
+            } catch (\Exception $e) {
+                $startDate = $endDate = null;
+            }
+        }
+
+        $yearOptions = DB::table('school_years')->pluck('name', 'id')->toArray();
+
+        $query = LateCurfew::where('student_id', $student->id)
             ->where('status', 'pending')
-            ->orderBy('date', 'desc')
-            ->paginate(5, ['*'], 'requested_page');
+            ->orderBy('date', 'desc');
 
+        if ($startDate && $endDate) {
+            $query->whereBetween('date', [$startDate, $endDate]);
+        }
 
-        $final = LateCurfew::where('student_id', $student->id)
+        if ($request->filled('year')) {
+            $yearName = DB::table('school_years')->where('id', $request->year)->value('name');
+            if ($yearName) {
+                [$yearStart, $yearEnd] = explode('-', $yearName);
+
+                $startOfYear = \Carbon\Carbon::createFromDate($yearStart, 6, 1)->startOfMonth(); // e.g. 2024-06-01
+                $endOfYear   = \Carbon\Carbon::createFromDate($yearEnd, 5, 31)->endOfMonth();   // e.g. 2025-05-31
+
+                $query->whereBetween('date', [$startOfYear, $endOfYear]);
+            }
+        }
+
+        $requested = $query->paginate(5, ['*'], 'requested_page');
+
+        $query2 = LateCurfew::where('student_id', $student->id)
             ->whereIn('status', ['approved', 'rejected'])
-            ->orderBy('date', 'desc')
-            ->paginate(5, ['*'], 'final_page');
+            ->orderBy('date', 'desc');
 
+        if ($startDate && $endDate) {
+            $query2->whereBetween('date', [$startDate, $endDate]);
+        }
 
-        $yearOptions = DB::table('school_years')
-            ->pluck('name', 'id')
-            ->toArray();
+        if ($request->filled('year')) {
+            $yearName = DB::table('school_years')->where('id', $request->year)->value('name');
+            if ($yearName) {
+                [$yearStart, $yearEnd] = explode('-', $yearName);
 
+                $startOfYear = \Carbon\Carbon::createFromDate($yearStart, 6, 1)->startOfMonth();
+                $endOfYear   = \Carbon\Carbon::createFromDate($yearEnd, 5, 31)->endOfMonth();
 
-        return view('student.late_curfew_request', [
-            'yearOptions' => $yearOptions
-        ], compact('requested', 'final'));
+                $query2->whereBetween('date', [$startOfYear, $endOfYear]);
+            }
+        }
+
+        $final = $query2->paginate(5, ['*'], 'final_page');
+
+        return view('student.late_curfew_request', compact('requested', 'final', 'yearOptions'));
     }
 
 

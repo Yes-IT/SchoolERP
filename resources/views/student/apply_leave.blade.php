@@ -38,25 +38,39 @@
                 <div class="dsbdy-filter-wrp p-0">
                     <button class="cmn-btn h-40" data-bs-target="#requestLeave" data-bs-toggle="modal"><i class="fa-solid fa-plus"></i> Request Leave
                     </button>
-                                           <select name="year" id="yearSelect">
-                            <option value="">Select Year</option>
-                            @foreach($yearOptions as $key => $label)
-                            <option value="{{ $key }}" {{ request('year')==$key ? 'selected' : '' }}>
-                                {{ $label }}
-                            </option>
-                            @endforeach
-                        </select>
- 
-                    <select name="semester" id="semester">
-                        <option value="first-semester">First Semester</option>
-                        <option value="second-semester">Second Semester</option>
-                        <option value="third-semester">Full Year</option>
-                    </select>
+
+                    <form method="GET" action="{{ route('student.apply_leave') }}">
+                        <div class="input-grp">
+                            <select name="year" id="yearSelect" onchange="this.form.submit()">
+                                <option value="">Select Year</option>
+                                @foreach($yearOptions as $key => $label)
+                                <option value="{{ $key }}" {{ request('year') == $key ? 'selected' : '' }}>
+                                    {{ $label }}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </form>
+
+                    <form method="GET" action="{{ route('student.apply_leave') }}">
+                        <input type="hidden" name="year" value="{{ request('year') }}">
+                        <div class="input-grp">
+                            <select name="semester" id="semesterSelect" onchange="this.form.submit()">
+                                <option value="">Select Semester</option>
+                                @foreach($semesteroptions as $key => $label)
+                                <option value="{{ $key }}" {{ request('semester') == $key ? 'selected' : '' }}>
+                                    {{ $label }}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </form>
+
                 </div>
             </div>
         </div>
 
-        <div class="ds-cmn-tble count-row w1200">
+        <div class="ds-cmn-tble  w1200">
             <table>
                 <thead>
                     <tr>
@@ -99,37 +113,25 @@
                         </td>
 
                         <td>
-                            @if($leave->status === 'pending')
-                            <p class="red-bg cmn-tbl-btn">Pending</p>
-                            @elseif($leave->status === 'approved')
+                            @if($leave->is_approved == 0)
+                            <p class="yellow-bg cmn-tbl-btn">Pending</p>
+                            @elseif($leave->is_approved == 1)
                             <p class="green-bg cmn-tbl-btn">Approved ({{ $leave->updated_at->format('d/m/Y') }})</p>
                             @else
-                            <p class="gray-bg cmn-tbl-btn">Rejected</p>
+                            <p class="cmn-tbl-btn red-bg  ">Rejected</p>
                             @endif
                         </td>
                         <td>
-                            @if($leave->status === 'approved')
+                            @if($leave->is_approved == 1)
                             -- {{-- Approved => no action --}}
                             @else
                             <div class="actions-wrp">
                                 <button type="button" class="edit-leave-btn" data-id="{{ $leave->id }}" data-bs-toggle="modal" data-bs-target="#editLeaveRequest">
                                     <img src="{{asset('student/images/edit-icon-primary.svg')}}" alt="Icon">
                                 </button>
-
-
-                                <!-- <button type="button" data-bs-toggle="modal" data-bs-target="#deleteLeaveRequest"><img src="{{asset('student/images/bin-icon.svg')}}" alt="Icon"></button> -->
-
                                 <button type="button" class="delete-leave-btn" data-id="{{ $leave->id }}" data-bs-toggle="modal" data-bs-target="#deleteLeaveRequest">
                                     <img src="{{asset('student/images/bin-icon.svg')}}" alt="Icon">
                                 </button>
-
-
-                                <!-- <form action="{{ route('student.apply_leave.delete', $leave->id) }}" method="POST" style="display:inline-block;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"><img src="{{asset('student/images/bin-icon.svg')}}" alt="Icon"></button>
-                                </form> -->
-
                             </div>
                             @endif
                         </td>
@@ -171,8 +173,6 @@
 </div>
 <!-- End Of Dashboard -->
 
-
-
 <!-- Request Leave Modal Begin -->
 
 <div class="modal fade cmn-popwrp pop800" id="requestLeave" tabindex="-1" role="dialog" aria-labelledby="requestLeave" aria-hidden="true">
@@ -213,7 +213,6 @@
     </div>
 </div>
 <!-- End Of Request Leave Modal -->
-
 
 <!-- Edit Request Leave Modal Begin -->
 
@@ -260,8 +259,6 @@
 
 <!-- End Of Edit Request Leave Modal -->
 
-
-
 <!-- Request of delete Leave Modal Begin -->
 
 <div class="modal fade cmn-popwrp popwrp w400" id="deleteLeaveRequest" tabindex="-1" role="dialog" aria-labelledby="deleteLeaveRequest" aria-hidden="true">
@@ -289,11 +286,6 @@
                             <button type="button" class="cmn-btn" data-bs-dismiss="modal">Cancel</button>
                         </div>
 
-
-                        <!-- <div class="btn-wrp">
-                            <button type="submit" class="cmn-btn">Delete</button>
-                            <button type="button" class="cmn-btn" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
-                        </div> -->
                     </div>
                 </div>
             </div>
@@ -301,9 +293,7 @@
         </div>
     </div>
 </div>
-
 <!-- End Of delete  Request Leave Modal -->
-
 
 @endsection
 
@@ -333,9 +323,6 @@
     });
 </script>
 
-
-
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const deleteButtons = document.querySelectorAll('.delete-leave-btn');
@@ -351,6 +338,19 @@
     });
 </script>
 
-
+<script>
+    document.getElementById('yearSelect').addEventListener('change', function() {
+        if (this.value === '') {
+            window.location.href = "{{ route('student.apply_leave') }}";
+        }
+    });
+</script>
+<script>
+    document.getElementById('semesterSelect').addEventListener('change', function() {
+        if (this.value === '') {
+            window.location.href = "{{ route('student.apply_leave') }}";
+        }
+    });
+</script>
 
 @endpush
