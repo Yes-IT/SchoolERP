@@ -832,7 +832,7 @@ class DormitoryController extends Controller
     }
 
 
-    public function pantry()
+    public function pantry()              
     {
 
         return view('backend.dormitory.pantry.index');

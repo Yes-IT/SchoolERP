@@ -18,8 +18,8 @@ class DisabledStudentController extends Controller
     private $classSetupRepo;
 
     function __construct(
-        DisabledStudentRepository $repo,
-        ClassesRepository         $classRepo, 
+        DisabledStudentRepository $repo,                     
+        ClassesRepository         $classRepo,                
         SectionRepository         $sectionRepo,
         ClassSetupRepository      $classSetupRepo
         )

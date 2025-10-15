@@ -313,24 +313,43 @@ class StudentController extends Controller
         return view('student.attendance');
     }
 
-
     public function studentGrades(Request $request)
     {
         $perPage = $request->get('perPage', 5);
+
+        $student = Student::where('user_id', Auth::id())->first();
+
+        if (!$student) {
+            return redirect()->back()->withErrors(['error' => 'Student not found.']);
+        }
 
         $yearOptions = DB::table('school_years')
             ->pluck('name', 'id')
             ->toArray();
 
-        $grades = Grade::filter($request->year, $request->semester)
-            ->paginate($perPage);
+        $semesterOptions = DB::table('semesters')
+            ->pluck('name', 'id')
+            ->toArray();
+
+        $query = Grade::where('student_id', $student->id)
+            ->orderBy('created_at', 'desc');
+
+        if ($request->filled('school_years_id')) {
+            $query->where('school_years_id', $request->school_years_id);
+        }
+
+        if ($request->filled('semester_id')) {
+            $query->where('semester_id', $request->semester_id);
+        }
+
+        $grades = $query->paginate($perPage);
 
         return view('student.grades', [
             'grades' => $grades,
-            'selectedYear' => $request->year,
-            'selectedSemester' => $request->semester,
+            'selectedYear' => $request->school_years_id,
+            'selectedSemester' => $request->semester_id,
             'yearOptions' => $yearOptions,
-            'semesterOptions' => Grade::$semesterOptions,
+            'semesterOptions' => $semesterOptions,
             'perPage' => $perPage,
         ]);
     }
