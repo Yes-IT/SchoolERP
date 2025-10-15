@@ -33,7 +33,7 @@ class AttendanceRepository implements AttendanceInterface
         $totalStudent = SessionClassStudent::where('session_id', setting('session'))->count();
         $data['present_student'] = $this->model->where('session_id', setting('session'))
                                     ->whereDay('date', date('d'))
-                                    ->whereIn('attendance', [AttendanceType::PRESENT, AttendanceType::LATE, AttendanceType::HALFDAY])
+                                    ->whereIn('attendance', [AttendanceType::PRESENT, AttendanceType::LATE])
                                     ->count();
         $data['absent_student'] = $totalStudent - $data['present_student'];
         return $data;
