@@ -106,10 +106,60 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::get('/it-assets',                 'itassets')->name('dormitory.itassets')->middleware('PermissionCheck:parent_read');
                     Route::get('/it-assets/filter',  'filterassettype')->name('dormitory.itassets.filter');
                     Route::get('/requested-assets',                 'requestedassets')->name('dormitory.requestedassets')->middleware('PermissionCheck:parent_read');
+                    Route::get('/requested-assets/filter',  'filterRequests')->name('requested-assets.filter');
+                    Route::post('/requested-assets/update-status/{id}',  'updateStatus')->name('requested-assets.update-status');
+
+
                     Route::get('/assigned-assets',                 'assignedassets')->name('dormitory.assignedassets')->middleware('PermissionCheck:parent_read');
                     Route::get('/issue-report',                 'issuereports')->name('dormitory.issuereports')->middleware('PermissionCheck:parent_read');
                     Route::get('/return-assets',                 'returnassets')->name('dormitory.returnassets')->middleware('PermissionCheck:parent_read');
                     Route::get('/procurement',                 'procurement')->name('dormitory.procurement')->middleware('PermissionCheck:parent_read');
+                    Route::get('/procurement/search',  'searchProcurement')->name('procurement.search');
+                    Route::post('/procurement/store',  'storeProcurement')->name('procurement.store');
+                    Route::post('/procurement/import', 'importProcurement')->name('procurement.import');
+                    Route::get('/procurement/filter',  'filterByUser')->name('procurement.filter');
+                    Route::get('/procurement/filter-by-date',  'filterByDate')->name('procurement.filterByDate');
+
+
+
+
+
+
+
+                    Route::get('/maintence-request',                 'maintainenceRequest')->name('dormitory.mantainenceRequest')->middleware('PermissionCheck:parent_read');
+                    Route::post('/maintenance-request/mark-done/{id}', 'markAsDone')->name('maintenance.markDone');
+                    Route::post('/maintenance-request-store',  'store')->name('maintenance.store');
+                    Route::get('/maintenance-request-filterByroom',  'filterByroom')->name('maintenance.filterByroom');
+                    Route::get('/maintenance-request/filter-by-issuedate',  'filterByIssueDate')->name('maintenance.filterByIssueDate');
+
+
+
+
+
+
+                    Route::get('/late-entry',                 'lateEntry')->name('dormitory.lateEntry')->middleware('PermissionCheck:parent_read');
+                    Route::get('/late-entry/get-student-room',  'getStudentRoom')->name('dormitory.lateEntry.get.student.room');
+                    Route::post('/late-curfew/store',  'latecurfewstore')->name('latecurfew.store');
+                    Route::get('/late-curfew-filterByroom',  'lateEntry')->name('latecurfew.filterByroom');
+                    Route::get('/late-curfew-filterBystudentname',  'lateEntry')->name('latecurfew.filterBystudentname');
+
+                    Route::get('/late-curfew-filterByDate',  'filterByDateLate')->name('latecurfew.filterByDateLate');
+
+
+
+
+
+                    Route::get('/doctor_visit',                 'doctorVisit')->name('dormitory.doctorVisit')->middleware('PermissionCheck:parent_read');
+                    Route::post('/doctor_visit/store',  'doctorVisitstore')->name('doctorVisit.store');
+                    Route::get('/doctor_visit/filterdoctordatabystudentId',  'doctorVisit')->name('doctorVisit.filterdoctordatabystudentId');
+                    Route::get('/doctor_visit/filterdoctordatabyDate',  'filterdoctordatabyDate')->name('doctorVisit.filterdoctordatabyDate');
+
+
+
+                    Route::get('/pantry',                 'pantry')->name('dormitory.pantry')->middleware('PermissionCheck:parent_read');
+                    Route::get('/inventory',                 'inventory')->name('dormitory.inventory')->middleware('PermissionCheck:parent_read');
+                    Route::get('/requested-inventory',                 'requestedInventory')->name('dormitory.requestedInventory')->middleware('PermissionCheck:parent_read');
+                    Route::get('/low-inventory',                 'lowInventory')->name('dormitory.lowInventory')->middleware('PermissionCheck:parent_read');
                 });
             });
         });
