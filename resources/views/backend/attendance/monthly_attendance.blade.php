@@ -1,23 +1,20 @@
 @extends('backend.master')
 @section('title')
-    Attendance Management
+    Monthly Attendance Management
 @endsection
 @section('content')
-    <!-- Dashboard Body Begin -->
     <div class="dashboard-body dspr-body-outer">
         <div class="ds-breadcrumb">
             <h1>Attendance</h1>
             <ul>
                 <li><a href="../dashboard">Dashboard</a> /</li>
                 <li><a href="./dashboard">Attendance</a> /</li>
-                <li>Attendance View</li>
+                <li>Monthly Attendance View</li>
             </ul>
 
-            <div class="dropdown-year" data-selected="Subject Grade Report">
+            <div class="dropdown-year" data-selected="Monthly Attendance">
                 <div class="dropdown-trigger" aria-expanded="false">
-                    <span class="dropdown-label">
-                        Daily Attendance
-                    </span>
+                    <span class="dropdown-label">Monthly Attendance</span>
                     <i class="dropdown-arrow"></i>
                 </div>
                 <div class="dropdown-options">
@@ -35,7 +32,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
         <div class="ds-pr-body">
             <div class="atndnc-filter-wrp w-100">
@@ -119,24 +115,23 @@
                                 </div>
                             </div>
 
-                            <!-- Date Input -->
+                            <!-- Month and Year Selector -->
                             <div class="dr-input-wrap">
-                                <div class="classes-schedule-filter">
-                                    <div class="datepicker">
-                                        <div class="datepicker__header">
-                                            <img src="{{ asset('backend/assets/images/calender-icon.svg') }}" alt="Icon">
-                                            <span id="range-display"> Jan, 2025</span>
-                                        </div>
-                                        <div class="datepicker-body-wrp">
-                                            <div class="datepicker__body">
-                                                <select id="year-select" name="year"></select>
-                                                <select id="month-select" name="month"></select>
-                                                <select id="week-select" name="week"></select>
-                                            </div>
-                                            <div class="datepicker__footer">
-                                                <button class="datepicker__btn datepicker__btn--cancel cmn-btn" id="btn-cancel">Cancel</button>
-                                                <button class="datepicker__btn datepicker__btn--apply cmn-btn" id="btn-apply">Apply</button>
-                                            </div>
+                                <button type="button" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false" id="toggle-date">
+                                    <span class="label" id="range-display">{{ now()->format('F, Y') }}</span>
+                                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                                </button>
+                                <div class="dropdown-menu datepicker-body-wrp" role="menu" aria-labelledby="toggle-date">
+                                    <div class="month-year-picker">
+                                        <select id="month-select" name="month">
+                                            <!-- Populated by JavaScript -->
+                                        </select>
+                                        <select id="year-select" name="year">
+                                            <!-- Populated by JavaScript -->
+                                        </select>
+                                        <div class="picker-actions">
+                                            <button type="button" id="btn-apply">Apply</button>
+                                            <button type="button" id="btn-cancel">Cancel</button>
                                         </div>
                                     </div>
                                 </div>
@@ -152,100 +147,136 @@
             </div>
 
             <div class="ds-cmn-table-wrp" id="attendance-table">
-                {{-- @include('backend.attendance.partials.daily_attendance_list', ['data' => ['attendance' => []]]) --}}
+                @include('backend.attendance.partials.monthly_attendance_list', [
+                    'data' => ['students' => $data['students']],
+                    'daysInMonth' => $daysInMonth,
+                    'month' => $month,
+                    'year' => $year
+                ])
             </div>
+            
         </div>
     </div>
-    <!-- Dashboard Body End -->
-
-    @endsection
+@endsection
 
 @push('script')
-
-<script>
-    $(document).ready(function() {
-        // Load initial data
-        loadAttendanceData();
-
-        // Handle attendance type dropdown page change
-        $('.dropdown-options .dropdown-option').on('click', function() {
-            const url = $(this).data('url');
-            if (url) {
-                window.location.href = url;
-            }
-        });
-
-        // Form submission
-        $('#attendance-filter-form').on('submit', function(e) {
-            e.preventDefault();
+    <script>
+        $(document).ready(function() {
+            // Load initial data
             loadAttendanceData();
-        });
 
-        // Handle attendance type change
-        $('#attendance-type').on('change', function() {
-            loadAttendanceData();
-        });
-
-        // Function to load attendance data
-        function loadAttendanceData(url = '{{ route("daily.search") }}') {
-            let formData = $('#attendance-filter-form').serialize();
-            formData += '&attendance_type=' + $('#attendance-type').val();
-
-            // Include per_page value if present
-            let perPage = $('select[name="per_page"]').val() || '{{ request("per_page", 2) }}';
-            formData += '&per_page=' + perPage;
-
-            // Extract query parameters from URL (for pagination)
-            if (url.includes('?')) {
-                let queryString = url.split('?')[1];
-                formData += '&' + queryString; // Append page and other query params
-            }
-
-            $.ajax({
-                url: '{{ route("daily.search") }}',
-                type: 'POST',
-                data: formData,
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Ensure CSRF token
-                },
-                success: function(response) {
-                    $('#attendance-table').html(response.data);
-                    // $('.tbl-pagination-inr').html(response.pagination);
-                    attachPaginationListeners();
-                    attachPerPageListener();
-                },
-                error: function(xhr) {
-                    console.log('Error:', xhr.responseText);
-                    alert('An error occurred while loading data. Please try again.');
+            // Handle attendance type dropdown page change
+            $('.dropdown-options .dropdown-option').on('click', function() {
+                const url = $(this).data('url');
+                if (url) {
+                    window.location.href = url;
                 }
             });
-        }
 
-        // Function to attach click listeners to pagination links
-        function attachPaginationListeners() {
-            $('.tbl-pagination-inr a').off('click').on('click', function(e) {
+            // Form submission
+            $('#attendance-filter-form').on('submit', function(e) {
                 e.preventDefault();
-                const url = $(this).attr('href');
-                loadAttendanceData(url);
+                loadAttendanceData();
             });
-        }
 
-        // Function to attach change listener to per-page select
-        function attachPerPageListener() {
-            const perPageSelect = $('select[name="per_page"]');
-            if (perPageSelect.length) {
-                perPageSelect.off('change').on('change', function() {
-                    loadAttendanceData(); // Reload with new per_page value
+            // Function to load attendance data
+            function loadAttendanceData(url = '{{ route("monthly.search") }}') {
+                let formData = $('#attendance-filter-form').serialize();
+                let perPage = $('select[name="per_page"]').val() || '{{ request("per_page", 10) }}';
+                formData += '&per_page=' + perPage;
+
+                if (url.includes('?')) {
+                    let queryString = url.split('?')[1];
+                    formData += '&' + queryString;
+                }
+
+                $.ajax({
+                    url: '{{ route("monthly.search") }}',
+                    type: 'POST',
+                    data: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        $('#attendance-table').html(response.data);
+                        attachPaginationListeners();
+                        attachPerPageListener();
+                    },
+                    error: function(xhr) {
+                        console.log('Error:', xhr.responseText);
+                        alert('An error occurred while loading data. Please try again.');
+                    }
                 });
             }
-        }
 
-        // Initialize
-        populateDatepicker();
-        attachPaginationListeners();
-        attachPerPageListener();
-        
-    });
-</script>
+            // Function to attach click listeners to pagination links
+            function attachPaginationListeners() {
+                $('.tbl-pagination-inr a').off('click').on('click', function(e) {
+                    e.preventDefault();
+                    const url = $(this).attr('href');
+                    loadAttendanceData(url);
+                });
+            }
 
+            // Function to attach change listener to per-page select
+            function attachPerPageListener() {
+                const perPageSelect = $('select[name="per_page"]');
+                if (perPageSelect.length) {
+                    perPageSelect.off('change').on('change', function() {
+                        loadAttendanceData();
+                    });
+                }
+            }
+
+            // Populate datepicker
+            function populateDatepicker() {
+                const yearSelect = $('#year-select');
+                const monthSelect = $('#month-select');
+                const currentYear = new Date().getFullYear();
+                const months = [
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                ];
+
+                // Populate years
+                for (let i = 2020; i <= currentYear + 5; i++) {
+                    yearSelect.append(`<option value="${i}">${i}</option>`);
+                }
+                yearSelect.val(currentYear);
+
+                // Populate months
+                months.forEach((month, index) => {
+                    monthSelect.append(`<option value="${index + 1}">${month}</option>`);
+                });
+                monthSelect.val(new Date().getMonth() + 1);
+
+                // Update range display
+                $('#range-display').text(`${months[monthSelect.val() - 1]}, ${yearSelect.val()}`);
+
+                // Update display on change
+                yearSelect.on('change', updateRangeDisplay);
+                monthSelect.on('change', updateRangeDisplay);
+
+                function updateRangeDisplay() {
+                    $('#range-display').text(`${months[monthSelect.val() - 1]}, ${yearSelect.val()}`);
+                }
+
+                // Apply button
+                $('#btn-apply').on('click', function() {
+                    $('.datepicker-body-wrp').hide();
+                    loadAttendanceData();
+                });
+
+                // Cancel button
+                $('#btn-cancel').on('click', function() {
+                    $('.datepicker-body-wrp').hide();
+                });
+            }
+
+            // Initialize
+            populateDatepicker();
+            attachPaginationListeners();
+            attachPerPageListener();
+        });
+    </script>
 @endpush
