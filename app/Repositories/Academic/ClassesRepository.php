@@ -42,7 +42,7 @@ class ClassesRepository implements ClassesInterface
     {
         // return $this->classes->latest()->paginate(Settings::PAGINATE);
          return $this->classes
-            ->with(['subject', 'teacher', 'schoolYear', 'yearStatus', 'semester']) 
+            ->with(['subject', 'teacher', 'session', 'yearStatus', 'semester']) 
             ->latest()
             ->paginate(Settings::PAGINATE);
 
@@ -272,7 +272,8 @@ class ClassesRepository implements ClassesInterface
         return $this->classes->with([
             'subject',
             'teacher', 
-            'schoolYear',
+            // 'schoolYear',
+            'session',
             'yearStatus',
             'semester',
             'schedules.room',

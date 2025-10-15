@@ -14,6 +14,7 @@ use App\Models\Staff\Staff;
 use Illuminate\Support\Facades\{Log,DB};
 use Exception;
 use App\Models\StudentInfo\Student;
+use App\Models\Session;
 
 
 
@@ -35,7 +36,7 @@ class ClassesController extends Controller
     public function index()
     {
         $data['classes'] = $this->classes->getAll();
-        // Log::info('records in classes', ['classes' => $data['classes']]);
+        Log::info('records in classes', ['classes' => $data['classes']]);
         $data['teachers'] = Staff::where('role_id', 5)->get();
 
         // dd($data['teachers']);
@@ -63,7 +64,9 @@ class ClassesController extends Controller
         $teachers     =  Staff::where('role_id', 5)
                         ->select('id', 'first_name', 'last_name')
                         ->get(); 
-        $schoolYears  = SchoolYear::all(['id', 'name']); 
+        // $schoolYears  = SchoolYear::all(['id', 'name']);
+        $sessions  = Session::all(['id', 'name']); 
+
         $semesters    = Semester::all(['id', 'name']);
         $yearStatuses = YearStatus::all(['id', 'name']);
         $students = Student::all();
@@ -83,7 +86,7 @@ class ClassesController extends Controller
 
         // Log::info('nextClassId', ['nextClassId' => $nextClassId]);
 
-        return view('backend.academic.class.create', compact('data','nextClassId','students','subjects', 'teachers', 'schoolYears', 'semesters', 'rooms','yearStatuses'));
+        return view('backend.academic.class.create', compact('data','sessions','nextClassId','students','subjects', 'teachers', 'semesters', 'rooms','yearStatuses'));
     }
 
     public function store(ClassesStoreRequest $request)
@@ -132,7 +135,6 @@ class ClassesController extends Controller
         $yearStatuses = YearStatus::all(['id', 'name']);
         $students = Student::all();
 
-        // Get all students
         $allStudents = Student::all();
         
          // Get assigned student IDs
@@ -143,7 +145,7 @@ class ClassesController extends Controller
             return !in_array($student->id, $assignedStudentIds);
         });
 
-        // dd($classes->subjects);
+        dd($classes->subjects);
 
         if(!$classes){
             return redirect()->route('classes.index')->with('danger', 'Class not found');
@@ -195,7 +197,7 @@ class ClassesController extends Controller
 
     public function filter(Request $request)
     {
-        Log::info('Filter request received', $request->all());
+        // Log::info('Filter request received', $request->all());
         
         try {
             $classes = $this->classes->filter($request->all()); 

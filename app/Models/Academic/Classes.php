@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Staff\Staff;
 use App\Models\StudentInfo\Student;
+use  App\Models\Session;
 
 class Classes extends BaseModel
 {
@@ -20,6 +21,8 @@ class Classes extends BaseModel
         'identification_number',
         'subject_id',
         'teacher_id',
+        'session_id',
+        'section_id',
         'school_year_id',
         'semester_id',
         'year_status_id',
@@ -79,9 +82,14 @@ class Classes extends BaseModel
     }
 
 
-    public function schoolYear()
+    // public function schoolYear()
+    // {
+    //     return $this->belongsTo(SchoolYear::class, 'school_year_id');
+    // }
+
+    public function session()
     {
-        return $this->belongsTo(SchoolYear::class, 'school_year_id');
+        return $this->belongsTo(Session::class, 'session_id');
     }
 
     public function yearStatus()

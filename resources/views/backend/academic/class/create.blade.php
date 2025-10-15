@@ -65,7 +65,7 @@
                                               <label for="school_year">School Year</label>
                                               <select id="school_year" name="school_year_id" required>
                                                     <option>School Year</option>
-                                                    @foreach($schoolYears as $year)
+                                                    @foreach($sessions as $year)
                                                         <option value="{{ $year->id }}">{{ $year->name }}</option>
                                                     @endforeach
                                               </select>
@@ -327,7 +327,7 @@
                                                                 data-homeroom="{{ $student->homeroom_class }}"
                                                                 data-division="{{ $student->division }}"
                                                                 data-group="{{ $student->group }}"
-                                                                data-studentid="{{ $student->student_identifier }}"
+                                                                data-studentid="{{ $student->student_id }}"
                                                             >
                                                                 {{ $student->first_name }} {{ $student->last_name }}
                                                             </option>
@@ -439,7 +439,7 @@
         if (!selected.value) return;
 
         // console.log(selected);
-        // console.log(selected.dataset);
+        console.log(selected.dataset);
         // Create a new row
         let wrapper = document.getElementById('students-wrapper');
 
@@ -452,15 +452,15 @@
                 <input type="text" value="${selected.dataset.first_name} ${selected.dataset.last_name}" readonly>
                 </div>
                 <div class="input-grp">
-                <input type="text" value="${selected.dataset.homeroom}" readonly>
+                <input type="text" value="${selected.dataset.homeroom}" placeholder="Homeroom Class" readonly>
                 </div>
             </div>
             <div class="multi-input-grp">
                 <div class="input-grp">
-                <input type="text" value="${selected.dataset.division}" readonly>
+                <input type="text" value="${selected.dataset.division}" placeholder="Division" readonly>
                 </div>
                 <div class="input-grp">
-                <input type="text" value="${selected.dataset.group}" readonly>
+                <input type="text" value="${selected.dataset.group}" placeholder="Group" readonly>
                 </div>
             </div>
             <div class="multi-input-grp">

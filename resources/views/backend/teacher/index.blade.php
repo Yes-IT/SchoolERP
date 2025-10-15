@@ -29,10 +29,7 @@
                                       <i class="dropdown-arrow"></i>
                                     </div>
                                     <div class="dropdown-options">
-                                      {{-- <div class="dropdown-option">Teacher 1</div>
-                                      <div class="dropdown-option">Teacher 2</div>
-                                      <div class="dropdown-option">Teacher 3</div> --}}
-
+                                      
                                       <div class="dropdown-option" data-id="all">All</div>
                                             @foreach($data['teachers'] as $teacher)
                                                 <div class="dropdown-option" data-id="{{ $teacher->id }}">{{ $teacher->first_name }} {{ $teacher->last_name }}</div>
@@ -41,7 +38,7 @@
                                   </div>
                                 
                                   <a href="{{route('teacher.create')}}" class="cmn-btn btn-sm"><i class="fa-solid fa-plus"></i> Add Teacher</a>
-                                  <a href="#" class="cmn-btn btn-sm">Generate Report</a>
+                                  {{-- <a href="#" class="cmn-btn btn-sm">Generate Report</a> --}}
                             </div>
                         </div>
                     </div>

@@ -26,7 +26,7 @@
 
                             <li>Add Teacher</li>
                         </ul>
-                        <button  class="cmn-btn" >
+                        <button onclick="window.location.href='{{ route('teacher.index') }}'"  class="cmn-btn" >
                            <img src="{{global_asset('backend/assets/images/new_images/lets-icons_back.png')}}" alt="Back" />
                              Back
                         </button>
