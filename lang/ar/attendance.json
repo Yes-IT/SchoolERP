@@ -1,0 +1,12 @@
+{
+    "Attendance": "الحضور",
+    "Note": "ملاحظة",
+    "Holiday": "عطلة",
+    "Present": "حاضر",
+    "Late": "متأخر",
+    "Absent": "غائب",
+    "half_day": "نصف يوم",
+    "attendance_already_collected_you_can_edit_record": "تم تسجيل الحضور مسبقاً، يمكنك تعديل السجل",
+    "Location Timeline": "خط الموقع",
+    "Live Tracking": "التتبع الحي"
+}

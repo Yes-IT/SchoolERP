@@ -1,0 +1,10 @@
+{
+    "Installer": true,
+    "MainApp": false,
+    "LiveChat": true,
+    "Forums": true,
+    "VehicleTracker": false,
+    "MultiBranch": false,
+    "LiveTracking": false,
+    "PushNotification": true
+}

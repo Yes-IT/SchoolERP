@@ -1,0 +1,17 @@
+{
+    "400_database_connection_error": "خطأ 400 في الاتصال بقاعدة البيانات",
+    "please_check_database_connection_and_tables": "يرجى التحقق من اتصال قاعدة البيانات والجداول",
+    "back_to_homepage": "العودة إلى الصفحة الرئيسية",
+    "reset_database": "إعادة تعيين قاعدة البيانات",
+    "403_forbidden": "403 غير مصرح به",
+    "you_re_trying_to_open_in_your_web_browser_is_a_resource_that_you_re_not_allowed_to_access": "المورد الذي تحاول فتحه في متصفحك غير مصرح لك بالوصول إليه",
+    "404_page_not_found": "404 الصفحة غير موجودة",
+    "you_were_trying_to_reach_couldn_t_be_found_on_the_server": "الصفحة التي تحاول الوصول إليها غير موجودة على الخادم",
+    "405_method_not_allowed": "405 الطريقة غير مسموح بها",
+    "the_server_knows_the_request_method_but_the_target_resource_doesn_t_support_this_method": "الخادم يعرف طريقة الطلب ولكن المورد المستهدف لا يدعم هذه الطريقة",
+    "500_something_wrong": "500 حدث خطأ ما",
+    "we_are_trying_to_fix_the_problem_as_soon_as_possible": "نحن نحاول إصلاح المشكلة في أقرب وقت ممكن",
+    "404 page not found": "404 الصفحة غير موجودة",
+    "you were trying to reach couldn t be found on the server": "الصفحة التي تحاول الوصول إليها غير موجودة على الخادم",
+    "back to homepage": "العودة إلى الصفحة الرئيسية"
+}
