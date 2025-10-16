@@ -189,22 +189,38 @@ class StudentController extends Controller
         return redirect()->route('student.dashboard')->with('success', 'Password updated successfully.');
     }
 
+
+
     public function studentDashboard()
     {
+        $student = Student::where('user_id', Auth::id())->first();
 
-        return view('student.dashboard');
+        if (!$student) {
+            return redirect()->back()->withErrors(['error' => 'Student not found.']);
+        }
+
+        $staff = DB::table('staff')->get();
+
+        $user = User::find($student->user_id);
+        $upload = $user ? DB::table('uploads')->where('id', $user->upload_id)->first() : null;
+        return view('student.dashboard', compact('upload', 'student', 'staff'));
     }
+
+
 
     public function studentProfile()
     {
-        $data = Student::where('user_id', Auth::user()->id)->first();
+        $data = Student::where('user_id', Auth::id())->first();
 
         if (!$data) {
             return redirect()->back()->withErrors(['email' => 'User not found.']);
         }
 
-        return view('student.profile', compact('data'));
+        $user = User::find($data->user_id);
+        $upload = $user ? DB::table('uploads')->where('id', $user->upload_id)->first() : null;
+        return view('student.profile', compact('data', 'upload'));
     }
+
 
     public function studentClasses()
     {
@@ -274,23 +290,26 @@ class StudentController extends Controller
             )
             ->orderBy('assignments.assigned_date', 'desc')
             ->get();
-        $completed_assignments = DB::table('assignments')->where('class_id', $student->class_id)->where('student_id', $student->id)
+        $completed_assignments = DB::table('assignments')
+            ->where('class_id', $student->class_id)
+            ->where('student_id', $student->id)
             ->leftJoin('subjects', 'assignments.subject_id', '=', 'subjects.id')
-            ->mapping(function ($assignment) use ($student) {
-                $media = DB::table('assignment_media')
-                    ->where('assignment_id', $assignment->id)
-                    ->where('student_id', $student->id)
-                    ->get();
-                $assignment->media = $media;
-                return $assignment;
-            })
-            // ->leftJoin('assignment_media', 'assignments.id', '=', 'assignment_media.assignment_id')
             ->select(
                 'assignments.*',
                 'subjects.name as subject_name'
             )
             ->orderBy('assignments.assigned_date', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($assignment) use ($student) {
+                $media = DB::table('assignment_media')
+                    ->where('assignment_id', $assignment->id)
+                    ->where('student_id', $student->id)
+                    ->get();
+
+                $assignment->media = $media;
+                return $assignment;
+            });
+
         return view('student.assignment', compact('assignments', 'completed_assignments'));
     }
 
@@ -346,15 +365,21 @@ class StudentController extends Controller
             ->pluck('name', 'id')
             ->toArray();
 
-        $query = Grade::where('student_id', $student->id)
-            ->orderBy('created_at', 'desc');
+        $query = DB::table('grades')
+            ->leftJoin('classes', 'grades.classes_id', '=', 'classes.id')
+            ->select(
+                'grades.*',
+                'classes.name as class_name'
+            )
+            ->where('grades.student_id', $student->id)
+            ->orderBy('grades.created_at', 'desc');
 
         if ($request->filled('school_years_id')) {
-            $query->where('school_years_id', $request->school_years_id);
+            $query->where('grades.school_years_id', $request->school_years_id);
         }
 
         if ($request->filled('semester_id')) {
-            $query->where('semester_id', $request->semester_id);
+            $query->where('grades.semester_id', $request->semester_id);
         }
 
         $grades = $query->paginate($perPage);

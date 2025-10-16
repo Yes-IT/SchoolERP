@@ -13,7 +13,12 @@
     <div class="ds-pr-profile-card">
         <div class="dspr-profile-cd-upr">
             <div class="dspr-profile-cd-img">
-                <img src="{{asset('student/images/student-img.png')}}" alt="Profile Image">
+                @if(!empty($upload->path))
+                <img src="{{ asset($upload->path) }}" alt="Profile Photo">
+                @else
+                <img src="{{ asset('backend/assets/images/new-version.jpg') }}" alt="Default Profile Image">
+                @endif
+                
             </div>
             <div class="dspr-profile-cd-info">
                 <h2>{{ "$data->first_name $data->last_name" }}</h2>

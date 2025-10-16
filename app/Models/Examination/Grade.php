@@ -11,11 +11,9 @@ class Grade extends Model
  
     protected $table = 'grades';
  
-    // Fillable columns
     protected $fillable = [
-        'class',
-        'student_id',
         'classes_id',
+        'student_id',
         'semester_id',
         'school_years_id',
         'average',
