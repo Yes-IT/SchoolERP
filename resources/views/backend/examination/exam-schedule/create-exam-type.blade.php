@@ -136,7 +136,7 @@
                                                     <img src="{{ global_asset('backend/assets/images/edit-icon-primary.svg') }}" alt="Icon">
                                                 </button>
 
-                                                <button type="button" data-bs-target="#deleteNewExamTypeModal" data-bs-toggle="modal">
+                                                <button type="button" data-bs-target="#deleteNewExamTypeModal" data-bs-toggle="modal" class="delete-exam-btn deleteExamTypeBtn" data-id="{{ $exam->id }}">
                                                     <img src="{{ global_asset('backend/assets/images/bin-icon.svg') }}" alt="Icon">
                                                 </button>
                                             </div>
@@ -333,7 +333,7 @@
                                             <div  class="multi-input-grp">   
                                                 <div class="input-grp">
                                                     <label for="capacity">Description</label>
-                                                    <textarea name="description" id="" cols="30" rows="10"></textarea>
+                                                    <textarea name="description" id="description" cols="30" rows="10"></textarea>
                                                 </div>
                                             </div>
 
@@ -378,10 +378,14 @@
                                 <div class="sec-head head-center">
                                     <h2>Delete!</h2>
                                     <p>Are you sure you want to delete exam type?</p>
-                                    <div class="btn-wrp">
-                                        <button type="submit" class="cmn-btn">Delete</button>
-                                        <button type="button" class="cmn-btn" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
-                                    </div>
+                                    <form method="post" id="deleteExamTypeForm">
+                                        @csrf
+                                        @method('DELETE')
+                                        <div class="btn-wrp">
+                                            <button type="submit" class="cmn-btn">Delete</button>
+                                            <button type="button" class="cmn-btn" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -407,7 +411,7 @@ $(document).ready(function () {
             url: url,
             type: 'GET',
             success: function (response) {
-                console.log(response);
+                console.log('data in edit',response);
                 if (response.status) {
                     // Populate form fields
 
@@ -430,6 +434,17 @@ $(document).ready(function () {
         });
     });
 });
+</script>
+
+<script>
+     $(document).ready(function(){
+        $('.deleteExamTypeBtn').on('click', function () {
+            let examTypeId = $(this).data('id');
+            let url = "{{ route('exam-schedule.deleteExamType', ':id') }}";
+            url = url.replace(':id', examTypeId);
+            $('#deleteExamTypeForm').attr('action', url);
+        });
+    });
 </script>
 
 

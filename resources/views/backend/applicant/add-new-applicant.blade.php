@@ -31,15 +31,15 @@
                                         <div class="multi-input-grp grp-3">
                                             <div class="input-grp">
                                               <label for="ID">ID</label>
-                                              <input type="text" id="identification_number" name="identification_number"  placeholder="ID"    readonly >
+                                              <input type="text" id="custom_id" name="custom_id"  placeholder="ID"  readonly >
                                             </div>
                                             <div class="input-grp">
                                               <label for="">Last Name</label>
-                                              <input type="text" id="" name=""  placeholder="Last Name">
+                                              <input type="text" id="last_name" name="last_name"  placeholder="Last Name">
                                             </div>
                                             <div class="input-grp">
                                               <label for="">First Name</label>
-                                              <input  type="text" id="" name=""  placeholder="First Name">
+                                              <input  type="text" id="first_name" name="first_name"  placeholder="First Name">
                                             </div>
                                         </div>
                                       
@@ -50,22 +50,22 @@
                                             </div>
                                             <div class="input-grp">
                                               <label for="">Birthdate</label>
-                                              <input type="date" id="" name="" placeholder="Birthdate">
+                                              <input type="date" id="date_of_birth" name="date_of_birth" placeholder="Birthdate">
                                             </div>
                                             <div class="input-grp">
                                               <label for="">USA Cell</label>
-                                              <input type="text" id="" name="" placeholder="USA Cell">
+                                              <input type="text" id="usa_cell" name="usa_cell" placeholder="USA Cell">
                                             </div>
                                         </div>
                                       
                                         <div class="multi-input-grp grp-3">
                                             <div class="input-grp">
                                                 <label for="">Email</label>
-                                                <input type="text" name="" placeholder="Email">
+                                                <input type="text" id="email" name="email" placeholder="Email">
                                             </div>
                                             <div class="input-grp">
                                                 <label for="">High School (Application)</label>
-                                                <input type="text" name="" placeholder="High School (Application)">
+                                                <input type="text" id="high_school_application" name="high_school_application" placeholder="High School (Application)">
                                             </div>
                                         </div>
                                     </div>
@@ -83,10 +83,10 @@
                                                 <div class="multi-input-grp input-grp-5">
                                                     
                                                     <div class="input-grp">
-                                                      <input type="text" placeholder="Camp">
+                                                      <input type="text" id="camp" name="camp" placeholder="Camp">
                                                     </div>
                                                     <div class="input-grp">
-                                                         <input type="text" placeholder="Position">
+                                                         <input type="text" id="position" name="position" placeholder="Position">
                                                     </div>
 
                                                 </div>
@@ -106,36 +106,36 @@
                                         <div class="multi-input-grp grp-3">
                                             <div class="input-grp input-full">
                                                 <label for="">Fee</label>
-                                                <input id="" name="" type="text" placeholder="$1200.00">
+                                                <input id="fee" name="fee" type="text" placeholder="$1200.00">
                                             </div>
                                         
                                             <div class="input-grp">
                                                 <label for="">CC Last 4</label>
-                                                <input id="" name="" type="text" placeholder="Lorem">
+                                                <input id="cc_last_4" name="cc_last_4" type="text" placeholder="Lorem">
                                             </div>
 
                                             <div class="input-grp">
                                                 <label for="">Date Deposited</label>
-                                                <input id="" name="" type="text" placeholder="12/11/2001"  > 
+                                                <input type="text" id="date_deposited" name="date_deposited"  placeholder="12/11/2001"  > 
                                             </div>
 
                                             <div class="input-grp">
                                                 <label for="">References</label>
-                                                <input id="" name="" type="text" placeholder="Enter References" >
+                                                <input type="text" id="refernce" name="refernce"  placeholder="Enter References" >
                                             </div>
                                              <div class="input-grp">
                                                 <label for="">Pictures</label>
-                                                <input id="" name="" type="text" placeholder="59" >
+                                                <input  type="text"  id="pictures" name="pictures"placeholder="59" >
                                             </div>
                                         </div>
                                         
                                         <div class="multi-input-grp grp-3">
                                             <div class="input-grp checkbox">
-                                                <label>Transcript Hebrew <input id="" name="" type="checkbox"> </label>
+                                                <label>Transcript Hebrew <input id="transcript_hebrew" name="transcript_hebrew" type="checkbox"> </label>
                                             </div>
                                             
                                             <div class="input-grp checkbox">
-                                                <label>Transcript English <input id="" name="" type="checkbox" > </label>
+                                                <label>Transcript English <input id="transcript_english" name="transcript_english" type="checkbox" > </label>
                                             </div>
                                         </div>
                                     </div>
@@ -146,26 +146,26 @@
                                         <div class="multi-input-grp grp-3">
                                             <div class="input-grp input-full">
                                                 <label for="">Interview Date</label>
-                                                <input type="date" id="" name="" placeholder="Birthdate">
+                                                <input type="date" id="interview_date" name="interview_date" placeholder="Birthdate">
                                             </div>
                                         
                                             <div class="input-grp">
                                                 <label for="">Interview Time</label>
-                                                <input id="" name="" type="text" placeholder="Interview Time">
+                                                <input  type="text" id="interview_time" name="interview_time"  placeholder="Interview Time">
                                             </div>
 
                                             <div class="input-grp">
                                                 <label for="">Interview Location</label>
-                                                <select name="" id=""></select>
+                                                <select name="interview_location" id="interview_location"></select>
                                             </div>
 
                                             <div class="input-grp">
                                                 <label for="">Status</label>
-                                                <input id="" name="" type="text" placeholder="Status" >
+                                                <input id="status" name="status" type="text" placeholder="Status" >
                                             </div>
                                              <div class="input-grp">
                                                 <label for="">Coming</label>
-                                                <input id="" name="" type="text" placeholder="Coming" >
+                                                <input id="coming" name="coming" type="text" placeholder="Coming" >
                                             </div>
                                         </div>
                                      
@@ -175,7 +175,7 @@
                                         <div class="multi-input-grp grp-1">
                                             <div class="input-grp">
                                                 <label for="comment">Application Comment</label>
-                                                <textarea id="comment" name="comment" cols="50" rows="10" placeholder="Application Comment"></textarea>
+                                                <textarea id="application_comment" name="application_comment" cols="50" rows="10" placeholder="Application Comment"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -184,18 +184,18 @@
                                           <div class="multi-input-grp grp-1">
                                             <div class="input-grp">
                                                 <label for="comment">Scholarship Comment</label>
-                                                <textarea id="comment" name="comment" cols="50" rows="10" placeholder="Scholarship Comment"></textarea>
+                                                <textarea id="scholarship_comment" name="scholarship_comment" cols="50" rows="10" placeholder="Scholarship Comment"></textarea>
                                             </div>
                                         </div>
                                           <div class="multi-input-grp grp-1">
                                             <div class="input-grp">
                                                 <label for="comment">Tuition Comment</label>
-                                                <textarea id="comment" name="comment" cols="50" rows="10" placeholder="Tuition Comment"></textarea>
+                                                <textarea id="tution_comment" name="tution_comment" cols="50" rows="10" placeholder="Tuition Comment"></textarea>
                                             </div>
                                         </div>
 
                                        <div class="input-grp checkbox">
-                                            <label>Letter Sent <input id="" name="" type="checkbox"> </label>
+                                            <label>Letter Sent <input id="letter_sent" name="letter_sent" type="checkbox"> </label>
                                         </div>
 
                                     </div>
@@ -211,102 +211,101 @@
                                         
                                             <div class="input-grp">
                                                 <label for="">Last Name</label>
-                                                <input id="" name="" type="text" placeholder="Last Name">
+                                                <input id="parent_last_name" name="parent_last_name" type="text" placeholder="Last Name">
                                             </div>
 
                                             <div class="input-grp">
                                                 <label for="">Father Title</label>
-                                                <input id="" name="" type="text" placeholder="Father Title">
+                                                <input id="father_title" name="father_title" type="text" placeholder="Father Title">
                                             </div>
 
                                             <div class="input-grp">
                                                 <label for="">Father Name</label>
-                                                <input id="" name="" type="text" placeholder="Father Name" >
+                                                <input id="father_name" name="father_name" type="text" placeholder="Father Name" >
                                             </div>
                                             <div class="input-grp">
                                                 <label for="">Mother Title</label>
-                                                <input id="" name="" type="text" placeholder="Mother Title"  >
+                                                <input id="mother_title" name="mother_title" type="text" placeholder="Mother Title"  >
                                             </div>
                                             <div class="input-grp">
                                                 <label for="">Mother Name</label>
-                                                <input id="" name="" type="text" placeholder="Mother Name"  >
+                                                <input id="mother_name" name="mother_name" type="text" placeholder="Mother Name"  >
                                             </div>
 
                                              <div class="input-grp">
                                                 <label for="">Maiden Name</label>
-                                                <input id="" name="" type="text" placeholder="Maiden Name"  >
+                                                <input id="maiden_name" name="maiden_name" type="text" placeholder="Maiden Name"  >
                                             </div>
                                              <div class="input-grp">
                                                 <label for="">Address</label>
-                                                <input id="" name="" type="text" placeholder="Address"  >
+                                                <input id="address" name="address" type="text" placeholder="Address"  >
                                             </div>
                                              <div class="input-grp">
                                                 <label for="">City</label>
-                                                <input id="" name="" type="text" placeholder="City" >
+                                                <input id="city" name="city" type="text" placeholder="City" >
                                             </div>
 
                                              <div class="input-grp">
                                                 <label for="">State</label>
-                                                <input id="" name="" type="text" placeholder="State" >
+                                                <input id="state" name="state" type="text" placeholder="State" >
                                             </div>
                                              <div class="input-grp">
                                                 <label for="">Zip Code</label>
-                                                <input id="" name="" type="text" placeholder="Zip Code" >
+                                                <input id="zip_code" name="zip_code" type="text" placeholder="Zip Code" >
                                             </div>
                                             <div class="input-grp">
                                                 <label for="">Country</label>
-                                                <input id="" name="" type="text" placeholder="Country" >
+                                                <input id="country" name="country" type="text" placeholder="Country" >
                                             </div>
                                             <div class="input-grp">
                                                 <label for="">Marital Status</label>
-                                                <input id="" name="" type="text" placeholder="Marital Status" >
+                                                <input id="martial_status" name="martial_status" type="text" placeholder="Marital Status" >
                                             </div>
                                             <div class="input-grp">
                                                 <label for="">Marital Comment</label>
-                                                <input id="" name="" type="text" placeholder="Marital Comment" >
+                                                <input id="marital_comment" name="marital_comment" type="text" placeholder="Marital Comment" >
                                             </div>
                                             <div class="input-grp">
                                                 <label for="">Home Phone</label>
-                                                <input id="" name="" type="text" placeholder="Home Phone" >
+                                                <input id="home_phone" name="home_phone" type="text" placeholder="Home Phone" >
                                             </div>
                                             <div class="input-grp">
                                                 <label for="">Father Cell</label>
-                                                <input id="" name="" type="text" placeholder="Father Cell" >
+                                                <input id="father_cell" name="father_cell" type="text" placeholder="Father Cell" >
                                             </div>
                                             <div class="input-grp">
                                                 <label for="">Mother Cell</label>
-                                                <input id="" name="" type="text" placeholder="Mother Cell" >
+                                                <input id="mother_cell" name="mother_cell" type="text" placeholder="Mother Cell" >
                                             </div>
                                             <div class="input-grp">
                                                 <label for="">Father Email</label>
-                                                <input id="" name="" type="text" placeholder="Father Email" >
+                                                <input id="father_email" name="father_email" type="text" placeholder="Father Email" >
                                             </div>
                                             <div class="input-grp">
                                                 <label for="">Mother Email</label>
-                                                <input id="" name="" type="text" placeholder="Mother Email" >
+                                                <input id="mother_email" name="mother_email" type="text" placeholder="Mother Email" >
                                             </div>
                                             <div class="input-grp">
                                                 <label for="">Father Occupation</label>
-                                                <input id="" name="" type="text" placeholder="Father Occupation" >
+                                                <input id="father_occupation" name="father_occupation" type="text" placeholder="Father Occupation" >
                                             </div>
                                             <div class="input-grp">
                                                 <label for="">Mother Occupation</label>
-                                                <input id="" name="" type="text" placeholder="Mother Occupation" >
+                                                <input id="mother_occupation" name="mother_occupation" type="text" placeholder="Mother Occupation" >
                                             </div>
                                             <div class="input-grp">
                                                 <label for="">Additional Phone No.</label>
-                                                <input id="" name="" type="text" placeholder="Additional Phone No." >
+                                                <input id="additional_phone" name="additional_phone" type="text" placeholder="Additional Phone No." >
                                             </div>
                                             <div class="input-grp">
                                                 <label for="">Additional Email Addresses</label>
-                                                <input id="" name="" type="text" placeholder="Additional Email Addresses" >
+                                                <input id="additional_email" name="additional_email" type="text" placeholder="Additional Email Addresses" >
                                             </div>
                                             
                                         </div>
                                      
                                     </div>
                                   
-
                                     <div class="form-submission btn-sm align-right">
                                         <button type="submit" class="cmn-btn btn-sm">Save Applicant</button>
                                     </div>

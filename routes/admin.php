@@ -13,7 +13,11 @@ use App\Http\Controllers\Admin\SmsMailTemplateController;
 use App\Http\Controllers\Admin\LeaveController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\AssignmentController;
+<<<<<<< HEAD
 use App\Http\Controllers\Admin\{GradeController, AlumniController, TeacherController, RoomManagementController};
+=======
+use App\Http\Controllers\Admin\{GradeController,AlumniController,TeacherController,ApplicantController,RoomManagementController};
+>>>>>>> 81c88cb (changes by nazmin)
 
 
 Route::middleware(saasMiddleware())->group(function () {
@@ -206,6 +210,7 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::get('/schedule-interview', 'schedule_interview')->name('applicant.schedule_interview')->middleware('PermissionCheck:applicant_read');
                     Route::get('/profile', 'profile')->name('applicant.profile')->middleware('PermissionCheck:applicant_read');
                     Route::get('/add-new-applicant', 'add_new_applicant')->name('applicant.add_new_applicant')->middleware('PermissionCheck:applicant_read');
+                    Route::post('/store-applicants',  'store_applicants')->name('applicants.store')->middleware('PermissionCheck:applicant_read');
                     Route::get('/edit-applicant', 'edit_applicant')->name('applicant.edit_applicant')->middleware('PermissionCheck:applicant_read');
                     Route::get('/custom-applicant-chart', 'custom_applicant_chart')->name('applicant.custom_applicant_chart')->middleware('PermissionCheck:applicant_read');
                     Route::get('/contacts', 'contacts')->name('applicant.contacts')->middleware('PermissionCheck:applicant_read');

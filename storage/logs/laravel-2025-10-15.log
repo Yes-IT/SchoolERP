@@ -73,3 +73,7 @@
 #70 C:\\YESITLABS\\Git-School-ERP\\SchoolERP\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(16): require_once('C:\\\\YESITLABS\\\\Gi...')
 #71 {main}
 "} 
+[2025-10-15 12:52:27] production.ERROR: Maximum execution time of 60 seconds exceeded {"userId":1,"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Maximum execution time of 60 seconds exceeded at D:\\YES IT Labs\\github-school_erp\\SchoolERP\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php:421)
+[stacktrace]
+#0 {main}
+"} 

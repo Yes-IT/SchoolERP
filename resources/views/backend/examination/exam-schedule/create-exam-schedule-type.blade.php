@@ -12,7 +12,7 @@
                     <li><a href="../dashboard.html">Dashboard</a> /</li>
                     <li><a href="dashboard.html">Exam Schedule</a> /</li>
                     <li>Exam Schedule</li>
-                    
+                
                 </ul>
             </div>
             <div class="ds-pr-body">
@@ -27,7 +27,7 @@
                             </ul>
                         </div>
 
-                        <a href="#" class="cmn-btn btn-sm"><i class="fa-solid fa-plus"></i> Create New Type</a>
+                        {{-- <a href="#" class="cmn-btn btn-sm"><i class="fa-solid fa-plus"></i> Create New Type</a> --}}
 
                     </div>
 
@@ -47,7 +47,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                {{-- <tr>
                                     <td>1</td>
                                     <td>
                                        <h6>Exam Type</h6>
@@ -73,7 +73,63 @@
                                         <div class="upcoming cmn-tbl-btn green-bg"><img src="{{ asset('backend/assets/images/qlementine-icons_check-tick-16.svg') }}" alt="Icon">Approved</div>
                                         <div class="upcoming cmn-tbl-btn red-bg"><img src="{{ asset('backend/assets/images/maki_cross.svg') }}" alt="Icon">Reject</div>
                                     </td>
-                                </tr>
+                                </tr> --}}
+                               
+                                @forelse ($data['exam_request'] as $index => $request)
+                                    <tr>
+                                        <td>{{ $index + 1 }}</td>
+                                        <td>
+                                            <h6>{{ $request->examType->name ?? 'N/A' }}</h6>
+                                            <p>{{ $request->exam_date?->format('d/m/Y') }}</p>
+                                        </td>
+                                        <td>{{ $request->class->name ?? 'N/A' }}</td>
+                                        <td>
+                                            <h6>Status:</h6>
+                                            <p>{{ $request->room->room_no ?? 'N/A' }}</p>
+                                        </td>
+                                        <td>
+                                            <h6>Requested:</h6>
+                                            <p>{{ $request->start_time?->format('h:i A') }} - {{ $request->end_time?->format('h:i A') }}</p>
+                                        </td>
+                                        <td>{{ $request->duration }} Hours</td>
+                                        <td>{{ $request->teacher->first_name }} {{ $request->teacher->last_name }}</td>
+                                        <td>
+                                            {{-- <a href="{{ route('exam-schedule.checkAvailablity') }}" class="cmn-tbl-btn gap-10">
+                                                <img src="{{ asset('backend/assets/images/calender-icon.svg') }}" alt="Icon">
+                                                Check Availability
+                                            </a> --}}
+
+                                            <a href="{{ route('exam-schedule.checkAvailablity', $request->id) }}" class="cmn-tbl-btn gap-10">
+                                                <img src="{{ asset('backend/assets/images/calender-icon.svg') }}" alt="Icon">
+                                                Check Availability
+                                            </a>
+
+                                        </td>
+                                        <td>
+                                            
+                                            @if($request->status === \App\Enums\ExamRequestStatus::APPROVED)
+                                                <div class="upcoming cmn-tbl-btn green-bg">
+                                                    <img src="{{ asset('backend/assets/images/qlementine-icons_check-tick-16.svg') }}" alt="Icon">
+                                                    Approved
+                                                </div>
+                                            @elseif($request->status === \App\Enums\ExamRequestStatus::REJECTED)
+                                                <div class="upcoming cmn-tbl-btn red-bg">
+                                                    <img src="{{ asset('backend/assets/images/maki_cross.svg') }}" alt="Icon">
+                                                    Reject
+                                                </div>
+                                            @else
+                                                <div class="upcoming cmn-tbl-btn yellow-bg">
+                                                    Pending
+                                                </div>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="9" class="text-center">No exam requests found.</td>
+                                    </tr>
+                                @endforelse
+
 
                                 
                             </tbody>
