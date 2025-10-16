@@ -264,7 +264,7 @@ class StudentController extends Controller
     {
         $user = Auth::user();
         $student = DB::table('students')->where('user_id', $user->id)->leftJoin('student_class_mapping', 'student_class_mapping.student_id', 'students.id')->first();
-        dd($student);
+
 
         $assignments = DB::table('assignments')->where('class_id', $student->class_id)
             ->leftJoin('subjects', 'assignments.subject_id', '=', 'subjects.id')
@@ -276,6 +276,15 @@ class StudentController extends Controller
             ->get();
         $completed_assignments = DB::table('assignments')->where('class_id', $student->class_id)->where('student_id', $student->id)
             ->leftJoin('subjects', 'assignments.subject_id', '=', 'subjects.id')
+            ->mapping(function ($assignment) use ($student) {
+                $media = DB::table('assignment_media')
+                    ->where('assignment_id', $assignment->id)
+                    ->where('student_id', $student->id)
+                    ->get();
+                $assignment->media = $media;
+                return $assignment;
+            })
+            // ->leftJoin('assignment_media', 'assignments.id', '=', 'assignment_media.assignment_id')
             ->select(
                 'assignments.*',
                 'subjects.name as subject_name'
