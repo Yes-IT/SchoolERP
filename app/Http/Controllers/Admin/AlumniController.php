@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Interfaces\AlumniGalleryRepositoryInterface as InterfacesAlumniGalleryRepositoryInterface;
 use App\Interfaces\RecordedClassRepositoryInterface;
+use App\Models\StudentInfo\Student;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use ZipArchive;
@@ -23,14 +25,60 @@ class AlumniController extends Controller
             $this->recordedClassRepository = $recordedClassRepository;
         }
 
-    public function index()
+    
+    public function index(Request $request)
     {
-        return view('backend.alumni.index');
+        if ($request->ajax()) {
+            return $this->getFiltered($request);
+        }
+
+        $allStudents = Student::with([
+            'parent' => function ($query) {
+                $query->with([
+                    'user',
+                    'lastMessage',
+                    'unreadMessages'
+                ])->active();
+            }
+        ])
+        ->selectRaw("CONCAT(first_name, ' ', last_name) as name")
+        ->distinct()
+        ->get();
+
+        return view('backend.alumni.index', compact('allStudents'));
     }
 
-    public function alumni_list_info()
+    public function getFiltered(Request $request)
     {
-        return view('backend.alumni.alumni-list-info');
+        $perPage = $request->query('per_page', 10); // default 10
+        $query = Student::query();
+
+        if ($studentName = $request->query('student_name')) {
+            $query->whereRaw("CONCAT(first_name, ' ', last_name) = ?", [$studentName]);
+        }
+
+        // Use paginate instead of manually creating paginator
+        $alumni = $query->paginate($perPage)->appends($request->query());
+
+        $html = view('backend.alumni.list', compact('alumni', 'perPage'))->render();
+
+        return response()->json(['html' => $html]);
+    }
+
+
+    public function alumni_list_info($id)
+    {
+        $alumniInfo = Student::with([
+            'parent' => function ($query) {
+                $query->with([
+                    'user',
+                    'lastMessage',
+                    'unreadMessages'
+                ])->active();
+            }
+        ])->findOrFail($id);
+
+        return view('backend.alumni.alumni-list-info', compact('alumniInfo'));
     }
 
     public function gallery()
@@ -204,13 +252,16 @@ class AlumniController extends Controller
         }
     }
 
-    
+
     public function update_record(Request $request, $id)
     {
         try {
             $data = $request->only(['title', 'author', 'class_id', 'speaker', 'date', 'coded_name']);
             $file = $request->file('file');
             $result = $this->recordedClassRepository->update($id, $data, $file);
+            if (!$result['recordedClass']) {
+                throw new \Exception('Update failed: No data returned');
+            }
             return response()->json($result, 200);
         } catch (ValidationException $e) {
             return response()->json([
