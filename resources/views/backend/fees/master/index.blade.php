@@ -2,145 +2,282 @@
 @section('title')
     {{ @$data['title'] }}
 @endsection
+
+<style>
+    .number-of-installment {
+        margin-top: 15px;
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+    }
+
+    .number-of-installment input {
+        width: 170px;
+    }
+
+    .installment-form {
+        margin-top: 15px;
+    }
+
+    .installment-form h3 {
+        color: var(--primary-clr);
+        font-size: 18px;
+        position: relative;
+        top: 11px;
+    }
+
+    .installment-review {
+        text-align: left;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .autosplit {
+        position: relative;
+        left: 184px;
+        top: -49px;
+    }
+
+    .input-grp img {
+        position: relative;
+        left: 506px;
+        top: -36px;
+        width: 25px;
+        height: 28px;
+    }
+
+    .installment-select input {
+        width: 168px;
+    }
+</style>
+
 @section('content')
-    <div class="page-content">
+    <div class="dashboard-main light-bg">
 
-        {{-- bradecrumb Area S t a r t --}}
-        <div class="page-header">
-            <div class="row">
-                <div class="col-sm-6">
-                    <h4 class="bradecrumb-title mb-1">{{ $data['title'] }}</h1>
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ ___('common.home') }}</a></li>
-                        <li class="breadcrumb-item">{{ $data['title'] }}</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-        {{-- bradecrumb Area E n d --}}
+        <!-- Sidebar Begin -->
 
-        <!--  table content start -->
-        <div class="table-content table-basic mt-20">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">{{ $data['title'] }}</h4>
-                    @if (hasPermission('fees_master_create'))
-                        <a href="{{ route('fees-master.create') }}" class="btn btn-lg ot-btn-primary">
-                            <span><i class="fa-solid fa-plus"></i> </span>
-                            <span class="">{{ ___('common.add') }}</span>
-                        </a>
-                    @endif
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered role-table">
-                            <thead class="thead">
-                                <tr>
-                                    <th class="serial">{{ ___('common.sr_no') }}</th>
-                                    <th class="purchase">{{ ___('fees.group') }}</th>
-                                    <th class="purchase">{{ ___('fees.type') }}</th>
-                                    <th class="purchase">{{ ___('fees.due_date') }}</th>
-                                    <th class="purchase">{{ ___('fees.amount') }} ({{ Setting('currency_symbol') }})</th>
-                                    <th class="purchase">{{ ___('fees.fine_type') }}</th>
-                                    <th class="purchase">{{ ___('fees.percentage') }}</th>
-                                    <th class="purchase">{{ ___('fees.fine_amount') }} ({{ Setting('currency_symbol') }})</th>
-                                    <th class="purchase">{{ ___('common.status') }}</th>
-                                    @if (hasPermission('fees_master_update') || hasPermission('fees_master_delete'))
-                                        <th class="action">{{ ___('common.action') }}</th>
-                                    @endif
-                                </tr>
-                            </thead>
-                            <tbody class="tbody">
-                                @forelse ($data['fees_masters'] as $key => $row)
-                                <tr id="row_{{ $row->id }}">
-                                    <td class="serial">{{ ++$key }}</td>
-                                    <td>{{ $row->group->name }}</td>
-                                    <td>{{ $row->type->name }}</td>
-                                    <td>{{ dateFormat($row->due_date) }}</td>
-                                    <td>{{ $row->amount }}</td>
-                                    <td>
-                                        @if ($row->fine_type == 0)
-                                            <span class="badge-basic-info-text">{{ ___('fees.none') }}</span>
-                                        @elseif($row->fine_type == 1)
-                                            <span class="badge-basic-info-text">{{ ___('fees.percentage') }}</span>
-                                        @elseif($row->fine_type == 2)
-                                            <span class="badge-basic-info-text">{{ ___('fees.fixed') }}</span>
-                                        @endif    
-                                    </td>
-                                    <td>{{ $row->percentage }}</td>
-                                    <td>{{ $row->fine_amount }}</td>
-                                    <td>
-                                        @if ($row->status == App\Enums\Status::ACTIVE)
-                                            <span class="badge-basic-success-text">{{ ___('common.active') }}</span>
-                                        @else
-                                            <span class="badge-basic-danger-text">{{ ___('common.inactive') }}</span>
-                                        @endif
-                                    </td>
-                                    @if (hasPermission('fees_master_update') || hasPermission('fees_master_delete'))
-                                        <td class="action">
-                                            <div class="dropdown dropdown-action">
-                                                <button type="button" class="btn-dropdown" data-bs-toggle="dropdown"
-                                                    aria-expanded="false">
-                                                    <i class="fa-solid fa-ellipsis"></i>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-end ">
-                                                    @if (hasPermission('fees_master_update'))
-                                                        <li>
-                                                            <a class="dropdown-item"
-                                                                href="{{ route('fees-master.edit', $row->id) }}"><span
-                                                                    class="icon mr-8"><i
-                                                                        class="fa-solid fa-pen-to-square"></i></span>
-                                                                {{ ___('common.edit') }}</a>
-                                                        </li>
-                                                    @endif
-                                                    @if (hasPermission('fees_master_delete'))
-                                                        <li>
-                                                            <a class="dropdown-item" href="javascript:void(0);"
-                                                                onclick="delete_row('fees-master/delete', {{ $row->id }})">
-                                                                <span class="icon mr-8"><i
-                                                                        class="fa-solid fa-trash-can"></i></span>
-                                                                <span>{{ ___('common.delete') }}</span>
-                                                            </a>
-                                                        </li>
-                                                    @endif
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    @endif
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="100%" class="text-center gray-color">
-                                        <img src="{{ asset('images/no_data.svg') }}" alt="" class="mb-primary" width="100">
-                                        <p class="mb-0 text-center">{{ ___('common.no_data_available') }}</p>
-                                        <p class="mb-0 text-center text-secondary font-size-90">
-                                            {{ ___('common.please_add_new_entity_regarding_this_table') }}</p>
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                    <!--  table end -->
-                    <!--  pagination start -->
+        @include('backend.partials.sidebar')
+        <!-- End Of Sidebar -->
 
-                        <div class="ot-pagination pagination-content d-flex justify-content-end align-content-center py-3">
-                            <nav aria-label="Page navigation example">
-                                <ul class="pagination justify-content-between">
-                                    {!!$data['fees_masters']->links() !!}
-                                </ul>
-                            </nav>
+        <!-- Dashboard Body Begin -->
+
+        <div class="dashboard-body dspr-body-outer" style="    margin-left: -9px;">
+            <div class="dashboard-body-head">
+                <div class="dsbdy-head-left">
+                    <div class="dsbdy-search-form">
+                        <div class="input-grp search-field">
+                            <input type="text" placeholder="Search Page">
+                            <input type="submit" value="Search">
                         </div>
-
-                    <!--  pagination end -->
+                    </div>
+                </div>
+                <div class="dsbdy-head-right">
+                    <button class="tgl-flscrn" aria-label="Toggle fullscreen">
+                        <img src="{{ asset('images/fees/fullscreen-toggler-icon.svg') }}" alt="Icon">
+                    </button>
+                    <div class="profile-ctrl">
+                        <button class="profile-ctrl-toggler">
+                            <div class="pr-pic">
+                                <img src="{{ asset('images/fees/profile-picture.png') }}" alt="Profile Picture">
+                            </div>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+                        <div class="pr-ctrl-menu">
+                            <ul>
+                                <li><a href="profile.html">My Profile</a></li>
+                                <li><a href="../../set-password.html">Change Password</a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <div class="ds-breadcrumb">
+                <h1>Fees Master</h1>
+                <ul>
+                    <li><a href="./dashboard.html">Dashboard</a> /</li>
+                    <li><a href="./additional-fees.html">Additional Fees</a> /</li>
+                    <li>Fees Master</li>
+                </ul>
+            </div>
+
+            <div class="ds-pr-body">
+
+                <div class="ds-bdy-content w-100 align-items-start">
+
+                    <div class="dsbdy-cmn-card w55">
+                        <div class="sec-head">
+                            <h2>Create Fees Master</h2>
+                        </div>
+                        <div class="request-leave-form-wrp fees-master-form-wrp">
+
+                            <form action="{{ route('fees-master.store') }}" enctype="multipart/form-data" method="post"
+                                id="visitForm">
+                                @csrf
+
+                                <div class="request-leave-form fees-master-form">
+                                    <div class="multi-input-grp">
+                                        <div class="input-grp">
+                                            <label>Fees Group</label>
+                                            <select name="fees_group_id" id="fees_group_id" onchange="fill_details('fees_group_id');" required>
+                                                <option value="">Select Fees Group</option>
+                                                @php
+                                                    $selected = old(
+                                                        'fees_group_id',
+                                                        $fees_master->fees_group_id ?? null,
+                                                    );
+                                                @endphp
+
+                                                @foreach ($fees_groups as $group)
+                                                    <option value="{{ $group->id }}"
+                                                        {{ (string) $selected === (string) $group->id ? 'selected' : '' }}>
+                                                        {{ $group->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div class="input-grp">
+                                            <label>Fees Type</label>
+                                            <select name="fees_type_id" id="fees_type_id" onchange="fill_details('fees_type_id');" required>
+                                                <option value="Select Fees Type">Select Fees Type</option>
+                                                @php
+                                                    $selected = old('fees_type_id', $fees_master->fees_type_id ?? null);
+                                                @endphp
+                                                @foreach ($fees_types as $type)
+                                                    <option value="{{ $type->id }}"
+                                                        {{ (string) $selected === (string) $type->id ? 'selected' : '' }}>
+                                                        {{ $type->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="input-grp">
+                                        <label>Total Amount</label>
+                                        <input type="text" name="amount" id="amount"
+                                            placeholder="Enter total amount"  onkeyup="updateAmountDisplay();">
+                                    </div>
+                                    <div class="input-grp">
+                                        <div class="installment-toggle">
+                                            <input id="enable-installments" class="toggle-input" type="checkbox"
+                                                onchange="toggleInstallmentSection()" />
+                                            <label for="enable-installments" class="toggle-label">
+                                                <span class="toggle-track" aria-hidden="true">
+                                                    <span class="toggle-thumb" aria-hidden="true"></span>
+                                                </span>
+                                                <span class="toggle-text">Enable installments</span>
+                                            </label>
+                                        </div>
+
+                                        <div class="number-of-installment" style="display: none;">
+                                            <div class="installment-select">
+                                                <!-- <select id="installment-count" onchange="generateInstallmentRows()">
+                                                    <option>1</option>
+                                                    <option value="group-1">2</option>
+                                                    <option value="group-2">3</option>
+                                                    <option value="group-3">4</option>
+                                                    <option value="group-4">5</option>
+                                                </select> -->
+                                                <input type="number" name="total_installment" id="installment-count"
+                                                    min="0" max="5" onkeyup="generateInstallmentRows()"
+                                                    style="width: 168px;">
+                                            </div>
+
+                                            <div class="installment-toggle autosplit">
+                                                <input id="auto-split" class="toggle-input" type="checkbox"
+                                                    onchange="toggleInstallmentForm()" />
+                                                <label for="auto-split" class="toggle-label"
+                                                    style="position:relative; top:10px;">
+                                                    <span class="toggle-track" aria-hidden="true">
+                                                        <span class="toggle-thumb" aria-hidden="true"></span>
+                                                    </span>
+                                                    <span class="toggle-text">Auto split amount equally</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="installment-form" style="display:none;" id="installment_fields">
+                                            <h3>Installments</h3>
+                                            <hr>
+                                            <div class="multi-input-grp" id="installment-rows-container">
+                                                <div class="input-grp">
+                                                    <label>Installment 1</label>
+                                                    <input type="number" style="width: 200px;"
+                                                        name="installment_amount[]">
+                                                </div>
+                                                <div class="input-grp">
+                                                    <label style="position:relative; top: -9px; left:-40px;">Due
+                                                        Date</label>
+                                                    <input type="date" name="due_date[]"
+                                                        style= " width: 207px; position:relative;left:-116px; top:28px; height: 50px;">
+                                                </div>
+                                                <div class="input-grp">
+                                                    <img src="{{ asset('images/fees/bin-icon.svg') }}" alt="Icon">
+
+                                                </div>
+                                            </div>
+
+                                            <!-- Wrap these two in a flex row -->
+
+
+
+                                        </div>
+
+                                    </div>
+                                    <div class="btn-wrp justify-content-start">
+                                        <!-- <button type="button" class="cmn-btn btn-sm" data-bs-dismiss="modal" aria-label="Close">Cancel</button> -->
+                                        <button type="submit" class="cmn-btn btn-sm w-100">Save Fees Master</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="dsbdy-cmn-card w45">
+                        <div class="sec-head">
+                            <h3 class="h2-title">Summary Review</h3>
+                        </div>
+                        <div class="dsprprofile-course-info p-0">
+                            <table>
+                                <tr>
+                                    <td>Fees Group:</td>
+                                    <td id="fees_group_id_name"></td>
+                                </tr>
+                                <tr>
+                                    <td>Fees Type:</td>
+                                    <td id="fees_type_id_name"></td>
+                                </tr>
+                                <tr>
+                                    <td id="total_amount">Total Amount:</td>
+                                    <td>$100</td>
+                                </tr>
+                                <tr>
+                                    <td>Installments:</td>
+                                    <td>1</td>
+                                </tr>
+                            </table>
+                            <hr>
+                            <table>
+                                <h4 class="installment-review">Installment Schdule</h4>
+                                <tr>
+                                    <td>Installment 1:</td>
+                                    <td>$750</td>
+                                </tr>
+                                <tr>
+                                    <td>Installment 2:</td>
+                                    <td>$750</td>
+                                </tr>
+
+                            </table>
+
+                        </div>
+                    </div>
+
+                   
+                </div>
+
+            </div>
         </div>
-        <!--  table content end -->
 
     </div>
 @endsection
-
-@push('script')
-    @include('backend.partials.delete-ajax')
-@endpush

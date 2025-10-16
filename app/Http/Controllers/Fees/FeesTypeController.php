@@ -49,8 +49,10 @@ class FeesTypeController extends Controller
         return view('backend.fees.type.edit', compact('data'));
     }
 
-    public function update(FeesTypeUpdateRequest $request, $id)
+    public function update(FeesTypeUpdateRequest $request)
     {
+        #print_r($request->all());die;
+        $id = $request->edit_fee_id;
         $result = $this->repo->update($request, $id);
         if($result['status']){
             return redirect()->route('fees-type.index')->with('success', $result['message']);
@@ -75,4 +77,36 @@ class FeesTypeController extends Controller
             return response()->json($success);
         endif;
     }
+
+    public function filter(Request $request)
+{
+    $category = $request->input('category');
+
+    $query = \App\Models\Fees\FeesType::query();
+
+    if (!empty($category)) {
+        $query->where('category', $category);
+    }
+
+    $feesTypes = $query->get();
+
+    // Return JSON so JS can re-render table
+    return response()->json($feesTypes);
+}
+public function search(Request $request)
+{
+    $query = $request->get('query');
+
+    $feesTypes = \App\Models\Fees\FeesType::when($query, function ($q) use ($query) {
+        $q->where('name', 'like', "%{$query}%");
+    })->get();
+
+    // Build $data so the view's $data['fees_types'] works
+    $data = ['fees_types' => $feesTypes];
+
+    return response()->json([
+        'html' => view('backend.fees.type.fees-type-table', compact('data'))->render()
+    ]);
+}
+
 }

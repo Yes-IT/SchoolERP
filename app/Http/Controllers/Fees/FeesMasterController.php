@@ -29,8 +29,13 @@ class FeesMasterController extends Controller
     public function index()
     {
         $data['title']        = ___('fees.fees_master');
+         $fees_types   = \App\Models\Fees\FeesType::all();
+           $fees_groups = \App\Models\Fees\FeesGroup::all();
+            
+         
+        
         $data['fees_masters'] = $this->repo->getPaginateAll();
-        return view('backend.fees.master.index', compact('data'));
+        return view('backend.fees.master.index', compact('data','fees_types','fees_groups'));
     }
     
     public function getAllTypes(Request $request)
@@ -42,9 +47,9 @@ class FeesMasterController extends Controller
     public function create()
     {
         $data['title']        = ___('fees.fees_master');
-        $data['fees_types']   = $this->type->all();
-        $data['fees_groups']  = $this->group->all();
-        return view('backend.fees.master.create', compact('data'));
+          $fees_types   = $this->type->all();
+          $fees_groups  = $this->group->all();
+        return view('backend.fees.master.create', compact('data','fees_types','fees_groups'));
     }
 
     public function store(FeesMasterStoreRequest $request)
@@ -59,16 +64,19 @@ class FeesMasterController extends Controller
 
     public function edit($id)
     {
+        $data['fees_masters'] = \App\Models\Fees\FeesMaster::findOrFail($id);
         $data['title']        = ___('fees.fees_master');
-        $data['fees_master']  = $this->repo->show($id);
-        $data['fees_types']   = $this->type->all();
+           $fees_types   = \App\Models\Fees\FeesType::all();
+           $fees_groups = \App\Models\Fees\FeesGroup::all();
         $data['fees_groups']  = $this->group->all();
         // dd($data);
-        return view('backend.fees.master.edit', compact('data'));
+        return view('backend.fees.master.edit', compact('data','fees_types','fees_groups'));
     }
+    
 
     public function update(FeesMasterUpdateRequest $request, $id)
     {
+          $data['fees_masters'] = \App\Models\Fees\FeesMaster::findOrFail($id);
         $result = $this->repo->update($request, $id);
         if($result['status']){
             return redirect()->route('fees-master.index')->with('success', $result['message']);
@@ -93,4 +101,24 @@ class FeesMasterController extends Controller
             return response()->json($success);
         endif;      
     }
+    public function search(Request $request)
+{
+    $query = $request->input('query');
+
+    $data['fees_masters'] = \App\Models\Fees\FeesMaster::with(['group', 'type'])
+        ->when($query, function ($q) use ($query) {
+            $q->whereHas('group', function ($q2) use ($query) {
+                $q2->where('name', 'like', "%{$query}%");
+            })->orWhereHas('type', function ($q3) use ($query) {
+                $q3->where('name', 'like', "%{$query}%");
+            });
+        })
+        ->orderBy('id', 'desc')
+        ->get();
+
+    // Return partial HTML for table rows
+    $html = view('backend.fees.master.master-list', compact('data'))->render();
+
+    return response()->json(['html' => $html]);
+}
 }

@@ -38,7 +38,7 @@
 
 @section('content')
     <div class="ds-breadcrumb">
-        <h1>Low Inventory</h1>
+        <h1>Usage Report</h1>
         <ul>
             <li><a href="./dashboard.html">Dashboard</a> /</li>
             <li><a href="./additional-fees.html">Pantry</a> /</li>
@@ -55,7 +55,7 @@
             <div class="ds-cmn-table-wrp request-transcript-pg tbl-btn-new">
                 <div class="ds-content-head">
                     <div class="sec-head">
-                        <h3 class="h2-title">Low Stocks</h3>
+                        <h3 class="h2-title">Usage Report list</h3>
                     </div>
                     <div class="btn-wrp align-items-start">
                         <div class="dsbdy-filter-wrp p-0 align-items-start">
@@ -77,23 +77,21 @@
                                 <th>S. No</th>
                                 <th>Product Name</th>
                                 <th>Category</th>
-                                <th>Quantity in Stock</th>
+                                <th>Total Used Quantity</th>
+                                <th>Remark</th>
                                 <th>Threshold Value</th>
-                                <th>Low Inventory Status</th>
-                                <th>Last Updated At</th>
+                                <th>Updated At</th>
                             </tr>
                         </thead>
                         <tbody id="assetsBody">
-                            @forelse ($inventories as $index => $item)
+                            @forelse($inventories as $index => $item)
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
-                                    <td>{{ $item->product_name ?? 'N/A' }}</td>
-                                    <td>{{ $item->name ?? 'N/A' }}</td>
+                                    <td>{{ $item->product_name }}</td>
+                                    <td>{{ $item->name }}</td>
                                     <td>{{ $item->qty }}</td>
-                                    <td>{{ $item->threshold_value ?? 'N/A' }}</td>
-                                    <td>
-
-                                    </td>
+                                    <td>{{ $item->reason ?? '-' }}</td>
+                                    <td>{{ $item->unit ?? '-' }}</td>
                                     <td>{{ \Carbon\Carbon::parse($item->updated_at)->format('d M Y, h:i A') }}</td>
                                 </tr>
                             @empty
@@ -105,6 +103,7 @@
                             @endforelse
                         </tbody>
                     </table>
+
 
 
                 </div>

@@ -1,154 +1,272 @@
 @extends('backend.master')
-
 @section('title')
     {{ @$data['title'] }}
 @endsection
+
+<style>
+    .number-of-installment {
+        margin-top: 15px;
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+    }
+
+    .number-of-installment input {
+        width: 170px;
+    }
+
+    .installment-form {
+        margin-top: 15px;
+    }
+
+    .installment-form h3 {
+        color: var(--primary-clr);
+        font-size: 18px;
+          position: relative;
+    top: 11px;
+    }
+    .installment-review {
+        text-align: left;
+        font-size: 18px;
+        font-weight: 700;
+    }
+    .autosplit{
+        position: relative;
+        left: 184px;
+         top: -49px;
+    }
+    .input-grp img{
+    position: relative;
+    left: 506px;
+    top: -65px;
+    width: 25px;
+    height: 28px;
+    }
+    .installment-select input{
+        width: 168px;
+    }
+</style>
+
 @section('content')
-    <div class="page-content">
 
-        {{-- bradecrumb Area S t a r t --}}
-        <div class="page-header">
-            <div class="row">
-                <div class="col-sm-6">
-                    <h4 class="bradecrumb-title mb-1">{{ $data['title'] }}</h1>
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}"> {{ ___('common.home') }} </a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('religions.index') }}">{{ $data['title'] }}</a></li>
-                        <li class="breadcrumb-item">{{ ___('common.edit') }}</li>
 
-                    </ol>
-                </div>
-            </div>
-        </div>
-        {{-- bradecrumb Area E n d --}}
+    <div class="dashboard-main light-bg">
 
-        <div class="card ot-card">
-            <div class="card-body">
-                <form action="{{ route('fees-master.update', @$data['fees_master']->id) }}" enctype="multipart/form-data" method="post"
-                    id="visitForm">
-                    @csrf
-                    @method('PUT')
-                    <div class="row mb-3">
-                        <div class="col-lg-12">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="validationServer04" class="form-label">{{ ___('fees.fees_group') }} <span class="fillable">*</span></label>
-                                    <select class="nice-select niceSelect bordered_style wide @error('fees_group_id') is-invalid @enderror"
-                                    name="fees_group_id" id="validationServer04"
-                                    aria-describedby="validationServer04Feedback">
-                                        @foreach ($data['fees_groups'] as $item)
-                                            <option {{ old('fees_group_id',@$data['fees_master']->fees_group_id == $item->id ? 'selected':'') }} value="{{ $item->id }}">{{ $item->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('fees_group_id')
-                                        <div id="validationServer04Feedback" class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="validationServer04" class="form-label">{{ ___('fees.fees_type') }} <span class="fillable">*</span></label>
-                                    <select id="getSubjects" class="nice-select niceSelect bordered_style wide @error('fees_type_id') is-invalid @enderror" 
-                                    name="fees_type_id">
-                                        <option value="">{{ ___('student_info.select_section') }}</option>
-                                        @foreach ($data['fees_types'] as $item)
-                                            <option {{ old('fees_type_id',@$data['fees_master']->fees_type_id) == $item->id ? 'selected':'' }} value="{{ $item->id }}">{{ $item->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('fees_type_id')
-                                        <div id="validationServer04Feedback" class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="exampleDataList" class="form-label ">{{ ___('fees.due_date') }} <span
-                                            class="fillable">*</span></label>
-                                    <input class="form-control ot-input @error('due_date') is-invalid @enderror" name="due_date"
-                                        list="datalistOptions" id="exampleDataList" type="date"
-                                        placeholder="{{ ___('fees.enter_due_date') }}" value="{{ old('due_date',@$data['fees_master']->due_date) }}">
-                                    @error('due_date')
-                                        <div id="validationServer04Feedback" class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="exampleDataList" class="form-label ">{{ ___('fees.amount') }} ({{ Setting('currency_symbol') }}) <span
-                                            class="fillable">*</span></label>
-                                    <input class="form-control ot-input amount @error('amount') is-invalid @enderror" name="amount"
-                                        list="datalistOptions" id="exampleDataList" type="number"
-                                        placeholder="{{ ___('fees.enter_amount') }}" value="{{ old('amount',@$data['fees_master']->amount) }}">
-                                    @error('amount')
-                                        <div id="validationServer04Feedback" class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="validationServer04" class="form-label">{{ ___('fees.fine_type') }} <span class="fillable">*</span></label>
-                                    <select class="fine_type nice-select niceSelect bordered_style wide @error('fine_type') is-invalid @enderror"
-                                    name="fine_type" id="validationServer04"
-                                    aria-describedby="validationServer04Feedback">
-                                        <option {{ old('fine_type',@$data['fees_master']->fine_type) == App\Enums\FineType::NONE ? 'selected':'' }} value="{{ App\Enums\FineType::NONE }}">{{ ___('fees.none') }}</option>
-                                        <option {{ old('fine_type',@$data['fees_master']->fine_type) == App\Enums\FineType::PERCENTAGE ? 'selected':'' }} value="{{ App\Enums\FineType::PERCENTAGE }}">{{ ___('fees.percentage') }}</option>
-                                        <option {{ old('fine_type',@$data['fees_master']->fine_type) == App\Enums\FineType::FIX_AMOUNT ? 'selected':'' }} value="{{ App\Enums\FineType::FIX_AMOUNT }}">{{ ___('fees.fix_amount') }}</option>
-                                    </select>
-                                    @error('fine_type')
-                                        <div id="validationServer04Feedback" class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="validationServer04" class="form-label">{{ ___('common.status') }} <span class="fillable">*</span></label>
-                                    <select class="nice-select niceSelect bordered_style wide @error('status') is-invalid @enderror"
-                                    name="status" id="validationServer04"
-                                    aria-describedby="validationServer04Feedback">
-                                        <option {{ old('status',@$data['fees_master']->status == App\Enums\Status::ACTIVE ? 'selected':'') }} value="{{ App\Enums\Status::ACTIVE }}">{{ ___('common.active') }}</option>
-                                        <option {{ old('status',@$data['fees_master']->status == App\Enums\Status::INACTIVE ? 'selected':'') }} value="{{ App\Enums\Status::INACTIVE }}">{{ ___('common.inactive') }}
-                                        </option>
-                                    </select>
-                                    @error('status')
-                                        <div id="validationServer04Feedback" class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-6 mb-3 percentage">
-                                    <label for="exampleDataList" class="form-label ">{{ ___('fees.percentage') }} <span
-                                            class="fillable">*</span></label>
-                                    <input class="form-control ot-input percentage_input @error('percentage') is-invalid @enderror" name="percentage"
-                                        list="datalistOptions" id="exampleDataList" type="number"
-                                        placeholder="{{ ___('fees.enter_percentage') }}" value="{{ old('percentage',@$data['fees_master']->percentage) ?? 0 }}">
-                                    @error('percentage')
-                                        <div id="validationServer04Feedback" class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-6 mb-3 fine_amount">
-                                    <label for="exampleDataList" class="form-label ">{{ ___('fees.fine_amount') }} ({{ Setting('currency_symbol') }}) <span
-                                            class="fillable">*</span></label>
-                                    <input class="form-control ot-input fine_amount_input @error('fine_amount') is-invalid @enderror" name="fine_amount"
-                                        list="datalistOptions" id="exampleDataList" type="number"
-                                        placeholder="{{ ___('fees.enter_fine_amount') }}" value="{{ old('fine_amount',@$data['fees_master']->fine_amount) ?? 0 }}">
-                                    @error('fine_amount')
-                                        <div id="validationServer04Feedback" class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-12 mt-24">
-                                    <div class="text-end">
-                                        <button class="btn btn-lg ot-btn-primary"><span><i class="fa-solid fa-save"></i>
-                                            </span>{{ ___('common.submit') }}</button>
-                                    </div>
-                                </div>
-                            </div>
+        <!-- Sidebar Begin -->
+
+        @include('backend.partials.sidebar')
+        <!-- End Of Sidebar -->
+
+        <!-- Dashboard Body Begin -->
+
+        <div class="dashboard-body dspr-body-outer">
+            <div class="dashboard-body-head">
+                <div class="dsbdy-head-left">
+                    <div class="dsbdy-search-form">
+                        <div class="input-grp search-field">
+                            <input type="text" placeholder="Search Page">
+                            <input type="submit" value="Search">
                         </div>
                     </div>
+                </div>
+                <div class="dsbdy-head-right">
+                    <button class="tgl-flscrn" aria-label="Toggle fullscreen">
+                        <img src="{{ asset('images/fees/fullscreen-toggler-icon.svg') }}" alt="Icon">
+                    </button>
+                    <div class="profile-ctrl">
+                        <button class="profile-ctrl-toggler">
+                            <div class="pr-pic">
+                                <img src="{{ asset('images/fees/profile-picture.png') }}" alt="Profile Picture">
+                            </div>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+                        <div class="pr-ctrl-menu">
+                            <ul>
+                                <li><a href="profile.html">My Profile</a></li>
+                                <li><a href="../../set-password.html">Change Password</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ds-breadcrumb">
+                <h1>Fees Master</h1>
+                <ul>
+                    <li><a href="./dashboard.html">Dashboard</a> /</li>
+                    <li><a href="./additional-fees.html">Additional Fees</a> /</li>
+                    <li>Fees Master</li>
+                </ul>
+            </div>
+
+            <div class="ds-pr-body">
+
+                <div class="ds-bdy-content w-100 align-items-start">
+
+                    <div class="dsbdy-cmn-card w55">
+                        <div class="sec-head">
+                            <h2>Edit Fees Master</h2>
+                        </div>
+                        <div class="request-leave-form-wrp fees-master-form-wrp">
+                          
+                             <form action="{{ route('fees-master.edit' ,$data['fees_masters'] ->id) }}" enctype="multipart/form-data" method="post" id="visitForm">
+                             @csrf
+                                
+                                <div class="request-leave-form fees-master-form">
+                                    <div class="multi-input-grp">
+                                   <div class="input-grp">
+                                    <label>Fees Group</label>
+                                    <select name="fees_group_id" required>
+                                        <option value="">Select Fees Group</option>
+                                        @php
+                                            $selected = old('fees_group_id', $fees_master->fees_group_id ?? null);
+                                        @endphp
+
+                                        @foreach ($fees_groups as $group)
+                                            <option value="{{ $group->id }}" {{ (string)$selected === (string)$group->id ? 'selected' : '' }}  >
+                                                {{ $group->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+
+                                      
+
+
+
+                                        <div class="input-grp">
+                                            <label>Fees Type</label>
+                                            <select name="fees_type_id" required>
+                                                <option value="Select Fees Type">Select Fees Type</option>
+                                                 @php
+                                                  $selected = old('fees_type_id', $fees_master->fees_type_id?? null);
+                                               @endphp
+                                               @foreach ( $fees_types as $type)
+                                            <option value="{{ $type->id }}" {{ (string)$selected === (string)$type->id ? 'selected' : '' }}>
+                                                {{ $type->name }}
+                                            </option>
+                                        @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="input-grp">
+                                        <label>Total Amount</label>
+                                        <input type="text" name="amount" placeholder="Enter total amount">
+                                    </div>
+                                    <div class="input-grp">
+                                        <div class="installment-toggle">
+                                        <input id="enable-installments" class="toggle-input" type="checkbox" onchange="toggleInstallmentSection()" />
+                                        <label for="enable-installments" class="toggle-label">
+                                            <span class="toggle-track" aria-hidden="true">
+                                                <span class="toggle-thumb" aria-hidden="true"></span>
+                                            </span>
+                                            <span class="toggle-text">Enable installments</span>
+                                        </label>
+                                    </div>
+
+                                    <div class="number-of-installment" style="display: none;">
+                                        <div class="installment-select">
+                                            <!-- <select id="installment-count" onchange="generateInstallmentRows()">
+                                                <option>1</option>
+                                                <option value="group-1">2</option>
+                                                <option value="group-2">3</option>
+                                                <option value="group-3">4</option>
+                                                <option value="group-4">5</option>
+                                            </select> -->
+                                            <input type="number" name="total_installment" id="installment-count" min="0" max="5" onkeyup="generateInstallmentRows()" style="width: 168px;" >
+                                        </div>
+
+                                        <div class="installment-toggle autosplit" >
+                                            <input id="auto-split" class="toggle-input" type="checkbox" onchange="toggleInstallmentForm()"/>
+                                            <label for="auto-split" class="toggle-label" style="position:relative; top:10px;">
+                                                <span class="toggle-track" aria-hidden="true">
+                                                    <span class="toggle-thumb" aria-hidden="true"></span>
+                                                </span>
+                                                <span class="toggle-text">Auto split amount equally</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                        <div class="installment-form" style="display:none;">
+                                            <h3>Installments</h3>
+                                            <hr>
+                                            <div class="multi-input-grp" id="installment-rows-container">
+                                                <div class="input-grp">
+                                                    <label>Installment 1</label>
+                                                     <input type="number" style="width: 200px;" name="installment_amount[]"  >
+                                                </div>
+                                                <div class="input-grp">
+                                                    <label style="position:relative; top: -9px; left:-40px;">Due Date</label>
+                                                    <input type="date" name="due_date[]" style= " width: 207px; position:relative;left:-116px; top:28px; height: 50px;"   >
+                                                </div>
+                                                <div class="input-grp">
+                                                  <img src="{{ asset('images/fees/bin-icon.svg') }}" alt="Icon">
+                                                        
+                                                </div>
+                                            </div>
+
+                                            <!-- Wrap these two in a flex row -->
+
+
+
+                                        </div>
+
+                                    </div>
+                                    <div class="btn-wrp justify-content-start">
+                                        <!-- <button type="button" class="cmn-btn btn-sm" data-bs-dismiss="modal" aria-label="Close">Cancel</button> -->
+                                        <button type="submit" class="cmn-btn btn-sm w-100">Save Fees Master</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="dsbdy-cmn-card w45">
+                        <div class="sec-head">
+                            <h3 class="h2-title">Summary Review</h3>
+                        </div>
+                        <div class="dsprprofile-course-info p-0">
+                            <table>
+                                <tr>
+                                    <td>Fees Group:</td>
+                                    <td>Lorem Ipsum</td>
+                                </tr>
+                                <tr>
+                                    <td>Fees Type:</td>
+                                    <td>Lorem Ipsum</td>
+                                </tr>
+                                <tr>
+                                    <td>Total Amount:</td>
+                                    <td>$100</td>
+                                </tr>
+                                <tr>
+                                    <td>Installments:</td>
+                                    <td>1</td>
+                                </tr>
+                            </table>
+                            <hr>
+                             <table>
+                               <h4 class="installment-review">Installment Schdule</h4>
+                                <tr>
+                                    <td>Installment 1:</td>
+                                    <td>$750</td>
+                                </tr>
+                                <tr>
+                                    <td>Installment 2:</td>
+                                    <td>$750</td>
+                                </tr>
+                               
+                            </table>
+
+                        </div>
+                    </div>
+
+                  
+                </div>
+
             </div>
         </div>
+
     </div>
+
 @endsection

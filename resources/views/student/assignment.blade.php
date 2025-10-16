@@ -41,7 +41,6 @@
                     </thead>
                     <tbody>
                         @forelse ($assignments as $key => $assignment)
-                          
                             <tr data-assignment-id="{{ $assignment->id }}" data-subject-id="{{ $assignment->subject_id }}">
                                 <td>{{ $key + 1 }}</td>
                                 <td>{{ $assignment->subject_name }}</td>
@@ -94,142 +93,39 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                        incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur
-                                        adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                        @forelse ($assignments as $key => $assignment)
+                            <tr data-assignment-id="{{ $assignment->id }}"
+                                data-subject-id="{{ $assignment->subject_id }}">
+                                <td>{{ $key + 1 }}</td>
+                                <td>{{ $assignment->subject_name }}</td>
+                                <td>{{ $assignment->title }}</td>
+                                <td>
+                                    <div class="toggle-text-wrapper">
+                                        <div class="toggle-text-content">
+                                            {{ $assignment->description }}
+                                        </div>
                                     </div>
-                                </div>
 
-                            </td>
-                            <td>
-                                <button class="view-attachment-btn" data-bs-target="#viewAttachedDocs"
-                                    data-bs-toggle="modal"><img src="{{ asset('student/images/eye-white.svg') }}"
-                                        alt="Eye Icon"></button>
-                            </td>
-                            <td>04/02/2025</td>
-                            <td>04/02/2025</td>
-                            <td>
-                                <div class="submitted-on">
-                                    <span>04/15/2025</span>
-                                    <div class="submitted-tag">Submitted</div>
-                                </div>
-                            </td>
-                            <td>
-                                <button class="edit-file-btn cmn-tbl-btn" data-bs-target="#editFile"
-                                    data-bs-toggle="modal"><img src="{{ asset('student/images/edit-icon.svg') }}"
-                                        alt="Eye Icon"> Edit</button>
-                            </td>
-                            <td>50</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                        incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur
-                                        adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                </td>
+                                <td><button class="view-attachment-btn" data-bs-target="#viewAttachedDocs"
+                                        data-bs-toggle="modal"><img src="{{ asset('student/images/eye-white.svg') }}"
+                                            alt="Eye Icon"></button></td>
+
+                                <td>{{ \Carbon\Carbon::parse($assignment->assigned_date)->format('d/m/Y') }}</td>
+                                <td>{{ \Carbon\Carbon::parse($assignment->due_date)->format('d/m/Y') }}</td>
+                                <td>
+                                    <div class="file-upload">
+                                        <button class="file-upload-btn" data-bs-target="#viewAttachments"
+                                            data-bs-toggle="modal"><img
+                                                src="{{ asset('student/images/upload-white.svg') }}">Upload</button>
                                     </div>
-                                </div>
-
-                            </td>
-                            <td>
-                                <button class="view-attachment-btn" data-bs-target="#viewAttachedDocs"
-                                    data-bs-toggle="modal"><img src="{{ asset('student/images/eye-white.svg') }}"
-                                        alt="Eye Icon"></button>
-                            </td>
-                            <td>04/02/2025</td>
-                            <td>04/02/2025</td>
-                            <td>
-                                <div class="submitted-on">
-                                    <span>04/15/2025</span>
-                                    <div class="submitted-tag">Submitted</div>
-                                </div>
-                            </td>
-                            <td>
-                                <button class="edit-file-btn cmn-tbl-btn" data-bs-target="#editFile"
-                                    data-bs-toggle="modal"><img src="{{ asset('student/images/edit-icon.svg') }}"
-                                        alt="Eye Icon"> Edit</button>
-                            </td>
-                            <td>50</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                        incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur
-                                        adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                </div>
-
-                            </td>
-                            <td>
-                                <button class="view-attachment-btn" data-bs-target="#viewAttachedDocs"
-                                    data-bs-toggle="modal"><img src="{{ asset('student/images/eye-white.svg') }}"
-                                        alt="Eye Icon"></button>
-                            </td>
-                            <td>04/02/2025</td>
-                            <td>04/02/2025</td>
-                            <td>
-                                <div class="submitted-on">
-                                    <span>04/15/2025</span>
-                                    <div class="submitted-tag">Submitted</div>
-                                </div>
-                            </td>
-                            <td>
-                                <button class="edit-file-btn cmn-tbl-btn" data-bs-target="#editFile"
-                                    data-bs-toggle="modal"><img src="{{ asset('student/images/edit-icon.svg') }}"
-                                        alt="Eye Icon"> Edit</button>
-                            </td>
-                            <td>50</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                        incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur
-                                        adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                </div>
-
-                            </td>
-                            <td>
-                                <button class="view-attachment-btn" data-bs-target="#viewAttachedDocs"
-                                    data-bs-toggle="modal"><img src="{{ asset('student/images/eye-white.svg') }}"
-                                        alt="Eye Icon"></button>
-                            </td>
-                            <td>04/02/2025</td>
-                            <td>04/02/2025</td>
-                            <td>
-                                <div class="submitted-on">
-                                    <span>04/15/2025</span>
-                                    <div class="submitted-tag">Submitted</div>
-                                </div>
-                            </td>
-                            <td>
-                                <button class="edit-file-btn cmn-tbl-btn" data-bs-target="#editFile"
-                                    data-bs-toggle="modal"><img src="{{ asset('student/images/edit-icon.svg') }}"
-                                        alt="Eye Icon"> Edit</button>
-                            </td>
-                            <td>50</td>
-                        </tr>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center">No assignments found.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -278,8 +174,7 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true"><img src="{{ asset('student/images/cross-icon.svg') }}"
-                            alt="Icon"></span>
+                    <span aria-hidden="true"><img src="{{ asset('student/images/cross-icon.svg') }}" alt="Icon"></span>
                 </button>
 
                 <div class="modal-body">

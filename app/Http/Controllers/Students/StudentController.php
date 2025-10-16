@@ -263,11 +263,10 @@ class StudentController extends Controller
     public function studentAssignment()
     {
         $user = Auth::user();
-        $student = DB::table('students')->where('user_id', $user->id)->first();
-        // dd($student);
+        $student = DB::table('students')->where('user_id', $user->id)->leftJoin('student_class_mapping', 'student_class_mapping.student_id', 'students.id')->first();
+        dd($student);
 
-
-        $assignments = DB::table('assignments')
+        $assignments = DB::table('assignments')->where('class_id', $student->class_id)
             ->leftJoin('subjects', 'assignments.subject_id', '=', 'subjects.id')
             ->select(
                 'assignments.*',
@@ -275,8 +274,15 @@ class StudentController extends Controller
             )
             ->orderBy('assignments.assigned_date', 'desc')
             ->get();
-        // dd($assignments);
-        return view('student.assignment', compact('assignments'));
+        $completed_assignments = DB::table('assignments')->where('class_id', $student->class_id)->where('student_id', $student->id)
+            ->leftJoin('subjects', 'assignments.subject_id', '=', 'subjects.id')
+            ->select(
+                'assignments.*',
+                'subjects.name as subject_name'
+            )
+            ->orderBy('assignments.assigned_date', 'desc')
+            ->get();
+        return view('student.assignment', compact('assignments', 'completed_assignments'));
     }
 
 

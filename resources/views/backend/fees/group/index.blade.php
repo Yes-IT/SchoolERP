@@ -2,127 +2,278 @@
 @section('title')
     {{ @$data['title'] }}
 @endsection
-@section('content')
-    <div class="page-content">
+<style>
+    .group-modal {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        left: 15px;
+    }
 
-        {{-- bradecrumb Area S t a r t --}}
-        <div class="page-header">
-            <div class="row">
-                <div class="col-sm-6">
-                    <h4 class="bradecrumb-title mb-1">{{ $data['title'] }}</h1>
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ ___('common.home') }}</a></li>
-                        <li class="breadcrumb-item">{{ $data['title'] }}</li>
-                    </ol>
+    .modal-body {
+        width: 615px;
+    }
+
+    .input-grp input {
+        height: 37px;
+    }
+
+    .input-grp label {
+        color: var(--primary-clr);
+        font-size: 15px;
+    }
+
+    .cmn-btn {
+        position: relative;
+        left: 31px;
+    }
+
+    .cross-icon {
+        position: relative;
+        left: -161px;
+        top: 11px;
+    }
+    
+.ds-cmn-info-cards-v2 .col-lg-4:nth-child(n+4) {
+    margin-top: 20px; /* adjust as per design */
+}
+
+</style>
+@section('content')
+
+
+    <div class="dashboard-main light-bg">
+
+        <!-- Sidebar Begin -->
+
+        @include('backend.partials.sidebar')
+        <!-- End Of Sidebar -->
+
+        <!-- Dashboard Body Begin -->
+
+        <div class="dashboard-body dspr-body-outer">
+            <div class="dashboard-body-head">
+                <div class="dsbdy-head-left">
+                    <div class="dsbdy-search-form">
+                        <div class="input-grp search-field">
+                            <input type="text" placeholder="Search Page">
+                            <input type="submit" value="Search">
+                        </div>
+                    </div>
+                </div>
+                <div class="dsbdy-head-right">
+                    <button class="tgl-flscrn" aria-label="Toggle fullscreen">
+                        <img src="{{ asset('images/fees/fullscreen-toggler-icon.svg') }}" alt="Icon">
+                    </button>
+                    <div class="profile-ctrl">
+                        <button class="profile-ctrl-toggler">
+                            <div class="pr-pic">
+                                <img src="{{ asset('images/fees/profile-picture.png') }}" alt="Profile Picture">
+                            </div>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+                        <div class="pr-ctrl-menu">
+                            <ul>
+                                <li><a href="profile.html">My Profile</a></li>
+                                <li><a href="../../set-password.html">Change Password</a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        {{-- bradecrumb Area E n d --}}
 
-        <!--  table content start -->
-        <div class="table-content table-basic mt-20">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">{{ $data['title'] }}</h4>
-                    @if (hasPermission('fees_group_create'))
-                        <a href="{{ route('fees-group.create') }}" class="btn btn-lg ot-btn-primary">
-                            <span><i class="fa-solid fa-plus"></i> </span>
-                            <span class="">{{ ___('common.add') }}</span>
-                        </a>
-                    @endif
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered role-table">
-                            <thead class="thead">
-                                <tr>
-                                    <th class="serial">{{ ___('common.sr_no') }}</th>
-                                    <th class="purchase">{{ ___('common.name') }}</th>
-                                    <th class="purchase">{{ ___('fees.description') }}</th>
-                                    <th class="purchase">{{ ___('common.status') }}</th>
-                                    @if (hasPermission('fees_group_update') || hasPermission('fees_group_delete'))
-                                        <th class="action">{{ ___('common.action') }}</th>
-                                    @endif
-                                </tr>
-                            </thead>
-                            <tbody class="tbody">
-                                @forelse ($data['fees_groups'] as $key => $row)
-                                <tr id="row_{{ $row->id }}">
-                                    <td class="serial">{{ ++$key }}</td>
-                                    <td>{{ $row->name }}</td>
-                                    <td>{{ $row->description }}</td>
-                                    <td>
-                                        @if ($row->status == App\Enums\Status::ACTIVE)
-                                            <span class="badge-basic-success-text">{{ ___('common.active') }}</span>
-                                        @else
-                                            <span class="badge-basic-danger-text">{{ ___('common.inactive') }}</span>
-                                        @endif
-                                    </td>
-                                    @if (hasPermission('fees_group_update') || hasPermission('fees_group_delete'))
-                                        <td class="action">
-                                            <div class="dropdown dropdown-action">
-                                                <button type="button" class="btn-dropdown" data-bs-toggle="dropdown"
-                                                    aria-expanded="false">
-                                                    <i class="fa-solid fa-ellipsis"></i>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-end ">
-                                                    @if (hasPermission('fees_group_update'))
-                                                        <li>
-                                                            <a class="dropdown-item"
-                                                                href="{{ route('fees-group.edit', $row->id) }}"><span
-                                                                    class="icon mr-8"><i
-                                                                        class="fa-solid fa-pen-to-square"></i></span>
-                                                                {{ ___('common.edit') }}</a>
-                                                        </li>
-                                                    @endif
-                                                    @if (hasPermission('fees_group_delete'))
-                                                        <li>
-                                                            <a class="dropdown-item" href="javascript:void(0);"
-                                                                onclick="delete_row('fees-group/delete', {{ $row->id }})">
-                                                                <span class="icon mr-8"><i
-                                                                        class="fa-solid fa-trash-can"></i></span>
-                                                                <span>{{ ___('common.delete') }}</span>
-                                                            </a>
-                                                        </li>
-                                                    @endif
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    @endif
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="100%" class="text-center gray-color">
-                                        <img src="{{ asset('images/no_data.svg') }}" alt="" class="mb-primary" width="100">
-                                        <p class="mb-0 text-center">{{ ___('common.no_data_available') }}</p>
-                                        <p class="mb-0 text-center text-secondary font-size-90">
-                                            {{ ___('common.please_add_new_entity_regarding_this_table') }}</p>
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+            <div class="ds-breadcrumb">
+                <h1>Fees Group</h1>
+                <ul>
+                    <li><a href="./dashboard.html">Dashboard</a> /</li>
+                    <li><a href="./additional-fees.html">Additional Fees</a> /</li>
+                    <li>Fees Group</li>
+                </ul>
+            </div>
+            <div class="ds-pr-body">
+                <div class="ds-cmn-table-wrp">
+
+                    <div class="ds-content-head has-drpdn">
+                        <div class="sec-head">
+                            <h2>Fees Groups List</h2>
+                        </div>
+                        <div class="ds-cmn-filter-wrp">
+                            <div class="dsbdy-filter-wrp p-0 align-items-start">
+                                <div class="input-grp search-field mb-0">
+                                    <input type="text" id="searchGroup"  placeholder="Search Group">
+                                    <input type="submit" value="Search" onclick="searchFeesGroup()">
+                                </div>
+                               
+                                <a href="#" class="cmn-btn btn-sm flex-shrink-0" data-bs-toggle="modal"
+                                    data-bs-target="#creategroup">
+                                    <i class="fa-solid fa-plus"></i> Create Group
+                                </a>
+
+                            </div>
+                        </div>
                     </div>
-                    <!--  table end -->
-                    <!--  pagination start -->
 
-                        <div class="ot-pagination pagination-content d-flex justify-content-end align-content-center py-3">
-                            <nav aria-label="Page navigation example">
-                                <ul class="pagination justify-content-between">
-                                    {!!$data['fees_groups']->links() !!}
-                                </ul>
-                            </nav>
+                    <div class="ds-cmn-info-cards-wrp ds-cmn-info-cards-v2">
+                        <div class="row g-3 mt-4" id="feesGroupCards"><!-- row outside loop with gap -->
+                            @foreach($data['fees_groups'] as $group)
+                                <div class="col-lg-4 col-md-6 col-sm-12">
+                                    <div class="ds-cmn-info-card h-200">
+                                        <div class="ds-cmn-ic-head d-flex justify-content-between align-items-center">
+                                            <h3 class="clr-primary mb-0">{{ $group->name }}</h3>
+                                            <div class="actions-wrp">
+                                                @if($group->status == 1)
+                                                    <span class="cmn-tbl-btn green-bg">Active</span>
+                                                @else
+                                                    <span class="cmn-tbl-btn red-bg">Inactive</span>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        <div class="ds-cmn-ic-body">
+                                            <p>{{ $group->description }}</p>
+                                        </div>
+
+                                        <div
+                                            class="ds-cmn-ic-ftr actions-wrp d-flex justify-content-between align-items-center">
+                                            <p class="mb-0">450 students assigned</p>
+                                            <div class="btn-wrp d-flex gap-2">
+                                                <button type="button" class="edit-group-btn" data-bs-toggle="modal"
+                                                    data-bs-target="#editgroup" data-id="{{ $group->id }}"
+                                                    data-name="{{ $group->name }}" data-description="{{ $group->description }}">
+                                                    <img src="{{ asset('images/fees/edit-icon-primary.svg') }}" alt="Icon">
+                                                </button>
+
+                                           <button type="button"
+                                                    data-id="{{ $group->id }}"
+                                                    onclick="deletefeesgroup(this)">
+                                                <img src="{{ asset('images/fees/bin-icon.svg') }}" alt="Delete">
+                                            </button>
+
+
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="modal fade cmn-popwrp pop800" id="creategroup" tabindex="-1" role="dialog" aria-labelledby="addVideo"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"><img src="{{ asset('images/fees/cross-icon.svg') }}" alt="Icon"
+                                class="cross-icon" style="    position: relative; left: -150px; top: 13px;"></span>
+
+
+                    </button>
+
+                    <div class="modal-body">
+                        <div class="cmn-pop-content-wrapper">
+                            <div class="cmn-pop-head">
+                                <h2>Create New Fees Group</h2>
+                            </div>
+
+
+
+                            <div class="cmn-tab-content">
+                                <form action="{{ route('fees-group.store') }}" enctype="multipart/form-data" method="post"
+                                    id="visitForm">
+                                    @csrf
+                                    <div class="multi-input-grp grp-2 mt-3 group-modal">
+                                        <div class="group-modal">
+                                            <div class="input-grp">
+                                                <label for="title">Group Name</label>
+                                                <input id="title" name="name" type="text" placeholder="Title Name"
+                                                    style="height:37px;" />
+                                            </div>
+
+                                            <div class="input-grp" style="margin-top: 10px;">
+                                                <label for="author">Description</label>
+                                                <input id="author" name="description" type="text" placeholder="Author Name"
+                                                    style="height:37px; width: 500px;" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+
+
+                                    <button class="btn-sm cmn-btn">Create Group</button>
+                                </form>
+
+                            </div>
                         </div>
 
-                    <!--  pagination end -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    </div>
+
+    <div class="modal fade cmn-popwrp pop800" id="editgroup" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">
+                        <img src="{{ asset('images/fees/cross-icon.svg') }}" alt="Close"
+                            style="position:relative; left:-150px; top:13px;">
+                    </span>
+                </button>
+
+                <div class="modal-body">
+                    <div class="cmn-pop-content-wrapper">
+                        <div class="cmn-pop-head">
+                            <h2>Edit Fees Group </h2>
+                        </div>
+
+
+                        <form action="{{ route('fees-group.update', $group->id) }}" enctype="multipart/form-data"
+                            method="post" id="visitForm">
+                            @csrf
+                            @method('PUT')
+
+
+
+
+                            <div class="multi-input-grp grp-2 mt-3 group-modal">
+                                <div class="group-modal">
+                                    <div class="input-grp">
+                                        <label for="edit_name">Group Name</label>
+                                        <input id="edit_name" name="name" type="text" placeholder="Title Name"
+                                            style="height:37px;" value="{{ old('name', $group->name ?? '') }}" />
+                                    </div>
+
+                                    <div class="input-grp" style="margin-top: 10px;">
+                                        <label for="edit_description">Description</label>
+                                        <input id="edit_description" name="description" type="text"
+                                            placeholder="Description" style="height:37px; width: 500px;"
+                                            value="{{ old('name', $group->description ?? '') }}" />
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-sm cmn-btn mt-3">Update Group</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-        <!--  table content end -->
+    </div>
 
     </div>
-@endsection
+    </div>
 
-@push('script')
-    @include('backend.partials.delete-ajax')
-@endpush
+@endsection

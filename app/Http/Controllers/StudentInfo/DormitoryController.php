@@ -832,7 +832,7 @@ class DormitoryController extends Controller
     }
 
 
-    public function pantry()              
+    public function pantry()
     {
 
         return view('backend.dormitory.pantry.index');
@@ -865,12 +865,122 @@ class DormitoryController extends Controller
 
     public function requestedInventory()
     {
-        return view('backend.dormitory.requested_inventory.index');
+
+        $requests = \DB::table('pantry_request_inventory as pri')
+            ->leftJoin('pantry_inventory as pi', 'pri.asset_id', '=', 'pi.id')
+            ->leftJoin('products as prod', 'pi.product_id', '=', 'prod.id')
+            ->leftJoin('category_list as cat', 'pi.category_id', '=', 'cat.id')
+            ->select(
+                'pri.id',
+                'pri.asset_id',
+                'pri.quantity',
+                'pri.reason',
+                'pri.status',
+                'pri.assign_status',
+                'pri.created_at',
+                'prod.name as product_name',
+                'cat.name as category_name'
+            )
+            ->orderBy('pri.id', 'desc')
+            ->get();
+
+
+        return view('backend.dormitory.requested_inventory.index', compact('requests'));
     }
+
 
 
     public function lowInventory()
     {
-        return view('backend.dormitory.low_inventory.index');
+        $inventories = \DB::table('pantry_inventory')
+            ->join('products', 'pantry_inventory.product_id', '=', 'products.id')
+            ->join('category_list', 'pantry_inventory.category_id', '=', 'category_list.id')
+            ->where('pantry_inventory.qty', '<=', value: 10)
+            ->orderBy('pantry_inventory.updated_at', 'desc')
+            ->select(
+                'pantry_inventory.*',
+                'products.product_name',
+                'category_list.name'
+            )
+            ->get();
+
+        #print_r($inventories);die;
+        // dd($inventories);
+
+        return view('backend.dormitory.low_inventory.index', compact('inventories'));
+    }
+
+
+    public function updateRequestInventoryStatus(Request $request, $id)
+    {
+        try {
+            $requestItem = \DB::table('pantry_request_inventory')->where('id', $id)->first();
+
+            if (!$requestItem) {
+                return response()->json(['success' => false, 'message' => 'Request not found']);
+            }
+
+            \DB::table('pantry_request_inventory')
+                ->where('id', $id)
+                ->update([
+                    'status' => $request->status,
+                    'updated_at' => now()
+                ]);
+
+            $statusText = match ($request->status) {
+                3 => 'Approved',
+                4 => 'Rejected',
+                default => 'Updated'
+            };
+
+            return response()->json([
+                'success' => true,
+                'message' => "Request has been {$statusText} successfully."
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating status: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+
+
+    public function usageReport()
+    {
+        // Step 1: Deduct approved request quantities from inventory (only once)
+        $approvedRequests = \DB::table('pantry_request_inventory')
+            ->where('status', 4)
+            ->get();
+
+        foreach ($approvedRequests as $req) {
+            // Deduct only if stock is sufficient
+            \DB::table('pantry_inventory')
+                ->where('id', $req->asset_id)
+                ->decrement('qty', $req->quantity);
+
+            // Optional: Mark processed so we don't deduct twice
+            \DB::table('pantry_request_inventory')
+                ->where('id', $req->id)
+                ->update(['status' => 4]); // mark as available or processed
+        }
+
+        // Step 2: Fetch updated pantry inventory data
+        $inventories = \DB::table('pantry_inventory')
+            ->join('products', 'pantry_inventory.product_id', '=', 'products.id')
+            ->join('category_list', 'pantry_inventory.category_id', '=', 'category_list.id')
+            ->select(
+                'pantry_inventory.id',
+                'products.product_name',
+                'category_list.name',
+                'pantry_inventory.qty',
+                'pantry_inventory.reason',
+                'pantry_inventory.updated_at',
+                'pantry_inventory.unit'
+            )
+            ->orderBy('pantry_inventory.updated_at', 'desc')
+            ->get();
+        return view('backend.dormitory.usage_report.index', compact('inventories'));
     }
 }

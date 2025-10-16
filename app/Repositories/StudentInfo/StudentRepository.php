@@ -541,10 +541,10 @@ class StudentRepository implements StudentInterface
                 foreach ($classIds as $index => $classId) {
                     if (empty($teacherIds[$index])) continue;
 
-                    DB::table('student_class_mapping')->insert([
+                    DB::table('class_student')->insert([
                         'student_id' => $row->id,
                         'class_id'   => $classId,
-                        'teacher_id' => $teacherIds[$index],
+                        // 'teacher_id' => $teacherIds[$index],
                         'status'     => 1,
                         'created_at' => now(),
                         'updated_at' => now(),

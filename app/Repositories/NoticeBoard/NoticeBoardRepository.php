@@ -40,7 +40,6 @@ class NoticeBoardRepository implements NoticeBoardInterface
     {
         $user  = Auth::user();
 
-
         $query = $this->model::query();
         if ($user->role_id != RoleEnum::SUPERADMIN) {
             if ($user->role_id == RoleEnum::STAFF || $user->role_id == RoleEnum::TEACHER) {
@@ -53,7 +52,6 @@ class NoticeBoardRepository implements NoticeBoardInterface
                     ->orWhereNull('department_id');
             });
         }
-
         return $query->latest()->orderByDesc('id')->paginate(10);
     }
 
@@ -82,11 +80,11 @@ class NoticeBoardRepository implements NoticeBoardInterface
             $row                    = new $this->model;
             $row->title             = $request->title;
             $row->publish_date      = date('Y-m-d H:i:s', strtotime($request->publish_date));
-            $row->date              = date('Y-m-d', strtotime($request->date));
+            // $row->date              = date('Y-m-d', strtotime($request->date));
 
 
-            $row->is_visible_web       = $request->is_visible_web;
-            $row->status               = $request->status;
+            $row->is_visible_web       = $request->is_visible_web ?? 0;
+            // $row->status               = $request->status;
             $row->description          = $request->description;
             $row->visible_to           = $request->visible_to;
             $row->department_id        = !empty($request->department_id) ? $request->department_id : null;
@@ -157,8 +155,8 @@ class NoticeBoardRepository implements NoticeBoardInterface
             $row->publish_date      = date('Y-m-d H:i:s', strtotime($request->publish_date));
             $row->date              = date('Y-m-d', strtotime($request->date));
 
-            $row->is_visible_web       = $request->is_visible_web;
-            $row->status               = $request->status;
+            $row->is_visible_web       = $request->is_visible_web ?? 0;
+            // $row->status               = $request->status;
             $row->description          = $request->description;
             $row->visible_to           = $request->visible_to;
             if (!empty(array_intersect($student_parent_roles, $request->visible_to ?? []))) {

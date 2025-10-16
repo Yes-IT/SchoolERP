@@ -7,6 +7,8 @@ use App\Http\Requests\Fees\Group\FeesGroupStoreRequest;
 use App\Http\Requests\Fees\Group\FeesGroupUpdateRequest;
 use App\Interfaces\Fees\FeesGroupInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
 
 class FeesGroupController extends Controller
 {
@@ -21,7 +23,7 @@ class FeesGroupController extends Controller
     {
         $data['title']              = ___('fees.fees_group');
         $data['fees_groups'] = $this->repo->getPaginateAll();
-
+        #print_r($data['fees_groups']);die;
         return view('backend.fees.group.index', compact('data'));
 
     }
@@ -50,14 +52,48 @@ class FeesGroupController extends Controller
         return view('backend.fees.group.edit', compact('data'));
     }
 
-    public function update(FeesGroupUpdateRequest $request, $id)
-    {
+   public function update(FeesGroupUpdateRequest $request, $id)
+{
+    try {
+        // Log the incoming request data and ID
+        Log::info('FeesGroup Update Request Received', [
+            'id' => $id,
+            'request_data' => $request->all()
+        ]);
+
+        // Call the repository update method
         $result = $this->repo->update($request, $id);
-        if($result['status']){
+
+        // Log the result returned by repository
+        Log::info('FeesGroup Update Result', [
+            'id' => $id,
+            'result' => $result
+        ]);
+
+        // Handle response
+        if ($result['status']) {
             return redirect()->route('fees-group.index')->with('success', $result['message']);
         }
+
+        // Log failure explicitly
+        Log::warning('FeesGroup Update Failed', [
+            'id' => $id,
+            'message' => $result['message']
+        ]);
+
         return back()->with('danger', $result['message']);
+
+    } catch (\Throwable $e) {
+        // Log any exceptions that may occur
+        Log::error('FeesGroup Update Exception', [
+            'id' => $id,
+            'error_message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+
+        return back()->with('danger', 'An error occurred: ' . $e->getMessage());
     }
+}
 
     public function delete($id)
     {
@@ -76,4 +112,18 @@ class FeesGroupController extends Controller
             return response()->json($success);
         endif;
     }
+
+    public function search(Request $request)
+{
+    $query = $request->get('name');
+
+    $groups = \App\Models\Fees\FeesGroup::query()
+        ->when($query, function ($q) use ($query) {
+            $q->where('name', 'LIKE', "%{$query}%");
+        })
+        ->orderBy('id', 'desc')
+        ->get(['id', 'name', 'description', 'status', 'online_admission_fees']); // only needed columns
+
+    return response()->json($groups);
+}
 }

@@ -37,10 +37,10 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::get('/import',           'import')->name('student.import')->middleware('PermissionCheck:student_create');
                     Route::post('/import-submit', 'importSubmit')->name('student.importSubmit')->middleware('PermissionCheck:student_create');
                     Route::get('/sample-download',          'sampleDownload')->name('student.sampleDownload')->middleware('PermissionCheck:student_create');
+                    Route::get('/filter-by-year',  'filterByYear')->name('student.filterByYear');
+                    Route::post('/students/filter-by-class',  'filterByClass')->name('student.filterByClass');
 
-                    // Route::get('/get-fees-collect-students', 'getFeesCollectStudents');
-                    // Route::get('/get-fees-assign-students',  'getFeesAssignStudents');
-
+                    Route::get('/search-by-name', 'filterByName')->name('student.filterByName');
                 });
 
                 Route::controller(StudentCategoryController::class)->prefix('student/category')->group(function () {
@@ -160,6 +160,10 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::get('/inventory',                 'inventory')->name('dormitory.inventory')->middleware('PermissionCheck:parent_read');
                     Route::get('/requested-inventory',                 'requestedInventory')->name('dormitory.requestedInventory')->middleware('PermissionCheck:parent_read');
                     Route::get('/low-inventory',                 'lowInventory')->name('dormitory.lowInventory')->middleware('PermissionCheck:parent_read');
+                    Route::post('requested-inventory/update-inventory-request-status/{id}',  'updateRequestInventoryStatus');
+ 
+                    Route::get('/low-inventory',                 'lowInventory')->name('dormitory.lowInventory')->middleware('PermissionCheck:parent_read');
+                      Route::get('/usage_report',                 'usageReport')->name('dormitory.usageReport')->middleware('PermissionCheck:parent_read');
                 });
             });
         });

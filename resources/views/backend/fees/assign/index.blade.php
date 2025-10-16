@@ -2,147 +2,316 @@
 @section('title')
     {{ @$data['title'] }}
 @endsection
+
+<style>
+    .multi-input-grp {
+        display: flex;
+        gap: 20px;
+        /* space between inputs */
+    }
+
+    .multi-input-grp .input-grp {
+        flex: 1;
+        /* make them equal width */
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+
 @section('content')
-    <div class="page-content">
 
-        {{-- bradecrumb Area S t a r t --}}
-        <div class="page-header">
-            <div class="row">
-                <div class="col-sm-6">
-                    <h4 class="bradecrumb-title mb-1">{{ $data['title'] }}</h1>
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ ___('common.home') }}</a></li>
-                            <li class="breadcrumb-item">{{ $data['title'] }}</li>
-                        </ol>
-                </div>
-            </div>
-        </div>
-        {{-- bradecrumb Area E n d --}}
 
-        <!--  table content start -->
-        <div class="table-content table-basic mt-20">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">{{ $data['title'] }}</h4>
-                    @if (hasPermission('fees_assign_create'))
-                        <div>
-                            <a href="{{ route('fees-assign.import') }}" class="btn btn-lg ot-btn-primary">
-                                <span><i class="fa-solid fa-plus"></i> </span>
-                                <span class="">{{ ___('common.Import Fees') }}</span>
-                            </a>
-                            <a href="{{ route('fees-assign.create') }}" class="btn btn-lg ot-btn-primary">
-                                <span><i class="fa-solid fa-plus"></i> </span>
-                                <span class="">{{ ___('common.add') }}</span>
-                            </a>
+    <div class="dashboard-main light-bg">
+
+        <!-- Sidebar Begin -->
+
+        @include('backend.partials.sidebar')
+        <!-- End Of Sidebar -->
+
+        <!-- Dashboard Body Begin -->
+
+        <div class="dashboard-body dspr-body-outer">
+            <div class="dashboard-body-head">
+                <div class="dsbdy-head-left">
+                    <div class="dsbdy-search-form">
+                        <div class="input-grp search-field">
+                            <input type="text" placeholder="Search Page">
+                            <input type="submit" value="Search">
                         </div>
-                    @endif
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered role-table">
-                            <thead class="thead">
-                                <tr>
-                                    <th class="serial">{{ ___('common.sr_no') }}</th>
-                                    <th class="purchase">{{ ___('fees.group') }}</th>
-                                    <th class="purchase">{{ ___('academic.class') }} ({{ ___('academic.section') }})</th>
-                                    <th class="purchase">{{ ___('fees.Category') }}</th>
-                                    <th class="purchase">{{ ___('common.gender') }}</th>
-                                    <th class="purchase">{{ ___('fees.students_list') }}</th>
-                                    @if (hasPermission('fees_assign_update') || hasPermission('fees_assign_delete'))
-                                        <th class="action">{{ ___('common.action') }}</th>
-                                    @endif
-                                </tr>
-                            </thead>
-                            <tbody class="tbody">
-                                @forelse ($data['fees_assigns'] as $key => $row)
-                                    <tr id="row_{{ $row->id }}">
-                                        <td class="serial">{{ ++$key }}</td>
-                                        <td>{{ @$row->feesGroup->name }}</td>
-                                        <td>{{ @$row->class->name }} ({{ @$row->section->name }})</td>
-                                        <td>{{ @$row->category->name }}</td>
-                                        <td>{{ @$row->gender->name }}</td>
-                                        <td>
-                                            <a href="#" class="btn btn-sm ot-btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#modalCustomizeWidth"
-                                                onclick="viewStudentList({{ $row->id }})">
-                                                <span><i class="fa-solid fa-eye"></i> </span>
-                                            </a>
-                                        </td>
-                                        @if (hasPermission('fees_assign_update') || hasPermission('fees_assign_delete'))
-                                            <td class="action">
-                                                <div class="dropdown dropdown-action">
-                                                    <button type="button" class="btn-dropdown" data-bs-toggle="dropdown"
-                                                        aria-expanded="false">
-                                                        <i class="fa-solid fa-ellipsis"></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu dropdown-menu-end ">
-                                                        @if (hasPermission('fees_assign_update'))
-                                                            <li>
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('fees-assign.edit', $row->id) }}"><span
-                                                                        class="icon mr-8"><i
-                                                                            class="fa-solid fa-pen-to-square"></i></span>
-                                                                    {{ ___('common.edit') }}</a>
-                                                            </li>
-                                                        @endif
-                                                        @if (hasPermission('fees_assign_delete'))
-                                                            <li>
-                                                                <a class="dropdown-item" href="javascript:void(0);"
-                                                                    onclick="delete_row('fees-assign/delete', {{ $row->id }})">
-                                                                    <span class="icon mr-8"><i
-                                                                            class="fa-solid fa-trash-can"></i></span>
-                                                                    <span>{{ ___('common.delete') }}</span>
-                                                                </a>
-                                                            </li>
-                                                        @endif
-                                                    </ul>
-                                                </div>
-                                            </td>
-                                        @endif
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="100%" class="text-center gray-color">
-                                            <img src="{{ asset('images/no_data.svg') }}" alt="" class="mb-primary"
-                                                width="100">
-                                            <p class="mb-0 text-center">{{ ___('common.no_data_available') }}</p>
-                                            <p class="mb-0 text-center text-secondary font-size-90">
-                                                {{ ___('common.please_add_new_entity_regarding_this_table') }}</p>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
                     </div>
-                    <!--  table end -->
-                    <!--  pagination start -->
-
-                    <div class="ot-pagination pagination-content d-flex justify-content-end align-content-center py-3">
-                        <nav aria-label="Page navigation example">
-                            <ul class="pagination justify-content-between">
-                                {!! $data['fees_assigns']->links() !!}
+                </div>
+                <div class="dsbdy-head-right">
+                    <button class="tgl-flscrn" aria-label="Toggle fullscreen">
+                        <img src="{{ asset('images/fees/fullscreen-toggler-icon.svg') }}" alt="Icon">
+                    </button>
+                    <div class="profile-ctrl">
+                        <button class="profile-ctrl-toggler">
+                            <div class="pr-pic">
+                                <img src="{{ asset('images/fees/profile-picture.png') }}" alt="Profile Picture">
+                            </div>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+                        <div class="pr-ctrl-menu">
+                            <ul>
+                                <li><a href="profile.html">My Profile</a></li>
+                                <li><a href="../../set-password.html">Change Password</a></li>
                             </ul>
-                        </nav>
+                        </div>
                     </div>
-
-                    <!--  pagination end -->
                 </div>
             </div>
-        </div>
-        <!--  table content end -->
 
-    </div>
+            <div class="ds-breadcrumb">
+                <h1>Assigning Fees to Students</h1>
+                <ul>
+                    <li><a href="./dashboard.html">Dashboard</a> /</li>
+                    <li><a href="./additional-fees.html">Additional Fees</a> /</li>
+                    <li>Assigning Fees to Students</li>
+                </ul>
+            </div>
 
-    <div id="view-modal">
-        <div class="modal fade" id="modalCustomizeWidth" tabindex="-1" aria-labelledby="modalWidth" aria-hidden="true">
-            <div class="modal-dialog modal-xl">
-                {{--  --}}
+            <div class="ds-pr-body">
+
+                <div class="ds-bdy-content w-100 align-items-start">
+
+                    <div class="dsbdy-cmn-card w55" style="width:1500px;">
+                        <div class="sec-head">
+                            <h2>Filter Students</h2>
+                        </div>
+                        <div class="request-leave-form-wrp fees-master-form-wrp">
+                            <form>
+                                <div class="request-leave-form fees-master-form">
+                                    <div class="multi-input-grp">
+                                        <div class="input-grp">
+                                            <label>Class</label>
+                                            <select>
+                                                <option value="Select Fees Group">Class</option>
+                                                <option value="group-1">Group 1</option>
+                                                <option value="group-2">Group 2</option>
+                                            </select>
+                                        </div>
+                                        <div class="input-grp">
+                                            <label>Subject</label>
+                                            <select>
+                                                <option value="Select Fees Type">Subject</option>
+                                                <option value="type-1">Type 1</option>
+                                                <option value="type-2">Type 2</option>
+                                            </select>
+                                        </div>
+                                        <div class="input-grp">
+                                            <label>Fees Group</label>
+                                            <select>
+                                                <option value="Select Fees Type">Fees Group</option>
+                                                <option value="type-1">Type 1</option>
+                                                <option value="type-2">Type 2</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="input-grp" style="width: 31%;">
+                                        <label>Fees Type</label>
+                                        <input type="text" placeholder="Enter total amount" style="width: 400px;">
+                                    </div>
+
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+
+
+
+                    <div class="ds-cmn-table-wrp request-transcript-pg tbl-btn-new">
+                        <div class="ds-content-head">
+                            <div class="sec-head">
+                                <h3 class="h2-title">Students (0 Selected)</h3>
+                            </div>
+                            <div class="filters">
+                                <div class="atndnc-filter-form">
+                                    <div class="atndnc-filter-options multi-input-grp">
+                                        <div class="input-grp search-field mb-0">
+                                            <input type="text" placeholder="Search Student Name">
+                                            <input type="submit" value="Search">
+                                        </div>
+                                        <div class="input-grp fees-type">
+                                            <select>
+                                                <option value="select-year">Select all</option>
+                                                <option value="2024">2024</option>
+                                            </select>
+                                        </div>
+                                        <div class="dsbdy-filter-wrp p-0 align-items-start">
+
+                                            <a href="#url" class="cmn-btn btn-sm flex-shrink-0"><i
+                                                    class="fa-solid fa-plus"></i>
+                                                Assign Fees</a>
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+
+
+
+
+                            </div>
+                        </div>
+
+                        <div class="ds-cmn-tble count-row">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Select</th>
+                                        <th>Student Details</th>
+                                        <th>Contact</th>
+                                        <th>Parents Name</th>
+                                        <th>Alloted Status</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><i class="fa-regular fa-square"></i></td>
+                                        <td>Lorem ipsumbr
+                                            <br>
+                                            <span style="font-size: 14px;
+                                                         color: var(--primary-clr);
+                                            ">Student Id- 24646</span>
+                                            
+                                        </td>
+                                                                            <td>example@gmail.com
+                                            <br>
+                                            <span style="font-size: 14px;
+                                                         color: var(--primary-clr);
+                                            ">Phone No- 24646</span>
+                                            
+                                        </td>
+                                        <td>$500</td>
+                                        <td>5</td>
+
+                                    </tr>
+                                    <tr>
+                                        <td><i class="fa-regular fa-square"></i></td>
+                                     <td>Lorem ipsumbr
+                                            <br>
+                                            <span style="font-size: 14px;
+                                                         color: var(--primary-clr);
+                                            ">Student Id- 24646</span>
+                                            
+                                        </td>
+                                      <td>example@gmail.com
+                                            <br>
+                                            <span style="font-size: 14px;
+                                                         color: var(--primary-clr);
+                                            ">Phone No- 24646</span>
+                                            
+                                        </td>
+                                        <td>$500</td>
+                                        <td>5</td>
+
+                                    </tr>
+                                    <tr>
+                                        <td><i class="fa-regular fa-square"></i></td>
+                                       <td>Lorem ipsumbr
+                                            <br>
+                                            <span style="font-size: 14px;
+                                                         color: var(--primary-clr);
+                                            ">Student Id- 24646</span>
+                                            
+                                        </td>
+                                     <td>example@gmail.com
+                                            <br>
+                                            <span style="font-size: 14px;
+                                                         color: var(--primary-clr);
+                                            ">Phone No- 24646</span>
+                                            
+                                        </td>
+                                        <td>$500</td>
+                                        <td>5</td>
+
+                                    </tr>
+                                    <tr>
+                                        <td><i class="fa-regular fa-square"></i></td>
+                                         <td>Lorem ipsumbr
+                                            <br>
+                                            <span style="font-size: 14px;
+                                                         color: var(--primary-clr);
+                                            ">Student Id- 24646</span>
+                                            
+                                        </td>
+                                  <td>example@gmail.com
+                                            <br>
+                                            <span style="font-size: 14px;
+                                                         color: var(--primary-clr);
+                                            ">Phone No- 24646</span>
+                                            
+                                        </td>
+                                        <td>$500</td>
+                                        <td>5</td>
+
+                                    </tr>
+                                    <tr>
+                                        <td><i class="fa-regular fa-square"></i></td>
+                                         <td>Lorem ipsumbr
+                                            <br>
+                                            <span style="font-size: 14px;
+                                                         color: var(--primary-clr);
+                                            ">Student Id- 24646</span>
+                                            
+                                        </td>
+                                       <td>example@gmail.com
+                                            <br>
+                                            <span style="font-size: 14px;
+                                                         color: var(--primary-clr);
+                                            ">Phone No- 24646</span>
+                                            
+                                        </td>
+                                        <td>$500</td>
+                                        <td>5</td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="tablepagination">
+                            <div class="tbl-pagination-inr">
+                                <ul>
+                                    <li><a href="#url"><img src="{{ asset('images/fees/arrow-left.svg') }}"></a></li>
+                                    <li class="active"><a href="#url">1</a></li>
+                                    <li><a href="#url">2</a></li>
+                                    <li><a href="#url">3</a></li>
+                                    <li><a href="#url"><img src="{{ asset('images/fees/arrow-right.svg') }}"></a></li>
+                                </ul>
+                            </div>
+
+                            <div class="pages-select">
+                                <form>
+                                    <div class="formfield">
+                                        <label>Per page</label>
+                                        <select>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                            <option value="9">9</option>
+                                            <option value="10">10</option>
+                                        </select>
+                                    </div>
+                                </form>
+                                <p>of 2 results</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
         </div>
+
     </div>
 
 @endsection
-
-@push('script')
-    @include('backend.partials.delete-ajax')
-@endpush

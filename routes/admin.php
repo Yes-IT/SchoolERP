@@ -13,7 +13,7 @@ use App\Http\Controllers\Admin\SmsMailTemplateController;
 use App\Http\Controllers\Admin\LeaveController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\AssignmentController;
-use App\Http\Controllers\Admin\{GradeController,AlumniController,TeacherController,RoomManagementController};
+use App\Http\Controllers\Admin\{GradeController, AlumniController, TeacherController, RoomManagementController};
 
 
 Route::middleware(saasMiddleware())->group(function () {
@@ -113,35 +113,33 @@ Route::middleware(saasMiddleware())->group(function () {
                 Route::controller(LeaveController::class)->group(function () {
                     // Student Leave
                     Route::get('leave/student', 'studentIndex')->name('leave.student.index')->middleware('PermissionCheck:student_leave_read');
-                    Route::get('/leave/student/data','studentData')->name('leave.student.data')->middleware('PermissionCheck:student_leave_read');
+                    Route::get('/leave/student/data', 'studentData')->name('leave.student.data')->middleware('PermissionCheck:student_leave_read');
 
                     // Teacher Leave
                     Route::get('leave/teacher', 'teacherIndex')->name('leave.teacher.index')->middleware('PermissionCheck:teacher_leave_read');
                     Route::get('/leave/teacher/data', 'teacherData')->name('leave.teacher.data')->middleware('PermissionCheck:teacher_leave_read');
                     Route::post('/admin/leave/teacher/update', 'updateTeacherLeave')->name('leave.teacher.update');
-                    
+
                     // Transcript
                     Route::get('transcript', 'transcriptIndex')->name('transcript.index')->middleware('PermissionCheck:transcript_read');
                     Route::get('transcript/data', 'transcriptData')->name('transcript.data')->middleware('PermissionCheck:transcript_read');
                     Route::post('transcript/update', 'updateTranscriptStatus')->name('transcript.update')->middleware('PermissionCheck:transcript_update');
-                    
+
                     // College
                     Route::get('college', 'collegeIndex')->name('transcript.college.index')->middleware('PermissionCheck:college_read');
                     Route::get('/transcript/college/data',  'collegeData')->name('transcript.college.data');
                     Route::post('/transcript/college/store', 'storeCollege')->name('transcript.college.store');
-
                 });
 
-               
 
-                Route::controller(SubjectController::class)->group(function(){
+
+                Route::controller(SubjectController::class)->group(function () {
                     Route::get('superadmin/subject', 'index')->name('superadmin.subject.index')->middleware('PermissionCheck:subject_read');
                     Route::get('superadmin/subject/view-details/{id}', 'viewSubjectDetails')->name('admin.subject.viewSubjectDetails')->middleware('PermissionCheck:subject_read');
                     Route::get('superadmin/subject/add', 'add')->name('superadmin.subject.add')->middleware('PermissionCheck:subject_read');
                     Route::post('superadmin/subject/store', 'store')->name('superadmin.subject.store')->middleware('PermissionCheck:subject_read');
                     Route::get('superadmin/subject/edit/{id}', 'edit')->name('superadmin.subject.edit')->middleware('PermissionCheck:subject_read');
                     Route::put('superadmin/subject/{id}', 'update')->name('superadmin.subject.update')->middleware('PermissionCheck:subject_read');
-
                 });
 
                 //Grade flow routes
@@ -149,7 +147,7 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::get('grade_flow/', 'index')->name('grade_flow.index')->middleware('PermissionCheck:grade_read');
                     Route::get('grade_flow/assign_grade/', 'assign_grade')->name('grade_flow.assign_grade')->middleware('PermissionCheck:grade_read');
                     Route::get('grade_flow/failing_grades/', 'failing_grades')->name('grade_flow.failing_grades')->middleware('PermissionCheck:grade_read');
-                    Route::get('grade_flow/missing_grades/', 'missing_grades')->name('grade_flow.missing_grades')->middleware('PermissionCheck:grade_read');    
+                    Route::get('grade_flow/missing_grades/', 'missing_grades')->name('grade_flow.missing_grades')->middleware('PermissionCheck:grade_read');
                 });
 
                 //Alumni flow routes
@@ -157,7 +155,7 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::get('alumni_flow/', 'index')->name('alumni_flow.index')->middleware('PermissionCheck:alumni_read');
                     Route::get('alumni_flow/alumni_list', 'alumni_list_info')->name('alumni_flow.alumni_list_info')->middleware('PermissionCheck:alumni_read');
                     Route::get('alumni_flow/gallery', 'gallery')->name('alumni_flow.alumni_gallery')->middleware('PermissionCheck:alumni_read');
-                    Route::post('alumni_flow/alumni-gallery','store')->name('alumni_flow.gallery.store');
+                    Route::post('alumni_flow/alumni-gallery', 'store')->name('alumni_flow.gallery.store');
                     Route::get('alumni_flow/alumni-gallery/{id}/edit', 'edit')->name('alumni_flow.gallery.edit');
                     Route::post('alumni_flow/alumni-gallery/{id}/update', 'update')->name('alumni_flow.gallery.update');
                     Route::delete('alumni_flow/alumni-gallery/{id}', 'destroy')->name('alumni_flow.gallery.destroy');
@@ -167,11 +165,10 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::post('alumni_flow/recorded-classes/store', 'storeRecord')->name('admin.recorded-classes.store');
                     Route::post('alumni_flow/recorded-classes/{id}/update', 'update_record')->name('admin.recorded-classes.update');
                     Route::delete('alumni_flow/recorded-classes/{id}', 'destroy_record')->name('admin.recorded-classes.destroy');
-
                 });
 
-                 //teacher  routes
-                Route::controller(TeacherController::class)->prefix('teacher')->group(function () {  
+                //teacher  routes
+                Route::controller(TeacherController::class)->prefix('teacher')->group(function () {
                     Route::get('/', 'index')->name('teacher.index')->middleware('PermissionCheck:teacher_read');
                     Route::get('/teacher-info/{id}', 'teacher_info')->name('teacher.teacher_info')->middleware('PermissionCheck:teacher_read');
                     Route::get('/create', 'create')->name('teacher.create')->middleware('PermissionCheck:teacher_read');
@@ -181,7 +178,6 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::delete('/delete/{id}', 'delete')->name('teacher.delete')->middleware('PermissionCheck:teacher_read');
                     Route::post('/teachers/{teacher}/inactive', 'toggleInactive')->name('teachers.toggleInactive')->middleware('PermissionCheck:teacher_read');
                     Route::get('/teachers/filter', 'filter')->name('teachers.filter')->middleware('PermissionCheck:teacher_read');
-
                 });
 
                 //room management routes
@@ -194,16 +190,16 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::delete('/{id}', 'destroy')->name('room_management.destroy')->middleware('PermissionCheck:room_management_delete');
                 });
 
-                 Route::controller(AssignmentController::class)->prefix('assignment')->group(function(){   //assignment routes
+                Route::controller(AssignmentController::class)->prefix('assignment')->group(function () {   //assignment routes
                     Route::get('assignment', 'index')->name('assignment.index')->middleware('PermissionCheck:assignment_read');
                     Route::get('assignment/{id}/details', 'assignment_details')->name('assignment.details')->middleware('PermissionCheck:assignment_read');
                     Route::get('assignment/{id}/evaluation_details', 'evaluation_details')->name('assignment.evalulation_details')->middleware('PermissionCheck:assignment_read');
                     Route::post('assignment/{id}/approve',  'approve_assignment')->name('assignment.approve_assignment')->middleware('PermissionCheck:assignment_read');
                     Route::post('assignment/{id}/reject',  'reject_assignment')->name('assignment.reject_assignment')->middleware('PermissionCheck:assignment_read');
-                    Route::get('/assignment/filter', 'filter')->name('assignments.filter')->middleware('PermissionCheck:assignment_read');  
+                    Route::get('/assignment/filter', 'filter')->name('assignments.filter')->middleware('PermissionCheck:assignment_read');
                 });
 
-                 Route::controller(ApplicantController::class)->prefix('applicant')->group(function(){
+                Route::controller(ApplicantController::class)->prefix('applicant')->group(function () {
                     Route::get('/', 'index')->name('applicant.index')->middleware('PermissionCheck:applicant_read');
                     Route::get('/dashboard', 'dashboard')->name('applicant.dashboard')->middleware('PermissionCheck:applicant_read');
                     Route::get('/calender', 'calender')->name('applicant.calender')->middleware('PermissionCheck:applicant_read');
@@ -214,7 +210,6 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::get('/custom-applicant-chart', 'custom_applicant_chart')->name('applicant.custom_applicant_chart')->middleware('PermissionCheck:applicant_read');
                     Route::get('/contacts', 'contacts')->name('applicant.contacts')->middleware('PermissionCheck:applicant_read');
                 });
-
             });
         });
     });
