@@ -121,6 +121,8 @@ use App\Repositories\Academic\RoomManagementRepository;
 use App\Repositories\AlumniGalleryRepository;
 use App\Interfaces\AlumniGalleryRepositoryInterface;
 use App\Interfaces\Academic\RoomManagementRepositoryInterface;
+use App\Repositories\Applicant\ApplicantRepository;
+use App\Interfaces\Applicant\ApplicantInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -185,6 +187,8 @@ class RepositoryServiceProvider extends ServiceProvider
         // Students
         $this->app->bind(PromoteStudentInterface::class,           PromoteStudentRepository::class);
         
+        // Applicant
+        $this->app->bind(ApplicantInterface::class,                 ApplicantRepository::class);
         
         // Student panel
         $this->app->bind(DashboardInterface::class,                          DashboardRepository::class);
