@@ -13,11 +13,8 @@ use App\Http\Controllers\Admin\SmsMailTemplateController;
 use App\Http\Controllers\Admin\LeaveController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\AssignmentController;
-<<<<<<< HEAD
-use App\Http\Controllers\Admin\{GradeController, AlumniController, TeacherController, RoomManagementController};
-=======
 use App\Http\Controllers\Admin\{GradeController,AlumniController,TeacherController,ApplicantController,RoomManagementController};
->>>>>>> 81c88cb (changes by nazmin)
+
 
 
 Route::middleware(saasMiddleware())->group(function () {
