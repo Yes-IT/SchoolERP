@@ -109,6 +109,7 @@ class SubjectRepository implements SubjectInterface
         }
     }
 
+    
     public function update($request, $id)
     {
         // Validation rules
@@ -136,7 +137,10 @@ class SubjectRepository implements SubjectInterface
         ]);
 
         if ($validator->fails()) {
-            return $this->responseWithError($validator->errors()->first(), []);
+            return $this->responseWithError(
+                __('Validation failed'),
+                $validator->errors()->toArray() // send all field errors
+            );
         }
 
         try {
@@ -170,6 +174,7 @@ class SubjectRepository implements SubjectInterface
             return $this->responseWithError(__('alert.something_went_wrong_please_try_again'), []);
         }
     }
+
 
     public function destroy($id)
     {

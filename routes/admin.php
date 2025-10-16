@@ -155,7 +155,7 @@ Route::middleware(saasMiddleware())->group(function () {
                 //Alumni flow routes
                 Route::controller(AlumniController::class)->group(function () { // alumni routes 
                     Route::get('alumni_flow/', 'index')->name('alumni_flow.index')->middleware('PermissionCheck:alumni_read');
-                    Route::get('alumni_flow/alumni_list', 'alumni_list_info')->name('alumni_flow.alumni_list_info')->middleware('PermissionCheck:alumni_read');
+                    Route::get('alumni_flow/alumni_info/{id}', 'alumni_list_info')->name('alumni_flow.alumni_list_info')->middleware('PermissionCheck:alumni_read');
                     Route::get('alumni_flow/gallery', 'gallery')->name('alumni_flow.alumni_gallery')->middleware('PermissionCheck:alumni_read');
                     Route::post('alumni_flow/alumni-gallery','store')->name('alumni_flow.gallery.store');
                     Route::get('alumni_flow/alumni-gallery/{id}/edit', 'edit')->name('alumni_flow.gallery.edit');

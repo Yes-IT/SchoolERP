@@ -4,6 +4,18 @@
 @endsection
 @section('content')
 
+<style>
+    .error {
+        color: red;
+        font-size: 12px;
+        display: block;
+        margin-top: 5px;
+    }
+    .alert {
+        margin-bottom: 15px;
+    }
+</style>
+
 <!-- Dashboard Body Begin -->
 <div class="dashboard-body dspr-body-outer">
     <div class="ds-breadcrumb">
@@ -41,12 +53,12 @@
                         <div class="multi-input-grp grp-3">
                             <div class="input-grp">
                                 <label for="code">Subject ID</label>
-                                <input id="code" name="code" type="text" placeholder="Enter Subject ID" value="{{ old('code', $subject->code) }}" required>
+                                <input id="code" name="code" type="text" placeholder="Enter Subject ID" value="{{ old('code', $subject->code) }}" readonly disabled>
                                 <span class="error"></span>
                             </div>
                             <div class="input-grp">
                                 <label for="name">Abbreviation</label>
-                                <input id="name" name="name" type="text" placeholder="Enter Abbreviation" value="{{ old('name', $subject->name) }}" required>
+                                <input id="name" name="name" type="text" placeholder="Enter Abbreviation" value="{{ old('name', $subject->name) }}" >
                                 <span class="error"></span>
                             </div>
                         </div>
@@ -57,22 +69,22 @@
                         <div class="multi-input-grp grp-3">
                             <div class="input-grp input-full">
                                 <label for="credits">Credits</label>
-                                <input id="credits" name="credits" type="text" placeholder="Enter Credits" value="{{ old('credits', $subject->credits) }}" required>
+                                <input id="credits" name="credits" type="text" placeholder="Enter Credits" value="{{ old('credits', $subject->credits) }}" >
                                 <span class="error"></span>
                             </div>
                             <div class="input-grp">
                                 <label for="allowed_absences">Allow Absence</label>
-                                <input id="allowed_absences" name="allowed_absences" type="text" placeholder="Enter Allowed Absences" value="{{ old('allowed_absences', $subject->allowed_absences) }}" required>
+                                <input id="allowed_absences" name="allowed_absences" type="text" placeholder="Enter Allowed Absences" value="{{ old('allowed_absences', $subject->allowed_absences) }}" >
                                 <span class="error"></span>
                             </div>
                             <div class="input-grp">
                                 <label for="allowed_penalty_amount">Allow Penalty Amount</label>
-                                <input id="allowed_penalty_amount" name="allowed_penalty_amount" type="text" placeholder="Enter Penalty Amount" value="{{ old('allowed_penalty_amount', $subject->allowed_penalty_amount) }}" required>
+                                <input id="allowed_penalty_amount" name="allowed_penalty_amount" type="text" placeholder="Enter Penalty Amount" value="{{ old('allowed_penalty_amount', $subject->allowed_penalty_amount) }}" >
                                 <span class="error"></span>
                             </div>
                             <div class="input-grp">
                                 <label for="number_latenesses_equal_absence">Number of Latenesses Equal to One Absence</label>
-                                <input id="number_latenesses_equal_absence" name="number_latenesses_equal_absence" type="text" placeholder="Enter Number" value="{{ old('number_latenesses_equal_absence', $subject->number_latenesses_equal_absence) }}" required>
+                                <input id="number_latenesses_equal_absence" name="number_latenesses_equal_absence" type="text" placeholder="Enter Number" value="{{ old('number_latenesses_equal_absence', $subject->number_latenesses_equal_absence) }}" >
                                 <span class="error"></span>
                             </div>
                         </div>
@@ -93,32 +105,32 @@
                         <div class="multi-input-grp grp-3">
                             <div class="input-grp input-full">
                                 <label for="attendance_percent_amount">Attendance % Amount</label>
-                                <input id="attendance_percent_amount" name="attendance_percent_amount" type="text" placeholder="Enter Attendance Percentage" value="{{ old('attendance_percent_amount', $subject->attendance_percent_amount) }}" required>
+                                <input id="attendance_percent_amount" name="attendance_percent_amount" type="text" placeholder="Enter Attendance Percentage" value="{{ old('attendance_percent_amount', $subject->attendance_percent_amount) }}" >
                                 <span class="error"></span>
                             </div>
                             <div class="input-grp">
                                 <label for="attendance_percent_fail_grade">Attendance % Fail Grade</label>
-                                <input id="attendance_percent_fail_grade" name="attendance_percent_fail_grade" type="text" placeholder="Enter Fail Grade" value="{{ old('attendance_percent_fail_grade', $subject->attendance_percent_fail_grade) }}" required>
+                                <input id="attendance_percent_fail_grade" name="attendance_percent_fail_grade" type="text" placeholder="Enter Fail Grade" value="{{ old('attendance_percent_fail_grade', $subject->attendance_percent_fail_grade) }}" >
                                 <span class="error"></span>
                             </div>
                             <div class="input-grp">
                                 <label for="gpa_weight">GPA Weight</label>
-                                <input id="gpa_weight" name="gpa_weight" type="text" placeholder="Enter GPA Weight" value="{{ old('gpa_weight', $subject->gpa_weight) }}" required>
+                                <input id="gpa_weight" name="gpa_weight" type="text" placeholder="Enter GPA Weight" value="{{ old('gpa_weight', $subject->gpa_weight) }}" >
                                 <span class="error"></span>
                             </div>
                             <div class="input-grp">
                                 <label for="prec_rc">Precedence on Report Card</label>
-                                <input id="prec_rc" name="prec_rc" type="text" placeholder="Enter Precedence" value="{{ old('prec_rc', $subject->prec_rc) }}" required>
+                                <input id="prec_rc" name="prec_rc" type="text" placeholder="Enter Precedence" value="{{ old('prec_rc', $subject->prec_rc) }}" >
                                 <span class="error"></span>
                             </div>
                             <div class="input-grp">
                                 <label for="transcript_name">Transcript Name</label>
-                                <input id="transcript_name" name="transcript_name" type="text" placeholder="Enter Transcript Name" value="{{ old('transcript_name', $subject->transcript_name) }}" required>
+                                <input id="transcript_name" name="transcript_name" type="text" placeholder="Enter Transcript Name" value="{{ old('transcript_name', $subject->transcript_name) }}" >
                                 <span class="error"></span>
                             </div>
                             <div class="input-grp">
                                 <label for="course_number">Transcript Course Number</label>
-                                <input id="course_number" name="course_number" type="text" placeholder="Enter Course Number" value="{{ old('course_number', $subject->course_number) }}" required>
+                                <input id="course_number" name="course_number" type="text" placeholder="Enter Course Number" value="{{ old('course_number', $subject->course_number) }}" >
                                 <span class="error"></span>
                             </div>
                             <div class="input-grp checkbox">
@@ -129,7 +141,7 @@
                         <div class="multi-input-grp grp-3">
                             <div class="input-grp">
                                 <label for="prec_transcript">Precedence on Transcript</label>
-                                <input id="prec_transcript" name="prec_transcript" type="text" placeholder="Enter Precedence" value="{{ old('prec_transcript', $subject->prec_transcript) }}" required>
+                                <input id="prec_transcript" name="prec_transcript" type="text" placeholder="Enter Precedence" value="{{ old('prec_transcript', $subject->prec_transcript) }}" >
                                 <span class="error"></span>
                             </div>
                         </div>
@@ -146,7 +158,7 @@
                         <div class="multi-input-grp grp-3">
                             <div class="input-grp">
                                 <label for="co_department">Chartered Oak Department</label>
-                                <input id="co_department" name="co_department" type="text" placeholder="Enter Department" value="{{ old('co_department', $subject->co_department) }}" required>
+                                <input id="co_department" name="co_department" type="text" placeholder="Enter Department" value="{{ old('co_department', $subject->co_department) }}" >
                                 <span class="error"></span>
                             </div>
                         </div>
@@ -192,16 +204,16 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('subjectForm');
+
     form.addEventListener('submit', function (e) {
         e.preventDefault();
 
-        // Clear previous error messages
+        // Clear old error messages
         document.querySelectorAll('.error').forEach(span => span.textContent = '');
+        document.querySelectorAll('.alert').forEach(alert => alert.remove());
 
-        // Collect form data
         const formData = new FormData(form);
 
-        // Send AJAX request
         fetch(form.action, {
             method: 'POST',
             body: formData,
@@ -210,49 +222,42 @@ document.addEventListener('DOMContentLoaded', function () {
                 'Accept': 'application/json'
             }
         })
-        .then(response => {
+        .then(async response => {
+            const data = await response.json();
             if (!response.ok) {
-                if (response.status === 422) {
-                    return response.json().then(data => {
-                        throw new Error('validation', { cause: data });
-                    });
-                }
-                return response.json().then(data => {
-                    throw new Error('server_error', { cause: data });
-                });
+                throw { status: response.status, data };
             }
-            return response.json();
+            return data;
         })
         .then(data => {
             if (data.status) {
+                // Success
                 window.location.href = '{{ route('superadmin.subject.index') }}';
             }
         })
-        .catch(error => {
-            console.error('Error:', error);
-            if (error.message === 'validation') {
-                const validationData = error.cause;
-                if (validationData && validationData.errors) {
-                    Object.keys(validationData.errors).forEach(field => {
-                        const input = document.querySelector(`input[name="${field}"], textarea[name="${field}"], select[name="${field}"]`);
-                        if (input) {
-                            const errorSpan = input.parentElement.querySelector('.error');
-                            if (errorSpan) {
-                                errorSpan.textContent = validationData.errors[field][0];
-                            }
-                            // Scroll to first error
-                            if (field === Object.keys(validationData.errors)[0]) {
-                                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                input.focus();
-                            }
+        .catch(err => {
+            if (err.status === 422 && err.data && err.data.errors) {
+                const errors = err.data.errors;
+                Object.keys(errors).forEach(field => {
+                    const input = document.querySelector(`[name="${field}"]`);
+                    if (input) {
+                        const errorSpan = input.parentElement.querySelector('.error');
+                        if (errorSpan) {
+                            errorSpan.textContent = errors[field][0];
                         }
-                    });
+                    }
+                });
+                // Scroll to the first error field
+                const firstErrorField = document.querySelector(`[name="${Object.keys(errors)[0]}"]`);
+                if (firstErrorField) {
+                    firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstErrorField.focus();
                 }
             } else {
-                // Display general error message above the form
+                // Display global error
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'alert alert-danger';
-                errorDiv.textContent = error.cause?.message || 'An unexpected error occurred.';
+                errorDiv.textContent = err.data?.message || 'An unexpected error occurred.';
                 form.prepend(errorDiv);
             }
         });
