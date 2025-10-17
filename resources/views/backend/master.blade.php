@@ -31,8 +31,24 @@
 <body>
 
     {{-- Main content --}}
-    @yield('content')
 
+    <div class="dashboard-main light-bg">
+        <!-- start sidebar -->
+        @include('backend.partials.sidebar')
+        <!-- end sidebar -->
+
+        <div class="dashboard-body">
+
+            <!-- start header -->
+            @include('backend.partials.header')
+            <!-- end header -->
+
+            <!-- start main content -->
+            @yield('content')
+            <!-- end main content -->
+
+        </div>
+    </div>
     <!-- Jquery-->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -714,16 +730,16 @@
         </table>
         <hr>
         ${data.installments?.length ? `
-                        <h4 class="installment-review">Installment Schedule</h4>
-                        <table>
-                            ${data.installments.map((inst, index) => `
+                                    <h4 class="installment-review">Installment Schedule</h4>
+                                    <table>
+                                        ${data.installments.map((inst, index) => `
                     <tr>
                         <td>Installment ${index + 1}:</td>
                         <td>$${inst.amount} (Due: ${inst.due_date})</td>
                     </tr>
                 `).join("")}
-                        </table>
-                    ` : ""}
+                                    </table>
+                                ` : ""}
     `;
         }
 
@@ -1542,28 +1558,28 @@
 
         // filter doctor data by student id
 
-function filterByStudentIdDoctor() {
-    const selectedStudent = document.getElementById('student_id').value;
+        function filterByStudentIdDoctor() {
+            const selectedStudent = document.getElementById('student_id').value;
 
-    // Build the URL dynamically (same route as page load)
-    let url = "{{ route('doctorVisit.filterdoctordatabystudentId') }}";
-    if (selectedStudent) {
-        url += `?student_id=${selectedStudent}`;
-    }
+            // Build the URL dynamically (same route as page load)
+            let url = "{{ route('doctorVisit.filterdoctordatabystudentId') }}";
+            if (selectedStudent) {
+                url += `?student_id=${selectedStudent}`;
+            }
 
-    fetch(url, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(res => res.json())
-    .then(data => {
-        const tbody = document.getElementById('doctorsDataBody');
-        tbody.innerHTML = '';
+            fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('doctorsDataBody');
+                    tbody.innerHTML = '';
 
-        if (data.doctors && data.doctors.length > 0) {
-            data.doctors.forEach((doctor, index) => {
-                tbody.innerHTML += `
+                    if (data.doctors && data.doctors.length > 0) {
+                        data.doctors.forEach((doctor, index) => {
+                            tbody.innerHTML += `
                     <tr>
                         <td>${index + 1}</td>
                         <td>${doctor.entry_date ?? ''}</td>
@@ -1573,17 +1589,17 @@ function filterByStudentIdDoctor() {
                         <td>${doctor.issue ?? ''}</td>
                     </tr>
                 `;
-            });
-        } else {
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center">No records found</td></tr>`;
+                        });
+                    } else {
+                        tbody.innerHTML = `<tr><td colspan="6" class="text-center">No records found</td></tr>`;
+                    }
+                })
+                .catch(err => console.error('Error fetching student data:', err));
         }
-    })
-    .catch(err => console.error('Error fetching student data:', err));
-}
 
 
-function filterByDateDoctor(){
-        const selectedDate = document.getElementById('filter_dateDoctor').value;
+        function filterByDateDoctor() {
+            const selectedDate = document.getElementById('filter_dateDoctor').value;
 
             fetch(`{{ route('doctorVisit.filterdoctordatabyDate') }}?entry_date=${selectedDate}`, {
                     headers: {
@@ -1595,9 +1611,9 @@ function filterByDateDoctor(){
                     const tbody = document.getElementById('doctorsDataBody');
                     tbody.innerHTML = '';
 
-                if (data.doctors && data.doctors.length > 0) {
-            data.doctors.forEach((doctor, index) => {
-                tbody.innerHTML += `
+                    if (data.doctors && data.doctors.length > 0) {
+                        data.doctors.forEach((doctor, index) => {
+                            tbody.innerHTML += `
                     <tr>
                         <td>${index + 1}</td>
                         <td>${doctor.entry_date ?? ''}</td>
@@ -1607,16 +1623,16 @@ function filterByDateDoctor(){
                         <td>${doctor.issue ?? ''}</td>
                     </tr>
                 `;
-            });
-        } else {
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center">No records found</td></tr>`;
-        }
+                        });
+                    } else {
+                        tbody.innerHTML = `<tr><td colspan="6" class="text-center">No records found</td></tr>`;
+                    }
                 })
                 .catch(err => console.error('Error fetching date filter data:', err));
-}
+        }
 
 
-// export inventory table
+        // export inventory table
 
         function exportVisibleLateTable() {
             let table;
@@ -1667,7 +1683,6 @@ function filterByDateDoctor(){
             downloadLink.click();
             document.body.removeChild(downloadLink);
         }
-
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"
         integrity="sha512-bE2H3X0bwh9k4EStk1gE5X01gA6Y+/C75OHyJDq4RVlM1aFzDJgcZlcpJKuFVZ0Y99D7eM6nE+EZ0zKfL6+5MA=="
