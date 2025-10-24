@@ -53,7 +53,7 @@
                     </a>
                     <ul class="sub-menu">
                         <li><a href="{{route('alumni_flow.alumni_list_info')}}">Alumni List</a></li>
-                        <li><a href="{{route('alumni_flow.recorded_class')}}">Recorded Classes</a></li>
+                        {{-- <li><a href="{{route('alumni_flow.recorded_class')}}">Recorded Classes</a></li> --}}
                         <li><a href="{{route('alumni_flow.alumni_gallery')}}">Gallery</a></li>
                     </ul>
                 </li>
