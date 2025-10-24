@@ -15,6 +15,15 @@
     pointer-events: none;
     opacity: 0.5;
 }
+.upload-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
 </style>
 
     <div class="ds-breadcrumb">
@@ -36,8 +45,8 @@
                 </div>
                 <div class="dsbdy-filter-wrp p-0 align-items-start">
                     <div class="input-grp search-field mb-0">
-                        <input type="text" placeholder="Search Recorded Class">
-                        <input type="submit" value="Search">
+                        <input type="text" id="searchInput" placeholder="Search Recorded Class">
+                        <input type="submit" value="Search" id="searchButton">
                     </div>
                     <button class="cmn-btn btn-sm add-media-btn" data-bs-target="#addMedia" data-bs-toggle="modal">
                         <i class="fa-solid fa-plus"></i> <span class="btn-text">Add Video</span>
@@ -48,9 +57,9 @@
             <!-- Videos Table -->
             <div class="ds-cmn-tble video active">
                 <div class="ds-vdo-gl-wrp">
-                    <div class="row">
+                    <div class="row" id="videoList">
                         @forelse($videos as $item)
-                            <div class="ds-vdo-gl-cd-wrp col-lg-3">
+                            <div class="ds-vdo-gl-cd-wrp col-lg-3" data-search="{{ strtolower($item->title . ' ' . $item->author . ' ' . ($item->class ? $item->class->name : '') . ' ' . $item->speaker) }}">
                                 <div class="ds-vdo-gl-cd">
                                     <div class="">
                                         <div class="ds-vdo-gl-media" style="position: relative;">
@@ -71,7 +80,7 @@
                                             <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($item->date)->format('d/m/Y \a\t h:i a') }}</p>
                                         </div>
                                         <div class="ds-vdo-gl-cd-actions btn-wrp">
-                                            <button type="button" class="cmn-btn btn-sm edit-media" data-bs-toggle="modal" data-bs-target="#editMedia" data-id="{{ $item->id }}" data-title="{{ $item->title }}" data-author="{{ $item->author }}" data-class_id="{{ $item->class_id }}" data-speaker="{{ $item->speaker }}" data-date="{{ \Carbon\Carbon::parse($item->date)->format('Y-m-d') }}" data-filename="{{ $item->filename }}">Edit</button>
+                                            <button type="button" class="cmn-btn btn-sm edit-media" data-bs-toggle="modal" data-bs-target="#editMedia" data-id="{{ $item->id }}" data-size="{{ $item->size }}" data-title="{{ $item->title }}" data-author="{{ $item->author }}" data-class_id="{{ $item->class_id }}" data-speaker="{{ $item->speaker }}" data-date="{{ \Carbon\Carbon::parse($item->date)->format('Y-m-d') }}" data-filename="{{ $item->filename }}">Edit</button>
                                             <button type="button" class="cmn-btn btn-sm btn-danger delete-media" data-bs-toggle="modal" data-bs-target="#deleteMedia" data-id="{{ $item->id }}">Delete</button>
                                         </div>
                                     </div>
@@ -89,9 +98,9 @@
             <!-- Audios Table -->
             <div class="ds-cmn-tble audio">
                 <div class="ds-vdo-gl-wrp">
-                    <div class="row">
+                    <div class="row" id="audioList">
                         @forelse($audios as $item)
-                            <div class="ds-vdo-gl-cd-wrp col-lg-3">
+                            <div class="ds-vdo-gl-cd-wrp col-lg-3" data-search="{{ strtolower($item->title . ' ' . $item->author . ' ' . ($item->class ? $item->class->name : '') . ' ' . $item->speaker) }}">
                                 <div class="ds-vdo-gl-cd">
                                     <div class="ds-vdo-gl-media">
                                         <a data-fancybox="gallery" href="{{ Storage::disk('public')->url($item->path) }}">
@@ -107,7 +116,7 @@
                                             <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($item->date)->format('d/m/Y \a\t h:i a') }}</p>
                                         </div>
                                         <div class="ds-vdo-gl-cd-actions btn-wrp">
-                                            <button type="button" class="cmn-btn btn-sm edit-media" data-bs-toggle="modal" data-bs-target="#editMedia" data-id="{{ $item->id }}" data-title="{{ $item->title }}" data-author="{{ $item->author }}" data-class_id="{{ $item->class_id }}" data-speaker="{{ $item->speaker }}" data-date="{{ \Carbon\Carbon::parse($item->date)->format('Y-m-d') }}" data-filename="{{ $item->filename }}">Edit</button>
+                                            <button type="button" class="cmn-btn btn-sm edit-media" data-bs-toggle="modal" data-bs-target="#editMedia" data-id="{{ $item->id }}" data-size="{{ $item->size }}" data-title="{{ $item->title }}" data-author="{{ $item->author }}" data-class_id="{{ $item->class_id }}" data-speaker="{{ $item->speaker }}" data-date="{{ \Carbon\Carbon::parse($item->date)->format('Y-m-d') }}" data-filename="{{ $item->filename }}">Edit</button>
                                             <button type="button" class="cmn-btn btn-sm btn-danger delete-media" data-bs-toggle="modal" data-bs-target="#deleteMedia" data-id="{{ $item->id }}">Delete</button>
                                         </div>
                                     </div>
@@ -338,6 +347,14 @@ $(document).ready(function () {
         timerProgressBar: true
     });
 
+    // Format file size function
+    function formatFileSize(bytes) {
+        if (!bytes) return '0 KB';
+        if (bytes < 1024) return bytes + ' B';
+        else if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
+        else return (bytes / 1048576).toFixed(2) + ' MB';
+    }
+
     // Initialize Fancybox for both video and audio
     Fancybox.bind("[data-fancybox='gallery']", {
         Thumbs: false,
@@ -360,8 +377,40 @@ $(document).ready(function () {
         },
     });
 
-    // Toggle button text, file input accept type, and support note based on active tab
+    // Search functionality
+    $('#searchInput').on('input', function () {
+        const searchTerm = $(this).val().toLowerCase().trim();
+        const activeTab = $('.cmn-tab-head li.active').data('tab');
+        const targetList = activeTab === 'video' ? '#videoList' : '#audioList';
+
+        $(targetList).find('.ds-vdo-gl-cd-wrp').each(function () {
+            const $item = $(this);
+            const searchData = $item.data('search') || '';
+            
+            if (searchTerm === '' || searchData.includes(searchTerm)) {
+                $item.show();
+            } else {
+                $item.hide();
+            }
+        });
+
+        // Show/hide "No record found" message
+        const visibleItems = $(targetList).find('.ds-vdo-gl-cd-wrp:visible').length;
+        const noRecordMessage = $(targetList).find('.text-center');
+        
+        if (visibleItems === 0 && !noRecordMessage.length) {
+            $(targetList).append('<div class="col-12"><p class="text-center">No record found</p></div>');
+        } else if (visibleItems > 0 && noRecordMessage.length) {
+            noRecordMessage.parent().remove();
+        }
+    });
+
+    // Clear search input on tab change
     $('.cmn-tab-head li').on('click', function () {
+        $('#searchInput').val('');
+        $('#videoList .ds-vdo-gl-cd-wrp, #audioList .ds-vdo-gl-cd-wrp').show();
+        $('#videoList .text-center, #audioList .text-center').parent().remove();
+        
         const tabType = $(this).data('tab');
         const addButton = $('.add-media-btn');
         const addButtonText = addButton.find('.btn-text');
@@ -391,10 +440,10 @@ $(document).ready(function () {
     $('#media-file').on('change', function (e) {
         const file = e.target.files[0];
         if (file) {
-            const fileSize = (file.size / 1024).toFixed(2) + ' KB';
+            const fileSize = formatFileSize(file.size);
             const fileName = file.name;
             const timestamp = new Date().toLocaleTimeString();
-            const icon = fileName.endsWith('.mp4') ? 'https://saserp.tgastaging.com/backend/assets/images/video-reel-icon.svg' : 'https://saserp.tgastaging.com/backend/assets/images/audio-play.svg';
+            const icon = fileName.endsWith('.mp4') ? '{{ global_asset('backend/assets/images/video-reel-icon.svg') }}' : '{{ global_asset('backend/assets/images/audio-play.svg') }}';
             const uploadItem = `
                 <li class="upload-item">
                     <span class="icon"><img src="${icon}" alt="icon"></span>
@@ -403,7 +452,7 @@ $(document).ready(function () {
                         <span class="timestamp">${timestamp}</span>
                     </div>
                     <span class="size">${fileSize}</span>
-                    <button class="remove-btn"><img src="https://saserp.tgastaging.com/backend/assets/images/cross-circle.svg" alt="Icon"></button>
+                    <button type="button" class="remove-btn"><img src="{{ global_asset('backend/assets/images/cross-circle.svg') }}" alt="Remove"></button>
                 </li>`;
             $('#upload-list').html(uploadItem);
 
@@ -443,7 +492,11 @@ $(document).ready(function () {
                     title: response.message
                 });
                 $('#addMedia').modal('hide');
-                location.reload();
+                
+                // Use setTimeout to ensure modal is fully hidden before reload
+                setTimeout(() => {
+                    location.reload();
+                }, 300);
             },
             error: function (xhr) {
                 if (xhr.status === 422) {
@@ -471,7 +524,7 @@ $(document).ready(function () {
     });
 
     // Handle edit button click to populate modal
-    $('.edit-media').on('click', function () {
+    $(document).on('click', '.edit-media', function () {
         const id = $(this).data('id');
         const title = $(this).data('title');
         const author = $(this).data('author');
@@ -479,8 +532,10 @@ $(document).ready(function () {
         const speaker = $(this).data('speaker');
         const date = $(this).data('date');
         const filename = $(this).data('filename');
-        const icon = filename.endsWith('.mp4') ? 'https://saserp.tgastaging.com/backend/assets/images/video-reel-icon.svg' : 'https://saserp.tgastaging.com/backend/assets/images/audio-play.svg';
-        const fileSize = 'Unknown'; // Size not available from data attributes
+        const size = $(this).data('size');
+        
+        const icon = filename.endsWith('.mp4') ? '{{ global_asset('backend/assets/images/video-reel-icon.svg') }}' : '{{ global_asset('backend/assets/images/audio-play.svg') }}';
+        const fileSize = formatFileSize(size);
         const timestamp = new Date().toLocaleTimeString();
         const activeTab = $('.cmn-tab-head li.active').data('tab');
         const editFileSupportNote = $('#edit-file-support-note');
@@ -502,7 +557,7 @@ $(document).ready(function () {
                     <span class="timestamp">${timestamp}</span>
                 </div>
                 <span class="size">${fileSize}</span>
-                <button class="remove-btn"><img src="https://saserp.tgastaging.com/backend/assets/images/cross-circle.svg" alt="Icon"></button>
+                <button type="button" class="remove-btn"><img src="{{ global_asset('backend/assets/images/cross-circle.svg') }}" alt="Remove"></button>
             </li>`;
         $('#edit-upload-list').html(uploadItem);
 
@@ -511,18 +566,16 @@ $(document).ready(function () {
             $('#edit-media-file').val('');
             $('#edit-upload-list').empty();
         });
-
-        $('#editMedia').modal('show');
     });
 
     // Handle file selection for edit modal
     $('#edit-media-file').on('change', function (e) {
         const file = e.target.files[0];
         if (file) {
-            const fileSize = (file.size / 1024).toFixed(2) + ' KB';
+            const fileSize = formatFileSize(file.size);
             const fileName = file.name;
             const timestamp = new Date().toLocaleTimeString();
-            const icon = fileName.endsWith('.mp4') ? 'https://saserp.tgastaging.com/backend/assets/images/video-reel-icon.svg' : 'https://saserp.tgastaging.com/backend/assets/images/audio-play.svg';
+            const icon = fileName.endsWith('.mp4') ? '{{ global_asset('backend/assets/images/video-reel-icon.svg') }}' : '{{ global_asset('backend/assets/images/audio-play.svg') }}';
             const uploadItem = `
                 <li class="upload-item">
                     <span class="icon"><img src="${icon}" alt="icon"></span>
@@ -531,7 +584,7 @@ $(document).ready(function () {
                         <span class="timestamp">${timestamp}</span>
                     </div>
                     <span class="size">${fileSize}</span>
-                    <button class="remove-btn"><img src="https://saserp.tgastaging.com/backend/assets/images/cross-circle.svg" alt="Icon"></button>
+                    <button type="button" class="remove-btn"><img src="{{ global_asset('backend/assets/images/cross-circle.svg') }}" alt="Remove"></button>
                 </li>`;
             $('#edit-upload-list').html(uploadItem);
 
@@ -550,16 +603,20 @@ $(document).ready(function () {
         formData.append('id', $('#editId').val());
         formData.append('title', $('#edit-title').val() || '');
         formData.append('author', $('#edit-author').val() || '');
-        formData.append('class_id', $('#edit-class_id').val() || '');
+        formData.append('class_id', $('#edit-class_id').val() || null);
         formData.append('speaker', $('#edit-speaker').val() || '');
         formData.append('date', $('#edit-date').val() || '');
-        formData.append('coded_name', ''); // Set to empty string if not used
+        formData.append('coded_name', '');
         const file = $('#edit-media-file')[0].files[0];
         if (file) {
             formData.append('file', file);
         }
 
-        // Disable upload section
+        // Log FormData
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
+        }
+
         $('.file-upload-lg, .btn-wrp').addClass('upload-disabled');
 
         $.ajax({
@@ -569,47 +626,36 @@ $(document).ready(function () {
             contentType: false,
             processData: false,
             headers: {
-                'X-CSRF-TOKEN': $('input[name="_token"]').val()
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function (response) {
+                console.log('Success response:', response);
                 Toast.fire({
                     icon: 'success',
                     title: response.message
                 });
                 $('#editMedia').modal('hide');
-                location.reload();
+                setTimeout(() => {
+                    location.reload();
+                }, 300);
             },
             error: function (xhr) {
-                if (xhr.status === 422) {
-                    const errors = xhr.responseJSON.errors;
-                    let errorMessage = 'Validation failed:<br>';
-                    $.each(errors, function (key, messages) {
-                        errorMessage += messages.join('<br>') + '<br>';
-                    });
-                    Toast.fire({
-                        icon: 'error',
-                        title: errorMessage
-                    });
-                } else {
-                    Toast.fire({
-                        icon: 'error',
-                        title: xhr.responseJSON?.message || 'Error updating media: ' + xhr.status
-                    });
-                }
+                console.log('Error response:', xhr.responseJSON);
+                Toast.fire({
+                    icon: 'error',
+                    title: xhr.responseJSON?.message || 'Error updating media: ' + xhr.status
+                });
             },
             complete: function () {
-                // Re-enable upload section
                 $('.file-upload-lg, .btn-wrp').removeClass('upload-disabled');
             }
         });
     });
 
-
     // Handle delete button click to populate modal
-    $('.delete-media').on('click', function () {
+    $(document).on('click', '.delete-media', function () {
         const id = $(this).data('id');
         $('#deleteId').val(id);
-        $('#deleteMedia').modal('show');
     });
 
     // Handle delete confirmation
@@ -628,15 +674,27 @@ $(document).ready(function () {
                     title: response.message
                 });
                 $('#deleteMedia').modal('hide');
-                location.reload();
+                
+                // Use setTimeout to ensure modal is fully hidden before reload
+                setTimeout(() => {
+                    location.reload();
+                }, 300);
             },
             error: function (xhr) {
                 Toast.fire({
                     icon: 'error',
                     title: xhr.responseJSON?.message || 'Error deleting media'
-                    });
-                }
-            });
+                });
+            }
+        });
+    });
+
+    // Clean up modal backdrops when modals are hidden
+    $('#addMedia, #editMedia, #deleteMedia').on('hidden.bs.modal', function () {
+        // Remove any stuck backdrops
+        $('.modal-backdrop').remove();
+        // Ensure body has correct classes
+        $('body').removeClass('modal-open');
     });
 });
 </script>
