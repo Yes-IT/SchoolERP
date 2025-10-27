@@ -24,14 +24,16 @@
                         <div class="ds-cmn-table-wrp">
                             
                             <div class="request-leave-form spradmin">
-                                <form  action="#" method="POST">
+                                <form action="{{ route('applicant.store_applicant') }}" method="POST">
                                     @csrf
+
                                     <div class="new-request-form">
                                         <h3>Applicant Details</h3>
                                         <div class="multi-input-grp grp-3">
                                             <div class="input-grp">
                                               <label for="ID">ID</label>
-                                              <input type="text" id="custom_id" name="custom_id"  placeholder="ID"  readonly >
+                                              <input type="text" id="custom_id" name="custom_id" value="{{ $nextId }}" placeholder="ID" readonly>
+
                                             </div>
                                             <div class="input-grp">
                                               <label for="">Last Name</label>
@@ -65,7 +67,7 @@
                                             </div>
                                             <div class="input-grp">
                                                 <label for="">High School (Application)</label>
-                                                <input type="text" id="high_school_application" name="high_school_application" placeholder="High School (Application)">
+                                                <input type="text" id="highschool_application" name="highschool_application" placeholder="2024–2025">
                                             </div>
                                         </div>
                                     </div>
@@ -83,10 +85,10 @@
                                                 <div class="multi-input-grp input-grp-5">
                                                     
                                                     <div class="input-grp">
-                                                      <input type="text" id="camp" name="camp" placeholder="Camp">
+                                                      <input type="text"  name="camps[0][camp]" placeholder="Camp">
                                                     </div>
                                                     <div class="input-grp">
-                                                         <input type="text" id="position" name="position" placeholder="Position">
+                                                         <input type="text" name="camps[0][position]" placeholder="Position">
                                                     </div>
 
                                                 </div>
@@ -116,26 +118,26 @@
 
                                             <div class="input-grp">
                                                 <label for="">Date Deposited</label>
-                                                <input type="text" id="date_deposited" name="date_deposited"  placeholder="12/11/2001"  > 
+                                                <input id="date_deposited" name="date_deposited" type="text" placeholder="12/11/2001"  > 
                                             </div>
 
                                             <div class="input-grp">
                                                 <label for="">References</label>
-                                                <input type="text" id="refernce" name="refernce"  placeholder="Enter References" >
+                                                <input id="references" name="references" type="text" placeholder="Enter References" >
                                             </div>
                                              <div class="input-grp">
                                                 <label for="">Pictures</label>
-                                                <input  type="text"  id="pictures" name="pictures"placeholder="59" >
+                                                <input id="pictures" name="pictures" type="text" placeholder="59" >
                                             </div>
                                         </div>
                                         
                                         <div class="multi-input-grp grp-3">
                                             <div class="input-grp checkbox">
-                                                <label>Transcript Hebrew <input id="transcript_hebrew" name="transcript_hebrew" type="checkbox"> </label>
+                                                <label>Transcript Hebrew <input id="transcript_hebrew" name="transcript_hebrew" type="checkbox"></label>
                                             </div>
                                             
                                             <div class="input-grp checkbox">
-                                                <label>Transcript English <input id="transcript_english" name="transcript_english" type="checkbox" > </label>
+                                                <label>Transcript English <input id="transcript_english" name="transcript_english" type="checkbox"></label>
                                             </div>
                                         </div>
                                     </div>
@@ -151,20 +153,25 @@
                                         
                                             <div class="input-grp">
                                                 <label for="">Interview Time</label>
-                                                <input  type="text" id="interview_time" name="interview_time"  placeholder="Interview Time">
+                                                <input id="interview_time" name="interview_time" type="text" placeholder="Interview Time">
                                             </div>
 
                                             <div class="input-grp">
                                                 <label for="">Interview Location</label>
-                                                <select name="interview_location" id="interview_location"></select>
+                                                <select name="interview_location" id="interview_location">
+                                                    <option value="">Choose Location</option>
+                                                    <option value="India">India</option>
+                                                    <option value="Canada">Canada</option>
+                                                    <option value="Israel">Israel</option>
+                                                </select>
                                             </div>
 
                                             <div class="input-grp">
-                                                <label for="">Status</label>
+                                                <label for="Status">Status</label>
                                                 <input id="status" name="status" type="text" placeholder="Status" >
                                             </div>
                                              <div class="input-grp">
-                                                <label for="">Coming</label>
+                                                <label for="Coming">Coming</label>
                                                 <input id="coming" name="coming" type="text" placeholder="Coming" >
                                             </div>
                                         </div>
@@ -184,13 +191,13 @@
                                           <div class="multi-input-grp grp-1">
                                             <div class="input-grp">
                                                 <label for="comment">Scholarship Comment</label>
-                                                <textarea id="scholarship_comment" name="scholarship_comment" cols="50" rows="10" placeholder="Scholarship Comment"></textarea>
+                                                <textarea id="scholaership_comment" name="scholaership_comment" cols="50" rows="10" placeholder="Scholarship Comment"></textarea>
                                             </div>
                                         </div>
                                           <div class="multi-input-grp grp-1">
                                             <div class="input-grp">
                                                 <label for="comment">Tuition Comment</label>
-                                                <textarea id="tution_comment" name="tution_comment" cols="50" rows="10" placeholder="Tuition Comment"></textarea>
+                                                <textarea id="tuition_comment" name="tuition_comment" cols="50" rows="10" placeholder="Tuition Comment"></textarea>
                                             </div>
                                         </div>
 
@@ -205,61 +212,61 @@
 
                                         <div class="multi-input-grp grp-3">
                                             <div class="input-grp input-full">
-                                                <label for="">ID</label>
+                                                <label for="ID">ID</label>
                                                  <input type="text" id="identification_number" name="identification_number"  placeholder="ID"    readonly >
                                             </div>
                                         
                                             <div class="input-grp">
-                                                <label for="">Last Name</label>
-                                                <input id="parent_last_name" name="parent_last_name" type="text" placeholder="Last Name">
+                                                <label for="Last Name">Last Name</label>
+                                                <input id="last_name" name="last_name" type="text" placeholder="Last Name">
                                             </div>
 
                                             <div class="input-grp">
-                                                <label for="">Father Title</label>
+                                                <label for="Father Title">Father Title</label>
                                                 <input id="father_title" name="father_title" type="text" placeholder="Father Title">
                                             </div>
 
                                             <div class="input-grp">
-                                                <label for="">Father Name</label>
+                                                <label for="Father Name">Father Name</label>
                                                 <input id="father_name" name="father_name" type="text" placeholder="Father Name" >
                                             </div>
                                             <div class="input-grp">
-                                                <label for="">Mother Title</label>
+                                                <label for="Mother Title">Mother Title</label>
                                                 <input id="mother_title" name="mother_title" type="text" placeholder="Mother Title"  >
                                             </div>
                                             <div class="input-grp">
-                                                <label for="">Mother Name</label>
+                                                <label for="Mother Name">Mother Name</label>
                                                 <input id="mother_name" name="mother_name" type="text" placeholder="Mother Name"  >
                                             </div>
 
                                              <div class="input-grp">
-                                                <label for="">Maiden Name</label>
+                                                <label for="Maiden Name">Maiden Name</label>
                                                 <input id="maiden_name" name="maiden_name" type="text" placeholder="Maiden Name"  >
                                             </div>
                                              <div class="input-grp">
-                                                <label for="">Address</label>
+                                                <label for="Address">Address</label>
                                                 <input id="address" name="address" type="text" placeholder="Address"  >
                                             </div>
                                              <div class="input-grp">
-                                                <label for="">City</label>
+                                                <label for="City">City</label>
                                                 <input id="city" name="city" type="text" placeholder="City" >
                                             </div>
 
                                              <div class="input-grp">
-                                                <label for="">State</label>
+                                                <label for="State">State</label>
                                                 <input id="state" name="state" type="text" placeholder="State" >
                                             </div>
                                              <div class="input-grp">
-                                                <label for="">Zip Code</label>
+                                                <label for="Zip Code">Zip Code</label>
                                                 <input id="zip_code" name="zip_code" type="text" placeholder="Zip Code" >
                                             </div>
                                             <div class="input-grp">
-                                                <label for="">Country</label>
+                                                <label for="Country">Country</label>
                                                 <input id="country" name="country" type="text" placeholder="Country" >
                                             </div>
                                             <div class="input-grp">
-                                                <label for="">Marital Status</label>
-                                                <input id="martial_status" name="martial_status" type="text" placeholder="Marital Status" >
+                                                <label for="Marital Status">Marital Status</label>
+                                                <input id="marital_status" name="marital_status" type="text" placeholder="Marital Status" >
                                             </div>
                                             <div class="input-grp">
                                                 <label for="">Marital Comment</label>
@@ -295,17 +302,18 @@
                                             </div>
                                             <div class="input-grp">
                                                 <label for="">Additional Phone No.</label>
-                                                <input id="additional_phone" name="additional_phone" type="text" placeholder="Additional Phone No." >
+                                                <input id="additional_phone_no" name="additional_phone_no" type="text" placeholder="Additional Phone No." >
                                             </div>
                                             <div class="input-grp">
                                                 <label for="">Additional Email Addresses</label>
-                                                <input id="additional_email" name="additional_email" type="text" placeholder="Additional Email Addresses" >
+                                                <input id="additional_emails" name="additional_emails" type="text" placeholder="Additional Email Addresses" >
                                             </div>
                                             
                                         </div>
                                      
                                     </div>
                                   
+
                                     <div class="form-submission btn-sm align-right">
                                         <button type="submit" class="cmn-btn btn-sm">Save Applicant</button>
                                     </div>
@@ -317,3 +325,56 @@
                    
 
 @endsection
+
+@push('script')
+<script>
+    $(document).ready(function() {
+        let campIndex = 0;
+
+        // When "Add" button is clicked
+        $('#add-row-btn').on('click', function(e) {
+            e.preventDefault();
+
+            // Create a new camp row with indexed names
+            let newRow = `
+                <div class="added-element-card schedule-row">
+                    <span class="sl-count"></span>
+                    <div class="multi-input-grp input-grp-5">
+                        <div class="input-grp">
+                            <input type="text" name="camps[${campIndex}][camp]" placeholder="Camp">
+                        </div>
+                        <div class="input-grp">
+                            <input type="text" name="camps[${campIndex}][position]" placeholder="Position">
+                        </div>
+                    </div>
+                    <div class="added-elm-actions btn-grp">
+                      <button type="submit" class="cmn-btn btn-sm"><img
+                                                                src="{{global_asset('backend/assets/images/edit-icon.svg')}}" alt="Icon"> Edit</button>
+                        <button type="submit" class="cmn-btn btn-sm delete-row-btn">Delete</button>
+                    </div>
+                </div>
+            `;
+
+            $('#schedule-wrapper').append(newRow);
+            campIndex++;
+        });
+
+        // Delete row functionality
+        $(document).on('click', '.delete-row-btn', function(e) {
+            e.preventDefault();
+            $(this).closest('.schedule-row').remove();
+
+            // Re-index after removal (optional)
+            $('#schedule-wrapper .schedule-row').each(function(i, el) {
+                $(el).find('input[name^="camps"]').each(function() {
+                    let oldName = $(this).attr('name');
+                    let newName = oldName.replace(/\[\d+\]/, `[${i}]`);
+                    $(this).attr('name', newName);
+                });
+            });
+            campIndex = $('#schedule-wrapper .schedule-row').length;
+        });
+    });
+</script>
+
+@endpush

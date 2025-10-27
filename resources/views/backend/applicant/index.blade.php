@@ -68,8 +68,8 @@
                         </div>
                     </div>
 
-                    <div class="ds-cmn-tble count-row tbl-5_4k">
-                        <table>
+                    <div class="ds-cmn-tble count-row tbl-5_4k" id="applicantTableContainer">
+                        {{-- <table>
                             <thead>
                                 <tr>
                                     <th>S. No</th>
@@ -243,10 +243,12 @@
                                     </td>
                                   </tr>
                               </tbody>
-                        </table>
+                        </table> --}}
+
+                         @include('backend.applicant.partials.applicant_list', ['applicants' => $applicants])
                     </div>
 
-                    <div class="tablepagination">
+                    {{-- <div class="tablepagination">
                         <div class="tbl-pagination-inr">
                             <ul>
                                 <li><a href="#url"><img src="{{global_asset('backend/assets/images/arrow-left.svg')}}" alt="Icon"></a></li>
@@ -277,7 +279,7 @@
                             </form>
                             <p>of 2 results</p>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
                   
             </div>
@@ -285,3 +287,35 @@
 
 
 @endsection
+
+@push('script')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const tableContainer = document.querySelector('#applicantTableContainer');
+
+    function loadTableData(url = '{{ route('applicant.index') }}') {
+        fetch(url, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            tableContainer.innerHTML = data.html;
+            attachPaginationListeners();
+        })
+        .catch(console.error);
+    }
+
+    function attachPaginationListeners() {
+        document.querySelectorAll('.tablepagination a').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                loadTableData(link.href);
+            });
+        });
+    }
+
+    attachPaginationListeners();
+});
+</script>
+    
+@endpush
