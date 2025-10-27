@@ -1,5 +1,5 @@
 <!-- Sidebar Begin -->
-<<<<<<< HEAD
+
     <div class="sidebar">
         <div class="sidebar-head">
             <a href="{{route('dashboard')}}" class="logo">
@@ -45,58 +45,6 @@
                         Applicant
                     </a>
                 </li>
-=======
-<div class="sidebar">
-    <div class="sidebar-head">
-        <a href="{{ route('dashboard') }}" class="logo">
-            <img src="{{ asset('backend') }}/assets/images/new_images/logo.png" alt="Logo">
-        </a>
-        <button class="sidebar-toggler"><i class="fa-solid fa-chevron-left"></i></button>
-    </div>
-    <div class="sidebar-body">
-        <ul>
-            <li class="{{ request()->routeIs('dashboard.*') ? 'active' : '' }}">
-                <a href="{{ route('dashboard') }}">
-                    <img src="{{ asset('backend') }}/assets/images/new_images/sidebar-icon-1.svg" alt="Sidebar Icon">
-                    Dashboard
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('student.*') ? 'active' : '' }}">
-                <a href="{{ url('student/index') }}">
-                    <img src="{{ asset('backend') }}/assets/images/new_images/superadmin-panel/sidebar-icon-1.svg"
-                        alt="Sidebar Icon">
-                    Student
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('parent.*') ? 'active' : '' }}">
-                <a href="{{ route('parent.index') }}">
-                    <img src="{{ asset('backend') }}/assets/images/new_images/superadmin-panel/sidebar-icon-2.svg"
-                        alt="Sidebar Icon">
-                    Parent
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('teacher.*') ? 'active' : '' }}">
-                <a href="{{ route('teacher.index') }}">
-                    <img src="{{ asset('backend/assets/images/superadmin-panel/sidebar-icon-3.svg') }}"
-                        alt="Sidebar Icon">
-                    Teacher
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('classes.*') ? 'active' : '' }}">
-                <a href="{{ route('classes.index') }}">
-                    <img src="{{ asset('backend/assets/images/superadmin-panel/sidebar-icon-4.svg') }}"
-                        alt="Sidebar Icon">
-                    Class
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('applicant.*') ? 'active' : '' }}">
-                <a href="{{ route('applicant.profile') }}">
-                    <img src="{{ asset('backend') }}/assets/images/new_images/superadmin-panel/sidebar-icon-5.svg"
-                        alt="Sidebar Icon">
-                    Applicant
-                </a>
-            </li>
->>>>>>> 42db4abf0d2784b0249b30cea5219cac1ea7d038
 
             <li class="menu-item-has-children {{ request()->routeIs('alumni_flow.*') ? 'active' : '' }}">
                 <a href="{{ route('alumni_flow.index') }}">
