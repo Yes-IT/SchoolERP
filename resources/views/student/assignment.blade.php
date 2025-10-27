@@ -93,7 +93,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($assignments as $key => $assignment)
+                        @forelse ($completed_assignments as $key => $assignment)
                             <tr data-assignment-id="{{ $assignment->id }}"
                                 data-subject-id="{{ $assignment->subject_id }}">
                                 <td>{{ $key + 1 }}</td>
@@ -108,8 +108,8 @@
 
                                 </td>
                                 <td><button class="view-attachment-btn" data-bs-target="#viewAttachedDocs"
-                                        data-bs-toggle="modal"><img src="{{ asset('student/images/eye-white.svg') }}"
-                                            alt="Eye Icon"></button></td>
+                                        data-bs-toggle="modal" data-assignment-media="{{ $assignment->media }}"><img
+                                            src="{{ asset('student/images/eye-white.svg') }}" alt="Eye Icon"></button></td>
 
                                 <td>{{ \Carbon\Carbon::parse($assignment->assigned_date)->format('d/m/Y') }}</td>
                                 <td>{{ \Carbon\Carbon::parse($assignment->due_date)->format('d/m/Y') }}</td>
@@ -123,7 +123,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center">No assignments found.</td>
+                                <td colspan="6" class="text-center text-dark">No assignments found.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -471,31 +471,10 @@
                         </div>
 
                         <div class="cmn-pop-inr-content-wrp">
-                            <div class="viewAttachedDocs">
-                                <div class="attached-doc-card">
-                                    <div class="attached-doc-info">
-                                        <p>Assignment No.- 24</p>
-                                        <p>Title: Lorem Ipsum</p>
-                                        <p>File Format: PDF File</p>
-                                    </div>
-                                    <div class="btn-wrp">
-                                        <a href="{{ asset('student/images/document-icon.svg') }}"
-                                            download="{{ asset('student/images/download-icon.svg') }}"
-                                            class="cmn-btn">Download</a>
-                                    </div>
-                                </div>
-                                <div class="attached-doc-card">
-                                    <div class="attached-doc-info">
-                                        <p>Assignment No.- 24</p>
-                                        <p>Title: Lorem Ipsum</p>
-                                        <p>File Format: PDF File</p>
-                                    </div>
-                                    <div class="btn-wrp">
-                                        <a href="{{ asset('student/images/document-icon.svg') }}"
-                                            download="{{ asset('student/images/download-icon.svg') }}"
-                                            class="cmn-btn">Download</a>
-                                    </div>
-                                </div>
+                            <div class="viewAttachedDocs" id="attachedDocsContent">
+                                <!-- Dynamic content will be loaded here -->
+
+
                             </div>
                         </div>
                     </div>
@@ -508,6 +487,39 @@
 @endsection
 
 @push('page_script')
+    <script>
+        $('#viewAttachedDocs').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget);
+            var media = button.data('assignment-id');
+            var assignmentId = button.data('assignment-id');
+            var assignmentId = button.data('title');
+
+            var modal = $(this);
+            htmlContent = '';
+            if (button.data('assignment-media')) {
+                var mediaFiles = button.data('assignment-media').split(',');
+                mediaFiles.forEach(function(file) {
+                     htmlContent += `<div class="attached-doc-card">
+                                    <div class="attached-doc-info">
+                                        <p>Assignment No.- 24</p>
+                                        <p>Title: Lorem Ipsum</p>
+                                        <p>File Format: PDF File</p>
+                                    </div>
+                                    <div class="btn-wrp">
+                                        <a href="{{ asset('student/images/document-icon.svg') }}"
+                                            download="{{ asset('student/images/download-icon.svg') }}"
+                                            class="cmn-btn">Download</a>
+                                    </div>
+                                </div>`;
+                });
+               
+            } else {
+                htmlContent = '<p>No attachments found for this assignment.</p>';
+            }
+
+
+        });
+    </script>
     <script>
         document.querySelectorAll('.file-upload-btn').forEach(function(button) {
             button.addEventListener('click', function() {

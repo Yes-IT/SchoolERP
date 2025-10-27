@@ -7,6 +7,11 @@
 @section('content')
 
 <style>
+    #addVideo .upload-list .upload-item {
+        border: 1px solid var(--border-clr);
+        border-radius: 10px;
+        padding: 12px;
+    }
     .upload-item {
         border: 1px solid var(--border-clr);
         border-radius: 10px;
@@ -226,6 +231,7 @@
                 </div>
             </div>
         </div>
+    </div>
 
     <!-- Delete Media Modal -->
     <div class="modal fade cmn-popwrp" id="deleteGallery" tabindex="-1" role="dialog" aria-labelledby="deleteGallery" aria-hidden="true">
@@ -315,7 +321,11 @@
                     $('#addGalleryForm')[0].reset();
                     $('#addFile').next('.file-upld-lg-design').find('p').text('Click to browse or drag and drop your files');
                     clearErrors('#addGalleryForm');
-                    location.reload();
+                    
+                    // Use setTimeout to ensure modal is fully hidden before reload
+                    setTimeout(() => {
+                        location.reload();
+                    }, 300);
                 },
                 error: function(xhr) {
                     let response = xhr.responseJSON;
@@ -337,7 +347,7 @@
         });
 
         // Handle edit button click
-        $('.edit-btn').on('click', function() {
+        $(document).on('click', '.edit-btn', function() {
             let id = $(this).data('id');
             
             $.ajax({
@@ -355,7 +365,6 @@
                     $('#currentFile .cross-btn').data('id', item.id);
                     $('#editFile').next('.file-upld-lg-design').find('p').text('Click to browse or drag and drop to replace file');
                     $('#currentFile').show();
-                    $('#editGallery').modal('show');
                 },
                 error: function(xhr) {
                     let response = xhr.responseJSON;
@@ -372,9 +381,10 @@
             clearErrors('#editGalleryForm');
             
             let formData = new FormData($('#editGalleryForm')[0]);
+            let id = $('#editId').val();
             
             $.ajax({
-                url: '{{ url("alumni_flow/alumni-gallery") }}/' + $('#editId').val() + '/update',
+                url: '{{ url("alumni_flow/alumni-gallery") }}/' + id + '/update',
                 type: 'POST',
                 data: formData,
                 processData: false,
@@ -391,7 +401,11 @@
                     $('#editGalleryForm')[0].reset();
                     $('#editFile').next('.file-upld-lg-design').find('p').text('Click to browse or drag and drop your files');
                     clearErrors('#editGalleryForm');
-                    location.reload();
+                    
+                    // Use setTimeout to ensure modal is fully hidden before reload
+                    setTimeout(() => {
+                        location.reload();
+                    }, 300);
                 },
                 error: function(xhr) {
                     let response = xhr.responseJSON;
@@ -413,14 +427,17 @@
         });
 
         // Handle delete button click
-        $('.delete-btn').on('click', function() {
-            $('#deleteId').val($(this).data('id'));
+        $(document).on('click', '.delete-btn', function() {
+            let id = $(this).data('id');
+            $('#deleteId').val(id);
         });
 
         // Handle confirm delete
         $('#confirmDelete').on('click', function() {
+            let id = $('#deleteId').val();
+            
             $.ajax({
-                url: '{{ url("alumni_flow/alumni-gallery") }}/' + $('#deleteId').val(),
+                url: '{{ url("alumni_flow/alumni-gallery") }}/' + id,
                 type: 'DELETE',
                 data: {
                     _token: '{{ csrf_token() }}'
@@ -434,7 +451,11 @@
                         title: response.message
                     });
                     $('#deleteGallery').modal('hide');
-                    location.reload();
+                    
+                    // Use setTimeout to ensure modal is fully hidden before reload
+                    setTimeout(() => {
+                        location.reload();
+                    }, 300);
                 },
                 error: function(xhr) {
                     let response = xhr.responseJSON;
@@ -450,7 +471,7 @@
         });
 
         // Handle cross button click to delete file
-        $('#currentFile .cross-btn').on('click', function() {
+        $(document).on('click', '#currentFile .cross-btn', function() {
             let id = $(this).data('id');
             if (!id) return;
 
@@ -475,7 +496,11 @@
                         $('#currentFile .size').text('');
                         $('#currentFile .download-btn').attr('href', '#');
                         $('#editFile').next('.file-upld-lg-design').find('p').text('Click to browse or drag and drop your files');
-                        location.reload();
+                        
+                        // Use setTimeout to ensure modal is fully hidden before reload
+                        setTimeout(() => {
+                            location.reload();
+                        }, 300);
                     },
                     error: function(xhr) {
                         let response = xhr.responseJSON;
@@ -541,6 +566,14 @@
                     $('#downloadAll').prop('disabled', false).text('Download All');
                 }
             });
+        });
+
+        // Reset forms when modals are hidden
+        $('#addGallery, #editGallery, #deleteGallery').on('hidden.bs.modal', function () {
+            // Clear any backdrop that might be stuck
+            $('.modal-backdrop').remove();
+            // Ensure body has correct classes
+            $('body').removeClass('modal-open');
         });
     });
 </script>
