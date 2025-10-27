@@ -1,3 +1,4 @@
 # Ignore Composer vendor directory
 /vendor/
 /storage/logs/
+.env

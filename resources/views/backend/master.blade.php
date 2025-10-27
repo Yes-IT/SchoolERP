@@ -1687,7 +1687,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"
         integrity="sha512-bE2H3X0bwh9k4EStk1gE5X01gA6Y+/C75OHyJDq4RVlM1aFzDJgcZlcpJKuFVZ0Y99D7eM6nE+EZ0zKfL6+5MA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+    @stack('script')
 </body>
 
 </html>

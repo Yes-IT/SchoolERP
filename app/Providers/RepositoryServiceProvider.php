@@ -119,10 +119,17 @@ use App\Interfaces\RecordedClassRepositoryInterface;
 use App\Interfaces\Report\ReportFilterInterface;
 use App\Repositories\Academic\RoomManagementRepository;
 use App\Repositories\AlumniGalleryRepository;
-use App\Repositories\AssignmentRepository;
 use App\Repositories\Leaves\LeaveRepository;
 use App\Repositories\RecordedClassRepository;
 use App\Repositories\Report\ReportFilterRepository;
+
+use App\Repositories\Applicant\ApplicantRepository;
+use App\Interfaces\Applicant\ApplicantInterface;
+
+use App\Interfaces\Academic\AssignmentInterface;
+use App\Repositories\Academic\AssignmentRepository;
+
+
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -186,6 +193,8 @@ class RepositoryServiceProvider extends ServiceProvider
         // Students
         $this->app->bind(PromoteStudentInterface::class,           PromoteStudentRepository::class);
         
+         //superadmin's Applicant module
+        $this->app->bind(ApplicantInterface::class,                 ApplicantRepository::class);
         
         // Student panel
         $this->app->bind(DashboardInterface::class,                          DashboardRepository::class);
@@ -219,7 +228,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(RoomManagementRepositoryInterface::class,RoomManagementRepository::class);
 
         //Assignment Management
-        $this->app->bind(AssignmentRepositoryInterface::class, AssignmentRepository::class);
+        $this->app->bind(AssignmentInterface::class,               AssignmentRepository::class);
 
         // Report Filter
         $this->app->bind(ReportFilterInterface::class, ReportFilterRepository::class);
