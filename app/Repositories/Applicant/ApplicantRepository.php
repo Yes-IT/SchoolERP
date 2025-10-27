@@ -19,89 +19,7 @@ class ApplicantRepository implements ApplicantInterface
         return Applicant::with('parents')->findOrFail($id);
     }
 
-    // public function createApplicant(array $data)
-    // {
-    //     return DB::transaction(function () use ($data) {
-
-    //         // Create applicant
-    //         $applicant = Applicant::create([
-    //             'custom_id' => $data['custom_id'] ?? null,
-    //             'last_name' => $data['last_name'] ?? null,
-    //             'first_name' => $data['first_name'] ?? null,
-    //             'high_school' => $data['high_school'] ?? null,
-    //             'date_of_birth' => $data['date_of_birth'] ?? null,
-    //             'usa_cell' => $data['usa_cell'] ?? null,
-    //             'email' => $data['email'] ?? null,
-    //             'highschool_application' => $data['highschool_application'] ?? null,
-    //         ]);
-
-    //        $applicantCheckList =    ApplicantCheckList::create([
-    //                 'applicant_id' => $applicant->id,
-    //                 'fee' => $data['fee'] ?? null,
-    //                 'cc_last_4' => $data['cc_last_4'] ?? null,
-    //                 'date_deposited' => $data['date_deposited'] ?? null,
-    //                 'references' => $data['references'] ?? null,
-    //                 'pictures' => $data['pictures'] ?? null,
-    //                 'transcript_hebrew' => isset($data['transcript_hebrew']) ? 1 : 0,
-    //                 'transcript_english' => isset($data['transcript_english']) ? 1 : 0,
-    //             ]);
-
-    //              //  Save Application Processing
-    //             ApplicationProcessing::create([
-    //                 'applicant_id' => $applicant->id,
-    //                 'interview_date' => $data['interview_date'] ?? null,
-    //                 'interview_time' => $data['interview_time'] ?? null,
-    //                 'interview_location' => $data['interview_location'] ?? null,
-    //                 'status' => $data['status'] ?? null,
-    //                 'coming' => $data['coming'] ?? null,
-    //             ]);
-
-    //             //  Save Camp Data (if dynamic rows added)
-    //             if (!empty($data['camps'])) {
-    //                 foreach ($data['camps'] as $camp) {
-    //                     ApplicantCamps::create([
-    //                         'applicant_id' => $applicant->id,
-    //                         'camp' => $camp['camp'] ?? null,
-    //                         'position' => $camp['position'] ?? null,
-    //                     ]);
-    //                 }
-    //             }
-
-    //         // Create parent
-    //         $parent = ParentGuardian::create([
-    //             'father_title' => $data['father_title'] ?? null,
-    //             'father_name' => $data['father_name'] ?? null,
-    //             'mother_title' => $data['mother_title'] ?? null,
-    //             'mother_name' => $data['mother_name'] ?? null,
-    //             'maiden_name' => $data['maiden_name'] ?? null,
-    //             'address' => $data['address'] ?? null,
-    //             'city' => $data['city'] ?? null,
-    //             'state' => $data['state'] ?? null,
-    //             'zip_code' => $data['zip_code'] ?? null,
-    //             'country' => $data['country'] ?? null,
-    //             'marital_status' => $data['marital_status'] ?? null,
-    //             'marital_comment' => $data['marital_comment'] ?? null,
-    //             'home_phone' => $data['home_phone'] ?? null,
-    //             'father_cell' => $data['father_cell'] ?? null,
-    //             'mother_cell' => $data['mother_cell'] ?? null,
-    //             'father_email' => $data['father_email'] ?? null,
-    //             'mother_email' => $data['mother_email'] ?? null,
-    //             'father_occupation' => $data['father_occupation'] ?? null,
-    //             'mother_occupation' => $data['mother_occupation'] ?? null,
-    //             'additional_phone_no' => $data['additional_phone_no'] ?? null,
-    //             'additional_emails' => $data['additional_emails'] ?? null,
-    //         ]);
-
-
-    //         // Link applicant to parent
-    //         ApplicantParent::create([
-    //             'applicant_id' => $applicant->id,
-    //             'parent_id' => $parent->id,
-    //         ]);
-
-    //         return $applicant->load('parents');
-    //     });
-    // }
+   
 
     public function createApplicant(array $data)
     {
@@ -126,7 +44,7 @@ class ApplicantRepository implements ApplicantInterface
                     'fee' => $data['fee'] ?? 0,
                     'cc_last_4' => $data['cc_last_4'] ?? 0,
                     'date_deposited' =>!empty($data['date_deposited']) ? $data['date_deposited'] : null,
-                    'references' => $data['references'] ?? 0,
+                    'reference' => $data['references'] ?? 0,
                     'pictures' => $data['pictures'] ?? 0,
                     'transcript_hebrew' => isset($data['transcript_hebrew']) ? 1 : 0,
                     'transcript_english' => isset($data['transcript_english']) ? 1 : 0,

@@ -40,7 +40,7 @@
                     </a>
                 </li>
                 <li class="{{ request()->routeIs('applicant.*') ? 'active' : '' }}">
-                    <a href="{{route('applicant.profile')}}">
+                    <a href="{{route('applicant.index')}}">
                         <img src="{{ asset('backend') }}/assets/images/new_images/superadmin-panel/sidebar-icon-5.svg" alt="Sidebar Icon">
                         Applicant
                     </a>

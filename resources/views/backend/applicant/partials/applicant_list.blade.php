@@ -4,6 +4,7 @@
             <th>S. No</th>
             <th>Last Name</th>
             <th>First Name</th>
+            <th>View</th>
             <th>High School</th>
             <th>High School (Application)</th>
             <th>City</th>
@@ -44,6 +45,11 @@
                 <td>{{ $applicants->firstItem() + $index }}</td>
                 <td>{{ $applicant->last_name }}</td>
                 <td>{{ $applicant->first_name }}</td>
+                 <td>
+                    <a href="{{ route('applicant.view_applicant_info', ['id' => $applicant->id]) }}" class="view-attachment-btn">
+                        <img src="{{ global_asset('backend/assets/images/eye-white.svg') }}" alt="Eye Icon">
+                    </a>
+                </td>
                 <td>{{ $applicant->high_school }}</td>
                 <td>{{ $applicant->highschool_application }}</td>
                 <td>kolkata</td>

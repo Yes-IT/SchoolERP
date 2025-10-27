@@ -25,7 +25,7 @@ class ApplicantStoreRequest extends FormRequest
     {
          return [
             // Applicant fields
-            'custom_id' => 'nullable|string|max:1000',
+            'custom_id' => 'nullable|string|max:100',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'high_school' => 'nullable|string|max:255',

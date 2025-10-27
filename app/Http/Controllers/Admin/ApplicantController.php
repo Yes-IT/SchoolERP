@@ -35,9 +35,8 @@ class ApplicantController extends Controller
         $perPage = $request->get('per_page', 10);
         $applicants = $query->paginate($perPage);
 
-        Log::info('Applicants', ['applicants' => $applicants]);
+        // Log::info('Applicants', ['applicants' => $applicants]);
 
-        // Detect AJAX
         if ($request->ajax()) {
             $html = view('backend.applicant.partials.table', compact('applicants'))->render();
             return response()->json(['html' => $html]);
@@ -76,21 +75,20 @@ class ApplicantController extends Controller
             $nextId = 'APPLI' . str_pad($number + 1, 4, '0', STR_PAD_LEFT);
         }
 
-        Log::info('Next custom_id: ' . $nextId);
+        // Log::info('Next custom_id: ' . $nextId);
 
         return view('backend.applicant.add-new-applicant', compact('nextId'));
     }
 
     public function store_applicant(ApplicantStoreRequest $request)
     {
-       
+        // Log::info('request for store applicant', ['request' => $request->all()]);
         try {
             $applicant = $this->applicantrepository->createApplicant($request->validated());
             return redirect()
                 ->route('applicant.index')
                 ->with('success', 'Applicant created successfully.');
         } catch (\Throwable $e) {
-           
             Log::error('Error in store_applicant: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
@@ -99,6 +97,19 @@ class ApplicantController extends Controller
                 ->route('applicant.add_new_applicant')
                 ->with('error', 'Failed to create applicant.');
         }
+    }
+
+    public function view_applicant_info($id){
+        try{
+            $applicant = $this->applicantrepository->getApplicantById($id);
+
+           Log::info('Applicant info details', ['applicant' => $applicant]);
+
+            return view('backend.applicant.view-applicant-info', compact('applicant'));
+        }catch(\Exception $e){
+            return redirect()->route('applicant.index')->with('error', 'Failed to get applicant.');
+        }
+       
     }
 
     public function edit_applicant(){
