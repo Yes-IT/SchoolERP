@@ -15,6 +15,7 @@ use App\Models\Examination\Grade;
 use App\Models\Attendance\Apply_Leave;
 use App\Models\Academic\StudyMaterial;
 use App\Models\Attendance\LateCurfew;
+use Carbon\Carbon;
 use DB;
 
 
@@ -341,11 +342,69 @@ class StudentController extends Controller
 
         return back()->with('success', 'File uploaded successfully!');
     }
-    public function studentAttendance()
-    {
 
-        return view('student.attendance');
+    public function studentAttendance(Request $request)
+    {
+        // Get logged-in student ID
+        $student = Student::where('user_id', Auth::user()->id)->first();
+        $id = $student->id;
+
+        // Get selected month/year or default to current
+        $month = $request->get('month', now()->month);
+        $year = $request->get('year', now()->year);
+        $selectedSubjects = $request->get('subjects', []);
+
+        // Base query for attendance
+        $query = DB::table('attendances')
+            ->where('student_id', $id)
+            ->whereMonth('date', $month)
+            ->whereYear('date', $year)->leftJoin('classes', 'attendances.classes_id', '=', 'classes.id');
+
+        // Filter by subjects (if not "all")
+        if (!in_array('all', $selectedSubjects) && !empty($selectedSubjects)) {
+            $query->whereIn('classes.subject_id', $selectedSubjects);
+        }
+
+        $data = $query->get();
+
+        // Get all subjects for the dropdown
+        $subjects = DB::table('student_class_mapping')
+            ->where('student_id', $id)
+            ->leftJoin('classes', 'student_class_mapping.class_id', '=', 'classes.id')
+            ->leftJoin('subjects', 'classes.subject_id', '=', 'subjects.id')
+            ->select('subjects.id', 'subjects.name')
+            ->get();
+
+        // Transform DB data
+        $attendanceData = $data->mapWithKeys(function ($item) {
+            $status = match ($item->roll) {
+                'on time', 'present' => 'present',
+                'late' => 'late',
+                'half_day' => 'half_day',
+                'absent' => 'absent',
+                default => null,
+            };
+            return [$item->date => $status];
+        })->toArray();
+
+        // Calendar details
+        $firstDay = Carbon::create($year, $month, 1);
+        $lastDay = $firstDay->copy()->endOfMonth();
+        $daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Shabbos'];
+
+        return view('student.attendance', compact(
+            'data',
+            'daysOfWeek',
+            'firstDay',
+            'lastDay',
+            'attendanceData',
+            'month',
+            'year',
+            'subjects'
+        ));
     }
+
+
 
     public function studentGrades(Request $request)
     {

@@ -21,7 +21,7 @@ Route::middleware(saasMiddleware())->group(function () {
             Route::group(['middleware' => ['auth.routes', 'AdminPanel']], function () {
 
                 Route::controller(StudentController::class)->prefix('student')->group(function () {
-                    Route::get('/',                 'index')->name('student.index')->middleware('PermissionCheck:student_read');
+                    Route::get('/index',                 'index')->name('student.index')->middleware('PermissionCheck:student_read');
                     Route::any('/search',           'search')->name('student.search')->middleware('PermissionCheck:student_read');
                     Route::get('/create',           'create')->name('student.create')->middleware('PermissionCheck:student_create');
                     Route::post('/store',           'store')->name('student.store')->middleware('PermissionCheck:student_create', 'DemoCheck');
@@ -161,9 +161,9 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::get('/requested-inventory',                 'requestedInventory')->name('dormitory.requestedInventory')->middleware('PermissionCheck:parent_read');
                     Route::get('/low-inventory',                 'lowInventory')->name('dormitory.lowInventory')->middleware('PermissionCheck:parent_read');
                     Route::post('requested-inventory/update-inventory-request-status/{id}',  'updateRequestInventoryStatus');
- 
+
                     Route::get('/low-inventory',                 'lowInventory')->name('dormitory.lowInventory')->middleware('PermissionCheck:parent_read');
-                      Route::get('/usage_report',                 'usageReport')->name('dormitory.usageReport')->middleware('PermissionCheck:parent_read');
+                    Route::get('/usage_report',                 'usageReport')->name('dormitory.usageReport')->middleware('PermissionCheck:parent_read');
                 });
             });
         });

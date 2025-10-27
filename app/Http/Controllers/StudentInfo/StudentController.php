@@ -71,7 +71,7 @@ class StudentController extends Controller
 
     public function index()
     {
-        dd("dsfsd");
+      
         $data['classes']  = $this->classRepo->assignedAll();
         $data['sections'] = [];
         $data['title']    = ___('student_info.student_list');

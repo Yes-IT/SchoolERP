@@ -1,6 +1,4 @@
 <IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteBase /
-    RewriteRule ^$ public/index.php [L]
-    RewriteRule ^((?!public/).*)$ public/$1 [L,NC]
+    RewriteEngine On RewriteCond %{REQUEST_FILENAME} !-d RewriteCond
+    %{REQUEST_FILENAME} !-f RewriteRule ^ index.php [L]
 </IfModule>

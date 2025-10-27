@@ -70,10 +70,13 @@ use App\Repositories\Homework\HomeworkRepository;
 use App\Repositories\Staff\DesignationRepository;
 use App\Repositories\WebsiteSetup\NewsRepository;
 use App\Interfaces\Academic\ClassRoutineInterface;
+use App\Interfaces\Academic\RoomManagementRepositoryInterface;
 use App\Interfaces\Academic\TimeScheduleInterface;
 use App\Repositories\Academic\ClassRoomRepository;
 use App\Repositories\Report\ExamRoutineRepository;
 use App\Interfaces\Academic\SubjectAssignInterface;
+use App\Interfaces\AlumniGalleryRepositoryInterface;
+use App\Interfaces\AssignmentRepositoryInterface;
 use App\Interfaces\StudentPanel\DashboardInterface;
 use App\Repositories\Academic\ClassSetupRepository;
 use App\Repositories\WebsiteSetup\SliderRepository;
@@ -112,17 +115,14 @@ use App\Repositories\StudentPanel\Homework\HomeworkRepository as StudentPanelHom
 use App\Repositories\ParentPanel\Homework\HomeworkInterface as ParentPanelHomeworkInterface;
 use App\Repositories\ParentPanel\Homework\HomeworkRepository as ParentPanelHomeworkRepository;
 use App\Interfaces\Leaves\LeaveRepositoryInterface;
-use App\Repositories\Leaves\LeaveRepository;
-use App\Interfaces\Staff\TeacherInterface;
-use App\Repositories\Staff\TeacherRepository;
-use App\Repositories\RecordedClassRepository;
 use App\Interfaces\RecordedClassRepositoryInterface;
+use App\Interfaces\Report\ReportFilterInterface;
 use App\Repositories\Academic\RoomManagementRepository;
 use App\Repositories\AlumniGalleryRepository;
-use App\Interfaces\AlumniGalleryRepositoryInterface;
-use App\Interfaces\Academic\RoomManagementRepositoryInterface;
-use App\Repositories\Applicant\ApplicantRepository;
-use App\Interfaces\Applicant\ApplicantInterface;
+use App\Repositories\AssignmentRepository;
+use App\Repositories\Leaves\LeaveRepository;
+use App\Repositories\RecordedClassRepository;
+use App\Repositories\Report\ReportFilterRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -171,7 +171,6 @@ class RepositoryServiceProvider extends ServiceProvider
         // Staff
         $this->app->bind(DepartmentInterface::class,               DepartmentRepository::class);
         $this->app->bind(DesignationInterface::class,              DesignationRepository::class);
-        $this->app->bind(TeacherInterface::class,                  TeacherRepository::class);
         
         // Examination
         $this->app->bind(ExamTypeInterface::class,                 ExamTypeRepository::class);
@@ -187,8 +186,6 @@ class RepositoryServiceProvider extends ServiceProvider
         // Students
         $this->app->bind(PromoteStudentInterface::class,           PromoteStudentRepository::class);
         
-        // Applicant
-        $this->app->bind(ApplicantInterface::class,                 ApplicantRepository::class);
         
         // Student panel
         $this->app->bind(DashboardInterface::class,                          DashboardRepository::class);
@@ -220,6 +217,13 @@ class RepositoryServiceProvider extends ServiceProvider
 
         //Room Management
         $this->app->bind(RoomManagementRepositoryInterface::class,RoomManagementRepository::class);
+
+        //Assignment Management
+        $this->app->bind(AssignmentRepositoryInterface::class, AssignmentRepository::class);
+
+        // Report Filter
+        $this->app->bind(ReportFilterInterface::class, ReportFilterRepository::class);
+
 
     }
 

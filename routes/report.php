@@ -12,6 +12,7 @@ use App\Http\Controllers\Report\ProgressListController;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use App\Http\Controllers\Attendance\AttendanceController;
 use App\Http\Controllers\Report\FeesCollectionController;
+use App\Http\Controllers\Report\ReportManagementController;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 
@@ -75,6 +76,18 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::get('/', 'index')->name('report-exam-routine.index')->middleware('PermissionCheck:report_exam_routine_read');
                     Route::post('/search', 'search')->name('report-exam-routine.search')->middleware('PermissionCheck:report_exam_routine_read');
                     Route::get('/pdf-generate/{class}/{section}/{type}', 'generatePDF')->name('report-exam-routine.pdf-generate');
+                });
+
+                Route::controller(ReportManagementController::class)->prefix('report-management')->group(function () {
+                    Route::get('/', 'index')->name('report-management.index');
+                    Route::get('/general-student-report', 'generalStudentReport')->name('report-management.general-student-report');
+                    Route::get('/teacher-report', 'teacherReport')->name('report-management.teacher-report');
+                    Route::get('/alumni-report', 'alumniReport')->name('report-management.alumni-report');
+                    Route::get('/attendance-report', 'attendanceReport')->name('report-management.attendance-report');
+                    Route::get('/school-grade-report', 'schoolGradeReport')->name('report-management.attendance-grade-report');
+                    Route::get('/class-report', 'classReport')->name('report-management.class-report');
+                    Route::get('/applicant-report', 'applicantReport')->name('report-management.applicant-report');
+                    Route::get('/tuition-report', 'tuitionReport')->name('report-management.tuition-report');
                 });
 
             });
