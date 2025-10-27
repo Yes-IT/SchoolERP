@@ -154,10 +154,9 @@
                     Exam Schedule
                 </a>
             </li>
-            <li>
-                <a href="#url">
-                    <img src="{{ asset('backend') }}/assets/images/new_images/superadmin-panel/sidebar-icon-16.svg"
-                        alt="Sidebar Icon">
+            <li class="{{ request()->routeIs('report-management.index.*') ? 'active' : '' }}">
+                <a href="{{ route('report-management.index') }}">
+                    <img src="{{ asset('backend') }}/assets/images/new_images/superadmin-panel/sidebar-icon-16.svg" alt="Sidebar Icon">
                     Report Management
                 </a>
             </li>
