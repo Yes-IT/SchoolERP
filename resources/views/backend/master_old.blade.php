@@ -110,40 +110,36 @@
             });
         });
 
-        const parentYearFilter = document.getElementById('ParentyearFilter');
-        if (parentYearFilter) {
-            parentYearFilter.addEventListener('change', function() {
-                let year = this.value;
-                $.ajax({
-                    url: "{{ route('student.filterByYearParent') }}",
-                    type: "GET",
-                    data: {
-                        year: year
-                    },
-                    success: function(response) {
-                        $('#studentsTable').html(response.html); // Replace only tbody rows
-                    }
-                });
-            });
-        }
 
-        const yearFilter = document.getElementById('yearFilter');
-        if(yearFilter){
-            yearFilter.addEventListener('change', function() {
-                let year = this.value;
-                $.ajax({
-                    url: "{{ route('student.filterByYear') }}",
-                    type: "GET",
-                    data: {
-                        year: year
-                    },
-                    success: function(response) {
-                        $('#studentsTable').html(response.html); // Replace only tbody rows
-                    }
-                });
+        document.getElementById('ParentyearFilter').addEventListener('change', function() {
+            let year = this.value;
+            $.ajax({
+                url: "{{ route('student.filterByYearParent') }}",
+                type: "GET",
+                data: {
+                    year: year
+                },
+                success: function(response) {
+                    $('#studentsTable').html(response.html); // Replace only tbody rows
+                }
             });
-        }
-        
+        });
+
+
+        document.getElementById('yearFilter').addEventListener('change', function() {
+            let year = this.value;
+            $.ajax({
+                url: "{{ route('student.filterByYear') }}",
+                type: "GET",
+                data: {
+                    year: year
+                },
+                success: function(response) {
+                    $('#studentsTable').html(response.html); // Replace only tbody rows
+                }
+            });
+        });
+
 
 
 
@@ -576,23 +572,23 @@
                 row.style.marginBottom = "10px";
 
                 row.innerHTML = `
-                    <div class="input-grp">
-                        <label>Installment ${i}</label>
-                        <input type="number" name="installment_amount[]" class="installment-amount"
-                            style="width: 184px; position: relative; top: 37px; left: -85px;" required>
-                    </div>
-                    <div class="input-grp">
-                        <label style="position:relative; top:-9px; left:-40px;">Due Date</label>
-                        <input type="date" name="due_date[]" 
-                            style="width: 207px; position:relative; left:-116px; top:28px; height: 50px;" required>
-                    </div>
-                    <div class="input-grp">
-                        <img src="{{ asset('images/fees/bin-icon.svg') }}" 
-                            alt="Delete" 
-                            style="cursor:pointer;" 
-                            onclick="removeInstallmentRow(this)">
-                    </div>
-                `;
+            <div class="input-grp">
+                <label>Installment ${i}</label>
+                <input type="number" name="installment_amount[]" class="installment-amount"
+                    style="width: 184px; position: relative; top: 37px; left: -85px;" required>
+            </div>
+            <div class="input-grp">
+                <label style="position:relative; top:-9px; left:-40px;">Due Date</label>
+                <input type="date" name="due_date[]" 
+                    style="width: 207px; position:relative; left:-116px; top:28px; height: 50px;" required>
+            </div>
+            <div class="input-grp">
+                <img src="{{ asset('images/fees/bin-icon.svg') }}" 
+                     alt="Delete" 
+                     style="cursor:pointer;" 
+                     onclick="removeInstallmentRow(this)">
+            </div>
+        `;
                 container.appendChild(row);
             }
 
@@ -619,16 +615,8 @@
         }
 
         // Attach events
-        const amountInput = document.getElementById("amount");
-        const installmentCountInput = document.getElementById("installment-count");
-
-        if (amountInput) {
-            amountInput.addEventListener("input", autoFillInstallmentAmounts);
-        }
-
-        if (installmentCountInput) {
-            installmentCountInput.addEventListener("input", generateInstallmentRows);
-        }
+        document.getElementById("amount").addEventListener("input", autoFillInstallmentAmounts);
+        document.getElementById("installment-count").addEventListener("input", generateInstallmentRows);
 
         function removeInstallmentRow(el) {
             el.closest(".installment-row").remove();
@@ -697,69 +685,62 @@
         }
 
 
-        const searchInput = document.getElementById('searchInput');
-
-        if (searchInput) {
-            searchInput.addEventListener('keyup', function() {
-                searchFeesMasters();
-            });
-        }
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            searchFeesMasters();
+        });
 
 
 
         // display summary Review
 
-        const visitFormSubmit = document.getElementById("visitForm");
-        if(visitFormSubmit){
-        
-            visitFormSubmit.addEventListener("submit", function(e) {
-                e.preventDefault();
 
-                let form = this;
-                let formData = new FormData(form);
+        document.getElementById("visitForm").addEventListener("submit", function(e) {
+            e.preventDefault();
 
-                fetch(form.action, {
-                        method: "POST",
-                        body: formData,
-                        headers: {
-                            "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            updateSummaryReview(data.data); // pass response data to function
-                            form.reset();
-                        } else {
-                            alert(data.message || "Something went wrong!");
-                        }
-                    })
-                    .catch(error => console.error("Error:", error));
-            });
-            
-        }
+            let form = this;
+            let formData = new FormData(form);
+
+            fetch(form.action, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateSummaryReview(data.data); // pass response data to function
+                        form.reset();
+                    } else {
+                        alert(data.message || "Something went wrong!");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+        });
+
         function updateSummaryReview(data) {
             // Dynamically fill the summary card
             document.querySelector(".dsprprofile-course-info").innerHTML = `
-                <table>
-                    <tr><td>Fees Group:</td><td>${data.fees_group_name}</td></tr>
-                    <tr><td>Fees Type:</td><td>${data.fees_type_name}</td></tr>
-                    <tr><td>Total Amount:</td><td>$${data.amount}</td></tr>
-                    <tr><td>Installments:</td><td>${data.total_installment || 0}</td></tr>
-                </table>
-                <hr>
-                ${data.installments?.length ? `
-                                            <h4 class="installment-review">Installment Schedule</h4>
-                                            <table>
-                                                ${data.installments.map((inst, index) => `
-                            <tr>
-                                <td>Installment ${index + 1}:</td>
-                                <td>$${inst.amount} (Due: ${inst.due_date})</td>
-                            </tr>
-                        `).join("")}
-                                            </table>
-                                        ` : ""}
-            `;
+        <table>
+            <tr><td>Fees Group:</td><td>${data.fees_group_name}</td></tr>
+            <tr><td>Fees Type:</td><td>${data.fees_type_name}</td></tr>
+            <tr><td>Total Amount:</td><td>$${data.amount}</td></tr>
+            <tr><td>Installments:</td><td>${data.total_installment || 0}</td></tr>
+        </table>
+        <hr>
+        ${data.installments?.length ? `
+                                    <h4 class="installment-review">Installment Schedule</h4>
+                                    <table>
+                                        ${data.installments.map((inst, index) => `
+                    <tr>
+                        <td>Installment ${index + 1}:</td>
+                        <td>$${inst.amount} (Due: ${inst.due_date})</td>
+                    </tr>
+                `).join("")}
+                                    </table>
+                                ` : ""}
+    `;
         }
 
 
@@ -957,7 +938,7 @@
         }
 
         // Initialize after DOM is loaded
-        // document.addEventListener('DOMContentLoaded', filterRequestStatus);
+        document.addEventListener('DOMContentLoaded', filterRequestStatus);
 
 
         // update request status
@@ -1015,18 +996,18 @@
 
                 // Build dynamic HTML
                 const attachmentHTML = `
-                    <div class="file-description">
-                        <div class="header">
-                            <p><strong>Title:</strong> ${title}</p>
-                            <p><strong>File Format:</strong> ${fileExtension} File</p>
-                        </div>
-                        <div class="footer">
-                            <a href="/uploads/${file}" download>
-                                <button>Download</button>
-                            </a>
-                        </div>
-                    </div>
-                `;
+            <div class="file-description">
+                <div class="header">
+                    <p><strong>Title:</strong> ${title}</p>
+                    <p><strong>File Format:</strong> ${fileExtension} File</p>
+                </div>
+                <div class="footer">
+                    <a href="/uploads/${file}" download>
+                        <button>Download</button>
+                    </a>
+                </div>
+            </div>
+        `;
 
                 // Insert into modal container
                 document.getElementById('attachmentsContainer').innerHTML = attachmentHTML;
@@ -1092,11 +1073,7 @@
         }
 
         // Attach onclick event to export button
-        const exportBtnn = document.getElementById("exportBtn");
-
-        if (exportBtnn) {
-            exportBtnn.onclick = exportRequestStatusTable;
-        }
+        document.getElementById("exportBtn").onclick = exportRequestStatusTable;
 
         // filter procurement by user name
 
@@ -1116,17 +1093,17 @@
 
                     data.requests.forEach((req, index) => {
                         const row = `
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td>${req.id}</td>
-                                <td>${req.staff_name ?? '—'}</td>
-                                <td>${req.staff_id ?? '—'}</td>
-                                <td>${req.asset_name ?? 'Unknown'}</td>
-                                <td>${req.asset_model ?? 'N/A'}</td>
-                                <td>${req.quantity}</td>
-                                <td>${req.quantity}</td>
-                                <td>${new Date(req.created_at).toLocaleDateString('en-GB')}</td>
-                            </tr>`;
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${req.id}</td>
+                        <td>${req.staff_name ?? '—'}</td>
+                        <td>${req.staff_id ?? '—'}</td>
+                        <td>${req.asset_name ?? 'Unknown'}</td>
+                        <td>${req.asset_model ?? 'N/A'}</td>
+                        <td>${req.quantity}</td>
+                        <td>${req.quantity}</td>
+                        <td>${new Date(req.created_at).toLocaleDateString('en-GB')}</td>
+                    </tr>`;
                         tbody.insertAdjacentHTML('beforeend', row);
                     });
                 })
@@ -1136,18 +1113,14 @@
         }
 
         // 🔹 Attach event listener
-        const userFilter = document.getElementById('userFilter');
-
-        if (userFilter) {
-            userFilter.addEventListener('change', function() {
-                const selectedUser = this.value;
-                fetchRequestsByUser(selectedUser);
-            });
-        }
+        document.getElementById('userFilter').addEventListener('change', function() {
+            const selectedUser = this.value;
+            fetchRequestsByUser(selectedUser);
+        });
 
         // 🔹 Optionally load all requests on page load
         document.addEventListener('DOMContentLoaded', function() {
-           // fetchRequestsByUser('');
+            fetchRequestsByUser('');
         });
 
 
@@ -1607,15 +1580,15 @@
                     if (data.doctors && data.doctors.length > 0) {
                         data.doctors.forEach((doctor, index) => {
                             tbody.innerHTML += `
-                                <tr>
-                                    <td>${index + 1}</td>
-                                    <td>${doctor.entry_date ?? ''}</td>
-                                    <td>${doctor.student_id ?? ''}</td>
-                                    <td>${doctor.name ?? ''}</td>
-                                    <td>${doctor.description ?? ''}</td>
-                                    <td>${doctor.issue ?? ''}</td>
-                                </tr>
-                            `;
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${doctor.entry_date ?? ''}</td>
+                        <td>${doctor.student_id ?? ''}</td>
+                        <td>${doctor.name ?? ''}</td>
+                        <td>${doctor.description ?? ''}</td>
+                        <td>${doctor.issue ?? ''}</td>
+                    </tr>
+                `;
                         });
                     } else {
                         tbody.innerHTML = `<tr><td colspan="6" class="text-center">No records found</td></tr>`;
@@ -1641,15 +1614,15 @@
                     if (data.doctors && data.doctors.length > 0) {
                         data.doctors.forEach((doctor, index) => {
                             tbody.innerHTML += `
-                                <tr>
-                                    <td>${index + 1}</td>
-                                    <td>${doctor.entry_date ?? ''}</td>
-                                    <td>${doctor.student_id ?? ''}</td>
-                                    <td>${doctor.name ?? ''}</td>
-                                    <td>${doctor.description ?? ''}</td>
-                                    <td>${doctor.issue ?? ''}</td>
-                                </tr>
-                            `;
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${doctor.entry_date ?? ''}</td>
+                        <td>${doctor.student_id ?? ''}</td>
+                        <td>${doctor.name ?? ''}</td>
+                        <td>${doctor.description ?? ''}</td>
+                        <td>${doctor.issue ?? ''}</td>
+                    </tr>
+                `;
                         });
                     } else {
                         tbody.innerHTML = `<tr><td colspan="6" class="text-center">No records found</td></tr>`;
@@ -1714,8 +1687,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"
         integrity="sha512-bE2H3X0bwh9k4EStk1gE5X01gA6Y+/C75OHyJDq4RVlM1aFzDJgcZlcpJKuFVZ0Y99D7eM6nE+EZ0zKfL6+5MA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-   @stack('script')
+    @stack('script')
 </body>
 
 </html>

@@ -144,9 +144,12 @@ Route::middleware(saasMiddleware())->group(function () {
                 });
 
                 //Grade flow routes
-                Route::controller(GradeController::class)->group(function () { // grade routes 
+                Route::controller(GradeController::class)->group(function () { // grade routes
                     Route::get('grade_flow/', 'index')->name('grade_flow.index')->middleware('PermissionCheck:grade_read');
                     Route::get('grade_flow/assign_grade/', 'assign_grade')->name('grade_flow.assign_grade')->middleware('PermissionCheck:grade_read');
+                    Route::post('grade_flow/assign_grade/', 'assign_grade_submit')->name('grade_flow.assign_grade')->middleware('PermissionCheck:grade_read');
+ 
+ 
                     Route::get('grade_flow/failing_grades/', 'failing_grades')->name('grade_flow.failing_grades')->middleware('PermissionCheck:grade_read');
                     Route::get('grade_flow/missing_grades/', 'missing_grades')->name('grade_flow.missing_grades')->middleware('PermissionCheck:grade_read');
                 });
