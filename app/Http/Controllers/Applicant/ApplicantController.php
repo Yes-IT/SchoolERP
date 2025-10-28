@@ -16,6 +16,16 @@ class ApplicantController extends Controller
 {
     use ReturnFormatTrait;
     use CommonHelperTrait;
+    public function register()
+    {
+        $data['title'] = ___('applicant.applicant_registration');
+        return view('applicant.register', compact('data'));
+    }
+    public function login()
+    {
+        $data['title'] = ___('applicant.applicant_registration');
+        return view('applicant.login', compact('data'));
+    }
     public function store(Request $request)
     {
         DB::beginTransaction();
@@ -127,5 +137,25 @@ class ApplicantController extends Controller
             dd($th);
             return $this->responseWithError(___('alert.something_went_wrong_please_try_again'), []);
         }
+    }
+    public function process()
+    {
+        $data['title'] = ___('applicant.application_process');
+        return view('applicant.process', compact('data'));
+    }
+    public function application()
+    {
+        $data['title'] = ___('applicant.application_application');
+        return view('applicant.application', compact('data'));
+    }
+    public function interview()
+    {
+        $data['title'] = ___('applicant.interview_interview');
+        return view('applicant.interview', compact('data'));
+    }
+    public function registration()
+    {
+        $data['title'] = ___('applicant.registration_registration');
+        return view('applicant.registration', compact('data'));
     }
 }

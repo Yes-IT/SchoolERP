@@ -45,7 +45,7 @@ class AuthenticationController extends Controller
             $user   = User::query()->firstWhere('phone', $email);
         if (!$user)
             $user   = User::query()->firstWhere('username', $email);
-       
+      
         if (!$user) {
             return back()->withErrors([
                 'email' =>  ___('users_roles.the_provided_email_do_not_match_our_records')
@@ -73,7 +73,10 @@ class AuthenticationController extends Controller
                 return redirect()->route('student_dashboard');
             elseif ($user->role_id == 7)
                 return redirect()->route('parent-panel-dashboard.index');
+            elseif ($user->role_id == 8)
+                return redirect()->route('applicant.process');
             else
+
                 return redirect()->route('dashboard');
         }
 
@@ -88,6 +91,7 @@ class AuthenticationController extends Controller
 
     public function register(RegisterRequest $request)
     {
+
         $user = $this->loginRepository->register($request);
 
         if ($user) {

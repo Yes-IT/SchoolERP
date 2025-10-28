@@ -25,6 +25,8 @@ class AdminMiddleware
             return redirect('student/dashboard')->with('error', ___('alert.You are not authorized to access this page'));
         } else if ((auth()->check()) && (auth()->user()->role_id == RoleEnum::GUARDIAN)) {
             return redirect('organization/dashboard')->with('error', ___('alert.You are not authorized to access this page'));
+        } else if ((auth()->check()) && (auth()->user()->role_id == RoleEnum::APPLICANT)) {
+            return redirect('organization/dashboard')->with('error', ___('alert.You are not authorized to access this page'));
         }
         return redirect('/login');
     }

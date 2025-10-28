@@ -22,7 +22,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         try {
-            $data = Validator::make($request->all(),[
+            $data = Validator::make($request->all(), [
                 'name'      => 'required',
                 'email'     => 'required|string|email|unique:users',
                 'password'  => 'required|string|min:8',
@@ -44,7 +44,6 @@ class AuthController extends Controller
                 'access_token'  => $token,
                 'token_type'    => 'Bearer',
             ]);
-
         } catch (\Throwable $th) {
             return $this->responseWithError(___('alert.something_went_wrong'), $th->getMessage());
         }
@@ -53,8 +52,9 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        dd(1);  
         try {
-            $data = Validator::make($request->all(),[
+            $data = Validator::make($request->all(), [
                 'email'     => 'required',
                 'password'  => 'required',
             ]);
@@ -88,7 +88,6 @@ class AuthController extends Controller
                 'token_type'    => 'Bearer',
                 'user'          => $user
             ]);
-
         } catch (\Throwable $th) {
             return $this->responseWithError(___('alert.something_went_wrong'), $th->getMessage());
         }
@@ -99,7 +98,7 @@ class AuthController extends Controller
     {
         try {
 
-            $data = Validator::make($request->all(),[
+            $data = Validator::make($request->all(), [
                 'email' => 'required'
             ]);
 
@@ -129,7 +128,6 @@ class AuthController extends Controller
             Mail::to($user->email)->send($forgotPassword);
 
             return $this->responseWithSuccess(___('alert.we_will_send_you_an_otp_on_this_email'), ['otp' => $otp]);
-
         } catch (\Throwable $th) {
             return $this->responseWithError(___('alert.something_went_wrong'), $th->getMessage());
         }
@@ -139,7 +137,7 @@ class AuthController extends Controller
     public function resetPassword(Request $request)
     {
         try {
-            $data = Validator::make($request->all(),[
+            $data = Validator::make($request->all(), [
                 'email'     => 'required',
                 'otp'       => 'required',
                 'password'  => 'required|confirmed',
@@ -165,7 +163,6 @@ class AuthController extends Controller
             ]);
 
             return $this->responseWithSuccess(___('alert.password_has_been_updated_successfully'), []);
-
         } catch (\Throwable $th) {
             return $this->responseWithError(___('alert.something_went_wrong'), $th->getMessage());
         }
@@ -179,7 +176,6 @@ class AuthController extends Controller
             User::where('id', auth()->id())->update(['password' => Hash::make($request->password)]);
 
             return $this->responseWithSuccess(___('alert.password_has_been_changed_successfully'), []);
-
         } catch (\Throwable $th) {
             return $this->responseWithError(___('alert.something_went_wrong'), $th->getMessage());
         }
@@ -191,7 +187,6 @@ class AuthController extends Controller
         try {
             Auth::logout();
             return $this->responseWithSuccess(___('alert.you_have_successfully_logged_out'), []);
-
         } catch (\Throwable $th) {
             return $this->responseWithError(___('alert.something_went_wrong'), $th->getMessage());
         }

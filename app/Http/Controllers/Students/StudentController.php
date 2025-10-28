@@ -15,6 +15,7 @@ use App\Models\Examination\Grade;
 use App\Models\Attendance\Apply_Leave;
 use App\Models\Academic\StudyMaterial;
 use App\Models\Attendance\LateCurfew;
+use App\Models\Leave;
 use Carbon\Carbon;
 use DB;
 
@@ -625,7 +626,19 @@ class StudentController extends Controller
 
     public function studentNoticeBoard()
     {
-        return view('student.notice_board');
+        $student = Student::where('user_id', Auth::id())->first();
+
+        $data = DB::table('notice_boards')
+            ->where(function ($query) use ($student) {
+                $query->whereNull('class_id')
+                    ->orWhereNull('section_id')
+                    ->orWhereNull('student_id')
+                    ->orWhere('student_id', $student->id);
+            })
+            ->whereDate('date', '>=', now())
+            ->get();
+
+        return view('student.notice_board', compact('data'));
     }
 
     public function studentStudyMaterial(Request $request)

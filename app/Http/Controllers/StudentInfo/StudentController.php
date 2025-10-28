@@ -71,7 +71,7 @@ class StudentController extends Controller
 
     public function index()
     {
-      
+
         $data['classes']  = $this->classRepo->assignedAll();
         $data['sections'] = [];
         $data['title']    = ___('student_info.student_list');
@@ -125,6 +125,7 @@ class StudentController extends Controller
 
     public function store(StudentStoreRequest $request)
     {
+       
         $result = $this->repo->store($request);
 
         if ($result['status']) {

@@ -14,10 +14,10 @@ class RoleEnum
     const TEACHER = 5;
     const STUDENT = 6;
     const GUARDIAN = 7;
+    const APPLICANT = 8;
 
     public static function DRIVER()
     {
         return Role::where("slug", "driver")->value('id') ?? null;
     }
 }
-
