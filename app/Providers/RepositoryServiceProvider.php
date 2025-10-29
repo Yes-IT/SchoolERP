@@ -121,14 +121,13 @@ use App\Repositories\Academic\RoomManagementRepository;
 use App\Repositories\AlumniGalleryRepository;
 use App\Repositories\Leaves\LeaveRepository;
 use App\Repositories\RecordedClassRepository;
-use App\Repositories\Report\ReportFilterRepository;
-
 use App\Repositories\Applicant\ApplicantRepository;
 use App\Interfaces\Applicant\ApplicantInterface;
-
 use App\Interfaces\Academic\AssignmentInterface;
 use App\Repositories\Academic\AssignmentRepository;
-
+use App\Repositories\Report\AttendanceReportRepository;
+use App\Repositories\Report\ReportFilterRepository;
+use App\Interfaces\Report\AttendanceReportInterface;
 
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -232,6 +231,12 @@ class RepositoryServiceProvider extends ServiceProvider
 
         // Report Filter
         $this->app->bind(ReportFilterInterface::class, ReportFilterRepository::class);
+
+        // Report Filter
+        $this->app->bind(ReportFilterInterface::class, ReportFilterRepository::class);
+
+        // Attendance Report
+        $this->app->bind(AttendanceReportInterface::class, AttendanceReportRepository::class);
 
 
     }
