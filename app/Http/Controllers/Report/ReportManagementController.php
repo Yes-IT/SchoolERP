@@ -68,7 +68,7 @@ class ReportManagementController extends Controller
 
     public function generalStudentReport()
     {
-        $data = $this->getFilterOption(['school_years', 'year_statuses','classes', 'semesters']);
+        $data = $this->getFilterOption(['school_years', 'year_statuses','classes']);
         return view('backend.report.general-student-report', compact('data'));
     }
 
@@ -86,8 +86,8 @@ class ReportManagementController extends Controller
 
     public function attendanceReport()
     {
-        $data = $this->getFilterOption(['school_years', 'year_statuses','classes', 'semesters', 'students']);
-        return view('backend.report.attendance-report', compact('data'));
+        $data = $this->getFilterOption(['school_years', 'year_statuses','classes', 'students','semesters']);
+        return view('backend.report.attendance.index', compact('data'));
     }
 
     public function schoolGradeReport()

@@ -14,6 +14,7 @@ use App\Http\Controllers\Attendance\AttendanceController;
 use App\Http\Controllers\Report\FeesCollectionController;
 use App\Http\Controllers\Report\ReportManagementController;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+use App\Http\Controllers\Report\AttendanceReportController;
 
 
 Route::middleware(saasMiddleware())->group(function () {
@@ -78,16 +79,27 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::get('/pdf-generate/{class}/{section}/{type}', 'generatePDF')->name('report-exam-routine.pdf-generate');
                 });
 
-                Route::controller(ReportManagementController::class)->prefix('report-management')->group(function () {
-                    Route::get('/', 'index')->name('report-management.index');
-                    Route::get('/general-student-report', 'generalStudentReport')->name('report-management.general-student-report');
-                    Route::get('/teacher-report', 'teacherReport')->name('report-management.teacher-report');
-                    Route::get('/alumni-report', 'alumniReport')->name('report-management.alumni-report');
-                    Route::get('/attendance-report', 'attendanceReport')->name('report-management.attendance-report');
-                    Route::get('/school-grade-report', 'schoolGradeReport')->name('report-management.attendance-grade-report');
-                    Route::get('/class-report', 'classReport')->name('report-management.class-report');
-                    Route::get('/applicant-report', 'applicantReport')->name('report-management.applicant-report');
-                    Route::get('/tuition-report', 'tuitionReport')->name('report-management.tuition-report');
+                Route::prefix('report-management')->group(function () {
+                    Route::controller(ReportManagementController::class)->group(function () {
+                        Route::get('/', 'index')->name('report-management.index');
+                        Route::get('/general-student-report', 'generalStudentReport')->name('report-management.general-student-report');
+                        Route::get('/teacher-report', 'teacherReport')->name('report-management.teacher-report');
+                        Route::get('/alumni-report', 'alumniReport')->name('report-management.alumni-report');
+                        Route::get('/attendance-report', 'attendanceReport')->name('report-management.attendance-report');
+                        Route::get('/school-grade-report', 'schoolGradeReport')->name('report-management.attendance-grade-report');
+                        Route::get('/class-report', 'classReport')->name('report-management.class-report');
+                        Route::get('/applicant-report', 'applicantReport')->name('report-management.applicant-report');
+                        Route::get('/tuition-report', 'tuitionReport')->name('report-management.tuition-report');
+                    });
+ 
+                    Route::controller(StudentReportController::class)->group(function () {
+                        Route::post('/generate-student-pdf', 'generatePDF')->name('report-management.generate-student-pdf');
+                        Route::post('/preview-student-report', 'previewReport')->name('report-management.preview-student-report');
+                    });
+
+                    Route::post('/attendance/reports/generate', [AttendanceReportController::class, 'generate'])->name('attendance.reports.generate');
+
+ 
                 });
 
             });
