@@ -68,7 +68,7 @@
                         </div>
                     </div>
 
-                    <div class="ds-cmn-tble count-row tbl-5_4k" id="applicantTableContainer">
+                    <div class="ds-cmn-tble count-row " id="applicantTableContainer">
                         {{-- <table>
                             <thead>
                                 <tr>
@@ -293,7 +293,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const tableContainer = document.querySelector('#applicantTableContainer');
 
-    function loadTableData(url = '{{ route('applicant.index') }}') {
+    function loadTableData(url = '{{ route('applicant.student_application_form') }}') {
         fetch(url, {
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })

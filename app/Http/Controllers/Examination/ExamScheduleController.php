@@ -23,7 +23,7 @@ class ExamScheduleController extends Controller
         $data['title']              = ___('examination.exam_schedule');
        
 
-        return view ('backend.examination.exam-schedule.index',compact('data'));
+        return view('backend.examination.exam-schedule.index',compact('data'));
     }
 
     public function createExamType(Request $request)
@@ -33,7 +33,7 @@ class ExamScheduleController extends Controller
         $data['exam_types'] = $this->examType->getPaginateAll($perPage);
 
         // dd($data);
-        return view ('backend.examination.exam-schedule.create-exam-type',compact('data'));
+        return view('backend.examination.exam-schedule.create-exam-type',compact('data'));
     }
 
     public function storeExamType(ExamTypeStoreRequest $request)
@@ -72,14 +72,14 @@ class ExamScheduleController extends Controller
     public function createExamScheduleType()
     {
         $data['title']              = ___('examination.exam_type');
-        return view ('backend.examination.exam-schedule.create-exam-schedule-type',compact('data'));
+        return view('backend.examination.exam-schedule.create-exam-schedule-type',compact('data'));
     }
 
     public function checkAvailablity(){
-        return view ('backend.examination.exam-schedule.check-availablity');
+        return view('backend.examination.exam-schedule.check-availablity');
     }
 
     public function roomAvailability(){
-        return view ('backend.examination.exam-schedule.room-availability');
+        return view('backend.examination.exam-schedule.room-availability');
     }
 }

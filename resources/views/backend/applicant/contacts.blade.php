@@ -20,17 +20,10 @@
             <div class="dsbdy-filter-wrp p-0">
         
                 <select id="gradeFilterId">
-                    <option value="">
-                        All Contacts
-                    </option>
-
-                    <option value="">
-                       Camp Contacts
-                    </option>
-
-                    <option value="">
-                        Region Contacts
-                    </option>
+                    <option value=""> All Contacts</option>
+                    <option value="">High School Contacts</option>
+                    <option value="">Camp Contacts</option>
+                    <option value=""> Region Contacts</option>
                 </select>
 
             </div>

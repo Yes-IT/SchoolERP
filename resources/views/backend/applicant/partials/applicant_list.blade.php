@@ -5,29 +5,6 @@
             <th>Last Name</th>
             <th>First Name</th>
             <th>View</th>
-            <th>High School</th>
-            <th>High School (Application)</th>
-            <th>City</th>
-            <th>Birth Date</th>
-            <th>Age</th>
-            <th>USA Cell</th>
-            <th>Email</th>
-            <th>Father Title</th>
-            <th>Father Name</th>
-            <th>Mother Title</th>
-            <th>Mother Name</th>
-            <th>Maiden Name</th>
-            <th>Address</th>
-            <th>Current State</th>
-            <th>Current Zipcode</th>
-            <th>Current Country</th>
-            <th>Marital Status</th>
-            <th>Marital Comment</th>
-            <th>Home Phone</th>
-            <th>Father Cell</th>
-            <th>Mother Cell</th>
-            <th>Father Email</th>
-            <th>Mother Email</th>
             <th>Interview Status</th>
             <th>Interview Mode</th>
             <th>Interview Date</th>
@@ -50,21 +27,21 @@
                         <img src="{{ global_asset('backend/assets/images/eye-white.svg') }}" alt="Eye Icon">
                     </a>
                 </td>
-                <td>{{ $applicant->high_school }}</td>
-                <td>{{ $applicant->highschool_application }}</td>
-                <td>kolkata</td>
-                <td>{{ $applicant->date_of_birth }}</td>
+                <td><span class="cmn-tbl-btn yellow-bg">Pending</span></td>
+                <td>Online</td>
+                <td>12/12/2022</td>
+                <td>10:00 AM</td>
+                <td>Zoom</td>
+                <td>https://zoom.us/</td>
                 <td>
-                    @if($applicant->date_of_birth)
-                        {{ \Carbon\Carbon::parse($applicant->date_of_birth)->age }}
-                    @else
-                        -
-                    @endif
+                   <a href="#url" class="cmn-btn btn-sm"><img src="{{global_asset('backend/assets/images/calender-icon.svg')}}" alt="Image"> Reschedule Interview</a>
                 </td>
-                <td>{{ $applicant->usa_cell }}</td>
-                <td>{{ $applicant->email }}</td>
+                <td><span class="cmn-tbl-btn yellow-bg">Pending</span></td>
                 <td>
-                    <a href="{{ route('applicant.edit_applicant', $applicant->id) }}" class="cmn-btn btn-sm">Edit</a>
+                    <div class="actions-wrp">
+                        <button type="button" class="cmn-tbl-btn green-bg"><i class="fa-solid fa-check"></i> Approve</button>
+                        <button type="button" class="cmn-tbl-btn red-bg"><i class="fa-solid fa-xmark"></i> Reject</button>
+                    </div>
                 </td>
             </tr>
         @empty
@@ -75,5 +52,5 @@
 </table>
 
 <div class="tablepagination">
-    @include('backend.partials.pagination', ['paginator' => $applicants, 'routeName' => 'applicant.index'])
+    @include('backend.partials.pagination', ['paginator' => $applicants, 'routeName' => 'applicant.student_application_form'])
 </div>

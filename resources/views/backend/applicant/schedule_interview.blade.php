@@ -81,7 +81,8 @@
                     <div class="cmn-tab-content online-mode">
                         <div class="cmn-tab-content-head">
                             <h3>Available Slots</h3>
-                            <button type="button">View Details</button>
+                            {{-- <button type="button">View Details</button> --}}
+                            <a href="{{route('applicant.calender')}}">View Details</a>
                         </div>
                     
                         <div class="avaiable-slots-cd-wrp">

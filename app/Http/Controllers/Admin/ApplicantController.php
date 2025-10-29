@@ -17,13 +17,12 @@ class ApplicantController extends Controller
         $this->applicantrepository = $applicantrepository;
     }
 
-    // public function index(){
-    //     $applicants = $this->applicantrepository->getAllApplicants();
-    //     return view('backend.applicant.index', compact('applicants'));
-    // }
+    public function dashboard(){
+        return view('backend.applicant.dashboard');
+    }
 
     
-    public function index(Request $request)
+    public function student_application_form(Request $request)
     {
         $query = Applicant::with('parents');
 
@@ -45,11 +44,15 @@ class ApplicantController extends Controller
         return view('backend.applicant.index', compact('applicants'));
     }
 
+   public function application_form(){
+       return view('backend.applicant.application_form');
+   }
 
+   public function parent_contract(){
+       return view('backend.applicant.parent_contract');
+   }
 
-    public function dashboard(){
-        return view('backend.applicant.dashboard');
-    }
+   
 
     public function calender(){
         return view('backend.applicant.calender');
@@ -122,5 +125,9 @@ class ApplicantController extends Controller
 
     public function contacts(){
         return view('backend.applicant.contacts');
+    }
+
+    public function contact_info(){
+        return view('backend.applicant.contact-info');
     }
 }

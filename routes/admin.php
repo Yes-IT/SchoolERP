@@ -205,7 +205,7 @@ Route::middleware(saasMiddleware())->group(function () {
 
               //Applicant routes
                 Route::controller(ApplicantController::class)->prefix('applicant')->group(function(){
-                    Route::get('/', 'index')->name('applicant.index')->middleware('PermissionCheck:applicant_read');
+                    Route::get('/student_application_form', 'student_application_form')->name('applicant.student_application_form')->middleware('PermissionCheck:applicant_read');
                     Route::get('/dashboard', 'dashboard')->name('applicant.dashboard')->middleware('PermissionCheck:applicant_read');
                     Route::get('/calender', 'calender')->name('applicant.calender')->middleware('PermissionCheck:applicant_read');
                     Route::get('/schedule-interview', 'schedule_interview')->name('applicant.schedule_interview')->middleware('PermissionCheck:applicant_read');
@@ -216,6 +216,9 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::get('/edit-applicant', 'edit_applicant')->name('applicant.edit_applicant')->middleware('PermissionCheck:applicant_read');
                     Route::get('/custom-applicant-chart', 'custom_applicant_chart')->name('applicant.custom_applicant_chart')->middleware('PermissionCheck:applicant_read');
                     Route::get('/contacts', 'contacts')->name('applicant.contacts')->middleware('PermissionCheck:applicant_read');
+                    Route::get('/contact-info', 'contact_info')->name('applicant.contact_info')->middleware('PermissionCheck:applicant_read');
+                    Route::get('/application-form', 'application_form')->name('applicant.application_form')->middleware('PermissionCheck:applicant_read');
+                    Route::get('/parent-contract', 'parent_contract')->name('applicant.parent_contract')->middleware('PermissionCheck:applicant_read');
                 });
 
             });
