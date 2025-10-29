@@ -39,9 +39,10 @@
             </ul>
             <div class="btn-wrp">
                 <a href="#url" class="cmn-btn sm-btn" style="width: 99px;">
-                    <img src="{{asset('student/images/lucide_edit.svg')}}" class="edit-img" />
+                    <img src="{{ asset('student/images/lucide_edit.svg') }}" class="edit-img" />
                     Draft</a>
-                <a href="#url" class="cmn-btn btn-sm back-btn"><img src="{{asset('student/images/back-icon.svg')}}" alt="Icon">
+                <a href="#url" class="cmn-btn btn-sm back-btn"><img src="{{ asset('student/images/back-icon.svg') }}"
+                        alt="Icon">
                     Back</a>
             </div>
         </div>
@@ -86,20 +87,29 @@
                             <div class="multi-input-grp">
                                 <div class="input-grp">
                                     <label>City *</label>
-                                    <input type="text" name="city" placeholder="Enter City">
+                                    <input name="city" placeholder="City *" class="form-control">
                                 </div>
+
                                 <div class="input-grp">
                                     <label>State</label>
-                                    <select>
-                                        <option value="1">Select State</option>
+                                    <select name="state_id" class="form-control select2">
+                                        <option value="">Select State</option>
+                                        @foreach ($data['states'] as $state)
+                                            <option value="{{ $state->id_state }}">{{ $state->state }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
+
                                 <div class="input-grp">
                                     <label>Country</label>
-                                    <select>
-                                        <option value="1">Select Country</option>
+                                    <select name="country_id" class="form-control select2">
+                                        <option value="">Select Country</option>
+                                        @foreach ($data['countries'] as $country)
+                                            <option value="{{ $country->country_id }}">{{ $country->country_name }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
+
                                 <div class="input-grp">
                                     <label>Zip/Postal Code</label>
                                     <input type="text" placeholder="Zip/Postal Code">
@@ -330,7 +340,8 @@
                                             accept=".pdf,.jpg,.jpeg,.png,.webp,.mp4,.mov,.doc,.docx,.xls,.xlsx">
                                         <div class="file-upld-lg-design">
                                             <div class="fupld-lg-icon">
-                                                <img src="../images/upload-file-icon.svg" alt="Icon">
+                                                <img src="{{ asset('student/images/upload-file-icon.svg') }}"
+                                                    alt="Icon">
                                             </div>
                                             <p>Click to browse or drag and drop your files</p>
                                         </div>
@@ -339,11 +350,11 @@
                                         <p>Accepted file types: pdf, Max. file size: 256 MB, Max. files: 2.</p>
                                         <div class="ibtn">
                                             <button type="button" class="ibtn-icon">
-                                                <img src="../images/i-icon.svg" alt="Icon">
+                                                <img src="{{ asset('student/images/i-icon.svg') }}" alt="Icon">
                                             </button>
                                             <div class="ibtn-info">
                                                 <button type="button" class="ibtn-close">
-                                                    <img src="../images/fa-times.svg" alt="icon">
+                                                    <img src="{{ asset('student/images/fa-times.svg') }}" alt="icon">
                                                 </button>
                                                 <h3>Upload Guidelines</h3>
                                                 <ul>
@@ -367,7 +378,8 @@
                                             accept=".pdf,.jpg,.jpeg,.png,.webp,.mp4,.mov,.doc,.docx,.xls,.xlsx">
                                         <div class="file-upld-lg-design">
                                             <div class="fupld-lg-icon">
-                                                <img src="../images/upload-file-icon.svg" alt="Icon">
+                                                <img src="{{ asset('student/images/upload-file-icon.svg') }}"
+                                                    alt="Icon">
                                             </div>
                                             <p>Click to browse or drag and drop your files</p>
                                         </div>
@@ -376,11 +388,11 @@
                                         <p>Accepted file types: pdf, Max. file size: 256 MB, Max. files: 2.</p>
                                         <div class="ibtn">
                                             <button type="button" class="ibtn-icon">
-                                                <img src="../images/i-icon.svg" alt="Icon">
+                                                <img src="{{ asset('student/images/i-icon.svg') }}" alt="Icon">
                                             </button>
                                             <div class="ibtn-info">
                                                 <button type="button" class="ibtn-close">
-                                                    <img src="../images/fa-times.svg" alt="icon">
+                                                    <img src="{{ asset('student/images/fa-times.svg') }}" alt="icon">
                                                 </button>
                                                 <h3>Upload Guidelines</h3>
                                                 <ul>
@@ -410,3 +422,6 @@
         </div>
     </div>
 @endsection
+@push('script')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+@endpush

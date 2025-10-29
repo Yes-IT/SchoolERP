@@ -62,14 +62,17 @@
                                         will not be accepted.</strong> Please double-check your scans to ensure they are
                                     clear! Pictures are not acceptable. Files should be scanned using a flatbed scanner or a
                                     scanning app.</p>
-                                <a class="cmn-btn btn-sm" href="#download">Download Here</a>
+                                <a class="cmn-btn btn-sm" href="#download" onclick="downloadFile()">Download Here</a>
+
+
+
                             </div>
                         </div>
 
                         <div class="timeline-item">
                             <div class="timeline-left">
                                 <div class="timeline-icon" aria-hidden="true">
-                                    <img src="{{ asset('images/timestamp-icon-2.svg') }}" alt="">
+                                    <img src="{{ asset('student/images/timestamp-icon-2.svg') }}" alt="">
                                 </div>
                             </div>
                             <div class="timeline-right">
@@ -89,7 +92,7 @@
                         <div class="timeline-item">
                             <div class="timeline-left">
                                 <div class="timeline-icon" aria-hidden="true">
-                                    <img src="images/timestamp-icon-3.svg" alt="">
+                                    <img src="{{ asset('student/images/timestamp-icon-3.svg') }}" alt="">
                                 </div>
                             </div>
                             <div class="timeline-right">
@@ -98,7 +101,7 @@
                                 <p class="muted">When your application is submitted successfully, you will receive a
                                     confirmation email.
                                     Please check spam/junk mail if you don't see it.</p>
-                                <a class="cmn-btn btn-sm" href="#start">Start application</a>
+                                <a class="cmn-btn btn-sm" href="{{ route('applicant.application') }}">Start application</a>
                             </div>
                         </div>
                     </div>
@@ -108,3 +111,15 @@
         </div>
     </div>
 @endsection
+@push('script')
+    <script>
+        function downloadFile() {
+            const link = document.createElement('a');
+            link.href = '{{ asset('student/images/hh.pdf') }}';
+            link.download = 'student_file.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+@endpush

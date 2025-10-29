@@ -39,46 +39,46 @@
             <div class="ds-cmn-card-item completed">
                 <div class="ds-cmn-card-item-left">
                     <div class="ds-cmn-card-item-icon">
-                        <img src="{{ asset('students/images/pen-white.svg') }}" alt="Icon">
+                        <img src="{{ asset('student/images/pen-white.svg') }}" alt="Icon">
                         <i class="fa-solid fa-check"></i>
                     </div>
                     <h3>Student Agreement Signed</h3>
                 </div>
                 <a href="student-agreement.html" class="ds-cmn-card-item-icon">
-                    <img src="{{ asset('students/images/arrow-upright.svg') }}" alt="Icon">
+                    <img src="{{ asset('student/images/arrow-upright.svg') }}" alt="Icon">
                 </a>
             </div>
             <div class="ds-cmn-card-item">
                 <div class="ds-cmn-card-item-left">
                     <div class="ds-cmn-card-item-icon">
-                        <img src="{{ asset('students/images/pen-white.svg') }}" alt="Icon">
+                        <img src="{{ asset('student/images/pen-white.svg') }}" alt="Icon">
                     </div>
                     <h3>Tuition Contract (F) </h3>
                 </div>
                 <a href="tuttion-contract-f.html" class="ds-cmn-card-item-icon">
-                    <img src="{{ asset('students/images/arrow-upright.svg') }}" alt="Icon">
+                    <img src="{{ asset('student/images/arrow-upright.svg') }}" alt="Icon">
                 </a>
             </div>
             <div class="ds-cmn-card-item">
                 <div class="ds-cmn-card-item-left">
                     <div class="ds-cmn-card-item-icon">
-                        <img src="{{ asset('students/images/pen-white.svg') }}" alt="Icon">
+                        <img src="{{ asset('student/images/pen-white.svg') }}" alt="Icon">
                     </div>
                     <h3>Tuition Contract (M) </h3>
                 </div>
                 <a href="student-agreement.html" class="ds-cmn-card-item-icon">
-                    <img src="{{ asset('students/images/arrow-upright.svg') }}" alt="Icon">
+                    <img src="{{ asset('student/images/arrow-upright.svg') }}" alt="Icon">
                 </a>
             </div>
             <div class="ds-cmn-card-item">
                 <div class="ds-cmn-card-item-left">
                     <div class="ds-cmn-card-item-icon">
-                        <img src="{{ asset('students/images/pen-white.svg') }}" alt="Icon">
+                        <img src="{{ asset('student/images/pen-white.svg') }}" alt="Icon">
                     </div>
                     <h3>Set up payment method</h3>
                 </div>
                 <a href="#url" class="ds-cmn-card-item-icon">
-                    <img src="{{ asset('students/images/arrow-upright.svg') }}" alt="Icon">
+                    <img src="{{ asset('student/images/arrow-upright.svg') }}" alt="Icon">
                 </a>
             </div>
         </div>

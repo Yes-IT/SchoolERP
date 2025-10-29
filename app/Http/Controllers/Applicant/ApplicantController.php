@@ -146,6 +146,10 @@ class ApplicantController extends Controller
     public function application()
     {
         $data['title'] = ___('applicant.application_application');
+        $data['countries'] = DB::table('countries')->get();
+        $data['states'] = DB::table('states')->get();
+        $data['cities'] = DB::table('cities')->get();
+      
         return view('applicant.application', compact('data'));
     }
     public function interview()
