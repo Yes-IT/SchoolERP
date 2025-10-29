@@ -68,42 +68,8 @@
 
 
 @section('content')
-    <div class="dashboard-main light-bg">
 
-        <!-- Sidebar Begin -->
-
-        @include('backend.partials.sidebar')
-        <!-- End Of Sidebar -->
-
-        <!-- Dashboard Body Begin -->
-
-        <div class="dashboard-body dspr-body-outer" id="rest-section" style="    margin-left: -9px;">
-            <div class="dashboard-body-head">
-                <div class="dsbdy-head-left">
-                    <div class="dsbdy-search-form">
-
-                    </div>
-                </div>
-                <div class="dsbdy-head-right">
-                    <button class="tgl-flscrn" aria-label="Toggle fullscreen">
-                        <img src="{{ asset('images/fees/fullscreen-toggler-icon.svg') }}" alt="Icon">
-                    </button>
-                    <div class="profile-ctrl">
-                        <button class="profile-ctrl-toggler">
-                            <div class="pr-pic">
-                                <img src="{{ asset('images/fees/profile-picture.png') }}" alt="Profile Picture">
-                            </div>
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </button>
-                        <div class="pr-ctrl-menu">
-                            <ul>
-                                <li><a href="profile.html">My Profile</a></li>
-                                <li><a href="../../set-password.html">Change Password</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      
 
             <div class="ds-breadcrumb">
                 <h1>It assets</h1>
@@ -210,15 +176,14 @@
 
                             <div class="tablepagination">
                                 <div class="tbl-pagination-inr">
-                                    <ul>
-                                        <li><a href="#url"><img src="{{ asset('images/fees/arrow-left.svg') }}"></a>
-                                        </li>
-                                        <li class="active"><a href="#url">1</a></li>
-                                        <li><a href="#url">2</a></li>
-                                        <li><a href="#url">3</a></li>
-                                        <li><a href="#url"><img src="{{ asset('images/fees/arrow-right.svg') }}"></a>
-                                        </li>
-                                    </ul>
+                                   <ul>
+                                    <li><a href="#url"><img src="{{ asset('images/parent/arrow-left.svg') }}"></a></li>
+                                    <li class="active"><a href="#url">1</a></li>
+                                    <li><a href="#url">2</a></li>
+                                    <li><a href="#url">3</a></li>
+                                    <li><a href="#url"><img src="{{ asset('images/parent/arrow-right.svg') }}"></a></li>
+                                </ul>
+
                                 </div>
 
                                 <div class="pages-select">
@@ -299,14 +264,13 @@
                             <div class="tablepagination">
                                 <div class="tbl-pagination-inr">
                                     <ul>
-                                        <li><a href="#url"><img src="{{ asset('images/fees/arrow-left.svg') }}"></a>
-                                        </li>
-                                        <li class="active"><a href="#url">1</a></li>
-                                        <li><a href="#url">2</a></li>
-                                        <li><a href="#url">3</a></li>
-                                        <li><a href="#url"><img src="{{ asset('images/fees/arrow-right.svg') }}"></a>
-                                        </li>
-                                    </ul>
+                                    <li><a href="#url"><img src="{{ asset('images/parent/arrow-left.svg') }}"></a></li>
+                                    <li class="active"><a href="#url">1</a></li>
+                                    <li><a href="#url">2</a></li>
+                                    <li><a href="#url">3</a></li>
+                                    <li><a href="#url"><img src="{{ asset('images/parent/arrow-right.svg') }}"></a></li>
+                                </ul>
+
                                 </div>
 
                                 <div class="pages-select">
@@ -532,17 +496,13 @@
 
                                 <div class="tablepagination">
                                     <div class="tbl-pagination-inr">
-                                        <ul>
-                                            <li><a href="#url"><img
-                                                        src="{{ asset('images/fees/arrow-left.svg') }}"></a>
-                                            </li>
-                                            <li class="active"><a href="#url">1</a></li>
-                                            <li><a href="#url">2</a></li>
-                                            <li><a href="#url">3</a></li>
-                                            <li><a href="#url"><img
-                                                        src="{{ asset('images/fees/arrow-right.svg') }}"></a>
-                                            </li>
-                                        </ul>
+                                       <ul>
+                                    <li><a href="#url"><img src="{{ asset('images/parent/arrow-left.svg') }}"></a></li>
+                                    <li class="active"><a href="#url">1</a></li>
+                                    <li><a href="#url">2</a></li>
+                                    <li><a href="#url">3</a></li>
+                                    <li><a href="#url"><img src="{{ asset('images/parent/arrow-right.svg') }}"></a></li>
+                                </ul>
                                     </div>
 
                                     <div class="pages-select">
@@ -569,10 +529,5 @@
                             </div>
                         </div>
 
-                    </div>
-
-                </div>
-            </div>
-
-        </div>
+                   
     @endsection

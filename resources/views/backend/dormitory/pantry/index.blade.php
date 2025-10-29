@@ -31,45 +31,7 @@ color: var(--primary-clr);
 </style>
 
 
-    <div class="dashboard-main light-bg">
-
-        <!-- Sidebar Begin -->
-
-        @include('backend.partials.sidebar')
-        <!-- End Of Sidebar -->
-
-        <!-- Dashboard Body Begin -->
-
-          <div class="dashboard-body dspr-body-outer">
-            <div class="dashboard-body-head">
-                <div class="dsbdy-head-left">
-                    <div class="dsbdy-search-form">
-                        <div class="input-grp search-field">
-                            <input type="text" placeholder="Search Page">
-                            <input type="submit" value="Search">
-                        </div>
-                    </div>
-                </div>
-                 <div class="dsbdy-head-right">
-                    <button class="tgl-flscrn" aria-label="Toggle fullscreen">
-                        <img src="{{ asset('images/fees/fullscreen-toggler-icon.svg') }}" alt="Icon">
-                    </button>
-                    <div class="profile-ctrl">
-                        <button class="profile-ctrl-toggler">
-                            <div class="pr-pic">
-                                <img src="{{ asset('images/fees/profile-picture.png') }}" alt="Profile Picture">
-                            </div>
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </button>
-                        <div class="pr-ctrl-menu">
-                            <ul>
-                                <li><a href="profile.html">My Profile</a></li>
-                                <li><a href="../../set-password.html">Change Password</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    
             
             <div class="ds-breadcrumb">
                 <h1>Exam Schedule</h1>
@@ -99,7 +61,7 @@ color: var(--primary-clr);
                                    </div>    
                                   
                                     <div class="ds-cmn-ic-ftr">
-                                      <a href="{{ route('dormitory.itassets') }}" class="cmn-btn w-100 btn-sm">View Details</a>
+                                      <a href="{{ route('dormitory.inventory') }}" class="cmn-btn w-100 btn-sm">View Details</a>
                                                                                                                     
                                                                                                                 
 
@@ -122,7 +84,7 @@ color: var(--primary-clr);
                                    </div>    
                                   
                                     <div class="ds-cmn-ic-ftr">
-                                      <a href="{{ route('dormitory.requestedassets') }}" class="cmn-btn w-100 btn-sm">View Details</a>
+                                      <a href="{{ route('dormitory.requestedInventory') }}" class="cmn-btn w-100 btn-sm">View Details</a>
                                                                                                                     
                                                                                                                 
 
@@ -145,7 +107,7 @@ color: var(--primary-clr);
                                    </div>    
                                   
                                     <div class="ds-cmn-ic-ftr">
-                                      <a href="{{ route('dormitory.assignedassets') }}" class="cmn-btn w-100 btn-sm">View Details</a>
+                                      <a href="{{ route('dormitory.lowInventory') }}" class="cmn-btn w-100 btn-sm">View Details</a>
                                                                                                                     
                                                                                                                 
 
@@ -173,7 +135,7 @@ color: var(--primary-clr);
                                    </div>    
                                   
                                     <div class="ds-cmn-ic-ftr">
-                                      <a href="{{ route('dormitory.issuereports') }}" class="cmn-btn w-100 btn-sm">View Details</a>
+                                      <a href="{{ route('dormitory.usageReport') }}" class="cmn-btn w-100 btn-sm">View Details</a>
                                                                                                                     
                                                                                                                 
 
@@ -196,7 +158,7 @@ color: var(--primary-clr);
                                    </div>    
                                   
                                     <div class="ds-cmn-ic-ftr">
-                                      <a href="{{ route('dormitory.returnassets') }}" class="cmn-btn w-100 btn-sm">View Details</a>
+                                      <a href="{{ route('dormitory.categoryManager') }}" class="cmn-btn w-100 btn-sm">View Details</a>
                                                                                                                     
                                                                                                                 
 
@@ -219,7 +181,7 @@ color: var(--primary-clr);
                                    </div>    
                                   
                                     <div class="ds-cmn-ic-ftr">
-                                      <a href="{{ route('dormitory.procurement') }}" class="cmn-btn w-100 btn-sm">View Details</a>
+                                      <a href="{{ route('dormitory.itemManager') }}" class="cmn-btn w-100 btn-sm">View Details</a>
                                                                                                                     
                                                                                                                 
 
@@ -247,7 +209,7 @@ color: var(--primary-clr);
                                    </div>    
                                   
                                     <div class="ds-cmn-ic-ftr">
-                                      <a href="{{ route('dormitory.mantainenceRequest') }}" class="cmn-btn w-100 btn-sm">View Details</a>
+                                      <a href="{{ route('dormitory.pantryprocurement') }}" class="cmn-btn w-100 btn-sm">View Details</a>
                                                                                                                     
                                                                                                                 
 
@@ -262,7 +224,7 @@ color: var(--primary-clr);
                 </div>
                   
             </div>
-        </div>
+        
 
         
 

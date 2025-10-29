@@ -287,7 +287,7 @@ class DormitoryController extends Controller
             ]);
 
             // Save to DB
-            $entry = ProcurementEntry::create([
+             DB::table('procurement_entry')->insert([
                 'category_id'    => $request->category_id,
                 'item_name'      => $request->item_name,
                 'qty'            => $request->qty,
@@ -298,9 +298,7 @@ class DormitoryController extends Controller
             ]);
 
             // Log success
-            Log::info('Procurement entry created successfully', [
-                'entry' => $entry->toArray()
-            ]);
+      
 
             return redirect()->back()->with('success', 'Procurement entry added successfully!');
         } catch (Exception $e) {
@@ -846,7 +844,7 @@ class DormitoryController extends Controller
             ->leftJoin('category_list as c', 'p.category_id', '=', 'c.id')
             ->select(
                 'p.id',
-                'prod.name as product_name',
+                'prod.product_name as product_name',
                 'c.name as category_name',
                 'p.qty',
                 'p.unit',
@@ -863,124 +861,623 @@ class DormitoryController extends Controller
     }
 
 
-    public function requestedInventory()
-    {
+public function requestedInventory(){
 
-        $requests = \DB::table('pantry_request_inventory as pri')
-            ->leftJoin('pantry_inventory as pi', 'pri.asset_id', '=', 'pi.id')
-            ->leftJoin('products as prod', 'pi.product_id', '=', 'prod.id')
-            ->leftJoin('category_list as cat', 'pi.category_id', '=', 'cat.id')
-            ->select(
-                'pri.id',
-                'pri.asset_id',
-                'pri.quantity',
-                'pri.reason',
-                'pri.status',
-                'pri.assign_status',
-                'pri.created_at',
-                'prod.name as product_name',
-                'cat.name as category_name'
-            )
-            ->orderBy('pri.id', 'desc')
-            ->get();
+    $requests = \DB::table('pantry_request_inventory as pri')
+        ->leftJoin('pantry_inventory as pi', 'pri.asset_id', '=', 'pi.id')
+        ->leftJoin('products as prod', 'pi.product_id', '=', 'prod.id')
+        ->leftJoin('category_list as cat', 'pi.category_id', '=', 'cat.id')
+        ->select(
+            'pri.id',
+            'pri.asset_id',
+            'pri.quantity',
+            'pri.reason',
+            'pri.status',
+            'pri.assign_status',
+            'pri.created_at',
+            'prod.product_name as product_name',
+            'cat.name as category_name'
+        )
+        ->orderBy('pri.id', 'desc')
+        ->get();
 
 
-        return view('backend.dormitory.requested_inventory.index', compact('requests'));
+    return view('backend.dormitory.requested_inventory.index' ,compact('requests'));
+}
+
+public function updateRequestInventoryStatus(Request $request, $id)
+{
+    try {
+        $requestItem = \DB::table('pantry_request_inventory')->where('id', $id)->first();
+
+        if (!$requestItem) {
+            return response()->json(['success' => false, 'message' => 'Request not found']);
+        }
+
+        \DB::table('pantry_request_inventory')
+            ->where('id', $id)
+            ->update([
+                'status' => $request->status,
+                'updated_at' => now()
+            ]);
+
+        $statusText = match ($request->status) {
+            3 => 'Approved',
+            4 => 'Rejected',
+            default => 'Updated'
+        };
+
+        return response()->json([
+            'success' => true,
+            'message' => "Request has been {$statusText} successfully."
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error updating status: ' . $e->getMessage()
+        ]);
     }
+}
 
 
-
-    public function lowInventory()
-    {
-        $inventories = \DB::table('pantry_inventory')
-            ->join('products', 'pantry_inventory.product_id', '=', 'products.id')
-            ->join('category_list', 'pantry_inventory.category_id', '=', 'category_list.id')
-            ->where('pantry_inventory.qty', '<=', value: 10)
-            ->orderBy('pantry_inventory.updated_at', 'desc')
-            ->select(
-                'pantry_inventory.*',
-                'products.product_name',
-                'category_list.name'
-            )
-            ->get();
+public function lowInventory()
+{
+    $inventories = \DB::table('pantry_inventory')
+        ->join('products', 'pantry_inventory.product_id', '=', 'products.id')
+        ->join('category_list', 'pantry_inventory.category_id', '=', 'category_list.id')
+        ->where('pantry_inventory.qty', '<=', value: 10)
+        ->orderBy('pantry_inventory.updated_at', 'desc')
+        ->select(
+            'pantry_inventory.*',
+            'products.product_name',
+            'category_list.name'
+        )
+        ->get();
 
         #print_r($inventories);die;
         // dd($inventories);
 
-        return view('backend.dormitory.low_inventory.index', compact('inventories'));
-    }
+    return view('backend.dormitory.low_inventory.index', compact('inventories'));
+}
 
+public function usageReport()
+{
+    // Step 1: Get all approved requests (status = 4)
+    $approvedRequests = \DB::table('pantry_request_inventory')
+        ->where('status', 4)
+        ->get();
 
-    public function updateRequestInventoryStatus(Request $request, $id)
-    {
-        try {
-            $requestItem = \DB::table('pantry_request_inventory')->where('id', $id)->first();
+    foreach ($approvedRequests as $req) {
+        $inventory = \DB::table('pantry_inventory')
+            ->where('id', $req->asset_id)
+            ->first();
 
-            if (!$requestItem) {
-                return response()->json(['success' => false, 'message' => 'Request not found']);
-            }
+        if ($inventory) {
+            // Deduct safely, never below 0
+            $newQty = max(0, $inventory->qty - $req->quantity);
+           
 
-            \DB::table('pantry_request_inventory')
-                ->where('id', $id)
-                ->update([
-                    'status' => $request->status,
-                    'updated_at' => now()
-                ]);
-
-            $statusText = match ($request->status) {
-                3 => 'Approved',
-                4 => 'Rejected',
-                default => 'Updated'
-            };
-
-            return response()->json([
-                'success' => true,
-                'message' => "Request has been {$statusText} successfully."
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error updating status: ' . $e->getMessage()
-            ]);
-        }
-    }
-
-
-
-    public function usageReport()
-    {
-        // Step 1: Deduct approved request quantities from inventory (only once)
-        $approvedRequests = \DB::table('pantry_request_inventory')
-            ->where('status', 4)
-            ->get();
-
-        foreach ($approvedRequests as $req) {
-            // Deduct only if stock is sufficient
+            // Update inventory
             \DB::table('pantry_inventory')
                 ->where('id', $req->asset_id)
-                ->decrement('qty', $req->quantity);
+                ->update([
+                    'qty' => $newQty,
+                    'updated_at' => now(),
+                ]);
 
-            // Optional: Mark processed so we don't deduct twice
+         
             \DB::table('pantry_request_inventory')
                 ->where('id', $req->id)
-                ->update(['status' => 4]); // mark as available or processed
+                ->update([
+                    'updated_at' => now(),
+                ]);
+        }
+    }
+
+    // Step 2: Get updated inventory
+    $inventories = \DB::table('pantry_inventory')
+        ->join('products', 'pantry_inventory.product_id', '=', 'products.id')
+        ->join('category_list', 'pantry_inventory.category_id', '=', 'category_list.id')
+        ->select(
+            'pantry_inventory.id',
+            'products.product_name',
+            'category_list.name',
+            'pantry_inventory.qty',
+            'pantry_inventory.reason',
+            'pantry_inventory.updated_at',
+            'pantry_inventory.unit'
+        )
+        ->orderBy('pantry_inventory.updated_at', 'desc')
+        ->get();
+
+    return view('backend.dormitory.usage_report.index', compact('inventories'));
+}
+
+
+
+
+public function categoryManager()
+{
+    $inventories = \DB::table('pantry_category_list')
+        ->orderBy('updated_at', 'desc')
+        ->select('id', 'name', 'description', 'unit', 'value', 'status', 'created_at', 'updated_at')
+        ->get();
+    #print_r($categories);die;
+    return view('backend.dormitory.category_manager.index', compact('inventories'));
+}
+
+
+public function categoryManagerStore(Request $request)
+{
+    #print_r($request->description);die;
+    $request->validate([
+        'name'        => 'required|string|max:200',
+        'description' => 'nullable|string|max:500',
+        'unit'        => 'nullable|string|max:20',
+        'value'       => 'nullable|string|max:20',
+    ]);
+
+    DB::table('pantry_category_list')->insert([
+        'name'        => $request->name,
+        'description' => $request->description,
+        'unit'        => $request->unit,
+        'value'       => $request->value,
+        'status'      => 1,
+        'created_at'  => now(),
+        'updated_at'  => now(),
+    ]);
+
+    return redirect()->back()->with('success', 'Category record saved successfully!');
+}
+
+public function categoryManagerUpdate(Request $request)
+{
+    $request->validate([
+        'id'          => 'required|integer|exists:pantry_category_list,id',
+        'name'        => 'required|string|max:255',
+        'description' => 'nullable|string|max:500',
+        'unit'        => 'nullable|string|max:50',
+        'value'       => 'nullable|string|max:20',
+    ]);
+
+    DB::table('pantry_category_list')
+        ->where('id', $request->id)
+        ->update([
+            'name'        => $request->name,
+            'description' => $request->description,
+            'unit'        => $request->unit,
+            'value'       => $request->value,
+            'updated_at'  => now(),
+        ]);
+
+    return redirect()->back()->with('success', 'Category updated successfully!');
+}
+
+
+public function categoryManagerDelete(Request $request)
+{
+    $request->validate([
+        'id' => 'required|integer|exists:pantry_category_list,id',
+    ]);
+
+    DB::table('pantry_category_list')
+        ->where('id', $request->id)
+        ->delete();
+
+     return redirect()->back()->with(['success' => true, 'message' => 'Category deleted successfully!']);
+}
+
+public function itemManager()    {
+        $inventories = \DB::table('pantry_inventory as p')
+            ->leftJoin('products as prod', 'p.product_id', '=', 'prod.id')
+            ->leftJoin('category_list as c', 'p.category_id', '=', 'c.id')
+            ->select(
+                'p.id','p.category_id',
+                'prod.product_name as product_name',
+                'prod.id as product_id',
+                'c.name as category_name',
+                'p.qty',
+                'p.unit',
+                'p.reason',
+                'p.status',
+                'prod.price',
+                'p.created_at',
+                'p.updated_at'
+            )
+            ->orderBy('p.id', 'desc')
+            ->get();
+            $categories = \DB::table('category_list')->select('id', 'name')->get();
+
+        return view('backend.dormitory.item_manager.index', compact('inventories','categories'));
+    }
+
+public function itemManagerStore(Request $request)
+{
+    try {
+       
+
+        // Step 1: Validate input
+        $request->validate([
+            'category_id' => 'required|exists:category_list,id',
+            'name' => 'required|string|max:255',
+            'reason' => 'nullable|string|max:500',
+            'unit' => 'required|string|max:50',
+            'qty' => 'nullable|numeric',
+        ]);
+      
+        // Step 2: Insert into products table
+        $productId = DB::table('products')->insertGetId([
+            'product_name' => $request->name,
+           
+            'price'        => 0, // default
+            'created_at'   => now(),
+            'updated_at'   => now(),
+        ]);
+      
+
+        // Step 3: Insert into pantry_inventory table
+        DB::table('pantry_inventory')->insert([
+            'category_id'  => $request->category_id,
+            'product_id'   => $productId,
+             'reason'         => $request->reason,
+           
+            'unit'         => $request->unit,
+            'qty'    => $request->qty, // check your column name here
+            'created_at'   => now(),
+            'updated_at'   => now(),
+        ]);
+      
+
+        return redirect()->back()->with('success', 'Item added successfully!');
+
+    } catch (\Throwable $e) {
+        // Log full error details
+      
+
+        return redirect()->back()->with('error', 'Failed to store item. Check logs for details.');
+    }
+}
+
+
+public function itemManagerUpdate(Request $request)
+{
+    try {
+        // Log incoming data
+        Log::info(' itemManagerUpdate called', ['request_data' => $request->all()]);
+
+        // Step 1: Validate input
+        $request->validate([
+            'id' => 'required|exists:pantry_inventory,id',
+            'category_id' => 'required|exists:category_list,id',
+            'name' => 'required|string|max:255',
+            'reason' => 'nullable|string|max:500',
+            'unit' => 'required|string|max:50',
+            'qty' => 'nullable|numeric',
+        ]);
+
+        // Step 2: Fetch pantry record
+        $inventory = DB::table('pantry_inventory')->where('id', $request->id)->first();
+
+        if (!$inventory) {
+            Log::warning(' Pantry inventory not found for ID', ['id' => $request->id]);
+            return redirect()->back()->with('error', 'Item not found.');
         }
 
-        // Step 2: Fetch updated pantry inventory data
-        $inventories = \DB::table('pantry_inventory')
-            ->join('products', 'pantry_inventory.product_id', '=', 'products.id')
-            ->join('category_list', 'pantry_inventory.category_id', '=', 'category_list.id')
-            ->select(
-                'pantry_inventory.id',
-                'products.product_name',
-                'category_list.name',
-                'pantry_inventory.qty',
-                'pantry_inventory.reason',
-                'pantry_inventory.updated_at',
-                'pantry_inventory.unit'
-            )
-            ->orderBy('pantry_inventory.updated_at', 'desc')
-            ->get();
-        return view('backend.dormitory.usage_report.index', compact('inventories'));
+        // Step 3: Update products table (linked by product_id)
+        DB::table('products')->where('id', $inventory->product_id)->update([
+            'product_name' => $request->name,
+            'updated_at'   => now(),
+        ]);
+        Log::info(' Product updated', ['product_id' => $inventory->product_id]);
+
+        // Step 4: Update pantry_inventory table
+        DB::table('pantry_inventory')->where('id', $request->id)->update([
+            'category_id' => $request->category_id,
+            'reason'      => $request->reason,
+            'unit'        => $request->unit,
+            'qty'         => $request->qty,
+            'updated_at'  => now(),
+        ]);
+        Log::info(' Pantry inventory updated', ['inventory_id' => $request->id]);
+
+        return redirect()->back()->with('success', 'Item updated successfully!');
+
+    } catch (\Throwable $e) {
+        // Log full error details for debugging
+        Log::error(' Error in itemManagerUpdate', [
+            'error_message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+
+        return redirect()->back()->with('error', 'Failed to update item. Check logs for details.');
     }
+}
+
+
+public function itemManagerDelete(Request $request) {
+
+    
+    $request->validate([
+        'id' => 'required|integer|exists:pantry_inventory,id',
+    ]);
+
+    DB::table('pantry_inventory')
+        ->where('id', $request->id)
+        ->delete();
+
+     return redirect()->back()->with(['success' => true, 'message' => 'Item deleted successfully!']);
+
+
+}
+
+ public function pantryprocurement()
+    {
+            $categories = \DB::table('category_list')->get();
+            $users =  \DB::table('users')->get();
+            $requests = \DB::table('pantry_request_inventory as pri')
+            ->leftJoin('users as u', 'pri.id', '=', 'u.id')
+            ->leftJoin('pantry_inventory as pi', 'pri.asset_id', '=', 'pi.id')
+            ->leftJoin('category_list as c', 'pi.category_id', '=', 'c.id')
+            ->leftJoin('products as p', 'pi.product_id', '=', 'p.id')
+            ->select(
+                'pri.id as request_id',
+                'pri.asset_id',
+                'pri.created_at',
+                'pi.qty as inventory_qty',
+                'pri.quantity as requested_qty',
+                'c.name as category_name',
+                'p.product_name as product_name',
+                // \DB::raw("CONCAT(u.firstname, ' ', u.lastname) as user_name"),
+                'u.name as user_name',
+                'u.id as user_id'
+            )
+            ->orderBy('pri.id', 'desc')
+            ->get();
+
+        return view('backend.dormitory.pantry_procurement.index', compact('requests','categories','users'));
+    }
+
+  public function searchPantryProcurement(Request $request)
+{
+    $search = $request->input('q'); // The search term
+
+    $requests = DB::table('pantry_request_inventory as pri')
+        ->leftJoin('users as u', 'pri.id', '=', 'u.id')
+        ->leftJoin('pantry_inventory as pi', 'pri.asset_id', '=', 'pi.id')
+        ->leftJoin('category_list as c', 'pi.category_id', '=', 'c.id')
+        ->leftJoin('products as p', 'pi.product_id', '=', 'p.id')
+        ->select(
+            'pri.id as request_id',
+            'pri.asset_id',
+            'pri.created_at',
+            'pi.qty as inventory_qty',
+            'pri.quantity as requested_qty',
+            'c.name as category_name',
+            'p.product_name as product_name',
+            'u.name as user_name',
+            'u.id as user_id'
+        )
+        ->when($search, function ($query) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('u.name', 'LIKE', "%{$search}%")
+                  ->orWhere('p.product_name', 'LIKE', "%{$search}%")
+                  ->orWhere('c.name', 'LIKE', "%{$search}%");
+            });
+        })
+        ->orderBy('pri.id', 'desc')
+        ->get();
+
+    // Build table HTML
+    $html = '';
+
+    if ($requests->isEmpty()) {
+        $html = '
+            <tr>
+                <td colspan="8" style="text-align:center; color:#999;">
+                    No data found
+                </td>
+            </tr>
+        ';
+    } else {
+        foreach ($requests as $index => $req) {
+            $html .= '
+                <tr>
+                    <td>' . ($index + 1) . '</td>
+                    <td>' . $req->request_id . '</td>
+                    <td>' . ($req->user_name ?? '—') . '</td>
+                    <td>' . ($req->product_name ?? 'Unknown') . '</td>
+                    <td>' . ($req->category_name ?? 'N/A') . '</td>
+                    <td>' . ($req->requested_qty ?? 0) . '</td>
+                    <td>' . ($req->inventory_qty ?? 0) . '</td>
+                    <td>' . \Carbon\Carbon::parse($req->created_at)->format('d-m-Y') . '</td>
+                </tr>
+            ';
+        }
+    }
+
+    return $html;
+}
+
+    public function storePantryProcurement(Request $request)
+    {
+        // Log that we entered the method
+        Log::info('storeProcurement() called', [
+            'request_data' => $request->all()
+        ]);
+
+        try {
+            // Validate the request
+            $request->validate([
+                'category_id'     => 'required|exists:category_list,id',
+                'item_name'       => 'required|string|max:255',
+                'qty'             => 'required|integer|min:1',
+                'amount_per_qty'  => 'required|numeric|min:0',
+                'supplier_name'   => 'required|string|max:255',
+                'delivery_date'   => 'required|date',
+            ]);
+
+            // Save to DB
+               DB::table('procurement_entry')->insert([
+                'category_id'    => $request->category_id,
+                'item_name'      => $request->item_name,
+                'qty'            => $request->qty,
+                'amount_per_qty' => $request->amount_per_qty,
+                'supplier_name'  => $request->supplier_name,
+                'delivery_date'  => $request->delivery_date,
+                'status'         => 1, 
+                'type' => 'pantry',
+                 
+            ]);
+
+            // Log success
+          
+
+            return redirect()->back()->with('success', 'Procurement entry added successfully!');
+        } catch (Exception $e) {
+            // Log error details
+            Log::error('Failed to store procurement entry', [
+                'error_message' => $e->getMessage(),
+                'stack_trace'   => $e->getTraceAsString(),
+                'request_data'  => $request->all()
+            ]);
+
+            // Return with error message
+            return redirect()->back()->with('error', 'Something went wrong: ' . $e->getMessage());
+        }
+    }
+
+    public function importPantryProcurement(Request $request)
+    {
+        Log::info('--- [IMPORT STARTED] importProcurement() called ---');
+
+        // Log incoming request data (excluding file binary content)
+        Log::info('Request Data Received', [
+            'inputs' => $request->except('file'),
+            'has_file' => $request->hasFile('file'),
+        ]);
+
+        try {
+            // ✅ Validation
+            Log::info('Validating uploaded file...');
+            $request->validate([
+                'file' => 'required|mimes:csv,xlsx,xls|max:2048',
+            ]);
+            Log::info('File validation passed.');
+
+            // ✅ Log file details
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                Log::info('Uploaded File Details', [
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type'     => $file->getMimeType(),
+                    'extension'     => $file->getClientOriginalExtension(),
+                    'size_kb'       => round($file->getSize() / 1024, 2) . ' KB',
+                    'path'          => $file->getRealPath(),
+                ]);
+            } else {
+                Log::warning('No file found in request despite validation.');
+            }
+
+            // ✅ Begin Import
+            Log::info('Starting Excel import process...');
+            #print_r($request->file('file'));die;
+            #Excel::import(new ProcurementImport, $request->file('file'));
+            Log::info('Excel import completed successfully.');
+
+            Log::info('--- [IMPORT COMPLETED SUCCESSFULLY] ---');
+
+            return redirect()->back()->with('success', 'Procurement data imported successfully!');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            // ✅ Catch Excel validation errors
+            Log::error('Excel Validation Exception', [
+                'failures' => $e->failures(),
+            ]);
+
+            return redirect()->back()->with('error', 'Excel validation failed: Check your file format.');
+        } catch (\Throwable $e) {
+            // ✅ Catch all other exceptions
+            Log::error('Procurement import failed due to an unexpected error.', [
+                'error_message' => $e->getMessage(),
+                'exception_class' => get_class($e),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->back()->with('error', 'Import failed: ' . $e->getMessage());
+        }
+    }
+
+ public function filterByUserPantryProcure(Request $request)
+{
+    $userId = $request->input('user_id');
+
+    $query = \DB::table('pantry_request_inventory as pri')
+        ->leftJoin('users as u', 'pri.id', '=', 'u.id')
+        ->leftJoin('pantry_inventory as pi', 'pri.asset_id', '=', 'pi.id')
+        ->leftJoin('category_list as c', 'pi.category_id', '=', 'c.id')
+        ->leftJoin('products as p', 'pi.product_id', '=', 'p.id')
+        ->select(
+            'pri.id as request_id',
+            'pri.asset_id',
+            'pri.created_at',
+            'pri.quantity as requested_qty',
+            'pi.qty as inventory_qty',
+            'u.id as user_id',
+            'u.name as user_name',
+            'p.product_name',
+            'c.name as category_name'
+        );
+
+   
+    if (!empty($userId)) {
+        $query->where('pri.id', $userId);
+    }
+
+    $requests = $query->orderBy('pri.id', 'desc')->get();
+
+    return response()->json(['requests' => $requests]);
+}
+
+
+
+
+
+    public function filterByDatePantryProcure(Request $request)
+    {
+        $date = $request->input('date');
+
+        $filtered = \DB::table('it_assets_request as r')
+            ->leftJoin('assets_list as a', 'r.asset_id', '=', 'a.id')
+            ->leftJoin('staff as s', 'r.assign_id', '=', 's.id')
+            ->select(
+                'r.id',
+                'r.asset_id',
+                'r.quantity',
+                'r.reason',
+                'r.created_at',
+                'a.name',
+                'a.model',
+                's.id as staff_id',
+                \DB::raw("CONCAT(s.first_name, ' ', s.last_name) as staff_name")
+            )
+            ->when($date, function ($query, $date) {
+                $query->whereDate('r.created_at', $date);
+            })
+            ->orderBy('r.created_at', 'desc')
+            ->get();
+
+        // Return partial HTML (only tbody rows)
+        $html = view('backend.dormitory.pantry_procurement.fullfillment-history-list', ['requests' => $filtered])->render();
+
+        return response()->json(['html' => $html]);
+    }
+
+
+
+
+
 }

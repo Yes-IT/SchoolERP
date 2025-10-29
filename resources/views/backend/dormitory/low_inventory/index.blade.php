@@ -111,13 +111,13 @@
 
                 <div class="tablepagination">
                     <div class="tbl-pagination-inr">
-                        <ul>
-                            <li><a href="#url"><img src="{{ asset('images/fees/arrow-left.svg') }}"></a></li>
-                            <li class="active"><a href="#url">1</a></li>
-                            <li><a href="#url">2</a></li>
-                            <li><a href="#url">3</a></li>
-                            <li><a href="#url"><img src="{{ asset('images/fees/arrow-right.svg') }}"></a></li>
-                        </ul>
+                     <ul>
+                                    <li><a href="#url"><img src="{{ asset('images/parent/arrow-left.svg') }}"></a></li>
+                                    <li class="active"><a href="#url">1</a></li>
+                                    <li><a href="#url">2</a></li>
+                                    <li><a href="#url">3</a></li>
+                                    <li><a href="#url"><img src="{{ asset('images/parent/arrow-right.svg') }}"></a></li>
+                                </ul>
                     </div>
 
                     <div class="pages-select">

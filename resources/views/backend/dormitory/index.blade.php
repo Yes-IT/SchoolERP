@@ -9,66 +9,14 @@
 display:flex;
 flex-direction: row;
 }
-.right-section button{
-    border: 1px solid var(--primary-clr);
-    width: 80px;
-    padding: 0px;
-    color: var(--primary-clr);
-    font-size: 14px;
-    position: relative;
-    left: -67px;
 
-}
-.left-section p{
-color: var(--primary-clr);
-    font-size: 14px;
-    font-weight: 700;
-    /* min-width: 27px; */
-    width: 300px;
-}
 
 </style>
 
 
-    <div class="dashboard-main light-bg">
 
-        <!-- Sidebar Begin -->
-
-        @include('backend.partials.sidebar')
-        <!-- End Of Sidebar -->
-
-        <!-- Dashboard Body Begin -->
-
-          <div class="dashboard-body dspr-body-outer">
-            <div class="dashboard-body-head">
-                <div class="dsbdy-head-left">
-                    <div class="dsbdy-search-form">
-                        <div class="input-grp search-field">
-                            <input type="text" placeholder="Search Page">
-                            <input type="submit" value="Search">
-                        </div>
-                    </div>
-                </div>
-                 <div class="dsbdy-head-right">
-                    <button class="tgl-flscrn" aria-label="Toggle fullscreen">
-                        <img src="{{ asset('images/fees/fullscreen-toggler-icon.svg') }}" alt="Icon">
-                    </button>
-                    <div class="profile-ctrl">
-                        <button class="profile-ctrl-toggler">
-                            <div class="pr-pic">
-                                <img src="{{ asset('images/fees/profile-picture.png') }}" alt="Profile Picture">
-                            </div>
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </button>
-                        <div class="pr-ctrl-menu">
-                            <ul>
-                                <li><a href="profile.html">My Profile</a></li>
-                                <li><a href="../../set-password.html">Change Password</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+       
+          
             
             <div class="ds-breadcrumb">
                 <h1>Exam Schedule</h1>
@@ -310,7 +258,7 @@ color: var(--primary-clr);
                 </div>
                   
             </div>
-        </div>
+      
 
         
 
