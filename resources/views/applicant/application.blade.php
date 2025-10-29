@@ -39,9 +39,9 @@
             </ul>
             <div class="btn-wrp">
                 <a href="#url" class="cmn-btn sm-btn" style="width: 99px;">
-                    <img src="../images/lucide_edit.svg" class="edit-img" />
+                    <img src="{{asset('student/images/lucide_edit.svg')}}" class="edit-img" />
                     Draft</a>
-                <a href="#url" class="cmn-btn btn-sm back-btn"><img src="../images/back-icon.svg" alt="Icon">
+                <a href="#url" class="cmn-btn btn-sm back-btn"><img src="{{asset('student/images/back-icon.svg')}}" alt="Icon">
                     Back</a>
             </div>
         </div>
@@ -58,35 +58,35 @@
                             <div class="multi-input-grp grp-3">
                                 <div class="input-grp">
                                     <label>Legal Name (first) *</label>
-                                    <input type="text" placeholder="Enter First Name">
+                                    <input type="text" name="first_name" placeholder="Enter First Name">
                                 </div>
                                 <div class="input-grp">
                                     <label>Last Name *</label>
-                                    <input type="text" placeholder="Enter Last Name">
+                                    <input type="text" name="last_name" placeholder="Enter Last Name">
                                 </div>
                                 <div class="input-grp">
                                     <label>You prefer to be called: *</label>
-                                    <input type="text" placeholder="You prefer to be called:">
+                                    <input type="text" name="prefered_name" placeholder="You prefer to be called:">
                                 </div>
                             </div>
                             <div class="multi-input-grp">
                                 <div class="input-grp">
                                     <label>שם בעברית *</label>
-                                    <input type="text" placeholder="שם בעברית ">
+                                    <input type="text" name="hebrew_name" placeholder="שם בעברית ">
                                 </div>
                                 <div class="input-grp">
                                     <label>שם פרטי</label>
-                                    <input type="text" placeholder="שם פרטי">
+                                    <input type="text" name="hebrew_first_name" placeholder="שם פרטי">
                                 </div>
                             </div>
                             <div class="input-grp">
                                 <label>Address *</label>
-                                <input type="text" placeholder="Enter Address">
+                                <input type="text" name="address" placeholder="Enter Address">
                             </div>
                             <div class="multi-input-grp">
                                 <div class="input-grp">
                                     <label>City *</label>
-                                    <input type="text" placeholder="Enter City">
+                                    <input type="text" name="city" placeholder="Enter City">
                                 </div>
                                 <div class="input-grp">
                                     <label>State</label>
