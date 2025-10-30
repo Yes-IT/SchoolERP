@@ -17,16 +17,24 @@ class ExaminationResult extends BaseModel
     {
         return $this->belongsTo(Student::class, 'student_id', 'id');
     }
+
     public function session()
     {
         return $this->belongsTo(Session::class, 'session_id', 'id');
     }
+
     public function class()
     {
         return $this->belongsTo(Classes::class, 'classes_id', 'id');
     }
+
     public function section()
     {
         return $this->belongsTo(Section::class, 'section_id', 'id');
+    }
+
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class,'subject_id','id');
     }
 }
