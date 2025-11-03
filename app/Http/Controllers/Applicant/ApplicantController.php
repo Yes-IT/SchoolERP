@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\Role;
 use App\Http\Controllers\Controller;
 use DB;
+use Exception;
 
 class ApplicantController extends Controller
 {
@@ -149,9 +150,253 @@ class ApplicantController extends Controller
         $data['countries'] = DB::table('countries')->get();
         $data['states'] = DB::table('states')->get();
         $data['cities'] = DB::table('cities')->get();
-      
+
         return view('applicant.application', compact('data'));
     }
+    public function applicationFormDraft(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Applicant insert or update
+            DB::table('applicants')->updateOrInsert(
+                ['user_id' => auth()->user()->id],
+                [
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'custom_id' => substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 6),
+                    'prefered_name' => $request->prefered_name,
+                    'date_of_birth' => $request->filled('dob') ? $request->dob : null,
+                    'hdob' => $request->filled('hdob') ? $request->hdob : null,
+                    'birth_place' => $request->birth_place,
+                    'number' => $request->number,
+                    'usa_cell' => $request->cell,
+                    'country' => $request->country,
+                    'state' => $request->state,
+                    'city' => $request->city,
+                    'address' => $request->address,
+                    'email' => $request->email,
+                    'is_draft' => 1,
+                ]
+            );
+
+            // get applicant id
+            $applicant = DB::table('applicants')->where('user_id', auth()->user()->id)->first();
+
+            // update or insert parent info
+            DB::table('applicant_parents')->updateOrInsert(
+                ['applicant_id' => $applicant->id],
+                [
+                    "marital_status" => $request->maritalStatus,
+                    "siblings" => $request->sibling,
+                ]
+            );
+
+            $school_name = null;
+            $grades = null;
+            $about = null;
+            $question = null;
+            $relation_name = null;
+            $relation_address = null;
+            $relation_phone = null;
+            $relation_relationship = null;
+
+            if ($request->filled('school_name')) {
+                $school_name = json_encode($request->school_name);
+            }
+
+            if ($request->filled('grades')) {
+                $grades = json_encode($request->grades);
+            }
+
+            if ($request->filled('relation_name')) {
+                $relation_name = json_encode($request->relation_name);
+            }
+
+            if ($request->filled('relation_address')) {
+                $relation_address = json_encode($request->relation_address);
+            }
+
+            if ($request->filled('relation_phone')) {
+                $relation_phone = json_encode($request->relation_phone);
+            }
+
+            if ($request->filled('relation_relationship')) {
+                $relation_relationship = json_encode($request->relation_relationship);
+            }
+
+            if ($request->hasFile('about') && $request->file('about')->isValid()) {
+                $file = $request->file('about');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('pdf'), $filename);
+                $about = 'pdf/' . $filename;
+            }
+
+            if ($request->hasFile('question') && $request->file('question')->isValid()) {
+                $file = $request->file('question');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('pdf'), $filename);
+                $question = 'pdf/' . $filename;
+            }
+
+            DB::table('aplicant_history')->updateOrInsert(
+                ['applicant_id' => $applicant->id],
+                [
+                    "school" => $request->school,
+                    "school_tel" => $request->school_tel,
+                    "grade" => $request->grade,
+                    "advisor_name" => $request->advisor_name,
+                    "home" => $request->home,
+                    "home_cell" => $request->home_cell,
+                    "email_address" => $request->email_address,
+                    "school_name" => $school_name,
+                    "school_grades" => $grades,
+                    "modified" => $request->modified,
+                    "surgery" => $request->surgery,
+                    "home" => $request->home,
+                    "medication" => $request->medication,
+                    "allergies" => $request->allergies,
+                    "about" => $about,
+                    "question" => $question,
+                    "relation_name" => $relation_name,
+                    "relation_address" => $relation_address,
+                    "relation_phone" => $relation_phone,
+                    "relation_relationship" => $relation_relationship,
+                ]
+            );
+
+            DB::commit();
+
+            return $this->responseWithSuccess(___('alert.draft_saved_successfully'), []);
+        } catch (Exception $e) {
+            DB::rollBack();
+            dd($e);
+            return $this->responseWithError(___('alert.something_went_wrong_please_try_again'), []);
+        }
+    }
+
+    public function applicationFormSave(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Applicant insert or update
+            DB::table('applicants')->updateOrInsert(
+                ['user_id' => auth()->user()->id],
+                [
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'custom_id' => substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 6),
+                    'prefered_name' => $request->prefered_name,
+                    'date_of_birth' => $request->filled('dob') ? $request->dob : null,
+                    'hdob' => $request->filled('hdob') ? $request->hdob : null,
+                    'birth_place' => $request->birth_place,
+                    'number' => $request->number,
+                    'usa_cell' => $request->cell,
+                    'country' => $request->country,
+                    'state' => $request->state,
+                    'city' => $request->city,
+                    'address' => $request->address,
+                    'email' => $request->email,
+                    'is_draft' => 0,
+                ]
+            );
+
+            // get applicant id
+            $applicant = DB::table('applicants')->where('user_id', auth()->user()->id)->first();
+
+            // update or insert parent info
+            DB::table('applicant_parents')->updateOrInsert(
+                ['applicant_id' => $applicant->id],
+                [
+                    "marital_status" => $request->maritalStatus,
+                    "siblings" => $request->sibling,
+                ]
+            );
+
+            $school_name = null;
+            $grades = null;
+            $about = null;
+            $question = null;
+            $relation_name = null;
+            $relation_address = null;
+            $relation_phone = null;
+            $relation_relationship = null;
+
+            if ($request->filled('school_name')) {
+                $school_name = json_encode($request->school_name);
+            }
+
+            if ($request->filled('grades')) {
+                $grades = json_encode($request->grades);
+            }
+
+            if ($request->filled('relation_name')) {
+                $relation_name = json_encode($request->relation_name);
+            }
+
+            if ($request->filled('relation_address')) {
+                $relation_address = json_encode($request->relation_address);
+            }
+
+            if ($request->filled('relation_phone')) {
+                $relation_phone = json_encode($request->relation_phone);
+            }
+
+            if ($request->filled('relation_relationship')) {
+                $relation_relationship = json_encode($request->relation_relationship);
+            }
+
+            if ($request->hasFile('about') && $request->file('about')->isValid()) {
+                $file = $request->file('about');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('pdf'), $filename);
+                $about = 'pdf/' . $filename;
+            }
+
+            if ($request->hasFile('question') && $request->file('question')->isValid()) {
+                $file = $request->file('question');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('pdf'), $filename);
+                $question = 'pdf/' . $filename;
+            }
+
+            DB::table('aplicant_history')->updateOrInsert(
+                ['applicant_id' => $applicant->id],
+                [
+                    "school" => $request->school,
+                    "school_tel" => $request->school_tel,
+                    "grade" => $request->grade,
+                    "advisor_name" => $request->advisor_name,
+                    "home" => $request->home,
+                    "home_cell" => $request->home_cell,
+                    "email_address" => $request->email_address,
+                    "school_name" => $school_name,
+                    "school_grades" => $grades,
+                    "modified" => $request->modified,
+                    "surgery" => $request->surgery,
+                    "home" => $request->home,
+                    "medication" => $request->medication,
+                    "allergies" => $request->allergies,
+                    "about" => $about,
+                    "question" => $question,
+                    "relation_name" => $relation_name,
+                    "relation_address" => $relation_address,
+                    "relation_phone" => $relation_phone,
+                    "relation_relationship" => $relation_relationship,
+                ]
+            );
+
+            DB::commit();
+
+            return $this->responseWithSuccess(___('alert.draft_saved_successfully'), []);
+        } catch (Exception $e) {
+            DB::rollBack();
+            dd($e);
+            return $this->responseWithError(___('alert.something_went_wrong_please_try_again'), []);
+        }
+    }
+
     public function interview()
     {
         $data['title'] = ___('applicant.interview_interview');

@@ -13,6 +13,8 @@ Route::middleware(saasMiddleware())->group(function () {
                 Route::group(['middleware' => ['auth.routes']], function () {
                     Route::get('/process', [ApplicantController::class, 'process'])->name('applicant.process');
                     Route::get('/application', [ApplicantController::class, 'application'])->name('applicant.application');
+                    Route::post('/application/form/save', [ApplicantController::class, 'applicationFormSave'])->name('applicant.application.form.save');
+                    Route::post('/application/form/draft', [ApplicantController::class, 'applicationFormDraft'])->name('applicant.application.form.draft');
                     Route::get('/interview', [ApplicantController::class, 'interview'])->name('applicant.interview');
                     Route::get('/registration', [ApplicantController::class, 'registration'])->name('applicant.registration');
                 });
