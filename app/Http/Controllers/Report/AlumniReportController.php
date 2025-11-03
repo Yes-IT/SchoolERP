@@ -4,18 +4,18 @@ namespace App\Http\Controllers\Report;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Repositories\Report\TeacherReportRepository;
+use App\Repositories\Report\AlumniReportRepository;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use PDF;
 use Exception;
 use Throwable;
 
-class TeacherReportController extends Controller
+class AlumniReportController extends Controller
 {
-    protected TeacherReportRepository $repo;
+    protected AlumniReportRepository $repo;
 
-    public function __construct(TeacherReportRepository $repo)
+    public function __construct(AlumniReportRepository $repo)
     {
         $this->repo = $repo;
     }
@@ -23,15 +23,12 @@ class TeacherReportController extends Controller
     protected function getReportConfig(string $reportType): array
     {
         return match ($reportType) {
-            'teacher_list' => [
-                'view' => 'backend.report.teacher_reports.pdf.teacher_list_pdf',
+            'alumni_list' => [
+                'view' => 'backend.report.alumni_reports.pdf.alumni_list_pdf',
                 'orientation' => 'landscape',
             ],
-            'teacher_home_address_labels' => [
-                'view' => 'backend.report.teacher_reports.pdf.teacher_home_address_labels_pdf',
-            ],
-            'teacher_name_labels' => [
-                'view' => 'backend.report.teacher_reports.pdf.teacher_name_labels_pdf',
+            'alumni_home_address_labels' => [
+                'view' => 'backend.report.alumni_reports.pdf.alumni_home_address_labels_pdf',
             ],
             default => throw new Exception("Invalid report type: {$reportType}"),
         };
@@ -109,11 +106,6 @@ class TeacherReportController extends Controller
                 ->setPaper('A4', $config['orientation'] ?? 'portrait');
 
             $fileName = sprintf('%s_preview_%s.pdf', $reportType, now()->format('Ymd_His'));
-
-            // return response($pdf->stream($fileName), 200, [
-            //     'Content-Type' => 'application/pdf',
-            //     'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-            // ]);
 
             return $pdf->stream($fileName, [
                 'Content-Type'  => 'application/pdf',

@@ -69,19 +69,19 @@ class ReportManagementController extends Controller
     public function generalStudentReport()
     {
         $data = $this->getFilterOption(['school_years', 'year_statuses','classes']);
-        return view('backend.report.general-student-report', compact('data'));
+        return view('backend.report.student_reports.general-student-report', compact('data'));
     }
 
     public function teacherReport()
     {
-        $data = $this->getFilterOption(['school_years', 'year_statuses']);
-        return view('backend.report.teacher-report', compact('data'));
+        $data = $this->getFilterOption(['school_years', 'year_statuses', 'classes']);
+        return view('backend.report.teacher_reports.teacher-report', compact('data'));
     }
 
     public function alumniReport()
     {
-        $data = $this->getFilterOption();
-        return view('backend.report.alumni-report', compact('data'));
+        $data = $this->getFilterOption(['school_years', 'year_statuses']);
+        return view('backend.report.alumni_reports.alumni-report', compact('data'));
     }
 
     public function attendanceReport()
