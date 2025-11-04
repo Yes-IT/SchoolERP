@@ -36,7 +36,7 @@
                                         <p>Plan and update school schedules, exams, and events in one place.</p>
                                     </div>
                                     <div class="ds-cmn-ic-ftr">
-                                        <a href="{{route('applicant.schedule_interview')}}" class="cmn-btn w-100 btn-sm">View Details</a>
+                                        <a href="{{route('applicant.calender')}}" class="cmn-btn w-100 btn-sm">View Details</a>
                                     </div>
                                 </div>
                             </div>

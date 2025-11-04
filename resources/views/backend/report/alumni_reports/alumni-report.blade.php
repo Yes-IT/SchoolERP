@@ -2,15 +2,16 @@
 @section('title')
     {{ @$data['title'] }}
 @endsection
+
 @section('content')
     <!-- Dashboard Body Begin -->
     <div class="dashboard-body dspr-body-outer">
         <div class="ds-breadcrumb">
-            <h1>Teacher Reports</h1>
+            <h1>Alumni Reports</h1>
             <ul>
                 <li><a href="../dashboard.html">Dashboard</a> /</li>
                 <li><a href="./dashboard.html">Report Management</a> /</li>
-                <li>Teacher Reports</li>
+                <li>Alumni Reports</li>
             </ul>
         </div>
         <div class="ds-pr-body">
@@ -49,40 +50,26 @@
                                             @endforelse
                                         </select>
                                     </div>
-                                    <div class="input-grp">
-                                        <label>Classes</label>
-                                        <select name="class_id" required>
-                                            @forelse($data['classes'] as $class)
-                                                <option value="{{ $class->id}}">{{ $class->name}}</option>
-                                            @empty
-                                            <option value="">No class available</option>
-                                            @endforelse
-                                        </select>
-                                    </div>
                                 </div>
                             </form>
                         </div>
                     </div>
 
-
                     <div class="dsbdy-cmn-card">
                         <div class="sec-head">
                             <h2 class="mb-0">Report Type Selection</h2>
-                            <p class="muted-sm">Choose a teacher report</p>
+                            <p class="muted-sm">Choose a alumni report</p>
                         </div>
                         <div class="request-leave-form-wrp student-report-filter-form-wrp">
                             <form id="report-type-form" aria-labelledby="report-type-heading">
                                 <fieldset class="request-leave-form student-report-filter-form" id="report-type-fieldset">
                                     <div class="multi-input-grp report-options">
-                                        <div class="report-column p-3">
+                                        <div class="report-column p-3 w-100">
                                             <div class="input-grp">
-                                                <label for="rpt-1"><input type="radio" id="rpt-1" name="report_type" value="teacher_list" checked /> Teacher List</label>
+                                                <label for="rpt-1"><input type="radio" name="report_type" value="alumni_list" checked /> Alumni List</label>
                                             </div>
                                             <div class="input-grp">
-                                                <label for="rpt-2"><input type="radio" id="rpt-2" name="report_type" value="teacher_home_address_labels"/> Teacher Home Address Labels</label>
-                                            </div>
-                                            <div class="input-grp">
-                                                <label for="rpt-3"><input type="radio" id="rpt-3" name="report_type" value="teacher_name_labels"/> Teacher Name Labels</label>
+                                                <label for="rpt-2"><input type="radio" name="report_type" value="alumni_home_address_labels"/> Alumni Home Address Labels</label>
                                             </div>
                                         </div>
                                     </div>
@@ -100,11 +87,31 @@
 
                         <form class="request-leave-form output-options-filter" id="output-options-form" aria-labelledby="output-options-heading">
                             <div class="input-grp">
-                                <label for="export_format">Export Format</label>
-                                <select id="export_format" name="export_format" required>
-                                    <!-- <option value="" disabled selected>Select Document Type</option> -->
-                                    <option value="pdf">PDF Document</option>
-                                </select>
+                              <label for="state">Export Format</label>
+                              <select id="state" name="state" required="">
+                                    <option value="" disabled="" selected="">Pdf Document</option>
+                              </select>
+                            </div>
+
+                            <fieldset class="opt-group">
+                                <legend class="opt-title">Sort Order</legend>
+                            
+                                <label class="opt-row">
+                                  <input type="radio" name="sort_order" value="student_name" checked>
+                                  <span class="opt-label">By Name</span>
+                                </label>
+                            
+                                <label class="opt-row">
+                                  <input type="radio" name="sort_order" value="high_school">
+                                  <span class="opt-label">By Year</span>
+                                </label>
+                            </fieldset>
+
+                            <div class="input-grp checkbox">
+                                <label class="text-muted">
+                                    <input type="checkbox" name="show_year" id="show_year" />
+                                    Show year in the corner of label
+                                </label>
                             </div>
                         
                             <div class="opt-cta">
@@ -121,7 +128,7 @@
                             <button id="print-preview-btn" class="print-preview cmn-white-btn w-100"><img src="{{ asset('backend/assets/images/new_images/print-preview-icon.svg') }}" alt="Icon"> Print Preview</button>
                         </div>
                     </div>
-                </div>                           
+                </div>               
             </div>
             
         </div>
@@ -144,8 +151,8 @@ $(document).ready(function() {
 
     // Routes
     const routes = {
-        generatePDF: '{{ route("report-management.generate-teacher-pdf") }}',
-        previewPDF: '{{ route("report-management.preview-teacher-report") }}'
+        generatePDF: '{{ route("report-management.generate-alumni-pdf") }}',
+        previewPDF: '{{ route("report-management.preview-alumni-report") }}'
     };
 
     // Combine form data from multiple forms

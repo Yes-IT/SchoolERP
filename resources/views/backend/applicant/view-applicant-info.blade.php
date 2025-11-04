@@ -10,10 +10,10 @@
                         <ul>
                             <li><a href="dashboard.html">Dashboard</a> /</li>
                             <li><a href="#">Applicantion</a> /</li>
-                            <li><a href="{{route('applicant.index')}}">Applicants List</a> /</li>
+                            <li><a href="{{route('applicant.student_application_form')}}">Applicants List</a> /</li>
                             <li>Applicants Info</li>
                         </ul>
-                        <button onclick="window.location.href='{{ route('applicant.index') }}'" class="cmn-btn" >
+                        <button onclick="window.location.href='{{ route('applicant.student_application_form') }}'" class="cmn-btn" >
                            <img src="{{global_asset('backend/assets/images/new_images/lets-icons_back.png')}}" alt="Back" />
                              Back
                         </button>
@@ -24,8 +24,8 @@
                                 <h2>Applicant Information</h2>
                             </div>
                             <div class="atndnc-filter student-filter">
-                                <a  class="cmn-btn" href="#">
-                                    <img src="{{global_asset('backend/assets/images/edit-icon.svg')}}" alt="Icon">Edit Applicant
+                                <a  class="cmn-btn" href="{{route('applicant.edit_applicant', $applicant->id)}}">
+                                  <img src="{{global_asset('backend/assets/images/edit-icon.svg')}}" alt="Icon">Edit Applicant
                                 </a>
                                 <a href="{{ route('applicant.add_new_applicant') }}" class="cmn-btn ">
                                     <i class="fa-solid fa-plus"></i> Add New Applicant
@@ -98,6 +98,7 @@
                                 </div>
                             </div>
 
+                          @if($applicant->checklist)  
                             <div class="dspr-bdy-content-sec border-0">
                                  <h2>Application Check List</h2>
                                 <div class="dsbdy-cmn-table table-full-height ">
@@ -105,31 +106,32 @@
                                         <tbody>
                                           <tr>
                                             <td>Fee</td>
-                                            <td>$1200.00</td>
+                                            <td>${{ number_format((float)optional($applicant->checklist)->fee, 2) }}</td>
+
                                           </tr>
                                           <tr>
                                             <td>CC Last 4</td>
-                                            <td>Lorem Ipsum</td>
+                                            <td>{{ $applicant->checklist->cc_last_4 ?? 'N/A' }}</td>
                                           </tr>
                                           <tr>
                                             <td>Date Deposited</td>
-                                            <td>12/11/2001</td>
+                                            <td>{{ $applicant->checklist->date_deposited ? \Carbon\Carbon::parse($applicant->checklist->date_deposited)->format('d/m/Y') : 'N/A' }}</td>
                                           </tr>
                                           <tr>
                                             <td>Transcript Hebrew</td>
-                                            <td> <input  type="checkbox"></td>
+                                            <td> <input  type="checkbox" disabled {{ $applicant->checklist->transcript_hebrew ? 'checked' : '' }}></td>
                                           </tr>
                                           <tr>
                                             <td>Transcript English</td>
-                                            <td> <input  type="checkbox"></td>
+                                            <td> <input  type="checkbox" disabled {{ $applicant->checklist->transcript_english ? 'checked' : '' }}></td>
                                           </tr>
                                           <tr>
                                             <td>References</td>
-                                            <td>Lorem Ipsum</td>
+                                            <td>{{ $applicant->checklist->reference ?? 'N/A' }}</td>
                                           </tr>
                                           <tr>
                                             <td>Pictures</td>
-                                            <td>59</td>
+                                            <td>{{ $applicant->checklist->pictures ?? 'N/A' }}</td>
                                           </tr>
                                          
                                           
@@ -137,6 +139,9 @@
                                       </table>
                                 </div>
                             </div>
+                          @endif
+
+                          @if($applicant->processing)
 
                                <div class="dspr-bdy-content-sec border-0">
                                  <h2>Application Processing</h2>
@@ -145,145 +150,150 @@
                                         <tbody>
                                           <tr>
                                             <td>Interview Date</td>
-                                            <td>12/11/2001</td>
+                                            <td>{{ $applicant->processing->interview_date ? \Carbon\Carbon::parse($applicant->processing->interview_date)->format('d/m/Y') : 'N/A' }}</td>
                                           </tr>
                                           <tr>
                                             <td>Interview Time</td>
-                                            <td>02:30 PM</td>
+                                            <td>{{ $applicant->processing->interview_time ?? 'N/A' }}</td>
                                           </tr>
                                           <tr>
                                             <td>Interview Location</td>
-                                            <td>12/11/2001</td>
+                                            <td>{{ $applicant->processing->interview_location ?? 'N/A' }}</td>
                                           </tr>
                                           <tr>
                                             <td>Status</td>
-                                            <td> lorem</td>
+                                            <td> {{ ucfirst($applicant->processing->status ?? 'N/A') }}</td>
                                           </tr>
                                           <tr>
                                             <td>Letter Sent</td>
-                                            <td> <input  type="checkbox"></td>
+                                            <td> <input  type="checkbox" disabled {{ $applicant->processing->letter_sent ? 'checked' : '' }}></td>
                                           </tr>
                                           <tr>
                                             <td>Coming</td>
-                                            <td>Lorem Ipsum</td>
+                                            <td>{{ $applicant->processing->coming ?? 'N/A' }}</td>
                                           </tr>
                                           <tr>
                                             <td>Application Comment </td>
-                                            <td>Lorem ipsum dolor sit amet</td>
+                                            <td>{{ $applicant->processing->application_comment ?? 'N/A' }}</td>
                                           </tr>
                                          <tr>
                                             <td> Scholarship Comment</td>
-                                            <td>Lorem ipsum dolor sit amet</td>
+                                            <td>{{ $applicant->processing->scholarship_comment ?? 'N/A' }}</td>
                                           </tr>
                                           <tr>
                                             <td> Tuition Comment</td>
-                                            <td>Lorem ipsum dolor sit amet</td>
+                                            <td>{{ $applicant->processing->tuition_comment ?? 'N/A' }}</td>
                                           </tr>
                                         </tbody>
                                       </table>
                                 </div>
                             </div>
+                          @endif
+
 
                             <div class="dspr-bdy-content-sec">
                                 <h2>Parents Information</h2>
-                                 <div class="dsbdy-cmn-table table-full-height pr-pg-tbl-wrp">
+                                <div class="dsbdy-cmn-table table-full-height pr-pg-tbl-wrp">
                                     <table>
                                         <tbody>
-                                          <tr>
-                                            <td class="td-lineremover" >ID</td>
-                                            <td class="td-lineremover" >1564564</td>
-                                          </tr>
-                                          <tr>
-                                            <td class="td-lineremover" >Last Name</td>
-                                            <td class="td-lineremover" >Mr. Olivier Thomas </td>
-                                          </tr>
-                                          <tr>
-                                            <td class="td-lineremover" >Father Title</td>
-                                            <td class="td-lineremover" >Mr. Olivier Thomas</td>
-                                          </tr>
-                                          <tr>
-                                            <td class="td-lineremover" >Father Name</td>
-                                            <td class="td-lineremover" >Mr. Olivier Thomas </td>
-                                          </tr>
+                                          @foreach($applicant->parents as $parent)
+                                                <tr>
+                                                  <td class="td-lineremover" >ID</td>
+                                                  <td class="td-lineremover" >153342</td>
+                                                </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Last Name</td>
+                                                  <td class="td-lineremover" >Thomas</td>
+                                                </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Father Title</td>
+                                                  <td class="td-lineremover" >{{ ucfirst($parent->father_title ?? 'N/A') }}</td>
+                                                </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Father Name</td>
+                                                  <td class="td-lineremover" >{{ ucfirst($parent->father_name ?? 'N/A') }} </td>
+                                                </tr>
 
-                                          <tr>
-                                            <td class="td-lineremover" >Mother  Title</td>
-                                            <td class="td-lineremover" >Mrs. Caroline Thomas </td>
-                                          </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Mother  Title</td>
+                                                  <td class="td-lineremover" >{{ ucfirst($parent->mother_title ?? 'N/A') }} </td>
+                                                </tr>
 
-                                          <tr>
-                                            <td class="td-lineremover" >Mother  Name</td>
-                                            <td class="td-lineremover" >Mrs. Caroline Thomas </td>
-                                          </tr>
-                                          <tr>
-                                            <td class="td-lineremover" >Maiden Name</td>
-                                            <td class="td-lineremover" >Nudell </td>
-                                          </tr>
-                                          <tr>
-                                            <td class="td-lineremover" >Address</td>
-                                            <td class="td-lineremover" >56 Main Street, Suite 3, Brooklyn, NY 11210-0000 </td>
-                                          </tr>
-                                          <tr>
-                                            <td class="td-lineremover" >City</td>
-                                            <td class="td-lineremover" >Cedarhurst </td>
-                                          </tr>
-                                          <tr>
-                                            <td class="td-lineremover" >State</td>
-                                            <td class="td-lineremover" >Lorem Ipsum </td>
-                                          </tr>
-                                          <tr>
-                                            <td class="td-lineremover" >Zip Code</td>
-                                            <td class="td-lineremover" >24546 </td>
-                                          </tr>
-                                          <tr>
-                                            <td class="td-lineremover" >Country</td>
-                                            <td class="td-lineremover" >lorem ipsum </td>
-                                          </tr>
-                                          <tr>
-                                            <td class="td-lineremover" >Marital Status</td>
-                                            <td class="td-lineremover" >Married </td>
-                                          </tr>
-                                          <tr>
-                                            <td class="td-lineremover" >Marital Comment</td>
-                                            <td class="td-lineremover" >Nudell </td>
-                                          </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Mother  Name</td>
+                                                  <td class="td-lineremover" >{{ ucfirst($parent->mother_name ?? 'N/A') }}</td>
+                                                </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Maiden Name</td>
+                                                  <td class="td-lineremover" >{{ ucfirst($parent->maiden_name ?? 'N/A') }} </td>
+                                                </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Address</td>
+                                                  <td class="td-lineremover" >{{ $parent->pivot->address ?? 'N/A' }}</td>
+                                                </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >City</td>
+                                                  <td class="td-lineremover" >{{ $parent->pivot->city ?? 'N/A' }} </td>
+                                                </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >State</td>
+                                                  <td class="td-lineremover" >{{ $parent->pivot->state ?? 'N/A' }} </td>
+                                                </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Zip Code</td>
+                                                  <td class="td-lineremover" >{{ $parent->pivot->zip_code ?? 'N/A' }} </td>
+                                                </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Country</td>
+                                                  <td class="td-lineremover" >{{ $parent->pivot->country ?? 'N/A' }} </td>
+                                                </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Marital Status</td>
+                                                  <td class="td-lineremover" >{{ ucfirst($parent->pivot->marital_status ?? 'N/A') }} </td>
+                                                </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Marital Comment</td>
+                                                  <td class="td-lineremover" >{{ $parent->pivot->marital_comment ?? 'N/A' }} </td>
+                                                </tr>
 
-                                           <tr>
-                                            <td class="td-lineremover" >Home Phone</td>
-                                            <td class="td-lineremover" >98654646 </td>
-                                          </tr>
-                                           <tr>
-                                            <td class="td-lineremover" >Father Cell</td>
-                                            <td class="td-lineremover" >98654646 </td>
-                                          </tr>
-                                           <tr>
-                                            <td class="td-lineremover" >Mother Cell</td>
-                                            <td class="td-lineremover" >Nudell </td>
-                                          </tr>
-                                           <tr>
-                                            <td class="td-lineremover" >Father Email</td>
-                                            <td class="td-lineremover" >olivierthomas@gmail.com </td>
-                                          </tr>
-                                           <tr>
-                                            <td class="td-lineremover" >Mother Email</td>
-                                            <td class="td-lineremover" >olivierthomas@gmail.com </td>
-                                          </tr>
-                                           <tr>
-                                            <td class="td-lineremover" >Father Occupation</td>
-                                            <td class="td-lineremover" >Lawyer </td>
-                                          </tr>
-                                           <tr>
-                                            <td class="td-lineremover" >Mother Occupation</td>
-                                            <td class="td-lineremover" >Teacher </td>
-                                          </tr>
-                                          <tr>
-                                            <td class="td-lineremover" >Additional Phone Numbers</td>
-                                            <td class="td-lineremover" >23489632, 1641556456 </td>
-                                          </tr>
-                                          <tr>
-                                            <td class="td-lineremover" >Additional Email Addresses</td>
-                                            <td class="td-lineremover" >carolinethomas36@gmail.com, olivierthomas55@gmail.com  </td>
-                                          </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Home Phone</td>
+                                                  <td class="td-lineremover" >{{ $parent->pivot->home_phone ?? 'N/A' }} </td>
+                                                </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Father Cell</td>
+                                                  <td class="td-lineremover" >{{ $parent->father_mobile ?? 'N/A' }} </td>
+                                                </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Mother Cell</td>
+                                                  <td class="td-lineremover" >{{ $parent->mother_mobile ?? 'N/A' }} </td>
+                                                </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Father Email</td>
+                                                  <td class="td-lineremover" > {{ $parent->father_email ?? 'N/A' }}</td>
+                                                </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Mother Email</td>
+                                                  <td class="td-lineremover" >{{ $parent->mother_email ?? 'N/A' }} </td>
+                                                </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Father Occupation</td>
+                                                  <td class="td-lineremover" > {{ ucfirst($parent->father_profession ?? 'N/A') }}</td>
+                                                </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Mother Occupation</td>
+                                                  <td class="td-lineremover" >{{ $parent->mother_profession ?? 'N/A' }} </td>
+                                                </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Additional Phone Numbers</td>
+                                                  <td class="td-lineremover" >{{ $parent->additional_mobile_numbers ?? 'N/A' }}</td>
+                                                </tr>
+                                                <tr>
+                                                  <td class="td-lineremover" >Additional Email Addresses</td>
+                                                  <td class="td-lineremover" >{{ $parent->additional_emails ?? 'N/A' }}</td>
+                                                </tr>
+                                                
+                                          @endforeach
                                          
                                         </tbody>
                                       </table>

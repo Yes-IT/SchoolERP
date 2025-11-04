@@ -17,7 +17,7 @@
         </tr>
     </thead>
     <tbody>
-       @forelse ($applicants as $index => $applicant)
+       @forelse ($applicants as $index => $applicant) 
             <tr>
                 <td>{{ $applicants->firstItem() + $index }}</td>
                 <td>{{ $applicant->last_name }}</td>
@@ -27,16 +27,18 @@
                         <img src="{{ global_asset('backend/assets/images/eye-white.svg') }}" alt="Eye Icon">
                     </a>
                 </td>
-                <td><span class="cmn-tbl-btn yellow-bg">Pending</span></td>
-                <td>Online</td>
-                <td>12/12/2022</td>
-                <td>10:00 AM</td>
-                <td>Zoom</td>
-                <td>https://zoom.us/</td>
+                
+                <td><span class="cmn-tbl-btn yellow-bg">{{ optional($applicant->interview)->interview_status ?? '-' }}</span></td>
+                <td>{{optional($applicant->interview)->interview_mode ?? '-' }}</td>
+                <td>{{ optional($applicant->interview)->interview_date ? optional($applicant->interview)->interview_date->format('d/m/Y') : '-' }}</td>
+                <td>{{ optional($applicant->interview)->interview_time ?? '-' }}</td>
+                <td>{{ optional($applicant->interview)->interview_location ?? '-' }}</td>
+                <td>{{ optional($applicant->interview)->interview_link ?? '-' }}</td>
                 <td>
-                   <a href="#url" class="cmn-btn btn-sm"><img src="{{global_asset('backend/assets/images/calender-icon.svg')}}" alt="Image"> Reschedule Interview</a>
+                   <a href="{{ route('applicant.schedule_interview', $applicant->id) }}" class="cmn-btn btn-sm"><img src="{{global_asset('backend/assets/images/calender-icon.svg')}}" alt="Image"> Schedule Interview</a>
                 </td>
-                <td><span class="cmn-tbl-btn yellow-bg">Pending</span></td>
+                <td><span class="cmn-tbl-btn yellow-bg">{{ $applicant->applicant_status ?? '-' }}</span></td>
+
                 <td>
                     <div class="actions-wrp">
                         <button type="button" class="cmn-tbl-btn green-bg"><i class="fa-solid fa-check"></i> Approve</button>
@@ -44,7 +46,7 @@
                     </div>
                 </td>
             </tr>
-        @empty
+            @empty
             <tr><td colspan="9">No Applicants Found</td></tr>
         @endforelse
         
