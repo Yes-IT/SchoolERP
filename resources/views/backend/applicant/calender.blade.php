@@ -64,16 +64,14 @@
                                             <div class="scheduled">
                                                 <div class="tag">Scheduled</div>
                                                 <div class="title">Applicant Name</div>
-                                                <div class="meta">Lesson · Grade 10
-                                                    10:00 - 10:40</div>
+                                                <div class="meta">Location: Lorem ipsum dolor sit amet, Texas, United States, 75001</div>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="scheduled">
                                                 <div class="tag">Scheduled</div>
                                                 <div class="title">Applicant Name</div>
-                                                <div class="meta">Interview · Level 2
-                                                    10:40 - 11:20</div>
+                                                 <div class="meta">Location: Lorem ipsum dolor sit amet, Texas, United States, 75001</div>
                                             </div>
                                         </td>
                                         <td>
@@ -152,8 +150,7 @@
                                             <div class="scheduled">
                                                 <div class="tag">Scheduled</div>
                                                 <div class="title">Applicant Name</div>
-                                                <div class="meta">Interview
-                                                    12:40 - 01:20</div>
+                                                 <div class="meta">Location: Lorem ipsum dolor sit amet, Texas, United States, 75001</div>
                                             </div>
                                         </td>
                                         <td>
@@ -184,16 +181,14 @@
                                             <div class="scheduled">
                                                 <div class="tag">Scheduled</div>
                                                 <div class="title">Applicant Name</div>
-                                                <div class="meta">Lesson
-                                                    10:00 - 10:40</div>
+                                                 <div class="meta">Location: Lorem ipsum dolor sit amet, Texas, United States, 75001</div>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="scheduled">
                                                 <div class="tag">Scheduled</div>
                                                 <div class="title">Applicant Name</div>
-                                                <div class="meta">Lesson
-                                                    10:40 - 11:20</div>
+                                                <div class="meta">Location: Lorem ipsum dolor sit amet, Texas, United States, 75001</div>
                                             </div>
                                         </td>
                                         <td>

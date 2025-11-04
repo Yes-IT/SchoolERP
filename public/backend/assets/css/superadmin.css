@@ -1580,5 +1580,208 @@ select{
     height: 20px;
     accent-color: var(--primary-clr);
 }
+.cmn-form-inr-row,
+.cmn-box-style {
+    overflow: hidden;
+    transition: max-height 300ms ease, opacity 220ms ease;
+    max-height: 2000px;
+    opacity: 1;
+}
+.cmn-form-inr-row.is-collapsed,
+.cmn-box-style.is-collapsed {
+    max-height: 0;
+    opacity: 0;
+    padding: 0;
+    pointer-events: none;
+}
+.action-toolbar .action-btn i {
+    display: inline-block;
+    transition: transform 200ms ease;
+}
 
 /* End of SS151025 */
+
+/* SS241025 Begin */
+
+.dsbdy-cmn-card.brdr{
+    border: 1px solid var(--primary-clr);
+    box-shadow: 3px 5px 8px rgba(0, 0, 0, 0.33);
+}
+.ds-bdy-content.p20{
+    padding: 0 20px;
+}
+.tution-fees-pg .dsbdy-cmn-card h3{
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+.tution-fees-pg .dsbdy-cmn-card p{
+    color: var(--primary-clr);
+    font-weight: 600;
+}
+
+/* End Of SS241025 */
+
+/* SS271025 Begin */
+
+.ds-cmn-tble table tr td a.link{
+    text-decoration: underline !important;
+}
+.ds-cmn-tble table tr td a.link:hover{
+    color: var(--primary-clr);
+}
+.ds-breadcrumb{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+.back-btn:hover img{
+    filter: brightness(0) saturate(100%) invert(9%) sepia(49%) saturate(5385%) hue-rotate(353deg) brightness(90%) contrast(111%);
+}
+.sec-head.has-brdr{
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--primary-clr);
+}
+.input-grp .upload-file{
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 1px solid var(--border-clr);
+    cursor: pointer;
+}
+.input-grp .upload-file input{
+    opacity: 0;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+    left: 0;
+    top: 0;
+    height: 100%;
+    cursor: pointer;
+}
+.upload-file-placeholder{
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0;
+    height: 100%;
+}
+.upload-file-placeholder span{
+    padding: 6px 30px;
+    color: var(--white);
+    background: var(--border-clr);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.input-grp .file-size{
+    color: var(--border-clr);
+    font-size: 14px;
+}
+
+/* End Of SS271025 */
+
+.inr-input-grp.has-submit{
+    display: flex;
+    gap: 12px;
+}
+.ds-pr-body{
+    gap: 0 20px;
+}
+.gray-txt{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--border-clr);
+}
+.gray-txt img{
+    filter: brightness(.5);
+    width: 15px;
+}
+.tuition-form-pg .dsprprofile-course-info.brdr-0 table tr td,.tab-cmn-content.w45 .tab-cmn-inr-tbl table tr td{
+    border-top: 0;
+    padding: 5px 0;
+}
+.tuition-form-pg  .ds-cmn-table-wrp{
+    height: 100% ;
+}
+.fees-form-wrp label,.tuition-info-form-wrp label{
+    margin-bottom: 4px;
+    color: var(--primary-clr);
+    font-weight: 500;
+}
+.tuition-form-pg .dsprprofile-course-info table td:last-child {
+    text-align: left;
+}
+.include-submit{
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+}
+.include-submit button{
+    height: 48px;
+}
+.include-submit .input-grp {
+    flex-grow: 1;
+    margin-bottom: 0;
+}
+.tuition-form-pg .tab-wrapper .cmn-tab-head{
+    width: 80%;
+    margin-bottom: 20px;
+}
+.tuition-form-pg .tab-wrapper .cmn-tab-head:last-child{
+    margin-bottom: 0;
+}
+.tab-cmn-content.w45 .tab-cmn-inr-tbl table{
+    min-width: auto;
+}
+.tab-cmn-content.w45 .sec-head{
+    margin-bottom: 15px;
+}
+.sidebar-cat-body .input-grp>label{
+    margin-bottom: 4px;
+    width: 100%;
+}
+.sidebar-cat-body .input-grp label span{
+    color: var(--primary-clr);
+    font-weight: 500;
+    width: 50%;
+    display: inline-block;
+}
+.sidebar-cat-head{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--primary-clr);
+    font-weight: 500;
+    font-size: 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+.sidebar-cat-head h5{
+    font-weight: 500;
+    font-size: 16px;
+    margin-bottom: 0;
+    color: var(--primary-clr);
+}
+.input-grp-inr{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.input-grp-inr>*{
+    width: calc(50% - 6px) !important;
+}
+.sidebar-category{
+    margin-bottom: 20px;
+}
+.sidebar-category:last-child{
+    margin-bottom: 0;
+}

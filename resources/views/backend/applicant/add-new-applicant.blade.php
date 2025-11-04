@@ -15,7 +15,7 @@
                             <li>Add Applicant </li>
                         </ul>
 
-                         <button onclick="window.location.href='{{ route('applicant.index') }}'" class="cmn-btn" >
+                         <button onclick="window.location.href='{{ route('applicant.student_application_form') }}'" class="cmn-btn" >
                            <img src="{{global_asset('backend/assets/images/new_images/lets-icons_back.png')}}" alt="Back" />
                              Back
                         </button>
@@ -191,7 +191,7 @@
                                           <div class="multi-input-grp grp-1">
                                             <div class="input-grp">
                                                 <label for="comment">Scholarship Comment</label>
-                                                <textarea id="scholaership_comment" name="scholaership_comment" cols="50" rows="10" placeholder="Scholarship Comment"></textarea>
+                                                <textarea id="scholarship_comment" name="scholarship_comment" cols="50" rows="10" placeholder="Scholarship Comment"></textarea>
                                             </div>
                                         </div>
                                           <div class="multi-input-grp grp-1">

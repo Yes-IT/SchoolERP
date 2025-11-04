@@ -60,7 +60,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
     <script src="frontend/js/common.js"></script>
 
-    <script src="{{ global_asset('backend') }}/assets/js/custom.js"></script>
+    <script src="{{ global_asset('backend/assets/js/custom.js') }}"></script>
+    <script src="{{ global_asset('backend/assets/js/common.js') }}"></script>
+    <script src="{{ global_asset('backend/assets/js/datepicker.js') }}"></script>
+
     <script>
         function changeLoginType(type) {
             const heading = document.getElementById("loginHeading");

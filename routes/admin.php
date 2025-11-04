@@ -208,17 +208,28 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::get('/student_application_form', 'student_application_form')->name('applicant.student_application_form')->middleware('PermissionCheck:applicant_read');
                     Route::get('/dashboard', 'dashboard')->name('applicant.dashboard')->middleware('PermissionCheck:applicant_read');
                     Route::get('/calender', 'calender')->name('applicant.calender')->middleware('PermissionCheck:applicant_read');
-                    Route::get('/schedule-interview', 'schedule_interview')->name('applicant.schedule_interview')->middleware('PermissionCheck:applicant_read');
+
+                    //interview
+                    Route::get('/schedule-interview/{id}', 'schedule_interview')->name('applicant.schedule_interview')->middleware('PermissionCheck:applicant_read');
+                    Route::post('/fetch-interview-slots', 'fetch_interview_slots')->name('applicant.fetch_interview_slots');
+                    Route::post('/assign-interview-slot', 'assign_interview_slot')->name('applicant.assign_interview_slot');
+
+                    // Route::post('/interview_store',  'store_schedule_interview')->name('applicant.store_schedule_interview');
+
+
                     Route::get('/profile', 'profile')->name('applicant.profile')->middleware('PermissionCheck:applicant_read');
                     Route::get('/add-new-applicant', 'add_new_applicant')->name('applicant.add_new_applicant')->middleware('PermissionCheck:applicant_read');
                     Route::post('/store-applicant', 'store_applicant')->name('applicant.store_applicant')->middleware('PermissionCheck:applicant_read');
                     Route::get('/view-applicant-info/{id}', 'view_applicant_info')->name('applicant.view_applicant_info')->middleware('PermissionCheck:applicant_read');
-                    Route::get('/edit-applicant', 'edit_applicant')->name('applicant.edit_applicant')->middleware('PermissionCheck:applicant_read');
+                    Route::get('/edit-applicant/{id}', 'edit_applicant')->name('applicant.edit_applicant')->middleware('PermissionCheck:applicant_read');
+                    Route::post('/update-applicant/{id}',  'update_applicant')->name('applicant.update_applicant')->middleware('PermissionCheck:applicant_update');
+
                     Route::get('/custom-applicant-chart', 'custom_applicant_chart')->name('applicant.custom_applicant_chart')->middleware('PermissionCheck:applicant_read');
                     Route::get('/contacts', 'contacts')->name('applicant.contacts')->middleware('PermissionCheck:applicant_read');
                     Route::get('/contact-info', 'contact_info')->name('applicant.contact_info')->middleware('PermissionCheck:applicant_read');
                     Route::get('/application-form', 'application_form')->name('applicant.application_form')->middleware('PermissionCheck:applicant_read');
                     Route::get('/parent-contract', 'parent_contract')->name('applicant.parent_contract')->middleware('PermissionCheck:applicant_read');
+                    Route::get('/high-school-contact', 'high_school_contact')->name('applicant.high_school_contact')->middleware('PermissionCheck:applicant_read');
                 });
 
             });

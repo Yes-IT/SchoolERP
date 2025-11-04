@@ -9,14 +9,29 @@ use Illuminate\Support\Facades\{DB,Log};
 
 class ApplicantRepository implements ApplicantInterface
 {
-    public function getAllApplicants()
+    // public function getAllApplicants()
+    // {
+    //     return Applicant::with('parents')->get();
+    // }
+
+    public function getAllApplicants($search = null, $perPage = 5)
     {
-        return Applicant::with('parents')->get();
+        $query = Applicant::with(['parents', 'interview']);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                ->orWhere('last_name', 'like', "%{$search}%");
+            });
+        }
+
+        return $query->paginate($perPage);
     }
+
 
     public function getApplicantById($id)
     {
-        return Applicant::with('parents')->findOrFail($id);
+        return Applicant::with(['parents', 'camps', 'checklist', 'processing'])->find($id);
     }
 
    
@@ -125,10 +140,91 @@ class ApplicantRepository implements ApplicantInterface
 
     public function updateApplicant($id, array $data)
     {
-        $applicant = Applicant::findOrFail($id);
-        $applicant->update($data);
-        return $applicant;
+        DB::beginTransaction();
+
+        try {
+            $applicant = Applicant::with(['checklist', 'processing', 'camps'])->findOrFail($id);
+
+            // Update main applicant fields
+            $applicant->update([
+                'first_name' => $data['first_name'] ?? $applicant->first_name,
+                'last_name' => $data['last_name'] ?? $applicant->last_name,
+                'high_school' => $data['high_school'] ?? $applicant->high_school,
+                'date_of_birth' => $data['date_of_birth'] ?? $applicant->date_of_birth,
+                'usa_cell' => $data['usa_cell'] ?? $applicant->usa_cell,
+                'email' => $data['email'] ?? $applicant->email,
+                'application_comment' => $data['application_comment'] ?? null,
+                'scholarship_comment' => $data['scholarship_comment'] ?? null,
+                'tuition_comment' => $data['tuition_comment'] ?? null,
+            ]);
+
+            //  Update Checklist
+            if (isset($data['checklist'])) {
+                $checklistData = $data['checklist'];
+                $checklistData['transcript_hebrew'] = isset($data['transcript_hebrew']) ? 1 : 0;
+                $checklistData['transcript_english'] = isset($data['transcript_english']) ? 1 : 0;
+
+                if ($applicant->checklist) {
+                    $applicant->checklist->update($checklistData);
+                } else {
+                    $applicant->checklist()->create($checklistData);
+                }
+            }
+
+            //  Update Processing
+            if (isset($data['processing'])) {
+                $processingData = $data['processing'];
+                $processingData['letter_sent'] = isset($data['letter_sent']) ? 1 : 0;
+                $processingData['interview_location'] = $data['interview_location'] ?? null;
+
+                if ($applicant->processing) {
+                    $applicant->processing->update($processingData);
+                } else {
+                    $applicant->processing()->create($processingData);
+                }
+            }
+
+            //  Update Camps
+            if (isset($data['camps']) && is_array($data['camps'])) {
+                foreach ($data['camps'] as $campData) {
+                    if (!empty($campData['id'])) {
+                        $camp = $applicant->camps()->find($campData['id']);
+                        if ($camp) {
+                            $camp->update([
+                                'camp' => $campData['camp'] ?? '',
+                                'position' => $campData['position'] ?? '',
+                            ]);
+                        }
+                    } else {
+                        $applicant->camps()->create([
+                            'camp' => $campData['camp'] ?? '',
+                            'position' => $campData['position'] ?? '',
+                        ]);
+                    }
+                }
+            }
+
+            //  Update Parents info (if applicable)
+            if (isset($data['parents'])) {
+                $applicant->parents()->updateOrCreate(
+                    ['applicant_id' => $id],
+                    $data['parents']
+                );
+            }
+
+            DB::commit();
+
+            Log::info("Applicant updated successfully in repository", ['applicant_id' => $id]);
+
+            return $applicant;
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Error updating applicant: " . $e->getMessage());
+            throw $e;
+        }
     }
+
 
     public function deleteApplicant($id)
     {
@@ -136,4 +232,49 @@ class ApplicantRepository implements ApplicantInterface
         $applicant->delete();
         return true;
     }
+
+    // public function getSlotsBetween($date, $startTime, $endTime)
+    // {
+    //     return ApplicationProcessing::whereDate('interview_date', $date)
+    //         ->whereBetween('interview_time', [$startTime, $endTime])
+    //         ->get();
+    // }
+
+    public function getSlotsBetween($date, $startTime, $endTime)
+    {
+        return ApplicationProcessing::whereDate('interview_date', $date)
+            ->where(function ($query) use ($startTime, $endTime) {
+                $query->where(function ($q) use ($startTime, $endTime) {
+                    $q->where('start_time', '<', $endTime)
+                    ->where('end_time', '>', $startTime);
+                });
+            })
+            ->get(['id', 'applicant_id', 'interview_date', 'start_time', 'end_time', 'interview_mode', 'interview_location', 'interview_link']);
+    }
+
+
+
+    public function saveInterviewSchedule($data)
+    {
+        Log::info('Saving interview schedule', ['data' => $data]);
+
+        $formattedTime = date('h:i A', strtotime($data['start_time'])) . ' - ' . date('h:i A', strtotime($data['end_time']));
+
+        return ApplicationProcessing::updateOrCreate(
+            ['applicant_id' => $data['applicant_id']],
+            [
+                'interview_mode'     => $data['interview_mode'],
+                'interview_date'     => $data['interview_date'],
+                'start_time'         => $data['start_time'],
+                'end_time'           => $data['end_time'],
+                'interview_time'     => $formattedTime,
+                'interview_location' => $data['interview_location'] ?? null,
+                'interview_link'     => $data['interview_link'] ?? null,
+                'interview_status'   => 1, // 1 = Scheduled
+            ]
+        );
+    }
+
+
+
 }
