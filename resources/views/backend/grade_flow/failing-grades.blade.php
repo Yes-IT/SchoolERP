@@ -50,27 +50,40 @@
                         <h2>Select Criteria </h2>
                     </div>
                     <div class="atndnc-filter student-filter">
-                        <form action="" method="post" id="marksheed" enctype="multipart/form-data">
-                            @csrf
+                        <form action="{{ route('grade_flow.failing_grades') }}" method="get" id="marksheed" enctype="multipart/form-data">
+                           
                             <div class="atndnc-filter-form">
                                 <div class="atndnc-filter-options grp-3 multi-input-grp">
                                     <div class="input-grp">
                                         {{-- <span><img src="{{global_asset('backend/assets/images/parent-panel/semdropdown.svg')}}" /></span> --}}
-                                        <select>
-                                            <option value="select-year">Select Year</option>
-                                            <option value="2024">2024</option>
+                                        <select name="select-session">
+                                            <option value="">Select Year</option>
+                                            @foreach ($sessions as $session)
+                                                <option value="{{ $session->id }}"
+                                                    {{ request('select-session') == $session->id ? 'selected' : '' }}
+                                                >{{ $session->name }}
+                                                </option>
+                                            @endforeach
                                         </select>
                                     </div>
                                     <div class="input-grp">
-                                        <select>
-                                            <option value="select-year">Select Year Status</option>
-                                            <option value="2024">2024</option>
+                                        <select name="select-year-status">
+                                            <option value="">Select Year Status</option>
+                                            @foreach ($yearStatus as $yearstatus)
+                                                <option value="{{ $yearstatus->id }}"
+                                                    {{ request('select-year-status') == $yearstatus->id ? 'selected' : '' }}
+                                                >{{ $yearstatus->name }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                     <div class="input-grp">
-                                        <select>
-                                            <option value="select-year">Select Semester</option>
-                                            <option value="2024">2024</option>
+                                        <select name="select-semester">
+                                            <option value="">Select Semester</option>
+                                            @foreach ($semesters as $semester)
+                                                <option value="{{ $semester->id }}"
+                                                    {{ request('select-semester') == $semester->id ? 'selected' : '' }}
+                                                >{{ $semester->name }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                      
@@ -106,86 +119,19 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>Child Development</td>
-                                            <td>1</td>
-                                            <td>1</td>
-                                            <td>1</td>
-                                            <td>1</td>
-
-                                           
-                                        </tr>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>Child Development</td>
-                                            <td>1</td>
-                                            <td>1</td>
-                                            <td>1</td>
-                                            <td>1</td>
-
-                                           
-                                        </tr>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>Child Development</td>
-                                            <td>1</td>
-                                            <td>1</td>
-                                            <td>1</td>
-                                            <td>1</td>
-
-                                           
-                                        </tr>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>Child Development</td>
-                                            <td>1</td>
-                                            <td>1</td>
-                                            <td>1</td>
-                                            <td>1</td>
-
-                                           
-                                        </tr>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>Child Development</td>
-                                            <td>1</td>
-                                            <td>1</td>
-                                            <td>1</td>
-                                            <td>1</td>
-
-                                           
-                                        </tr>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>Child Development</td>
-                                            <td>1</td>
-                                            <td>1</td>
-                                            <td>1</td>
-                                            <td>1</td>
-
-                                           
-                                        </tr>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>Child Development</td>
-                                            <td>1</td>
-                                            <td>1</td>
-                                            <td>1</td>
-                                            <td>1</td>
-
-                                           
-                                        </tr>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>Child Development</td>
-                                            <td>1</td>
-                                            <td>1</td>
-                                            <td>1</td>
-                                            <td>1</td>
-
-                                           
-                                        </tr>
+                                        @foreach ($failedStudents as $failedStudent)
+                                           <tr>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ $failedStudent->subject_name }}</td>
+                                                <td>{{ $failedStudent->class_name }}</td>
+                                                <td>{{ $failedStudent->student_first_name }} {{ $failedStudent->student_last_name }}</td>
+                                                <td>{{ $failedStudent->average }}</td>
+                                                <td>{{ $failedStudent->reduced }}</td>                                  
+                                            
+                                            </tr> 
+                                        @endforeach
+                                        
+                                        
                                     </tbody>
                                 </table>
                     </div>
@@ -200,38 +146,42 @@
                     </div>
                     <!--  pagination end -->
 
-                    {{-- <div class="tablepagination">
-                        <div class="tbl-pagination-inr">
-                            <ul>
-                                <li><a href="#url"><img src="{{ asset('backend') }}/assets/images/new_images/arrow-left.svg" alt="Icon"></a></li>
-                                <li class="active"><a href="#url">1</a></li>
-                                <li><a href="#url">2</a></li>
-                                <li><a href="#url">3</a></li>
-                                <li><a href="#url"><img src="{{ asset('backend') }}/assets/images/new_images/arrow-right.svg" alt="Icon"></a></li>
-                            </ul>
-                        </div>
 
-                        <div class="pages-select">
-                            <form>
-                                <div class="formfield">
-                                    <label>Per page</label>
-                                    <select>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
-                                        <option value="9">9</option>
-                                        <option value="10">10</option>
-                                    </select>
-                                </div>
-                            </form>
-                            <p>of 2 results</p>
-                        </div>
-                    </div> --}}
+                    {{--
+                        <div class="tablepagination">
+                            <div class="tbl-pagination-inr">
+                                <ul>
+                                    <li><a href="#url"><img src="{{ asset('backend') }}/assets/images/new_images/arrow-left.svg" alt="Icon"></a></li>
+                                    <li class="active"><a href="#url">1</a></li>
+                                    <li><a href="#url">2</a></li>
+                                    <li><a href="#url">3</a></li>
+                                    <li><a href="#url"><img src="{{ asset('backend') }}/assets/images/new_images/arrow-right.svg" alt="Icon"></a></li>
+                                </ul>
+                            </div>
+
+                            <div class="pages-select">
+                                <form>
+                                    <div class="formfield">
+                                        <label>Per page</label>
+                                        <select>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                            <option value="9">9</option>
+                                            <option value="10">10</option>
+                                        </select>
+                                    </div>
+                                </form>
+                                <p>of 2 results</p>
+                            </div>
+                        </div> 
+                    --}}
+                    
                     <div>
                        <p><b>KEY: E</b>=Excused;<b> P</b>=Personal; <b> NC</b>=Not Counted; 
                            <b> L</b>=Late, counts as half an absence '=at limit of allowed absences;<b>*</b>=exceeds allowed absences 

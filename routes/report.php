@@ -15,6 +15,9 @@ use App\Http\Controllers\Report\FeesCollectionController;
 use App\Http\Controllers\Report\ReportManagementController;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\Report\AttendanceReportController;
+use App\Http\Controllers\Report\StudentReportController;
+use App\Http\Controllers\Report\TeacherReportController;
+use App\Http\Controllers\Report\AlumniReportController;
 
 
 Route::middleware(saasMiddleware())->group(function () {
@@ -95,6 +98,16 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::controller(StudentReportController::class)->group(function () {
                         Route::post('/generate-student-pdf', 'generatePDF')->name('report-management.generate-student-pdf');
                         Route::post('/preview-student-report', 'previewReport')->name('report-management.preview-student-report');
+                    });
+
+                    Route::controller(TeacherReportController::class)->group(function () {
+                        Route::post('/generate-teacher-pdf', 'generatePDF')->name('report-management.generate-teacher-pdf');
+                        Route::post('/preview-teacher-report', 'previewReport')->name('report-management.preview-teacher-report');
+                    });
+
+                    Route::controller(AlumniReportController::class)->group(function () {
+                        Route::post('/generate-alumni-pdf', 'generatePDF')->name('report-management.generate-alumni-pdf');
+                        Route::post('/preview-alumni-report', 'previewReport')->name('report-management.preview-alumni-report');
                     });
 
                     Route::post('/attendance/reports/generate', [AttendanceReportController::class, 'generate'])->name('attendance.reports.generate');
