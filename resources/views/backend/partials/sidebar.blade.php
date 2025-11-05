@@ -59,12 +59,15 @@
                 </ul>
             </li>
 
-            <li class="{{ request()->routeIs('grade_flow.*') ? 'active' : '' }}">
+            <li class="menu-item-has-children {{ request()->routeIs('grade_flow.*') ? 'active' : '' }}">
                 <a href="{{ route('grade_flow.index') }}">
                     <img src="{{ asset('backend/assets/images/superadmin-panel/sidebar-icon-7.svg') }}"
                         alt="Sidebar Icon">
                     Grade Flow
                 </a>
+                <ul class="sub-menu">
+                    <li><a href="{{route('grade_flow.assign_grade')}}">Assign Grade</a></li>
+                </ul>
             </li>
 
             <li
