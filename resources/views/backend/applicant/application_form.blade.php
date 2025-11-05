@@ -14,7 +14,7 @@
                     <div class="ds-breadcrumb">
                         <h1>Application Form</h1>
                         <ul>
-                            <li><a href="../dashboard.html">Dashboard</a> /</li>
+                            <li><a href="{{route('applicant.dashboard')}}">Dashboard</a> /</li>
                             <li>Application Form</li>
                         </ul>
                     </div>
@@ -71,55 +71,55 @@
                                             <div class="input-grp">
                                               <div class="field-card">
                                                 <div class="field-cd-icon"><img src="{{global_asset('backend/assets/images/field-icon-1.svg')}}" alt="Icon"></div>
-                                                <div class="field-label">Section</div>
+                                                <div class="field-label">Title</div>
                                               </div>
                                             </div>
                                             <div class="input-grp">
                                               <div class="field-card">
                                                 <div class="field-cd-icon"><img src="{{global_asset('backend/assets/images/field-icon-2.svg')}}" alt="Icon"></div>
-                                                <div class="field-label">Section</div>
+                                                <div class="field-label">Single Line Text</div>
                                               </div>
                                             </div>
                                             <div class="input-grp">
                                               <div class="field-card">
                                                 <div class="field-cd-icon"><img src="{{global_asset('backend/assets/images/field-icon-3.svg')}}" alt="Icon"></div>
-                                                <div class="field-label">Section</div>
+                                                <div class="field-label">Paragraph Text</div>
                                               </div>
                                             </div>
                                             <div class="input-grp">
                                               <div class="field-card">
                                                 <div class="field-cd-icon"><img src="{{global_asset('backend/assets/images/field-icon-4.svg')}}" alt="Icon"></div>
-                                                <div class="field-label">Section</div>
+                                                <div class="field-label">Drop Down</div>
                                               </div>
                                             </div>
                                             <div class="input-grp">
                                               <div class="field-card">
                                                 <div class="field-cd-icon"><img src="{{global_asset('backend/assets/images/field-icon-5.svg')}}" alt="Icon"></div>
-                                                <div class="field-label">Section</div>
+                                                <div class="field-label">Hidden</div>
                                               </div>
                                             </div>
                                             <div class="input-grp">
                                               <div class="field-card">
                                                 <div class="field-cd-icon"><img src="{{global_asset('backend/assets/images/field-icon-6.svg')}}" alt="Icon"></div>
-                                                <div class="field-label">Section</div>
+                                                <div class="field-label">Page</div>
                                               </div>
                                             </div>
                                             <div class="input-grp">
                                               <div class="field-card">
                                                 <div class="field-cd-icon"><img src="{{global_asset('backend/assets/images/field-icon-7.svg')}}" alt="Icon"></div>
-                                                <div class="field-label">Section</div>
+                                                <div class="field-label">Multiple Choice</div>
                                               </div>
                                             </div>
                                             <div class="input-grp">
                                               <div class="field-card">
                                                 <div class="field-cd-icon"><img src="{{global_asset('backend/assets/images/field-icon-8.svg')}}" alt="Icon"></div>
-                                                <div class="field-label">Section</div>
+                                                <div class="field-label">Image Choice</div>
                                               </div>
                                             </div>
                                             <div class="input-grp">
                                               <div class="field-card">
                                                 <div class="field-cd-icon"><img src="{{global_asset('backend/assets/images/field-icon-9.svg')}}" alt="Icon"></div>
-                                                <div class="field-label">Section</div>
+                                                <div class="field-label">Number</div>
                                               </div>
                                             </div>
                                         </div>
@@ -214,6 +214,10 @@
                                                 <label>Last Name <span>*</span></label>
                                                 <input type="text">
                                             </div>
+                                            <div class="input-grp">
+                                                <label>You prefer to be called: <span>*</span></label>
+                                                <input type="text">
+                                            </div>
                                         </div>
                                     </div>
 
@@ -246,15 +250,15 @@
 
                                         <div class="cmn-box-style">
                                             <div class="input-grp">
-                                                <label>Title</label>
+                                                <label>Hebrew Name</label>
                                                 <input type="text">
                                             </div>
                                             <div class="input-grp">
-                                                <label>First Name <span>*</span></label>
+                                                <label>שם משפחה <span>*</span></label>
                                                 <input type="text">
                                             </div>
                                             <div class="input-grp">
-                                                <label>Last Name <span>*</span></label>
+                                                <label>שם פרטי <span>*</span></label>
                                                 <input type="text">
                                             </div>
                                         </div>
@@ -286,6 +290,104 @@
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <div class="cmn-box-style">
+                                            <div class="input-grp">
+                                                <label>Address</label>
+                                                <input type="text">
+                                            </div>
+                                            <div class="input-grp">
+                                                <label>Street Address<span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                            <div class="input-grp">
+                                                <label>City<span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                             <div class="input-grp">
+                                                <label>State<span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                             <div class="input-grp">
+                                                <label>Province<span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                             <div class="input-grp">
+                                                <label>Country<span>*</span></label>
+                                                <input type="text">
+                                            </div> <div class="input-grp">
+                                                <label>Zip/Postal Code<span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="cmn-form-row">
+                                        <div class="cmn-form-row-head">
+                                            <div class="cmn-frh-actions">
+                                                <div class="action-toolbar" role="toolbar" aria-label="Field actions">
+                                                    <button class="action-btn" aria-label="Drag" title="Drag" data-action="drag">
+                                                        <img src="{{global_asset('backend/assets/images/action-toolbar-icon-1.svg')}}" alt="Icon">
+                                                    </button>
+                                                
+                                                    <button class="action-btn" aria-label="Duplicate" title="Duplicate" data-action="duplicate">
+                                                        <img src="{{global_asset('backend/assets/images/action-toolbar-icon-2.svg')}}" alt="Icon">
+                                                    </button>
+                                                
+                                                    <button class="action-btn" aria-label="Edit" title="Edit" data-action="edit">
+                                                        <img src="{{global_asset('backend/assets/images/action-toolbar-icon-3.svg')}}" alt="Icon">
+                                                    </button>
+                                                
+                                                    <button class="action-btn danger" aria-label="Delete" title="Delete" data-action="delete">
+                                                        <img src="{{global_asset('backend/assets/images/action-toolbar-icon-4.svg')}}" alt="Icon">
+                                                    </button>
+                                                
+                                                    <button class="action-btn" aria-label="Collapse" title="Collapse" data-action="collapse" aria-pressed="false">
+                                                        <i class="fa-solid fa-chevron-down"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="cmn-box-style">
+                                            <div class="input-grp">
+                                                <label>Notice for interview city</label>
+                                                <input type="text">
+                                            </div>
+                                            <div class="input-grp">
+                                                <label>City (for interviews) <span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                            <div class="input-grp">
+                                                <label>Applicant's email<span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                                <div class="input-grp">
+                                                <label>Applicant's cell<span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                                <div class="input-grp">
+                                                <label>Home phone <span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                             <div class="input-grp">
+                                                <label>Place of birth <span>*</span></label>
+                                                <input type="text">
+                                            </div> 
+                                            <div class="input-grp">
+                                                <label>Date of birth <span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                            <div class="input-grp">
+                                                <label>Hebrew date of birth (בעברית)  <span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="cmn-form-row">
+                                      
 
                                         <div class="cmn-box-style">
                                             <div class="cmn-form-row-head">
@@ -348,6 +450,217 @@
                                                         </label>
                                                     </div>
                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="cmn-form-row">
+                                       
+
+                                        <div class="cmn-box-style">
+                                            <div class="cmn-form-row-head">
+                                                <div class="cmn-frh-left">
+                                                    <h4></h4>
+                                                </div>
+                                                <div class="cmn-frh-actions">
+                                                    <div class="action-toolbar" role="toolbar" aria-label="Field actions">
+                                                        <button class="action-btn" aria-label="Drag" title="Drag" data-action="drag">
+                                                            <img src="{{global_asset('backend/assets/images/action-toolbar-icon-1.svg')}}" alt="Icon">
+                                                        </button>
+                                                        <button class="action-btn" aria-label="Duplicate" title="Duplicate" data-action="duplicate">
+                                                            <img src="{{global_asset('backend/assets/images/action-toolbar-icon-2.svg')}}" alt="Icon">
+                                                        </button>
+                                                        <button class="action-btn" aria-label="Edit" title="Edit" data-action="edit">
+                                                            <img src="{{global_asset('backend/assets/images/action-toolbar-icon-3.svg')}}" alt="Icon">
+                                                        </button>
+                                                        <button class="action-btn danger" aria-label="Delete" title="Delete" data-action="delete">
+                                                            <img src="{{global_asset('backend/assets/images/action-toolbar-icon-4.svg')}}" alt="Icon">
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                  
+                                            </div>
+                                            <div class="mcq-wrp">
+                                                <div class="input-grp question text-red">
+                                                    <label>Question</label>
+                                                    <input type="text" placeholder="Which parent do you share a primary residence with?  *" disabled>
+                                                </div>
+
+                                                <div class="mcq-options">
+                                                    <div class="input-grp">
+                                                        <label>
+                                                            <input type="radio" name="option">
+                                                            <span>Mother</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="input-grp">
+                                                        <label>
+                                                            <input type="radio" name="option">
+                                                            <span>Father</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="input-grp">
+                                                        <label>
+                                                            <input type="radio" name="option">
+                                                            <span>Both Parents</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="input-grp">
+                                                        <label>
+                                                            <input type="radio" name="option">
+                                                            <span>Legal guardian/s</span>
+                                                        </label>
+                                                    </div>
+                                                   
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                     <div class="cmn-form-row">
+                                    
+                                        <div class="cmn-box-style">
+                                            <div class="input-grp">
+                                                <label for="comment">Comment</label>
+                                                <textarea id="comment" name="comment" cols="50" rows="10" placeholder="Enter Comments"></textarea>
+                                            </div>
+                                           
+                                        </div>
+                                    </div>
+
+                                    <div class="cmn-form-row">
+                                        <div class="cmn-form-row-head">
+                                            <div class="cmn-frh-actions">
+                                                <div class="action-toolbar" role="toolbar" aria-label="Field actions">
+                                                    <button class="action-btn" aria-label="Drag" title="Drag" data-action="drag">
+                                                        <img src="{{global_asset('backend/assets/images/action-toolbar-icon-1.svg')}}" alt="Icon">
+                                                    </button>
+                                                
+                                                    <button class="action-btn" aria-label="Duplicate" title="Duplicate" data-action="duplicate">
+                                                        <img src="{{global_asset('backend/assets/images/action-toolbar-icon-2.svg')}}" alt="Icon">
+                                                    </button>
+                                                
+                                                    <button class="action-btn" aria-label="Edit" title="Edit" data-action="edit">
+                                                        <img src="{{global_asset('backend/assets/images/action-toolbar-icon-3.svg')}}" alt="Icon">
+                                                    </button>
+                                                
+                                                    <button class="action-btn danger" aria-label="Delete" title="Delete" data-action="delete">
+                                                        <img src="{{global_asset('backend/assets/images/action-toolbar-icon-4.svg')}}" alt="Icon">
+                                                    </button>
+                                                
+                                                    <button class="action-btn" aria-label="Collapse" title="Collapse" data-action="collapse" aria-pressed="false">
+                                                        <i class="fa-solid fa-chevron-down"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="cmn-box-style">
+                                            <div class="input-grp">
+                                                <label>Father's title <span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                            <div class="input-grp">
+                                                <label>First name  <span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                            <div class="input-grp">
+                                                <label>Last name <span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                                <div class="input-grp">
+                                                <label>Cell phone <span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                                <div class="input-grp">
+                                                <label>Email  <span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                                <div class="input-grp">
+                                                <label>Confirm Email * <span>*</span></label>
+                                                <input type="text">
+                                            </div> <div class="input-grp">
+                                                <label>Occupation  <span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                            <div class="input-grp">
+                                                <label>Firm name <span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                            <div class="input-grp">
+                                                <label>Business phone  <span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="cmn-form-row">
+                                        <div class="cmn-form-row-head">
+                                            <div class="cmn-frh-actions">
+                                                <div class="action-toolbar" role="toolbar" aria-label="Field actions">
+                                                    <button class="action-btn" aria-label="Drag" title="Drag" data-action="drag">
+                                                        <img src="{{global_asset('backend/assets/images/action-toolbar-icon-1.svg')}}" alt="Icon">
+                                                    </button>
+                                                
+                                                    <button class="action-btn" aria-label="Duplicate" title="Duplicate" data-action="duplicate">
+                                                        <img src="{{global_asset('backend/assets/images/action-toolbar-icon-2.svg')}}" alt="Icon">
+                                                    </button>
+                                                
+                                                    <button class="action-btn" aria-label="Edit" title="Edit" data-action="edit">
+                                                        <img src="{{global_asset('backend/assets/images/action-toolbar-icon-3.svg')}}" alt="Icon">
+                                                    </button>
+                                                
+                                                    <button class="action-btn danger" aria-label="Delete" title="Delete" data-action="delete">
+                                                        <img src="{{global_asset('backend/assets/images/action-toolbar-icon-4.svg')}}" alt="Icon">
+                                                    </button>
+                                                
+                                                    <button class="action-btn" aria-label="Collapse" title="Collapse" data-action="collapse" aria-pressed="false">
+                                                        <i class="fa-solid fa-chevron-down"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="cmn-box-style">
+                                            <div class="input-grp">
+                                                <label>Mother's title</label>
+                                                <input type="text">
+                                            </div>
+                                            <div class="input-grp">
+                                                <label>First name  <span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                            <div class="input-grp">
+                                                <label>Last name <span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                            <div class="input-grp">
+                                                <label>Maiden name  <span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                            <div class="input-grp">
+                                                <label>Cell phone <span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                                <div class="input-grp">
+                                                <label>Email  <span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                                <div class="input-grp">
+                                                <label>Confirm Email  <span>*</span></label>
+                                                <input type="text">
+                                            </div> <div class="input-grp">
+                                                <label>Occupation  <span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                             <div class="input-grp">
+                                                <label>Firm name <span>*</span></label>
+                                                <input type="text">
+                                            </div>
+                                              <div class="input-grp">
+                                                <label>Business phone  <span>*</span></label>
+                                                <input type="text">
                                             </div>
                                         </div>
                                     </div>

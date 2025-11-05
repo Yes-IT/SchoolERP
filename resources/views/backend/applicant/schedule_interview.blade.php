@@ -256,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const offlineModeDiv = document.getElementById('offline-mode');
     const searchForm = document.getElementById('searchSlotsForm');
 
-    // ✅ Default to online mode
+    // Default to online mode
     if (interviewModeInput.value === '' || interviewModeInput.value === 'online') {
         interviewModeInput.value = 'online';
         onlineTab.classList.add('active');
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function () {
         offlineModeDiv.style.display = 'none';
     }
 
-    // 🔁 Online tab click
+    //  Online tab click
     onlineTab.addEventListener('click', () => {
         onlineTab.classList.add('active');
         offlineTab.classList.remove('active');
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function () {
         onlineModeDiv.style.display = 'block';
         offlineModeDiv.style.display = 'none';
 
-        // 👉 Trigger re-fetch for booked slots (Online mode)
+        // Trigger re-fetch for booked slots (Online mode)
         searchForm.dispatchEvent(new Event('submit'));
     });
 
@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function () {
         offlineModeDiv.style.display = 'block';
         onlineModeDiv.style.display = 'none';
 
-        // 👉 Trigger re-fetch for booked slots (Offline mode)
+        // Trigger re-fetch for booked slots (Offline mode)
         searchForm.dispatchEvent(new Event('submit'));
     });
 });
@@ -312,7 +312,7 @@ document.getElementById('searchSlotsForm').addEventListener('submit', function(e
             container.innerHTML = data.html;
             // console.log('HTML:', data.html);
 
-            // ✅ Copy date/time values from search form to assign form
+            // Copy date/time values from search form to assign form
             document.getElementById('assign_interview_date').value = document.getElementById('interview_date').value;
             document.getElementById('assign_start_time').value = document.getElementById('interview_start_time').value;
             document.getElementById('assign_end_time').value = document.getElementById('interview_end_time').value;

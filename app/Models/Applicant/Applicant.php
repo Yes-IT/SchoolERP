@@ -34,6 +34,7 @@ class Applicant extends Model
         'cell',
         'number',
         'hdob',
+        'applicant_status'
         
     ];
 

@@ -3,12 +3,21 @@
 @section('title')
     {{ @$data['title'] }}
 @endsection
+<style>
+    .gray-bg {
+    background-color: #c0c0c0 !important;
+    color: #666 !important;
+    cursor: not-allowed !important;
+    opacity: 0.7;
+}
+
+</style>
 
 @section('content')
             <div class="ds-breadcrumb">
                 <h1>Student Application Forms</h1>
                 <ul>
-                    <li><a href="../dashboard.html">Dashboard</a> /</li>
+                    <li><a href="{{route('applicant.dashboard')}}">Dashboard</a> /</li>
                     <li><a href="#">Student Application Forms</a> /</li>
                     
                 </ul>
@@ -246,6 +255,7 @@
                         </table> --}}
 
                          @include('backend.applicant.partials.applicant_list', ['applicants' => $applicants])
+
                     </div>
 
                     {{-- <div class="tablepagination">
@@ -297,10 +307,13 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch(url, {
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
         .then(data => {
             tableContainer.innerHTML = data.html;
-            attachPaginationListeners();
+            attachPaginationListeners(); 
         })
         .catch(console.error);
     }
@@ -309,13 +322,73 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.tablepagination a').forEach(link => {
             link.addEventListener('click', e => {
                 e.preventDefault();
-                loadTableData(link.href);
+                const pageUrl = link.getAttribute('href');
+                loadTableData(pageUrl);
             });
         });
     }
 
     attachPaginationListeners();
 });
+
 </script>
+
+<script>
+$(document).ready(function () {
+    $('.applicant-action-btn').on('click', function () {
+        let applicantId = $(this).data('id');
+        let action = $(this).data('action'); // approved / rejected
+        let $row = $(this).closest('tr');
+
+        if (!confirm(`Are you sure you want to ${action} this applicant?`)) {
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('applicant.applicant_update_status') }}",
+            type: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                applicant_id: applicantId,
+                status: action
+            },
+            success: function (response) {
+                if (response.success) {
+                    alert(response.message);
+
+                    // Update status cell
+                    let $statusCell = $row.find('td').eq(-2).find('span');
+                    $statusCell.text(response.new_status);
+
+                    // Reset color classes
+                    $statusCell.removeClass('green-bg red-bg yellow-bg');
+
+                    if (response.new_status === 'accept') {
+                        $statusCell.addClass('green-bg');
+                        $statusCell.text('Approved');
+                    } else if (response.new_status === 'not_accepted') {
+                        $statusCell.addClass('red-bg');
+                        $statusCell.text('Rejected');
+                    } else {
+                        $statusCell.addClass('yellow-bg');
+                        $statusCell.text('Pending');
+                    }
+
+                    // Disable or hide buttons
+                    $row.find('.applicant-action-btn').prop('disabled', true);
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error:', error);
+                alert('Something went wrong while updating the status.');
+            }
+        });
+    });
+});
+
+</script>
+
     
 @endpush

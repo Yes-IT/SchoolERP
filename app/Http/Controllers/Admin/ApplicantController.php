@@ -8,6 +8,10 @@ use App\Interfaces\Applicant\ApplicantInterface;
 use App\Http\Requests\Applicant\{ApplicantStoreRequest,ApplicantUpdateRequest};
 use Illuminate\Support\Facades\{DB,Log};
 use App\Models\Applicant\{Applicant,ApplicantParent,ApplicationProcessing,ApplicantCamps,ApplicantCheckList};
+use Carbon\Carbon;
+use App\Enums\ApplicantStatus;
+
+
 
 class ApplicantController extends Controller
 {
@@ -54,10 +58,11 @@ class ApplicantController extends Controller
 
                 Log::info('listing of Applicants', ['applicants' => $applicants]);
 
-                if ($request->ajax()) {
-                    $html = view('backend.applicant.partials.table', compact('applicants'))->render();
+               if ($request->ajax() || $request->wantsJson()) {
+                    $html = view('backend.applicant.partials.applicant_list', compact('applicants'))->render();
                     return response()->json(['html' => $html]);
                 }
+
 
                 return view('backend.applicant.index', compact('applicants'));
         } catch(\Exception $e){
@@ -65,6 +70,55 @@ class ApplicantController extends Controller
         }
       
     }
+
+    public function applicant_update_status(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'applicant_id' => 'required|integer|exists:applicants,id',
+                'status' => 'required|string',
+            ]);
+
+            // Map frontend status to your Enum
+            $statusMap = [
+                'approved' => ApplicantStatus::Accept,
+                'rejected' => ApplicantStatus::NotAccepted,
+                'priority_pending' => ApplicantStatus::PriorityPending,
+                'pending' => ApplicantStatus::Pending,
+            ];
+
+            $mappedStatus = $statusMap[$validated['status']] ?? ApplicantStatus::Pending;
+
+            Log::info('Updating applicant status', [
+                'request' => $validated,
+                'mapped_to' => $mappedStatus,
+            ]);
+
+            $applicant = Applicant::findOrFail($validated['applicant_id']);
+            
+            // Use the enum instance directly
+            $applicant->update([
+                'applicant_status' => $mappedStatus,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Applicant status updated successfully!',
+                'new_status' => $mappedStatus->value, 
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error updating applicant status', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while updating the status.',
+            ], 500);
+        }
+    }
+
+
 
 
    public function application_form(){
@@ -77,9 +131,103 @@ class ApplicantController extends Controller
 
    
 
-    public function calender(){
-        return view('backend.applicant.calender');
+    // public function calender()
+    // {
+    //     $slots = ApplicationProcessing::select(
+    //         'interview_date', 'start_time', 'end_time', 'interview_location', 'interview_mode'
+    //     )->get();
+
+    //     // Remove empty ones
+    //     $slots = $slots->filter(function ($slot) {
+    //         return $slot->interview_date && $slot->start_time && $slot->end_time;
+    //     });
+
+    //     Log::info('Cleaned interview slots', ['slots' => $slots]);;
+
+    //     return view('backend.applicant.calender',compact('slots'));
+    // }
+
+
+    public function calender(Request $request)
+    {
+        try{
+                $startOfWeek = now()->startOfWeek();
+                $endOfWeek   = now()->endOfWeek();
+
+               
+
+                // Fetch all booked slots within this week
+                $slots = ApplicationProcessing::whereBetween('interview_date', [$startOfWeek, $endOfWeek])
+                    ->get();
+
+                
+                $timeSlots = [
+                    ['start' => '10:00:00', 'end' => '10:59:59'],
+                    ['start' => '11:00:00', 'end' => '11:59:59'],
+                    ['start' => '12:00:00', 'end' => '12:59:59'],
+                    ['start' => '13:00:00', 'end' => '13:59:59'],
+                    ['start' => '14:00:00', 'end' => '14:59:59'],
+                    ['start' => '15:00:00', 'end' => '15:59:59'],
+                    ['start' => '16:00:00', 'end' => '16:59:59'],
+                    ['start' => '17:00:00', 'end' => '17:59:59'],
+                ];
+
+                Log::info('Weekly calendar view slots', [
+                    'range' => [$startOfWeek->toDateString(), $endOfWeek->toDateString()],
+                    'slots' => $slots,
+                    'count' => $slots->count(),
+                ]);
+
+            return view('backend.applicant.calender', compact('slots', 'timeSlots', 'startOfWeek', 'endOfWeek'));
+        }   
+        catch(\Exception $e){
+            Log::error('Error in calender: ' . $e->getMessage());
+            return redirect()->route('applicant.dashboard')->with('error', 'Failed to get interview slots.');
+        }
     }
+
+    public function calendar_filter_slots(Request $request)
+    {
+        $validated = $request->validate([
+            'year' => 'required|integer',
+            'month' => 'required|integer',
+            'week' => 'required|string', 
+        ]);
+
+        try {
+            // Split week range
+            [$startDay, $endDay] = explode('-', $validated['week']);
+            $startDay = (int) $startDay;
+            $endDay = (int) $endDay;
+
+            // Generate date range
+            $startDate = Carbon::createFromDate($validated['year'], $validated['month'], $startDay);
+            $endDate   = Carbon::createFromDate($validated['year'], $validated['month'], $endDay);
+
+            Log::info('Filtering calendar slots', [
+                'range' => [$startDate->toDateString(), $endDate->toDateString()],
+            ]);
+
+            // Fetch slots from repository
+            $slots = $this->applicantrepository->getSlotsForWeek($startDate, $endDate);
+            Log::info('Filtered slots in calendar filter slots', ['slots' => $slots]);
+
+            $html = view('backend.applicant.partials.calendar-slots', [
+                'slots' => $slots,
+                'startOfWeek' => $startDate,
+                'endOfWeek' => $endDate,
+            ])->render();
+
+            return response()->json(['html' => $html]);
+
+        } catch (\Throwable $e) {
+            Log::error('Error in calendar_filter_slots: ' . $e->getMessage());
+            return response()->json(['error' => 'Invalid week range format.'], 400);
+        }
+    }
+
+    
+
 
     public function schedule_interview($id,Request $request)
     {
@@ -95,36 +243,6 @@ class ApplicantController extends Controller
        
     }
 
-    // public function fetch_interview_slots(Request $request)
-    // {
-    //     try {
-    //         $validated = $request->validate([
-    //             'interview_date' => 'required|date',
-    //             'start_time' => 'required',
-    //             'end_time' => 'required',
-    //         ]);
-
-    //         $slots = $this->applicantrepository->getSlotsBetween(
-    //             $validated['interview_date'],
-    //             $validated['start_time'],
-    //             $validated['end_time']
-    //         );
-
-    //         Log::info('Available interview slots', ['slots' => $slots]);
-
-    //         $html = view('backend.applicant.partials.available_slots', compact('slots'))->render();
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'html' => $html,
-    //         ]);
-
-    //     } catch (\Exception $e) {
-    //         Log::error('Failed to fetch interview slots', ['error' => $e->getMessage()]);
-    //         return response()->json(['success' => false, 'message' => 'Something went wrong.']);
-    //     }
-    // }
-
     public function fetch_interview_slots(Request $request)
     {
         try {
@@ -134,48 +252,15 @@ class ApplicantController extends Controller
                 'end_time' => 'required',
             ]);
 
-            // Get booked slots
-            $bookedSlots = $this->applicantrepository->getSlotsBetween(
+            $slots = $this->applicantrepository->getSlotsBetween(
                 $validated['interview_date'],
                 $validated['start_time'],
                 $validated['end_time']
             );
 
-            // Generate all possible time slots for the day
-            $allSlots = $this->generateTimeSlots(
-                $validated['start_time'],
-                $validated['end_time']
-            );
+            Log::info('Available interview slots', ['slots' => $slots]);
 
-            // Create a map of booked slots for easy lookup
-            $bookedSlotsMap = [];
-            foreach ($bookedSlots as $slot) {
-                $bookedSlotsMap[$slot->time_slot] = $slot;
-            }
-
-            // Separate available and booked slots
-            $availableSlots = [];
-            $scheduledSlots = [];
-
-            foreach ($allSlots as $slotTime => $slotLabel) {
-                if (isset($bookedSlotsMap[$slotTime])) {
-                    $scheduledSlots[$slotTime] = $bookedSlotsMap[$slotTime];
-                } else {
-                    $availableSlots[$slotTime] = $slotLabel;
-                }
-            }
-
-            Log::info('Interview slots processed', [
-                'date' => $validated['interview_date'],
-                'booked' => count($scheduledSlots),
-                'available' => count($availableSlots)
-            ]);
-
-            $html = view('backend.applicant.partials.available_slots', [
-                'scheduledSlots' => $scheduledSlots,
-                'availableSlots' => $availableSlots,
-                'selectedDate' => $validated['interview_date']
-            ])->render();
+            $html = view('backend.applicant.partials.available_slots', compact('slots'))->render();
 
             return response()->json([
                 'success' => true,
@@ -188,24 +273,9 @@ class ApplicantController extends Controller
         }
     }
 
-    private function generateTimeSlots($startTime, $endTime, $interval = '1 hour')
-    {
-        $slots = [];
-        
-        $start = \Carbon\Carbon::createFromFormat('H:i A', $startTime);
-        $end = \Carbon\Carbon::createFromFormat('H:i A', $endTime);
-        
-        while ($start <= $end) {
-            $slotTime = $start->format('h:i A');
-            $slotEnd = $start->copy()->addHour()->format('h:i A');
-            $slotLabel = $slotTime . ' - ' . $slotEnd;
-            
-            $slots[$slotTime] = $slotLabel;
-            $start->addHour();
-        }
-        
-        return $slots;
-    }
+   
+
+  
 
     public function assign_interview_slot(Request $request)
     {

@@ -11,4 +11,6 @@ interface ApplicantInterface
     public function deleteApplicant($id);
     public function getSlotsBetween($date, $startTime, $endTime);
     public function saveInterviewSchedule($data);
+    public function getSlotsForWeek($startDate, $endDate);
+    
 }

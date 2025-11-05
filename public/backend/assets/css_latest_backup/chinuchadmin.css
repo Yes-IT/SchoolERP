@@ -1,0 +1,310 @@
+.assigment-dtls-cd-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+    color: var(--text-clr);
+    background: var(--white);
+    border-radius: 8px;
+    width: 100%;
+}
+.assigment-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px 24px;
+    align-items: start;
+}
+.meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.meta-label {
+    color: var(--primary-clr);
+    font-weight: 700;
+    font-size: 16px;
+}
+.meta-value {
+    color: var(--muted);
+    font-size: 15px;
+}
+.assignment-description .meta-label {
+    margin-bottom: 8px;
+}
+.assignment-description p {
+    margin: 0;
+    color: #666;
+    line-height: 1.6;
+    font-size: 14px;
+}
+.assignment-attachments .meta-label {
+    margin-bottom: 10px;
+}
+.attachments-list {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.attachment-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--primary-clr);
+    color: var(--white);
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    min-height: 44px;
+    box-shadow: none;
+    font-weight: 700;
+    font-size: 14px;
+}
+.attachment-btn:active {
+    transform: translateY(1px);
+}
+.attachment-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+}
+.attachment-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+}
+.attachment-action {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+}
+.submission-stats-section .meta-label {
+    margin-bottom: 12px;
+    color: var(--primary-clr);
+    font-weight: 700;
+    font-size: 16px;
+}
+.submission-stats-grid {
+    display: flex;
+    gap: 16px;
+    align-items: stretch;
+    flex-wrap: wrap;
+}
+.stat-card {
+    flex: 1 1 220px;
+    min-width: 180px;
+    padding: 18px;
+    border-radius: 8px;
+    border: 2px solid rgba(102, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: transparent;
+    box-sizing: border-box;
+}
+.stat-card .stat-number {
+    font-size: 28px;
+    font-weight: 800;
+}
+.stat-card .stat-text {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 700;
+}
+.stat-success {
+    border-color: rgba(0, 166, 90, 0.12);
+}
+.stat-success .stat-number {
+    color: var(--green-clr);
+}
+.stat-warning {
+    border-color: rgba(223, 165, 16, 0.12);
+}
+.stat-warning .stat-number {
+    color: var(--yellow-clr);
+}
+.stat-neutral {
+    border-color: rgba(102, 0, 0, 0.12);
+}
+.stat-neutral .stat-number {
+    color: var(--primary-clr);
+}
+@media (max-width:1100px) {
+    .assigment-meta-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .attachments-list {
+        gap: 10px;
+    }
+    .attachment-name {
+        max-width: 120px;
+    }
+    .submission-stats-grid {
+        gap: 12px;
+    }
+}
+@media (max-width:640px) {
+    .assigment-meta-grid {
+        grid-template-columns: 1fr;
+    }
+    .attachments-list {
+        width: 100%;
+    }
+    .stat-card {
+        flex-basis: 100%;
+    }
+}
+.ds-cmn-tble.tbl-100 table{
+    min-width: 100%;
+}
+.ds-filter-ch-funk .student-filter .atndnc-filter-options .date-dropdown select ,.ds-filter-ch-funk .student-filter .date-dropdown .dropdown-menu{
+    width: 100%;
+    min-width: auto;
+}
+.ds-filter-ch-funk .student-filter .date-dropdown .dropdown-menu{
+    min-width: 170px;
+    right: 0;
+    left: auto;
+}
+.ds-filter-ch-funk:has(.ds-filter-ch-hide.active) .atndnc-filter-wrp{
+    display: none;
+}
+.ds-filter-ch-funk table tr td p{
+    margin-bottom: 0;
+}
+.ds-cmn-avail-slot-count-wrp{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    color: var(--primary-clr);
+    margin-bottom: 12px;
+}
+.seat-badge {
+    padding: 3px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--primary-clr);
+    background: transparent;
+    color: var(--primary-clr);
+    font-weight: 700;
+    font-size: 13px;
+}
+.ds-cmn-available-slotsforroom {
+    padding: 16px;
+    border-radius: 10px;
+}
+.slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+}
+.ds-cmn-avail-slot-count-wrp h4{
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary-clr);
+    margin-bottom: 0;
+}
+.slot-card {
+    border-radius: 10px;
+    padding: 14px;
+    border: 2px solid transparent;
+    position: relative;
+    min-height: 88px;
+    border: 1px solid var(--primary-clr);
+    background: #f5f5f5;
+    overflow: hidden;
+}
+.slot-card .icons {
+    position: absolute;
+    left: 12px;
+    top: 16px;
+    font-size: 14px;
+}
+.slot-card .close-x {
+    position: absolute;
+    right: 12px;
+    top: 16px;
+    font-size: 14px;
+    cursor: pointer;
+    opacity: 0.9;
+    color: #DE2A0E;
+}
+.slot-card .time {
+    margin-left: 22px;
+    font-weight: 800;
+    font-size: 16px;
+    color: #121212;
+}
+.slot-card .meta {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.25;
+}
+
+.slot-card .status {
+    margin-top: 8px;
+    font-weight: 700;
+}
+.slot-card.available {
+    background: #F0FDF4;
+    border-color: #1A932E;
+}
+.slot-card.available .icons {
+    color: var(--green-clr);
+}
+.slot-card.available .room-book-status {
+    color: var(--green-clr);
+}
+.slot-card.booked {
+    border-color: #DE2A0E;
+    background: #FEF5F5;
+}
+.slot-card.booked .icons {
+    color: #DE2A0E;
+}
+.slot-card.booked .room-book-status {
+    color: #DE2A0E;
+}
+.slot-card.requested {
+    border-color: #DE2A0E;
+}
+.slot-card h4 {
+    margin: 0;
+    font-size: 13px;
+    color: #b93b34;
+    font-weight: 700;
+}
+.slot-card p.small {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #b93b34;
+}
+@media (max-width:520px) {
+    .ds-cmn-details-cd-outer {
+        gap: 8px;
+    }
+    .input-grp select {
+        width: 100%;
+    }
+    .seat-badge {
+        right: 12px;
+        top: 12px;
+    }
+}
+.cmn-popwrp.pop800 .modal-dialog{
+    max-width: 1200px;
+}

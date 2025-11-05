@@ -28,6 +28,7 @@ class ApplicationProcessing extends Model
         'scholarship_comment',
         'tution_comment',
         'letter_sent',
+        'interview_status',
          
         ];
 

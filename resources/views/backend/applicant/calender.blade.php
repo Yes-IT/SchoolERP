@@ -8,7 +8,7 @@
  <div class="ds-breadcrumb">
                 <h1>Calendar</h1>
                 <ul>
-                    <li><a href="dashboard.html">Dashboard</a> /</li>
+                    <li><a href="{{route('applicant.dashboard')}}">Dashboard</a> /</li>
                     <li>Calendar</li>
                 </ul>
             </div>
@@ -42,7 +42,7 @@
                         <div class="box-table-container">
                             <table class="calendar-table" role="grid" aria-label="Weekly timetable">
                                 <thead>
-                                    <tr>
+                                    {{-- <tr>
                                         <th>Day/Time</th>
                                         <th>10:00 AM - 10:59 AM</th>
                                         <th>11:00 AM - 11:59 AM</th>
@@ -54,10 +54,19 @@
                                         <th>05:00 PM - 05:59 PM</th>
                                         <th>06:00 PM - 06:59 PM</th>
                                         <th>07:00 PM - 07:59 PM</th>
+                                    </tr> --}}
+
+                                    <tr>
+                                    <th>Day/Time</th>
+                                       @foreach($timeSlots as $slot)
+                                            <th>
+                                                {{ date('h:i A', strtotime($slot['start'])) }} - {{ date('h:i A', strtotime($slot['end'])) }}
+                                            </th>
+                                        @endforeach
                                     </tr>
                                 </thead>
                             
-                                <tbody>
+                                {{-- <tbody>
                                     <tr>
                                         <th>Thursday, September 01</th>
                                         <td>
@@ -410,7 +419,90 @@
                                         </td>
                                     </tr>
                             
+                                </tbody> --}}
+
+ 
+                                {{-- <tbody>
+                                    @php
+                                        use Carbon\Carbon;
+                                        use Carbon\CarbonPeriod;
+
+                                      
+                                        $timeColumns = [
+                                            '10:00:00' => '10:59:59',
+                                            '11:00:00' => '11:59:59',
+                                            '12:00:00' => '12:59:59',
+                                            '13:00:00' => '13:59:59',
+                                            '14:00:00' => '14:59:59',
+                                            '15:00:00' => '15:59:59',
+                                            '16:00:00' => '16:59:59',
+                                            '17:00:00' => '17:59:59',
+                                            '18:00:00' => '18:59:59',
+                                            '19:00:00' => '19:59:59'
+                                        ];
+
+                                        
+                                        $startOfWeek = Carbon::parse($startDate ?? now())->startOfWeek(Carbon::MONDAY);
+                                        $endOfWeek   = Carbon::parse($endDate ?? now())->endOfWeek(Carbon::SUNDAY);
+
+                                        $allDays = collect(CarbonPeriod::create($startOfWeek, $endOfWeek));
+
+                                        $filteredDays = $allDays->filter(function ($date) {
+                                          
+                                            return in_array($date->dayOfWeek, [0, 1, 2, 3, 4, 5]) && $date->dayOfWeek !== 6; 
+                                            
+                                        });
+
+                                        
+                                        $groupedSlots = $slots->groupBy(fn($slot) => Carbon::parse($slot->interview_date)->format('Y-m-d'));
+                                    @endphp
+
+                                  
+                                    @foreach($filteredDays as $date)
+                                        @php
+                                            $daySlots = $groupedSlots[$date->format('Y-m-d')] ?? collect();
+                                        @endphp
+
+                                        <tr>
+                                            <th>{{ $date->format('l, F d') }}</th>
+
+                                            @foreach($timeColumns as $start => $end)
+                                                @php
+                                                    $booked = $daySlots->first(function ($slot) use ($start, $end) {
+                                                        return $slot->start_time >= $start && $slot->start_time <= $end;
+                                                    });
+                                                @endphp
+
+                                                <td>
+                                                    @if($booked)
+                                                        <div class="scheduled">
+                                                            <div class="tag">Scheduled</div>
+                                                            <div class="title">{{ ucfirst($booked->interview_mode ?? 'N/A') }}</div>
+                                                            <div class="meta">
+                                                                {{ $booked->interview_location ?? 'N/A' }}<br>
+                                                                {{ date('h:i A', strtotime($booked->start_time)) }} - {{ date('h:i A', strtotime($booked->end_time)) }}
+                                                            </div>
+                                                        </div>
+                                                    @else
+                                                        <div class="cell-center">
+                                                            <div class="available">Available</div>
+                                                        </div>
+                                                    @endif
+                                                </td>
+                                            @endforeach
+                                        </tr>
+                                    @endforeach
+                                </tbody> --}}
+
+                                <tbody id="calendar-table-body">
+                                    @include('backend.applicant.partials.calendar-slots', [
+                                        'slots' => $slots,
+                                        'startOfWeek' => $startOfWeek,
+                                        'endOfWeek' => $endOfWeek,
+                                    ])
                                 </tbody>
+
+
                             </table>
                         </div>
                     </div>
@@ -421,3 +513,46 @@
 
 
 @endsection
+
+@push('script')
+<script>
+$(document).ready(function() {
+    $('#btn-apply').on('click', function() {
+        const year  = $('#year-select').val();
+       const month = parseInt($('#month-select').val()) + 1;
+        const week  = $('#week-select').val();
+
+        console.log(year, month, week);
+
+        if (!year || !month || !week) {
+            alert('Please select year, month, and week.');
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('calendar.calendar_filter_slots') }}",
+            method: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                year: year,
+                month: month,
+                week: week
+            },
+            success: function(response) {
+                console.log(response);
+                if (response.html && $.trim(response.html) !== '') {
+                    $('#calendar-table-body').html(response.html);
+                } else {
+                    $('#calendar-table-body').html('<tr><td colspan="8" class="text-center text-muted">No slots found for this week.</td></tr>');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching slots:', error);
+                alert('Failed to load slots. Please try again.');
+            }
+        });
+    });
+});
+</script>
+
+@endpush

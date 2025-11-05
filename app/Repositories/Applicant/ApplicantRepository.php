@@ -6,6 +6,7 @@ use App\Interfaces\Applicant\ApplicantInterface;
 use App\Models\Applicant\{Applicant,ApplicantParent,ApplicationProcessing,ApplicantCamps,ApplicantCheckList};
 use App\Models\StudentInfo\ParentGuardian;
 use Illuminate\Support\Facades\{DB,Log};
+use Carbon\Carbon;
 
 class ApplicantRepository implements ApplicantInterface
 {
@@ -233,12 +234,7 @@ class ApplicantRepository implements ApplicantInterface
         return true;
     }
 
-    // public function getSlotsBetween($date, $startTime, $endTime)
-    // {
-    //     return ApplicationProcessing::whereDate('interview_date', $date)
-    //         ->whereBetween('interview_time', [$startTime, $endTime])
-    //         ->get();
-    // }
+   
 
     public function getSlotsBetween($date, $startTime, $endTime)
     {
@@ -252,6 +248,57 @@ class ApplicantRepository implements ApplicantInterface
             ->get(['id', 'applicant_id', 'interview_date', 'start_time', 'end_time', 'interview_mode', 'interview_location', 'interview_link']);
     }
 
+    // public function getSlotsForWeek($year, $month, $week)
+    // {
+    //     $startOfMonth = Carbon::createFromDate($year, $month, 1)->startOfWeek(Carbon::MONDAY);
+    //     $endOfMonth = Carbon::createFromDate($year, $month, 1)->endOfMonth()->endOfWeek(Carbon::SUNDAY);
+
+    //     $weeks = collect();
+    //     $currentStart = $startOfMonth->copy();
+
+    //     while ($currentStart->lte($endOfMonth)) {
+    //         $weeks->push([
+    //             'start' => $currentStart->copy(),
+    //             'end'   => $currentStart->copy()->endOfWeek(Carbon::SUNDAY),
+    //         ]);
+    //         $currentStart->addWeek();
+    //     }
+
+    //     $selectedWeek = $weeks[$week - 1] ?? null;
+    //     if (!$selectedWeek) {
+    //         return [collect(), null, null];
+    //     }
+
+    //     $startDate = $selectedWeek['start'];
+    //     $endDate = $selectedWeek['end'];
+
+    //     $daysToShow = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Sunday'];
+
+    //     $slots = ApplicationProcessing::whereBetween('interview_date', [$startDate, $endDate])
+    //         ->get()
+    //         ->filter(fn($slot) => in_array(Carbon::parse($slot->interview_date)->format('l'), $daysToShow));
+
+    //     return [$slots, $startDate, $endDate];
+    // }
+
+    public function getSlotsForWeek($startDate, $endDate)
+    {
+        $daysToShow = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Sunday'];
+
+        // Convert to UTC range for database query
+        $startUtc = $startDate->copy()->startOfDay()->setTimezone('UTC');
+        $endUtc   = $endDate->copy()->endOfDay()->setTimezone('UTC');
+
+        $slots = ApplicationProcessing::whereBetween('interview_date', [$startUtc, $endUtc])->get();
+
+        Log::info('Slots query range (UTC)', [
+            'startUtc' => $startUtc->toDateTimeString(),
+            'endUtc' => $endUtc->toDateTimeString(),
+            'count' => $slots->count(),
+        ]);
+
+        return $slots->filter(fn($slot) => in_array(Carbon::parse($slot->interview_date)->format('l'), $daysToShow));
+    }
 
 
     public function saveInterviewSchedule($data)

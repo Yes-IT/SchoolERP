@@ -18,6 +18,31 @@
     </thead>
     <tbody>
        @forelse ($applicants as $index => $applicant) 
+         @php
+                        $interviewStatus = optional($applicant->interview)->interview_status;
+                        $statusClass = 'yellow-bg'; // Default for pending/0
+                        $statusText = '-';
+                        $interviewButtonText = 'Schedule Interview';
+                        
+                        if ($interviewStatus == 1) {
+                            $statusClass = 'green-bg'; // Scheduled
+                            $statusText = 'Scheduled';
+                            $interviewButtonText = 'Reschedule Interview';
+                        } elseif ($interviewStatus == 2) {
+                            $statusClass = 'red-bg'; // rescheduled or other status
+                            $statusText = 'Completed';
+                            $interviewButtonText = 'View Details';
+                        } elseif ($interviewStatus == 3) {
+                            $statusClass = 'blue-bg'; // Completed or other status
+                            $statusText = 'Cancelled';
+                            $interviewButtonText = 'Schedule Interview';
+                        } elseif ($interviewStatus == 0) {
+                            $statusText = 'Pending';
+                            $interviewButtonText = 'Schedule Interview';
+                        }
+                        
+                       
+                    @endphp
             <tr>
                 <td>{{ $applicants->firstItem() + $index }}</td>
                 <td>{{ $applicant->last_name }}</td>
@@ -28,23 +53,103 @@
                     </a>
                 </td>
                 
-                <td><span class="cmn-tbl-btn yellow-bg">{{ optional($applicant->interview)->interview_status ?? '-' }}</span></td>
+                {{-- <td><span class="cmn-tbl-btn yellow-bg">{{ optional($applicant->interview)->interview_status ?? '-' }}</span></td> --}}
+                <td>
+                    <span class="cmn-tbl-btn {{ $statusClass }}">{{ $statusText }}</span>
+                </td>
+
                 <td>{{optional($applicant->interview)->interview_mode ?? '-' }}</td>
                 <td>{{ optional($applicant->interview)->interview_date ? optional($applicant->interview)->interview_date->format('d/m/Y') : '-' }}</td>
                 <td>{{ optional($applicant->interview)->interview_time ?? '-' }}</td>
                 <td>{{ optional($applicant->interview)->interview_location ?? '-' }}</td>
                 <td>{{ optional($applicant->interview)->interview_link ?? '-' }}</td>
-                <td>
+                {{-- <td>
                    <a href="{{ route('applicant.schedule_interview', $applicant->id) }}" class="cmn-btn btn-sm"><img src="{{global_asset('backend/assets/images/calender-icon.svg')}}" alt="Image"> Schedule Interview</a>
+                </td> --}}
+
+                 <!-- Interview Action -->
+                <td>
+                   <a href="{{ route('applicant.schedule_interview', $applicant->id) }}"  class="cmn-btn btn-sm" >
+                       <img src="{{ global_asset('backend/assets/images/calender-icon.svg') }}" alt="Image"> 
+                       {{ $interviewButtonText }}
+                   </a>
                 </td>
-                <td><span class="cmn-tbl-btn yellow-bg">{{ $applicant->applicant_status ?? '-' }}</span></td>
+
+                {{-- <td><span class="cmn-tbl-btn yellow-bg">{{ $applicant->applicant_status ?? '-' }}</span></td> --}}
+                <td>
+                    @php
+                        $applicantStatus = $applicant->applicant_status?->value ?? '-';
+                        $applicantStatusClass = 'yellow-bg';
+                        $displayText = ucfirst($applicantStatus);
+
+                        if ($applicantStatus === 'accept') {
+                            $applicantStatusClass = 'green-bg';
+                            $displayText = 'Approved';
+                        } elseif ($applicantStatus === 'not_accepted') {
+                            $applicantStatusClass = 'red-bg';
+                            $displayText = 'Rejected';
+                        } elseif ($applicantStatus === 'pending') {
+                            $applicantStatusClass = 'yellow-bg';
+                            $displayText = 'Pending';
+                        }
+                    @endphp
+
+                    <span class="cmn-tbl-btn {{ $applicantStatusClass }}">
+                        {{ $displayText }}
+                    </span>
+
+                </td>
+
+                {{-- <td>
+                    <div class="actions-wrp">
+                        <button type="button"
+                          class="cmn-tbl-btn green-bg applicant-action-btn"
+                          data-id="{{ $applicant->id }}"
+                          data-action="approved">
+                          <i class="fa-solid fa-check"></i> Approve
+                        </button>
+                        <button type="button" class="cmn-tbl-btn red-bg applicant-action-btn"
+                          data-id="{{ $applicant->id }}"
+                          data-action="rejected">
+                          <i class="fa-solid fa-xmark"></i> Reject
+                        </button>
+                    </div>
+                </td> --}}
 
                 <td>
                     <div class="actions-wrp">
-                        <button type="button" class="cmn-tbl-btn green-bg"><i class="fa-solid fa-check"></i> Approve</button>
-                        <button type="button" class="cmn-tbl-btn red-bg"><i class="fa-solid fa-xmark"></i> Reject</button>
+                        @if ($applicantStatus === 'accept' || $applicantStatus === 'not_accepted')
+                            {{-- If status is already approved or rejected, show greyed-out buttons --}}
+                            <button type="button"
+                                class="cmn-tbl-btn gray-bg"
+                                disabled>
+                                <i class="fa-solid fa-check"></i> Approve
+                            </button>
+
+                            <button type="button"
+                                class="cmn-tbl-btn gray-bg"
+                                disabled>
+                                <i class="fa-solid fa-xmark"></i> Reject
+                            </button>
+                        @else
+                            {{-- Active buttons when pending --}}
+                            <button type="button"
+                                class="cmn-tbl-btn green-bg applicant-action-btn"
+                                data-id="{{ $applicant->id }}"
+                                data-action="approved">
+                                <i class="fa-solid fa-check"></i> Approve
+                            </button>
+
+                            <button type="button"
+                                class="cmn-tbl-btn red-bg applicant-action-btn"
+                                data-id="{{ $applicant->id }}"
+                                data-action="rejected">
+                                <i class="fa-solid fa-xmark"></i> Reject
+                            </button>
+                        @endif
                     </div>
                 </td>
+
             </tr>
             @empty
             <tr><td colspan="9">No Applicants Found</td></tr>
