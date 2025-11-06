@@ -105,7 +105,7 @@ class ReportManagementController extends Controller
     public function applicantReport()
     {
         $data = $this->getFilterOption();
-        return view('backend.report.applicant-report', compact('data'));
+        return view('backend.report.applicant_report.applicant-report', compact('data'));
     }
 
     public function tuitionReport()

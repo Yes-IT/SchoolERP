@@ -28,12 +28,12 @@
                 </a>
             </li>
 
-            <li class="{{ request()->routeIs('applicant.registration') ? 'active' : '' }}">
+            {{-- <li class="{{ request()->routeIs('applicant.registration') ? 'active' : '' }}">
                 <a href="{{ route('applicant.registration') }}">
                     <img src="{{ asset('student/images/sidebar-icon-4.svg') }}" alt="Sidebar Icon">
                     Registration Form
                 </a>
-            </li>
+            </li> --}}
 
             <li>
                 <a href="{{ route('logout') }}"
@@ -49,3 +49,43 @@
 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
     @csrf
 </form>
+@push('page_script')
+ 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Find the search form in the dashboard body
+        const searchForm = document.querySelector('.dsbdy-search-form');
+ 
+        if (searchForm) {
+            searchForm.addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent the form from submitting traditionally
+ 
+                const searchInput = searchForm.querySelector('input[type="text"]');
+                const query = searchInput.value.trim().toLowerCase();
+ 
+                if (!query) {
+                    return; // Do nothing if search is empty
+                }
+ 
+                // Get all sidebar links
+                const sidebarLinks = document.querySelectorAll('.sidebar-body ul li a');
+                let found = false;
+ 
+                for (const link of sidebarLinks) {
+                    const linkText = link.textContent.trim().toLowerCase();
+                    // Check if the link's text includes the search query
+                    if (linkText.includes(query)) {
+                        window.location.href = link.href; // Redirect to the found page
+                        found = true;
+                        break; // Stop after finding the first match
+                    }
+                }
+ 
+                if (!found) {
+                    alert('No page found matching your search.');
+                }
+            });
+        }
+    });
+</script>
+@endpush
