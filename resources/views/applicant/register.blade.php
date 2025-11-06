@@ -48,30 +48,37 @@
                             </div>
                             <div class="login-panel">
                                 <h2 class="login-heading">Create Account</h2>
-                                <form id="login-form" method="post" action="{{ route('register') }}"
+                                <form id="login-form" method="post" action="{{ route('register_applicant') }}"
                                     enctype="multipart/form-data">
                                     @csrf
                                     <div class="input-group">
-                                        <input type="text" id="name" name="ma,e" placeholder="Full Name *"
-                                            required />
+                                        <input type="text" id="name" name="name" placeholder="Full Name *" required />
+                                        @error('name')
+                                            <div class="text-danger mt-1 small">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                     <div class="input-group">
                                         <input type="email" id="email" name="email"
                                             placeholder="Email Address *" required />
+                                        @error('email')
+                                            <div class="text-danger mt-1 small">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                     <div class="input-group password-wrapper">
                                         <input type="password" class="password-field" id="password" name="password"
                                             placeholder="Password *" required />
-                                        <button type="button" aria-label="Show or hide password"
-                                            class="toggle-password-visibility">
+                                        <button type="button" class="toggle-password-visibility">
                                             <img src="{{ asset('student/images/eye-close.svg') }}" alt="Icon">
                                         </button>
+                                        @error('password')
+                                            <div class="text-danger mt-1 small">{{ $message }}</div>
+                                        @enderror
                                     </div>
+
                                     <div class="input-group password-wrapper">
-                                        <input type="password" class="password-field" id="password" name="password"
+                                        <input type="password" class="password-field" id="password_confirmation" name="password_confirmation"
                                             placeholder="Confirm Password *" required />
-                                        <button type="button" aria-label="Show or hide password"
-                                            class="toggle-password-visibility">
+                                        <button type="button" class="toggle-password-visibility">
                                             <img src="{{ asset('student/images/eye-close.svg') }}" alt="Icon">
                                         </button>
                                     </div>
@@ -110,9 +117,61 @@
         </div>
     </div>
 
+    <!-- modal -->
+    <div class="modal fade show" id="lms_view_modal2" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center p-4">
+                <div id="modalStatusIcon" class="mb-3">
+                    <img src="{{ asset('images/okay.png') }}" alt="Success" width="60">
+                </div>
+                <h4 id="modalStatusTitle" class="modal-title mb-2">Success!</h4>
+                <p id="modalStatusMessage" class="text-muted">
+                    Your Account has been created successfully!
+                </p>
+
+                <div class="mt-4">
+                    <button type="button" class="cmn-btn btn-sm back-btn" data-bs-dismiss="modal">
+                        Okay
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Jquery-->
-   
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        @if (session('success'))
+            const modalEl = document.getElementById('lms_view_modal2');
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+
+            // Redirect on "Okay" click
+            modalEl.querySelector('.back-btn').addEventListener('click', () => {
+                window.location.href = "{{ route('applicant.login') }}";
+            });
+        @endif
+    });
+
+    document.querySelectorAll('.toggle-password-visibility').forEach(button => {
+        button.addEventListener('click', () => {
+            const input = button.closest('.password-wrapper').querySelector('.password-field');
+            const icon = button.querySelector('img');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.src = "{{ asset('student/images/eye-open.svg') }}"; // 👁 show icon
+            } else {
+                input.type = 'password';
+                icon.src = "{{ asset('student/images/eye-close.svg') }}"; // 👁‍🗨 hide icon
+            }
+        });
+    });
+</script>   
 </body>
+
 
 </html>

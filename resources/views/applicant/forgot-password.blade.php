@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=0">
-    <title>School Management System | Login</title>
+    <title>School Management System | Forgot Password</title>
 
     <!-- fabicon -->
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
@@ -27,64 +27,54 @@
     <!-- bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="{{ asset('student/css/style.css') }}">
+    <link rel="stylesheet" href="{{asset('student/css/style.css')}}">
+    <style>
+        label.error {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            display: block;
+        }
+    </style>
 </head>
 
 <body>
     <div class="login-flow has-texture">
         <div class="container">
             <div class="textures">
-                <img src="{{ asset('student/images/login-flow-shape-1.png') }}" alt="Image"
-                    class="texture-1 texture">
-                <img src="{{ asset('student/images/login-flow-shape-2.png') }}" alt="Image"
-                    class="texture-2 texture">
+                <img src="{{asset('student/images/login-flow-shape-1.png')}}" alt="Image" class="texture-1 texture">
+                <img src="{{asset('student/images/login-flow-shape-2.png')}}" alt="Image" class="texture-2 texture">
             </div>
             <div class="login-flow-inr">
                 <div class="row">
                     <div class="login-flow-left-wrp col-lg-6">
                         <div class="login-panel-outer">
                             <div class="logo">
-                                <img src="{{ asset('student/images/logo.png') }}" alt="Logo">
+                                <img src="{{asset('student/images/logo.png')}}" alt="Logo">
                             </div>
                             <div class="login-panel">
-                                <h2 class="login-heading">User Login</h2>
-                                <form id="login-form" method="post" action="{{ route('login.auth') }}"
-                                    enctype="multipart/form-data">
+                                <h2 class="login-heading">Forgot Password</h2>
+                                <form id="login-form" novalidate>
                                     @csrf
                                     <div class="input-group">
-                                        <input type="email" id="email" name="email"
-                                            placeholder="Email Address *" required />
+                                        <input type="email" id="email" name="email" placeholder="Email Address *"
+                                            required/>
+                                        <!-- message placeholder -->
+                                        <p id="otp-send-message" style="display:none; color:green; font-size:14px; margin-top:10px;"></p>
                                     </div>
-                                    <div class="input-group password-wrapper">
-                                        <input type="password" class="password-field" id="password" name="password"
-                                            placeholder="Password *" required />
-                                        <button type="button" aria-label="Show or hide password"
-                                            class="toggle-password-visibility">
-                                            <img src="{{ asset('student/images/eye-close.svg') }}" alt="Icon">
-                                        </button>
-                                    </div>
-                                    <p class="forgot-password">
-                                        <a href="{{ route('applicant-forgot-password')}}">Forgot your password?</a>
-                                    </p>
                                     <button type="submit" class="btn-submit">Submit <i
                                             class="fa-solid fa-arrow-right"></i></button>
                                 </form>
-
-                                <p class="forgot-password">
-                                    New here?<a href="{{ route('applicant.register')}}">Create an Account</a>
-                                </p>
-
-                                
                             </div>
                         </div>
                     </div>
                     <div class="login-right-wrp col-lg-6">
                         <div class="login-flow-right">
                             <div class="lfr-logo-cover">
-                                <img src="{{ asset('student/images/login-flow-texture-sm-1.svg') }}" alt="Image"
+                                <img src="{{asset('student/images/login-flow-texture-sm-1.svg')}}" alt="Image"
                                     class="login-lg-cover-texture">
                                 <div class="lfr-logo">
-                                    <img src="{{ asset('student/images/logo.png') }}" alt="Logo">
+                                    <img src="{{asset('student/images/logo.png')}}" alt="Logo">
                                 </div>
                             </div>
                         </div>
@@ -97,24 +87,78 @@
                         Hakerem Yerushalayim</p>
                 </div>
                 <div class="company-contact">Phone Number: <a href="tel:+972026300900">+972 02-630-0900</a> <span
-                        class="txt-primary"></span>/ ADSL #:</span> <a href="tel:8452620020">845-262-0020</a></div>
+                        class="txt-primary">/ ADSL #:</span> <a href="tel:8452620020">845-262-0020</a></div>
                 <div class="company-email">Email: <a href="mailto:office@meohr.org">office@meohr.org</a></div>
             </div>
         </div>
     </div>
-
 
     <!-- Jquery-->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+
     <script
         src="https://cdn.jsdelivr.net/npm/@splidejs/splide-extension-auto-scroll@0.5.3/dist/js/splide-extension-auto-scroll.min.js">
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
 
-    <script src="{{ asset('student/js/common.js') }}"></script>
+    <script src="{{asset('student/js/common.js')}}"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Apply validation rules
+            $('#login-form').validate({
+                rules: {
+                    email: {
+                        required: true,
+                        email: true
+                    }
+                },
+                messages: {
+                    email: {
+                        required: "Please enter email",
+                        email: "Please enter a valid email"
+                    }
+                }
+            });
+
+            // Handle form submit with AJAX
+            $('#login-form').on('submit', function (event) {
+                event.preventDefault();
+
+                // Check if form is valid
+                if (!$(this).valid()) {
+                    return false;
+                }
+
+                //Show message immediately when button is clicked
+                $("#otp-send-message")
+                    .text("Sending OTP... ⏳")
+                    .css("color","blue")
+                    .fadeIn();
+
+                // AJAX request
+                $.ajax({
+                    url: "{{ route('applicant-send-otp') }}",
+                    type: "POST",
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.status === "success") {
+                            window.location.href = "{{ route('applicant-verify-otp') }}";
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error:", error);
+                        alert("Something went wrong. Please try again.");
+                    }
+                });
+            });
+        });
+    </script>
+
 
 </body>
 

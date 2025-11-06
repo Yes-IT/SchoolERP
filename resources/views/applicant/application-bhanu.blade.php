@@ -2,34 +2,6 @@
 
 @section('content')
     <style>
-        .upload-box {
-            border: 2px dashed #007bff;
-            border-radius: 10px;
-            padding: 40px;
-            text-align: center;
-            color: #555;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .upload-box.dragover {
-            background-color: #f0f8ff;
-            border-color: #0056b3;
-            color: #0056b3;
-        }
-
-        /* Make input cover the box but invisible */
-        .upload-box input[type="file"] {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-        }
-
         .signature-area {
             position: relative;
             /* required for ::after */
@@ -71,13 +43,13 @@
             background: #0056b3;
         }
     </style>
-    <form action="{{ route('applicant.application.form.save') }}" id="application" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('applicant.application.form.save.bhanu') }}" id="application" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="dashboard-body dspr-body-outer">
             @include('applicant.partials.header')
 
             <div class="ds-breadcrumb">
-                <h1> Application</h1>
+                <h1> Application Bhanu</h1>
                 <ul>
                     <li><a href="./process.html">Dashboard</a> /</li>
                     <li>Application</li>
@@ -188,7 +160,7 @@
                                         address.
                                         If you don’t see an option that looks correct for you, please let us know.
                                     </label>
-
+                                   
                                     <select class="w-50" name="interview_city">
                                         <option value="">-Select a city-</option>
                                         @foreach ($data['cities'] as $city)
@@ -718,37 +690,23 @@
                                         </p>
                                     </div>
                                 </div>
+
+
+                                
                                 <div class="input-grp" id="school_office_mail_box" style="display:none;">
                                     <label>School office email address*</label>
-                                    <label>We will email your school to with a form to upload your letters/records. Please
-                                        check with your school for the correct email address for the person who can upload
-                                        this information.</label>
+                                    <label>We will email your school to with a form to upload your letters/records. Please check with your school for the correct email address for the person who can upload this information.</label>
                                     <input type="text" name="address" placeholder="Enter Address"
                                         value="{{ old('address', isset($data['applicant']) ? $data['applicant']->address : '') }}">
                                 </div>
+
                                 <h4 class="txt-primary cmn-accr-head">Please upload a photo of yourself *</h4>
                                 <h4 class="txt-primary cmn-accr-head">
                                     Picture must be in color. You will be able to crop and resize your photo after
-                                    uploading. Please center it on your face. JPEG/JPG format required.
+                                    uploading.
+                                    Please center it on your face. JPEG/JPG format required.
                                 </h4>
-
-                                <!-- Upload Box -->
-                                <div class="upload-box" id="uploadBox">
-                                    <p>Click to browse or drag & drop your photo here</p>
-                                    <input type="file" id="photoInput" name="upload"
-                                        accept=".jpg,.jpeg,image/jpeg,image/jpg">
-                                </div>
-
-                                <!-- Preview -->
-                                <div id="previewContainer"
-                                    style="margin-top:10px; {{ empty($data['upload'] ?? null) ? 'display:none;' : '' }}">
-                                    @if (!empty($data['upload']))
-                                        <img id="previewImage" src="{{ asset($data['upload']) }}" alt="Preview"
-                                            style="max-width:200px; border-radius:8px; border:1px solid #ccc;">
-                                    @endif
-                                </div>
-
-
+                                <button class="cmn-suggestion-btn">Click to browse or drag and drop your files</button>
 
                             </div>
                         </div>
@@ -1396,7 +1354,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const form = document.getElementById('application');
-            const saveUrl = "{{ route('applicant.application.form.save') }}";
+            const saveUrl = "{{ route('applicant.application.form.save.bhanu') }}";
 
             function saveFormData() {
                 const formData = new FormData(form);
@@ -1415,8 +1373,8 @@
                     Application_Information_cell: formData.get('cell')?.trim(),
                     Family_marital_status: formData.get('maritalStatus')?.trim(),
                     Family_sibling: formData.get('sibling')?.trim(),
-                    Current_school: formData.get('school')?.trim(),
-                    School_phone: formData.get('s_tel')?.trim(),
+                    School_current_school: formData.get('school')?.trim(),
+                    School_school_phone: formData.get('s_tel')?.trim(),
                     School_grade: formData.get('grade')?.trim(),
                     School_advisor_name: formData.get('advisor_name')?.trim(),
                     School_email_address: formData.get('email_address')?.trim(),
@@ -1582,10 +1540,11 @@
                         const box = document.getElementById(section.box);
                         if (this.value === 'self') {
                             box.style.display = 'block';
-                        } else {
+                        } 
+                        else {
                             box.style.display = 'none';
                         }
-
+                        
                         toggleSchoolBox();
                     });
                 });
@@ -1801,54 +1760,6 @@
                     signatureArea2.style.display = showingCanvas ? "none" : "block";
                     signaturePreview2.style.display = showingCanvas ? "block" : "none";
                 });
-            }
-        });
-    </script>
-    {{-- photo upload script --}}
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const uploadBox = document.getElementById('uploadBox');
-            const fileInput = document.getElementById('photoInput');
-            const previewContainer = document.getElementById('previewContainer');
-            const previewImage = document.getElementById('previewImage');
-
-            // Make the entire box clickable
-            uploadBox.addEventListener('click', () => fileInput.click());
-
-            // Handle manual file selection
-            fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
-
-            // Drag over
-            uploadBox.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadBox.classList.add('dragover');
-            });
-
-            // Drag leave
-            uploadBox.addEventListener('dragleave', () => {
-                uploadBox.classList.remove('dragover');
-            });
-
-            // Drop file
-            uploadBox.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadBox.classList.remove('dragover');
-                handleFiles(e.dataTransfer.files);
-            });
-
-            // Function to handle uploaded files
-            function handleFiles(files) {
-                const file = files[0];
-                if (file && file.type.match('image.*')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        previewImage.src = e.target.result;
-                        previewContainer.style.display = 'block';
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    alert('Please upload a valid JPG or JPEG image.');
-                }
             }
         });
     </script>
