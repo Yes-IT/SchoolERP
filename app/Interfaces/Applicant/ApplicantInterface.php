@@ -12,5 +12,5 @@ interface ApplicantInterface
     public function getSlotsBetween($date, $startTime, $endTime);
     public function saveInterviewSchedule($data);
     public function getSlotsForWeek($startDate, $endDate);
-    
+    public function updateInterviewSchedule($data);
 }

@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         $("#btn-apply").on("click", (e) => {
             e.preventDefault();
-            alert("You picked: " + rangeDisp.text());
+            // alert("You picked: " + rangeDisp.text());
         });
         yearSel.val(currentY);
         monthSel.val(now.getMonth());

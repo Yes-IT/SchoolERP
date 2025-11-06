@@ -516,13 +516,14 @@
 
 @push('script')
 <script>
+
 $(document).ready(function() {
     $('#btn-apply').on('click', function() {
         const year  = $('#year-select').val();
-       const month = parseInt($('#month-select').val()) + 1;
+        const month = $('#month-select').val(); 
         const week  = $('#week-select').val();
 
-        console.log(year, month, week);
+        console.log('Filter parameters:', { year, month, week });
 
         if (!year || !month || !week) {
             alert('Please select year, month, and week.');
@@ -535,11 +536,11 @@ $(document).ready(function() {
             data: {
                 _token: "{{ csrf_token() }}",
                 year: year,
-                month: month,
+                month: month, 
                 week: week
             },
             success: function(response) {
-                console.log(response);
+                console.log('AJAX response:', response);
                 if (response.html && $.trim(response.html) !== '') {
                     $('#calendar-table-body').html(response.html);
                 } else {
@@ -548,6 +549,7 @@ $(document).ready(function() {
             },
             error: function(xhr, status, error) {
                 console.error('Error fetching slots:', error);
+                console.error('Response text:', xhr.responseText);
                 alert('Failed to load slots. Please try again.');
             }
         });

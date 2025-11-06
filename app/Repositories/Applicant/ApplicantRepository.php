@@ -17,7 +17,8 @@ class ApplicantRepository implements ApplicantInterface
 
     public function getAllApplicants($search = null, $perPage = 5)
     {
-        $query = Applicant::with(['parents', 'interview']);
+        $query = Applicant::with(['parents', 'interview'])
+                  ->orderBy('id', 'desc');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -236,70 +237,88 @@ class ApplicantRepository implements ApplicantInterface
 
    
 
-    public function getSlotsBetween($date, $startTime, $endTime)
+    // public function getSlotsBetween($date, $startTime, $endTime)
+    // {
+    //     return ApplicationProcessing::whereDate('interview_date', $date)
+    //         ->where(function ($query) use ($startTime, $endTime) {
+    //             $query->where(function ($q) use ($startTime, $endTime) {
+    //                 $q->where('start_time', '<', $endTime)
+    //                 ->where('end_time', '>', $startTime);
+    //             });
+    //         })
+    //         ->get(['id', 'applicant_id', 'interview_date', 'start_time', 'end_time', 'interview_mode', 'interview_location', 'interview_link']);
+    // }
+
+    public function getSlotsBetween($date, $startTime, $endTime, $interviewMode = null)
     {
-        return ApplicationProcessing::whereDate('interview_date', $date)
+        $query = ApplicationProcessing::whereDate('interview_date', $date)
             ->where(function ($query) use ($startTime, $endTime) {
                 $query->where(function ($q) use ($startTime, $endTime) {
                     $q->where('start_time', '<', $endTime)
                     ->where('end_time', '>', $startTime);
                 });
-            })
-            ->get(['id', 'applicant_id', 'interview_date', 'start_time', 'end_time', 'interview_mode', 'interview_location', 'interview_link']);
+            });
+
+        // Filter by interview mode if provided
+        if ($interviewMode) {
+            $query->where('interview_mode', $interviewMode);
+        }
+
+        return $query->get(['id', 'applicant_id', 'interview_date', 'start_time', 'end_time', 'interview_mode', 'interview_location', 'interview_link']);
     }
 
-    // public function getSlotsForWeek($year, $month, $week)
+   
+    // public function getSlotsForWeek($startDate, $endDate)
     // {
-    //     $startOfMonth = Carbon::createFromDate($year, $month, 1)->startOfWeek(Carbon::MONDAY);
-    //     $endOfMonth = Carbon::createFromDate($year, $month, 1)->endOfMonth()->endOfWeek(Carbon::SUNDAY);
-
-    //     $weeks = collect();
-    //     $currentStart = $startOfMonth->copy();
-
-    //     while ($currentStart->lte($endOfMonth)) {
-    //         $weeks->push([
-    //             'start' => $currentStart->copy(),
-    //             'end'   => $currentStart->copy()->endOfWeek(Carbon::SUNDAY),
-    //         ]);
-    //         $currentStart->addWeek();
-    //     }
-
-    //     $selectedWeek = $weeks[$week - 1] ?? null;
-    //     if (!$selectedWeek) {
-    //         return [collect(), null, null];
-    //     }
-
-    //     $startDate = $selectedWeek['start'];
-    //     $endDate = $selectedWeek['end'];
-
     //     $daysToShow = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Sunday'];
 
-    //     $slots = ApplicationProcessing::whereBetween('interview_date', [$startDate, $endDate])
-    //         ->get()
-    //         ->filter(fn($slot) => in_array(Carbon::parse($slot->interview_date)->format('l'), $daysToShow));
+    //     // Convert to UTC range for database query
+    //     $startUtc = $startDate->copy()->startOfDay()->setTimezone('UTC');
+    //     $endUtc   = $endDate->copy()->endOfDay()->setTimezone('UTC');
 
-    //     return [$slots, $startDate, $endDate];
+    //     $slots = ApplicationProcessing::whereBetween('interview_date', [$startUtc, $endUtc])->get();
+
+    //     Log::info('Slots query range (UTC)', [
+    //         'startUtc' => $startUtc->toDateTimeString(),
+    //         'endUtc' => $endUtc->toDateTimeString(),
+    //         'count' => $slots->count(),
+    //     ]);
+
+    //     return $slots->filter(fn($slot) => in_array(Carbon::parse($slot->interview_date)->format('l'), $daysToShow));
     // }
 
     public function getSlotsForWeek($startDate, $endDate)
     {
         $daysToShow = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Sunday'];
 
-        // Convert to UTC range for database query
-        $startUtc = $startDate->copy()->startOfDay()->setTimezone('UTC');
-        $endUtc   = $endDate->copy()->endOfDay()->setTimezone('UTC');
+       
+        $slots = ApplicationProcessing::whereBetween('interview_date', [
+            $startDate->startOfDay(), 
+            $endDate->endOfDay()
+        ])->get();
 
-        $slots = ApplicationProcessing::whereBetween('interview_date', [$startUtc, $endUtc])->get();
-
-        Log::info('Slots query range (UTC)', [
-            'startUtc' => $startUtc->toDateTimeString(),
-            'endUtc' => $endUtc->toDateTimeString(),
+        Log::info('Slots query range', [
+            'start' => $startDate->toDateTimeString(),
+            'end' => $endDate->toDateTimeString(),
             'count' => $slots->count(),
+            'slots_dates' => $slots->pluck('interview_date')->toArray()
         ]);
 
-        return $slots->filter(fn($slot) => in_array(Carbon::parse($slot->interview_date)->format('l'), $daysToShow));
+        return $slots->filter(function($slot) use ($daysToShow) {
+            $slotDay = Carbon::parse($slot->interview_date)->format('l');
+            $isIncluded = in_array($slotDay, $daysToShow);
+            
+            if (!$isIncluded) {
+                Log::info('Slot filtered out due to day', [
+                    'slot_date' => $slot->interview_date,
+                    'slot_day' => $slotDay,
+                    'allowed_days' => $daysToShow
+                ]);
+            }
+            
+            return $isIncluded;
+        });
     }
-
 
     public function saveInterviewSchedule($data)
     {
@@ -322,6 +341,27 @@ class ApplicantRepository implements ApplicantInterface
         );
     }
 
+
+    public function updateInterviewSchedule($data)
+    {
+        Log::info('Updating interview schedule', ['data' => $data]);
+
+        $formattedTime = date('h:i A', strtotime($data['start_time'])) . ' - ' . date('h:i A', strtotime($data['end_time']));
+
+        return ApplicationProcessing::updateOrCreate(
+            ['applicant_id' => $data['applicant_id']],
+            [
+                'interview_mode'     => $data['interview_mode'],
+                'interview_date'     => $data['interview_date'],
+                'start_time'         => $data['start_time'],
+                'end_time'           => $data['end_time'],
+                'interview_time'     => $formattedTime,
+                'interview_location' => $data['interview_location'] ?? null,
+                'interview_link'     => $data['interview_link'] ?? null,
+                'interview_status'   => 2, // 2 = Rescheduled
+            ]
+        );
+    }
 
 
 }

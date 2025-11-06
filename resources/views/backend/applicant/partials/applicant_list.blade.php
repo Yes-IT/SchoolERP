@@ -30,7 +30,7 @@
                             $interviewButtonText = 'Reschedule Interview';
                         } elseif ($interviewStatus == 2) {
                             $statusClass = 'red-bg'; // rescheduled or other status
-                            $statusText = 'Completed';
+                            $statusText = 'Rescheduled';
                             $interviewButtonText = 'View Details';
                         } elseif ($interviewStatus == 3) {
                             $statusClass = 'blue-bg'; // Completed or other status
@@ -68,11 +68,37 @@
                 </td> --}}
 
                  <!-- Interview Action -->
-                <td>
+                {{-- <td>
                    <a href="{{ route('applicant.schedule_interview', $applicant->id) }}"  class="cmn-btn btn-sm" >
                        <img src="{{ global_asset('backend/assets/images/calender-icon.svg') }}" alt="Image"> 
                        {{ $interviewButtonText }}
                    </a>
+                </td> --}}
+                <!-- Interview Action -->
+                <td>
+                    @if(in_array($interviewStatus, [0, 1, 2])) {{-- Pending, Scheduled, or Rescheduled --}}
+                        @if($interviewStatus == 0) {{-- Pending --}}
+                            <a href="{{ route('applicant.schedule_interview', $applicant->id) }}" class="cmn-btn btn-sm">
+                                <img src="{{ global_asset('backend/assets/images/calender-icon.svg') }}" alt="Image"> 
+                                Schedule Interview
+                            </a>
+                        @else {{-- Scheduled (1) or Rescheduled (2) --}}
+                            <a href="{{ route('applicant.reschedule_interview', $applicant->id) }}" class="cmn-btn btn-sm">
+                                <img src="{{ global_asset('backend/assets/images/calender-icon.svg') }}" alt="Image"> 
+                                Reschedule Interview
+                            </a>
+                        @endif
+                    @elseif($interviewStatus == 3) {{-- Completed --}}
+                        <button class="cmn-btn btn-sm gray-bg" disabled>
+                            <img src="{{ global_asset('backend/assets/images/eye-white.svg') }}" alt="View Icon"> 
+                            Completed
+                        </button>
+                    @else
+                        <a href="{{ route('applicant.schedule_interview', $applicant->id) }}" class="cmn-btn btn-sm">
+                            <img src="{{ global_asset('backend/assets/images/calender-icon.svg') }}" alt="Image"> 
+                            Schedule Interview
+                        </a>
+                    @endif
                 </td>
 
                 {{-- <td><span class="cmn-tbl-btn yellow-bg">{{ $applicant->applicant_status ?? '-' }}</span></td> --}}

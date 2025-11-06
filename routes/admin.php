@@ -216,8 +216,14 @@ Route::middleware(saasMiddleware())->group(function () {
 
                     //interview
                     Route::get('/schedule-interview/{id}', 'schedule_interview')->name('applicant.schedule_interview')->middleware('PermissionCheck:applicant_read');
+                    Route::get('/reschedule-interview/{id}','reschedule_interview')->name('applicant.reschedule_interview')->middleware('PermissionCheck:applicant_read');
+                    Route::post('/update-interview-slot', 'update_interview_slot')->name('applicant.update_interview_slot');
+
+
                     Route::post('/fetch-interview-slots', 'fetch_interview_slots')->name('applicant.fetch_interview_slots');
                     Route::post('/assign-interview-slot', 'assign_interview_slot')->name('applicant.assign_interview_slot');
+                    
+
 
                     // Route::post('/interview_store',  'store_schedule_interview')->name('applicant.store_schedule_interview');
 

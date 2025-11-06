@@ -10,11 +10,14 @@ use Illuminate\Support\Facades\{DB,Log};
 use App\Models\Applicant\{Applicant,ApplicantParent,ApplicationProcessing,ApplicantCamps,ApplicantCheckList};
 use Carbon\Carbon;
 use App\Enums\ApplicantStatus;
+use App\Traits\ReturnFormatTrait;
+
 
 
 
 class ApplicantController extends Controller
 {
+    use ReturnFormatTrait;
     protected $applicantrepository;
 
     public function __construct(ApplicantInterface $applicantrepository){
@@ -24,29 +27,6 @@ class ApplicantController extends Controller
     public function dashboard(){
         return view('backend.applicant.dashboard');
     }
-
-    
-    // public function student_application_form(Request $request)
-    // {
-    //     $query = Applicant::with(['parents','interview']);
-
-    //     if ($request->has('search') && $request->search) {
-    //         $query->where('first_name', 'like', "%{$request->search}%")
-    //             ->orWhere('last_name', 'like', "%{$request->search}%");
-    //     }
-
-    //     $perPage = $request->get('per_page', 5);
-    //     $applicants = $query->paginate($perPage);
-
-    //     // Log::info('Applicants', ['applicants' => $applicants]);
-
-    //     if ($request->ajax()) {
-    //         $html = view('backend.applicant.partials.table', compact('applicants'))->render();
-    //         return response()->json(['html' => $html]);
-    //     }
-
-    //     return view('backend.applicant.index', compact('applicants'));
-    // }
 
     public function student_application_form(Request $request)
     {
@@ -119,8 +99,6 @@ class ApplicantController extends Controller
     }
 
 
-
-
    public function application_form(){
        return view('backend.applicant.application_form');
    }
@@ -154,8 +132,6 @@ class ApplicantController extends Controller
                 $startOfWeek = now()->startOfWeek();
                 $endOfWeek   = now()->endOfWeek();
 
-               
-
                 // Fetch all booked slots within this week
                 $slots = ApplicationProcessing::whereBetween('interview_date', [$startOfWeek, $endOfWeek])
                     ->get();
@@ -186,6 +162,46 @@ class ApplicantController extends Controller
         }
     }
 
+    // public function calendar_filter_slots(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'year' => 'required|integer',
+    //         'month' => 'required|integer',
+    //         'week' => 'required|string', 
+    //     ]);
+
+    //     try {
+    //         // Split week range
+    //         [$startDay, $endDay] = explode('-', $validated['week']);
+    //         $startDay = (int) $startDay;
+    //         $endDay = (int) $endDay;
+
+    //         // Generate date range
+    //         $startDate = Carbon::createFromDate($validated['year'], $validated['month'], $startDay);
+    //         $endDate   = Carbon::createFromDate($validated['year'], $validated['month'], $endDay);
+
+    //         Log::info('Filtering calendar slots', [
+    //             'range' => [$startDate->toDateString(), $endDate->toDateString()],
+    //         ]);
+
+    //         // Fetch slots from repository
+    //         $slots = $this->applicantrepository->getSlotsForWeek($startDate, $endDate);
+    //         Log::info('Filtered slots in calendar filter slots', ['slots' => $slots]);
+
+    //         $html = view('backend.applicant.partials.calendar-slots', [
+    //             'slots' => $slots,
+    //             'startOfWeek' => $startDate,
+    //             'endOfWeek' => $endDate,
+    //         ])->render();
+
+    //         return response()->json(['html' => $html]);
+
+    //     } catch (\Throwable $e) {
+    //         Log::error('Error in calendar_filter_slots: ' . $e->getMessage());
+    //         return response()->json(['error' => 'Invalid week range format.'], 400);
+    //     }
+    // }
+
     public function calendar_filter_slots(Request $request)
     {
         $validated = $request->validate([
@@ -195,27 +211,53 @@ class ApplicantController extends Controller
         ]);
 
         try {
-            // Split week range
+           
             [$startDay, $endDay] = explode('-', $validated['week']);
             $startDay = (int) $startDay;
             $endDay = (int) $endDay;
 
-            // Generate date range
-            $startDate = Carbon::createFromDate($validated['year'], $validated['month'], $startDay);
-            $endDate   = Carbon::createFromDate($validated['year'], $validated['month'], $endDay);
+            $carbonMonth = $validated['month'] + 1;
+
+            Log::info('Month conversion', [
+                'received_month' => $validated['month'],
+                'carbon_month' => $carbonMonth
+            ]);
+
+           
+            $startDate = Carbon::createFromDate($validated['year'], $carbonMonth, $startDay)->startOfDay();
+            $endDate   = Carbon::createFromDate($validated['year'], $carbonMonth, $endDay)->endOfDay();
 
             Log::info('Filtering calendar slots', [
+                'year' => $validated['year'],
+                'frontend_month' => $validated['month'],
+                'backend_month' => $carbonMonth,
+                'week' => $validated['week'],
                 'range' => [$startDate->toDateString(), $endDate->toDateString()],
             ]);
 
-            // Fetch slots from repository
             $slots = $this->applicantrepository->getSlotsForWeek($startDate, $endDate);
-            Log::info('Filtered slots in calendar filter slots', ['slots' => $slots]);
+            
+            Log::info('Final filtered slots', [
+                'slots_count' => $slots->count(),
+                'slots_dates' => $slots->pluck('interview_date')->toArray()
+            ]);
+
+            $timeSlots = [
+                ['start' => '10:00:00', 'end' => '10:59:59'],
+                ['start' => '11:00:00', 'end' => '11:59:59'],
+                ['start' => '12:00:00', 'end' => '12:59:59'],
+                ['start' => '13:00:00', 'end' => '13:59:59'],
+                ['start' => '14:00:00', 'end' => '14:59:59'],
+                ['start' => '15:00:00', 'end' => '15:59:59'],
+                ['start' => '16:00:00', 'end' => '16:59:59'],
+                ['start' => '17:00:00', 'end' => '17:59:59'],
+            ];
 
             $html = view('backend.applicant.partials.calendar-slots', [
                 'slots' => $slots,
                 'startOfWeek' => $startDate,
                 'endOfWeek' => $endDate,
+                'timeSlots' => $timeSlots
             ])->render();
 
             return response()->json(['html' => $html]);
@@ -226,17 +268,17 @@ class ApplicantController extends Controller
         }
     }
 
-    
-
-
     public function schedule_interview($id,Request $request)
     {
         try{ 
              $applicant = $this->applicantrepository->getApplicantById($id);
+             $isReschedule = false;
+             $existingInterview = null;
 
-            //  Log::info('Applicant details for scheduling interview', ['applicant' => $applicant]);
 
-             return view('backend.applicant.schedule_interview',compact('applicant'));
+             Log::info('Applicant details for scheduling interview', ['applicant' => $applicant]);
+
+             return view('backend.applicant.schedule_interview',compact('applicant', 'isReschedule', 'existingInterview'));
         } catch(\Exception $e){
            return redirect()->route('applicant.dashboard')->with('error', 'Failed to get applicant.');
         }
@@ -250,17 +292,31 @@ class ApplicantController extends Controller
                 'interview_date' => 'required|date',
                 'start_time' => 'required',
                 'end_time' => 'required',
+                'interview_mode' => 'sometimes|string'
             ]);
+
+            // Validate 1-hour duration for search as well
+            $start = strtotime($validated['start_time']);
+            $end = strtotime($validated['end_time']);
+            $duration = ($end - $start) / 3600;
+
+            if ($duration != 1) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Please select a time range of exactly 1 hour.'
+                ]);
+            }
 
             $slots = $this->applicantrepository->getSlotsBetween(
                 $validated['interview_date'],
                 $validated['start_time'],
-                $validated['end_time']
+                $validated['end_time'],
+                $validated['interview_mode'] ?? null
             );
 
-            Log::info('Available interview slots', ['slots' => $slots]);
+            // Log::info('Available interview slots', ['slots' => $slots]);
 
-            $html = view('backend.applicant.partials.available_slots', compact('slots'))->render();
+            $html = view('backend.applicant.partials.booked_slots', compact('slots'))->render();
 
             return response()->json([
                 'success' => true,
@@ -273,19 +329,13 @@ class ApplicantController extends Controller
         }
     }
 
-   
-
-  
-
     public function assign_interview_slot(Request $request)
     {
-        
-        try{
-
+        try {
             Log::info('request for assign interview slot', ['request' => $request->all()]);
 
-            $validated =  $request->validate([
-                'applicant_id'  => 'required|exists:applicants,id',
+            $validated = $request->validate([
+                'applicant_id' => 'required|exists:applicants,id',
                 'interview_mode' => 'required|in:online,offline',
                 'interview_date' => 'required|date',
                 'start_time' => 'required',
@@ -294,33 +344,120 @@ class ApplicantController extends Controller
                 'interview_location' => 'nullable|required_if:interview_mode,offline',
             ]);
 
-            // Extra validation: meeting_link required if online, location if offline
+            // Validate 1-hour duration
+            $start = strtotime($validated['start_time']);
+            $end = strtotime($validated['end_time']);
+            $duration = ($end - $start) / 3600;
+
+            if ($duration != 1) {
+                // return response()->json([
+                //     'success' => false,
+                //     'message' => 'Interview slot must be exactly 1 hour long.'
+                // ]);
+                return response()->json($this->responseWithError('Interview slot must be exactly 1 hour long.'));
+
+            }
+
             if ($validated['interview_mode'] === 'online' && empty($validated['interview_link'])) {
-                return response()->json(['success' => false, 'message' => 'Meeting link is required for online mode.']);
+                // return response()->json(['success' => false, 'message' => 'Meeting link is required for online mode.']);
+                return response()->json($this->responseWithError('Meeting link is required for online mode.'));
+
             }
 
             if ($validated['interview_mode'] === 'offline' && empty($validated['interview_location'])) {
-                return response()->json(['success' => false, 'message' => 'Interview location is required for offline mode.']);
+                // return response()->json(['success' => false, 'message' => 'Interview location is required for offline mode.']);
+                return response()->json($this->responseWithError('Interview location is required for offline mode.'));
+
             }
 
             $validated['interview_time'] = $request->start_time . ' - ' . $request->end_time;
 
             $this->applicantrepository->saveInterviewSchedule($validated);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Interview slot assigned successfully!'
-            ]);
-        } catch(\Exception $e){
+            // return response()->json([
+            //     'success' => true,
+            //     'message' => 'Interview slot assigned successfully!'
+            // ]);
+
+            return response()->json($this->responseWithSuccess('Interview slot assigned successfully!'));
+
+        } catch (\Exception $e) {
             Log::error('Failed to assign interview slot', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
-        }
+            // return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            return response()->json($this->responseWithError($e->getMessage()));
 
+        }
     }
 
+
+    public function reschedule_interview($id, Request $request)
+    {
+        try {
+            $applicant = $this->applicantrepository->getApplicantById($id);
+            $isReschedule = true;
+            $existingInterview = $applicant->interview;
+
+            Log::info('Applicant details for rescheduling interview', [
+                'applicant' => $applicant,
+                'existing_interview' => $existingInterview
+            ]);
+
+            return view('backend.applicant.schedule_interview', compact('applicant', 'isReschedule', 'existingInterview'));
+        } catch (\Exception $e) {
+            return redirect()->route('applicant.dashboard')->with('error', 'Failed to get applicant.');
+        }
+    }
+
+    public function update_interview_slot(Request $request)
+    {
+        try {
+            Log::info('request for update interview slot', ['request' => $request->all()]);
+
+            $validated = $request->validate([
+                'applicant_id' => 'required|exists:applicants,id',
+                'interview_mode' => 'required|in:online,offline',
+                'interview_date' => 'required|date',
+                'start_time' => 'required',
+                'end_time' => 'required',
+                'interview_link' => 'nullable|required_if:interview_mode,online',
+                'interview_location' => 'nullable|required_if:interview_mode,offline',
+            ]);
+
+            // Validate 1-hour duration (same as your existing validation)
+            $start = strtotime($validated['start_time']);
+            $end = strtotime($validated['end_time']);
+            $duration = ($end - $start) / 3600;
+
+            if ($duration != 1) {
+                return response()->json($this->responseWithError('Interview slot must be exactly 1 hour long.'));
+            }
+
+            if ($validated['interview_mode'] === 'online' && empty($validated['interview_link'])) {
+                return response()->json($this->responseWithError('Meeting link is required for online mode.'));
+            }
+
+            if ($validated['interview_mode'] === 'offline' && empty($validated['interview_location'])) {
+                return response()->json($this->responseWithError('Interview location is required for offline mode.'));
+            }
+
+            $validated['interview_time'] = $request->start_time . ' - ' . $request->end_time;
+
+            // Use repository to update interview with reschedule status
+            $this->applicantrepository->updateInterviewSchedule($validated);
+
+            return response()->json($this->responseWithSuccess('Interview rescheduled successfully!'));
+
+        } catch (\Exception $e) {
+            Log::error('Failed to update interview slot', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json($this->responseWithError($e->getMessage()));
+        }
+    }
 
     public function profile(){
         return view('backend.applicant.profile');

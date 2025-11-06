@@ -4,13 +4,18 @@
     {{ @$data['title'] }}
 @endsection
 
+
 @section('content')
            <div class="ds-breadcrumb">
-                <h1>Schedule Interview</h1>
+                {{-- <h1>Schedule Interview</h1> --}}
+                <h1>{{ $isReschedule ? 'Reschedule' : 'Schedule' }} Interview</h1>
+
                 <ul>
                     <li><a href="{{route('applicant.dashboard')}}">Dashboard</a> /</li>
                     <li><a href="{{route('applicant.student_application_form')}}">Student Application Forms</a> /</li>
-                    <li>Schedule Interview</li>
+                    {{-- <li>Schedule Interview</li> --}}
+                    <li>{{ $isReschedule ? 'Reschedule' : 'Schedule' }} Interview</li>
+
                 </ul>
             </div>
             <div class="ds-pr-body tab-wrapper">
@@ -28,6 +33,32 @@
                                 <p>{{$applicant->address}}</p>
                             </div>
                         </div>
+
+
+                        @if($isReschedule && $existingInterview)
+                            <div class="ds-cmn-details-cd-outer mt-3" style="border-top: 1px solid #ddd; padding-top: 15px;">
+                                <div class="ds-cmn-details-cd">
+                                    <h3>Current Interview:</h3>
+                                    <p>
+                                        {{ \Carbon\Carbon::parse($existingInterview->interview_date)->format('d/m/Y') }} 
+                                        at {{ $existingInterview->interview_time }}
+                                        ({{ ucfirst($existingInterview->interview_mode) }})
+                                    </p>
+                                </div>
+                                @if($existingInterview->interview_location)
+                                <div class="ds-cmn-details-cd">
+                                    <h3>Current Location:</h3>
+                                    <p>{{ $existingInterview->interview_location }}</p>
+                                </div>
+                                @endif
+                                @if($existingInterview->interview_link)
+                                <div class="ds-cmn-details-cd">
+                                    <h3>Current Meeting Link:</h3>
+                                    <p>{{ $existingInterview->interview_link }}</p>
+                                </div>
+                                @endif
+                            </div>
+                        @endif
                     </div>
 
                    <form id="searchSlotsForm">
@@ -37,21 +68,25 @@
                                 <div class="multi-input-grp grp-3">
                                     <div class="input-grp">
                                         <label for="examDate">Select Date</label>
-                                        <input type="date" name="interview_date" id="interview_date" >
+                                        <input type="date" name="interview_date" id="interview_date" 
+                                           value="{{ $isReschedule && $existingInterview ? \Carbon\Carbon::parse($existingInterview->interview_date)->format('Y-m-d') : '' }}">
                                     </div>
                                     <div class="input-grp">
                                         <label for="examTime">Start Time</label>
-                                        <input type="time" name="start_time" id="interview_start_time"  >
+                                        <input type="time" name="start_time" id="interview_start_time"
+                                          value="{{ $isReschedule && $existingInterview ? $existingInterview->start_time : '' }}">
                                     </div>
 
                                     <div class="input-grp">
                                         <label for="endTime">End Time</label>
-                                        <input type="time" name="end_time" id="interview_end_time">
+                                        <input type="time" name="end_time" id="interview_end_time"
+                                        value="{{ $isReschedule && $existingInterview ? $existingInterview->end_time : '' }}">
                                     </div>
                                 </div>
                                 <div class="action-wrp">
                                     {{-- <input type="submit" value="Search"> --}}
-                                   <button type="submit" class="cmn-btn">Search</button>
+                                  
+                                   <button type="submit" class="cmn-btn ">Search</button>
                                 </div>
                             </div>
                         
@@ -65,9 +100,13 @@
                         <input type="hidden" name="interview_date" id="assign_interview_date">
                         <input type="hidden" name="start_time" id="assign_start_time">
                         <input type="hidden" name="end_time" id="assign_end_time">
+                        <input type="hidden" name="is_reschedule" id="is_reschedule" value="{{ $isReschedule ? '1' : '0' }}">
 
-                         <!-- ✅ This changes when tab (Online/Offline) is clicked -->
-                         <input type="hidden" name="interview_mode" id="interview_mode" value="online">
+
+                         <!-- This changes when tab (Online/Offline) is clicked -->
+                         {{-- <input type="hidden" name="interview_mode" id="interview_mode" value="online"> --}}
+                          <input type="hidden" name="interview_mode" id="interview_mode" 
+                             value="{{ $isReschedule && $existingInterview ? $existingInterview->interview_mode : 'online' }}">
 
                             <div class="ds-content-head">
                                 <div class="cmn-tab-head">
@@ -80,73 +119,9 @@
                             </div>
 
                         <div class="cmn-tab-content online-mode" id="online-mode">
-                            {{-- <div class="cmn-tab-content-head">
-                                <h3>Booked Slots</h3>
-                                <button type="button">View Details</button>
-                            </div> --}}
-                        
-                            {{-- <div class="avaiable-slots-cd-wrp">
-                                <form>
-                                    <div class="available-slots-form">
-                                        <fieldset class="avaiable-slots-cd-form" aria-labelledby="available-slots-heading">
-                                        <legend id="available-slots-heading" class="sr-only">Available Slots</legend>
-                                
-                                        <div class="avaiable-slots-cd-grid">
-                                            <div class="avaiable-slots-cd" data-slot="2024-09-14T10:00">
-                                                <label for="avaiable-slot-1" tabindex="0">
-                                                    <span class="avlble-slot-date">Thursday, September 14, 2024</span>
-                                                    <span class="avlble-slot-time">10:00 AM - 11:00 AM</span>
-                                                </label>
-                                                <input id="avaiable-slot-1" type="radio" name="avaiable-slot" value="2024-09-14T10:00" />
-                                            </div>
-                                
-                                            <div class="avaiable-slots-cd" data-slot="2024-09-14T14:00">
-                                                <label for="avaiable-slot-2" tabindex="0">
-                                                    <span class="avlble-slot-date">Thursday, September 14, 2024</span>
-                                                    <span class="avlble-slot-time">02:00 PM - 03:00 PM</span>
-                                                </label>
-                                                <input id="avaiable-slot-2" type="radio" name="avaiable-slot" value="2024-09-14T14:00" />
-                                            </div>
-                                
-                                            <div class="avaiable-slots-cd" data-slot="2024-09-15T10:00">
-                                                <label for="avaiable-slot-3" tabindex="0">
-                                                    <span class="avlble-slot-date">Friday, September 15, 2024</span>
-                                                    <span class="avlble-slot-time">10:00 AM - 11:00 AM</span>
-                                                </label>
-                                                <input id="avaiable-slot-3" type="radio" name="avaiable-slot" value="2024-09-15T10:00" />
-                                            </div>
-                                            <div class="avaiable-slots-cd" data-slot="2024-09-15T12:00">
-                                                <label for="avaiable-slot-4" tabindex="0">
-                                                    <span class="avlble-slot-date">Friday, September 15, 2024</span>
-                                                    <span class="avlble-slot-time">12:00 PM - 01:00 PM</span>
-                                                </label>
-                                                <input id="avaiable-slot-4" type="radio" name="avaiable-slot" value="2024-09-15T12:00" />
-                                            </div>
-                                
-                                            <div class="avaiable-slots-cd" data-slot="2024-09-17T10:00">
-                                                <label for="avaiable-slot-5" tabindex="0">
-                                                    <span class="avlble-slot-date">Sunday, September 17, 2024</span>
-                                                    <span class="avlble-slot-time">10:00 AM - 11:00 AM</span>
-                                                </label>
-                                                <input id="avaiable-slot-5" type="radio" name="avaiable-slot" value="2024-09-17T10:00" />
-                                            </div>
-                                            <div class="avaiable-slots-cd" data-slot="2024-09-17T14:00">
-                                                <label for="avaiable-slot-6" tabindex="0">
-                                                    <span class="avlble-slot-date">Sunday, September 17, 2024</span>
-                                                    <span class="avlble-slot-time">02:00 PM - 03:00 PM</span>
-                                                </label>
-                                                <input id="avaiable-slot-6" type="radio" name="avaiable-slot" value="2024-09-17T14:00" />
-                                            </div>
-                                        </div>
-                                
-                                        </fieldset>
-                                    </div>
-                                </form>
-                            </div> --}}
-
-                            <!-- booked Slots Section -->
-                            <div id="bookedSlotsContainer">
-                                {{-- Slots will be loaded here --}}
+                            
+                            <div id="onlineBookedSlotsContainer">
+                                <!-- Online booked Slots Section -->
                             </div>
 
                             <div class="interview-location-row">
@@ -161,71 +136,10 @@
                         </div>
 
                         <div class="cmn-tab-content offline-mode" id="offline-mode">
-                            {{-- <div class="cmn-tab-content-head">
-                                <h3>Booked Slots</h3>
-                                <button type="button">View Details</button>
-                            </div> --}}
                         
-                            {{-- <div class="avaiable-slots-cd-wrp">
-                                <form>
-                                    <div class="available-slots-form">
-                                        <fieldset class="avaiable-slots-cd-form" aria-labelledby="available-slots-heading">
-                                        <legend id="available-slots-heading" class="sr-only">Available Slots</legend>
-                                
-                                        <div class="avaiable-slots-cd-grid">
-                                            <div class="avaiable-slots-cd" data-slot="2024-09-14T10:00">
-                                                <label for="avaiable-slot-1" tabindex="0">
-                                                    <span class="avlble-slot-date">Thursday, September 14, 2024</span>
-                                                    <span class="avlble-slot-time">10:00 AM - 11:00 AM</span>
-                                                </label>
-                                                <input id="avaiable-slot-1" type="radio" name="avaiable-slot" value="2024-09-14T10:00" />
-                                            </div>
-                                
-                                            <div class="avaiable-slots-cd" data-slot="2024-09-14T14:00">
-                                                <label for="avaiable-slot-2" tabindex="0">
-                                                    <span class="avlble-slot-date">Thursday, September 14, 2024</span>
-                                                    <span class="avlble-slot-time">02:00 PM - 03:00 PM</span>
-                                                </label>
-                                                <input id="avaiable-slot-2" type="radio" name="avaiable-slot" value="2024-09-14T14:00" />
-                                            </div>
-                                
-                                            <div class="avaiable-slots-cd" data-slot="2024-09-15T10:00">
-                                                <label for="avaiable-slot-3" tabindex="0">
-                                                    <span class="avlble-slot-date">Friday, September 15, 2024</span>
-                                                    <span class="avlble-slot-time">10:00 AM - 11:00 AM</span>
-                                                </label>
-                                                <input id="avaiable-slot-3" type="radio" name="avaiable-slot" value="2024-09-15T10:00" />
-                                            </div>
-                                            <div class="avaiable-slots-cd" data-slot="2024-09-15T12:00">
-                                                <label for="avaiable-slot-4" tabindex="0">
-                                                    <span class="avlble-slot-date">Friday, September 15, 2024</span>
-                                                    <span class="avlble-slot-time">12:00 PM - 01:00 PM</span>
-                                                </label>
-                                                <input id="avaiable-slot-4" type="radio" name="avaiable-slot" value="2024-09-15T12:00" />
-                                            </div>
-                                
-                                            <div class="avaiable-slots-cd" data-slot="2024-09-17T10:00">
-                                                <label for="avaiable-slot-5" tabindex="0">
-                                                    <span class="avlble-slot-date">Sunday, September 17, 2024</span>
-                                                    <span class="avlble-slot-time">10:00 AM - 11:00 AM</span>
-                                                </label>
-                                                <input id="avaiable-slot-5" type="radio" name="avaiable-slot" value="2024-09-17T10:00" />
-                                            </div>
-                                            <div class="avaiable-slots-cd" data-slot="2024-09-17T14:00">
-                                                <label for="avaiable-slot-6" tabindex="0">
-                                                    <span class="avlble-slot-date">Sunday, September 17, 2024</span>
-                                                    <span class="avlble-slot-time">02:00 PM - 03:00 PM</span>
-                                                </label>
-                                                <input id="avaiable-slot-6" type="radio" name="avaiable-slot" value="2024-09-17T14:00" />
-                                            </div>
-                                        </div>
-                                
-                                        </fieldset>
-                                    </div>
-                                </form>
-                            </div> --}}
-
-                            <div id="bookedSlotsContainer"></div>
+                            <div id="offlineBookedSlotsContainer">
+                                 <!-- Offline Mode Booked Slots Container -->
+                            </div>
 
                             <div class="interview-location-row">
                                 <label class="interview-location-label" for="interview-location">Interview Location</label>
@@ -233,8 +147,11 @@
                             
                             </div>
                             <div class="avaiable-slots-actions">
-                                <button type="button" class="cmn-btn cancel-btn">Cancel</button>
-                                <button type="submit" class="cmn-btn primary-assign-btn">Assign Slot</button>
+                                <button type="button" class="cmn-btn cancel-btn" onclick="window.location.href='{{ route('applicant.student_application_form') }}'">Cancel</button>
+                                {{-- <button type="submit" class="cmn-btn primary-assign-btn">Assign Slot</button> --}}
+                                <button type="submit" class="cmn-btn primary-assign-btn">
+                                    {{ $isReschedule ? 'Reschedule Interview' : 'Assign Slot' }}
+                                </button>
                             </div>
                         </div>
                   
@@ -248,47 +165,80 @@
 
 @push('script')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const onlineTab = document.getElementById('online-tab');
-    const offlineTab = document.getElementById('offline-tab');
-    const interviewModeInput = document.getElementById('interview_mode');
-    const onlineModeDiv = document.getElementById('online-mode');
-    const offlineModeDiv = document.getElementById('offline-mode');
-    const searchForm = document.getElementById('searchSlotsForm');
+    document.addEventListener('DOMContentLoaded', function () {
+        const onlineTab = document.getElementById('online-tab');
+        const offlineTab = document.getElementById('offline-tab');
+        const interviewModeInput = document.getElementById('interview_mode');
+        const onlineModeDiv = document.getElementById('online-mode');
+        const offlineModeDiv = document.getElementById('offline-mode');
+        const searchForm = document.getElementById('searchSlotsForm');
+        
+        // Set initial mode based on existing interview (for reschedule)
+        const initialMode = "{{ $isReschedule && $existingInterview ? $existingInterview->interview_mode : 'online' }}";
+        
+        // Function to switch tabs
+        function switchToOnlineMode() {
+            onlineTab.classList.add('active');
+            offlineTab.classList.remove('active');
+            interviewModeInput.value = 'online';
+            onlineModeDiv.style.display = 'block';
+            offlineModeDiv.style.display = 'none';
+        }
 
-    // Default to online mode
-    if (interviewModeInput.value === '' || interviewModeInput.value === 'online') {
-        interviewModeInput.value = 'online';
-        onlineTab.classList.add('active');
-        offlineTab.classList.remove('active');
-        onlineModeDiv.style.display = 'block';
-        offlineModeDiv.style.display = 'none';
-    }
+        function switchToOfflineMode() {
+            offlineTab.classList.add('active');
+            onlineTab.classList.remove('active');
+            interviewModeInput.value = 'offline';
+            offlineModeDiv.style.display = 'block';
+            onlineModeDiv.style.display = 'none';
+        }
 
-    //  Online tab click
-    onlineTab.addEventListener('click', () => {
-        onlineTab.classList.add('active');
-        offlineTab.classList.remove('active');
-        interviewModeInput.value = 'online';
-        onlineModeDiv.style.display = 'block';
-        offlineModeDiv.style.display = 'none';
+        // Set initial mode
+        if (initialMode === 'offline') {
+            switchToOfflineMode();
+        } else {
+            switchToOnlineMode();
+        }
 
-        // Trigger re-fetch for booked slots (Online mode)
-        searchForm.dispatchEvent(new Event('submit'));
+        // Online tab click
+        onlineTab.addEventListener('click', () => {
+            switchToOnlineMode();
+            
+            // Only trigger search if form has values
+            if (document.getElementById('interview_date').value) {
+                searchForm.dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Offline tab click
+        offlineTab.addEventListener('click', () => {
+            switchToOfflineMode();
+            
+            // Only trigger search if form has values
+            if (document.getElementById('interview_date').value) {
+                searchForm.dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Auto-populate search form for reschedule
+        @if($isReschedule && $existingInterview)
+            if (!document.getElementById('interview_date').value) {
+                document.getElementById('interview_date').value = "{{ \Carbon\Carbon::parse($existingInterview->interview_date)->format('Y-m-d') }}";
+                document.getElementById('interview_start_time').value = "{{ $existingInterview->start_time }}";
+                document.getElementById('interview_end_time').value = "{{ $existingInterview->end_time }}";
+                
+                // Also set the assign form hidden fields
+                document.getElementById('assign_interview_date').value = "{{ \Carbon\Carbon::parse($existingInterview->interview_date)->format('Y-m-d') }}";
+                document.getElementById('assign_start_time').value = "{{ $existingInterview->start_time }}";
+                document.getElementById('assign_end_time').value = "{{ $existingInterview->end_time }}";
+                
+                // Trigger search automatically for reschedule
+                setTimeout(() => {
+                    searchForm.dispatchEvent(new Event('submit'));
+                }, 500);
+            }
+        @endif
     });
-
-    // 🔁 Offline tab click
-    offlineTab.addEventListener('click', () => {
-        offlineTab.classList.add('active');
-        onlineTab.classList.remove('active');
-        interviewModeInput.value = 'offline';
-        offlineModeDiv.style.display = 'block';
-        onlineModeDiv.style.display = 'none';
-
-        // Trigger re-fetch for booked slots (Offline mode)
-        searchForm.dispatchEvent(new Event('submit'));
-    });
-});
 </script>
 
 <script>
@@ -296,22 +246,29 @@ document.getElementById('searchSlotsForm').addEventListener('submit', function(e
     e.preventDefault();
 
     const formData = new FormData(this);
+    
+    // Add the current interview mode to the form data
+    const interviewMode = document.getElementById('interview_mode').value;
+    formData.append('interview_mode', interviewMode);
+
+    // Determine which container to update based on current mode
+    const targetContainerId = interviewMode === 'online' ? 'onlineBookedSlotsContainer' : 'offlineBookedSlotsContainer';
+    const container = document.getElementById(targetContainerId);
 
     fetch("{{ route('applicant.fetch_interview_slots') }}", {
         method: 'POST',
         headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
         },
         body: formData
     })
     .then(response => response.json())
     .then(data => {
-        const container = document.getElementById('bookedSlotsContainer');
-        console.log(data);
+        console.log('Server response:', data);
         if (data.success) {
             container.innerHTML = data.html;
-            // console.log('HTML:', data.html);
-
+            
             // Copy date/time values from search form to assign form
             document.getElementById('assign_interview_date').value = document.getElementById('interview_date').value;
             document.getElementById('assign_start_time').value = document.getElementById('interview_start_time').value;
@@ -320,39 +277,291 @@ document.getElementById('searchSlotsForm').addEventListener('submit', function(e
             container.innerHTML = `<p style="color:red;">${data.message}</p>`;
         }
     })
-    .catch(error => console.error('Error fetching slots:', error));
+    .catch(error => {
+        console.error('Error fetching slots:', error);
+        container.innerHTML = `<p style="color:red;">Error fetching slots. Please try again.</p>`;
+    });
 });
 </script>
 
 <script>
 
+
+
+// document.addEventListener('DOMContentLoaded', function () {
+//     const form = document.getElementById('assignSlotForm');
+    
+//     // Function to validate time range is exactly 1 hour
+//     function validateTimeRange(startTime, endTime) {
+//         if (!startTime || !endTime) return false;
+        
+//         const start = new Date(`2000-01-01T${startTime}`);
+//         const end = new Date(`2000-01-01T${endTime}`);
+//         const diffMs = end - start;
+//         const diffHours = diffMs / (1000 * 60 * 60);
+        
+//         return diffHours === 1;
+//     }
+
+//     // Auto-set end time when start time changes (1 hour later)
+//     document.getElementById('interview_start_time').addEventListener('change', function() {
+//         if (this.value) {
+//             const startTime = new Date(`2000-01-01T${this.value}`);
+//             const endTime = new Date(startTime.getTime() + (60 * 60 * 1000)); // Add 1 hour
+            
+//             // Format to HH:MM
+//             const endTimeString = endTime.toTimeString().slice(0, 5);
+//             document.getElementById('interview_end_time').value = endTimeString;
+            
+//             // Also update the hidden fields for assign form
+//             document.getElementById('assign_start_time').value = this.value;
+//             document.getElementById('assign_end_time').value = endTimeString;
+//         }
+//     });
+
+//     // Validate end time when manually changed
+//     document.getElementById('interview_end_time').addEventListener('change', function() {
+//         const startTime = document.getElementById('interview_start_time').value;
+//         const endTime = this.value;
+        
+//         if (startTime && endTime) {
+//             if (!validateTimeRange(startTime, endTime)) {
+//                 alert('Time range must be exactly 1 hour. End time has been auto-adjusted.');
+                
+//                 // Auto-correct to 1 hour
+//                 const start = new Date(`2000-01-01T${startTime}`);
+//                 const correctEnd = new Date(start.getTime() + (60 * 60 * 1000));
+//                 const correctEndString = correctEnd.toTimeString().slice(0, 5);
+                
+//                 this.value = correctEndString;
+//                 document.getElementById('assign_end_time').value = correctEndString;
+//             }
+//         }
+//     });
+
+//     // Validate search form submission
+//     document.getElementById('searchSlotsForm').addEventListener('submit', function(e) {
+//         const startTime = document.getElementById('interview_start_time').value;
+//         const endTime = document.getElementById('interview_end_time').value;
+        
+//         if (startTime && endTime && !validateTimeRange(startTime, endTime)) {
+//             e.preventDefault();
+//             alert('Please select a time range of exactly 1 hour.');
+//             return;
+//         }
+        
+//         // If validation passes, copy values to assign form
+//         document.getElementById('assign_interview_date').value = document.getElementById('interview_date').value;
+//         document.getElementById('assign_start_time').value = startTime;
+//         document.getElementById('assign_end_time').value = endTime;
+//     });
+
+//     // Your existing form submission with added validation
+//     form.addEventListener('submit', function (e) {
+//         e.preventDefault();
+//         console.log("Assign Slot form submitted "); 
+
+//         // Validate time range before submitting
+//         const startTime = document.getElementById('assign_start_time').value;
+//         const endTime = document.getElementById('assign_end_time').value;
+        
+//         if (!validateTimeRange(startTime, endTime)) {
+//             alert('Time range must be exactly 1 hour. Please adjust your time selection.');
+//             return;
+//         }
+
+//         const formData = new FormData(this);
+//         console.log("Form Data:", formData);
+
+//         fetch("{{ route('applicant.assign_interview_slot') }}", {  
+//             method: 'POST',
+//             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+//             body: formData
+//         })
+//         .then(response => response.json())
+//         .then(data => {
+//             console.log("Server Response:", data);
+//             if (data.success) {
+//                 alert(data.message);
+//                 window.location.href = "{{ route('applicant.student_application_form') }}";
+//             } else {
+//                 alert(data.message);
+//             }
+//         })
+//         .catch(err => {
+//             console.error("Error:", err);
+//             alert('Error while assigning slot.');
+//         });
+//     });
+// });
+
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('assignSlotForm');
+    
+    // Bootstrap Toast Notification Function
+    function showNotification(message, type = 'error') {
+        // Create container if it doesn't exist
+        let toastContainer = document.getElementById('notification-toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'notification-toast-container';
+            toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+            toastContainer.style.zIndex = '9999';
+            document.body.appendChild(toastContainer);
+        }
+
+        const toastId = 'toast-' + Date.now();
+        const toast = document.createElement('div');
+        toast.id = toastId;
+        toast.className = `toast align-items-center text-bg-${type === 'error' ? 'danger' : 'success'} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+
+        toastContainer.appendChild(toast);
+        
+        // Initialize and show the toast
+        const bsToast = new bootstrap.Toast(toast, {
+            autohide: true,
+            delay: 5000
+        });
+        bsToast.show();
+        
+        // Remove from DOM after hide
+        toast.addEventListener('hidden.bs.toast', () => {
+            toast.remove();
+        });
+    }
+
+    // Function to validate time range is exactly 1 hour
+    function validateTimeRange(startTime, endTime) {
+        if (!startTime || !endTime) return false;
+        
+        const start = new Date(`2000-01-01T${startTime}`);
+        const end = new Date(`2000-01-01T${endTime}`);
+        const diffMs = end - start;
+        const diffHours = diffMs / (1000 * 60 * 60);
+        
+        return diffHours === 1;
+    }
+
+    // Auto-set end time when start time changes (1 hour later)
+    document.getElementById('interview_start_time').addEventListener('change', function() {
+        if (this.value) {
+            const startTime = new Date(`2000-01-01T${this.value}`);
+            const endTime = new Date(startTime.getTime() + (60 * 60 * 1000)); // Add 1 hour
+            
+            // Format to HH:MM
+            const endTimeString = endTime.toTimeString().slice(0, 5);
+            document.getElementById('interview_end_time').value = endTimeString;
+            
+            // Also update the hidden fields for assign form
+            document.getElementById('assign_start_time').value = this.value;
+            document.getElementById('assign_end_time').value = endTimeString;
+        }
+    });
+
+    // Validate end time when manually changed
+    document.getElementById('interview_end_time').addEventListener('change', function() {
+        const startTime = document.getElementById('interview_start_time').value;
+        const endTime = this.value;
+        
+        if (startTime && endTime) {
+            if (!validateTimeRange(startTime, endTime)) {
+                showNotification('Time range must be exactly 1 hour. End time has been auto-adjusted.');
+                
+                // Auto-correct to 1 hour
+                const start = new Date(`2000-01-01T${startTime}`);
+                const correctEnd = new Date(start.getTime() + (60 * 60 * 1000));
+                const correctEndString = correctEnd.toTimeString().slice(0, 5);
+                
+                this.value = correctEndString;
+                document.getElementById('assign_end_time').value = correctEndString;
+            }
+        }
+    });
+
+    // Validate search form submission
+    document.getElementById('searchSlotsForm').addEventListener('submit', function(e) {
+        const startTime = document.getElementById('interview_start_time').value;
+        const endTime = document.getElementById('interview_end_time').value;
+        
+        if (startTime && endTime && !validateTimeRange(startTime, endTime)) {
+            e.preventDefault();
+            showNotification('Please select a time range of exactly 1 hour.');
+            return;
+        }
+        
+        // If validation passes, copy values to assign form
+        document.getElementById('assign_interview_date').value = document.getElementById('interview_date').value;
+        document.getElementById('assign_start_time').value = startTime;
+        document.getElementById('assign_end_time').value = endTime;
+    });
+
+    // Your existing form submission with added validation
     form.addEventListener('submit', function (e) {
         e.preventDefault();
-        console.log("Assign Slot form submitted "); 
+        // console.log("Assign Slot form submitted "); 
+         console.log("Form submitted - Mode:", document.getElementById('is_reschedule').value);
+
+
+        // Validate time range before submitting
+        const startTime = document.getElementById('assign_start_time').value;
+        const endTime = document.getElementById('assign_end_time').value;
+        
+        if (!validateTimeRange(startTime, endTime)) {
+            showNotification('Time range must be exactly 1 hour. Please adjust your time selection.');
+            return;
+        }
 
         const formData = new FormData(this);
         console.log("Form Data:", formData);
 
-        fetch("{{ route('applicant.assign_interview_slot') }}", {  
+        const isReschedule = document.getElementById('is_reschedule').value === '1';
+        const endpoint = isReschedule 
+                ? "{{ route('applicant.update_interview_slot') }}"
+                : "{{ route('applicant.assign_interview_slot') }}";
+
+        console.log("Submitting to:", endpoint);
+
+        fetch(endpoint, {  
             method: 'POST',
-            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            headers: { 
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
             body: formData
         })
         .then(response => response.json())
         .then(data => {
             console.log("Server Response:", data);
-            if (data.success) {
-                alert(data.message);
-                window.location.href = "{{ route('applicant.student_application_form') }}";
+            if (data.success || data.status) {
+             const message = data.message || (isReschedule ? 'Interview rescheduled successfully!' : 'Interview slot assigned successfully!');
+
+                showNotification(message, 'success');
+                
+                // Redirect after a short delay to show the success message
+                setTimeout(() => {
+                    window.location.href = "{{ route('applicant.student_application_form') }}";
+                }, 1500);
             } else {
-                alert(data.message);
+                const errorMessage = data.message || (isReschedule ? 'Failed to reschedule interview.' : 'Failed to assign interview slot.');
+
+                showNotification(errorMessage, 'error');
             }
         })
         .catch(err => {
             console.error("Error:", err);
-            alert('Error while assigning slot.');
+            showNotification('Error while assigning slot. Please try again.', 'error');
         });
     });
 });
