@@ -4,18 +4,18 @@ namespace App\Http\Controllers\Report;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Repositories\Report\AlumniReportRepository;
+use App\Repositories\Report\ApplicantReportRepository;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use PDF;
 use Exception;
 use Throwable;
 
-class AlumniReportController extends Controller
+class ApplicantReportController extends Controller
 {
-    protected AlumniReportRepository $repo;
+    protected ApplicantReportRepository $repo;
 
-    public function __construct(AlumniReportRepository $repo)
+    public function __construct(ApplicantReportRepository $repo)
     {
         $this->repo = $repo;
     }

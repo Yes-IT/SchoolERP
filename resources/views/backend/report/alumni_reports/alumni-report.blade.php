@@ -28,7 +28,7 @@
                                 <div class="request-leave-form student-report-filter-form">
                                     <div class="input-grp">
                                         <label>School Year</label>
-                                        <select name="session_id" required>
+                                        <select name="school_year" required>
                                             @forelse($data['school_years'] as $schoolYear)
                                                 <option value="{{ $schoolYear->id}}">
                                                     {{ $schoolYear->start_date }} - {{ $schoolYear->end_date }}
@@ -40,11 +40,10 @@
                                     </div>
                                     <div class="input-grp">
                                         <label>Year Status</label>
-                                        <select name="year_status_id" required>
+                                        <select name="year_status" id="year_status" required>
+                                            <option value="all" selected>All</option>
                                             @forelse($data['year_statuses'] as $yearStatus)
-                                                <option value="{{ $yearStatus->id }}">
-                                                    {{ $yearStatus->name }}
-                                                </option>
+                                                <option value="{{ $yearStatus->id }}">{{ $yearStatus->name }}</option>
                                             @empty
                                                 <option value="">No year status available</option>
                                             @endforelse
@@ -87,23 +86,23 @@
 
                         <form class="request-leave-form output-options-filter" id="output-options-form" aria-labelledby="output-options-heading">
                             <div class="input-grp">
-                              <label for="state">Export Format</label>
-                              <select id="state" name="state" required="">
-                                    <option value="" disabled="" selected="">Pdf Document</option>
+                              <label for="exportOption">Export Format</label>
+                              <select id="exportOption" name="export_format" required>
+                                    <option value="pdf" selected>Pdf Document</option>
                               </select>
                             </div>
 
-                            <fieldset class="opt-group">
-                                <legend class="opt-title">Sort Order</legend>
-                            
+                            <fieldset class="input-grp" id="sort_order_fieldset">
+                                <label>Sort Order</label>
+
                                 <label class="opt-row">
-                                  <input type="radio" name="sort_order" value="student_name" checked>
-                                  <span class="opt-label">By Name</span>
+                                    <input type="radio" name="sort_order" value="name" checked>
+                                    <span class="opt-label">By Name</span>
                                 </label>
-                            
+
                                 <label class="opt-row">
-                                  <input type="radio" name="sort_order" value="high_school">
-                                  <span class="opt-label">By Year</span>
+                                    <input type="radio" name="sort_order" value="year">
+                                    <span class="opt-label">By Year</span>
                                 </label>
                             </fieldset>
 
@@ -115,7 +114,7 @@
                             </div>
                         
                             <div class="opt-cta">
-                              <button type="submit" class="cmn-btn generate-btn">Generate Reports</button>
+                              <button type="submit" id="generateReportBtn" class="cmn-btn generate-btn">Generate Reports</button>
                             </div>
                         </form>
                     </div>
@@ -125,7 +124,7 @@
                             <h2 class="mb-0">Quick Actions</h2>
                         </div>
                         <div class="request-leave-form-wrp student-report-filter-form-wrp">
-                            <button id="print-preview-btn" class="print-preview cmn-white-btn w-100"><img src="{{ asset('backend/assets/images/new_images/print-preview-icon.svg') }}" alt="Icon"> Print Preview</button>
+                            <button id="previewReportBtn" class="print-preview cmn-white-btn w-100"><img src="{{ asset('backend/assets/images/new_images/print-preview-icon.svg') }}" alt="Icon"> Print Preview</button>
                         </div>
                     </div>
                 </div>               
@@ -139,162 +138,121 @@
 @push('script')
 
 <script>
-$(document).ready(function() {
+    $(function () {
+        const $yearSelect = $('#year_status');
+        const $sortFieldset = $('#sort_order_fieldset');
+        const $sortInputs = $sortFieldset.find('input[name="sort_order"]');
+
+        function toggleSortOptions() {
+            const isAll = $yearSelect.val() === 'all';
+            $sortInputs.prop('disabled', !isAll);
+            $sortFieldset.css('opacity', isAll ? 1 : 0.5);
+        }
+
+        $yearSelect.on('change', toggleSortOptions);
+        toggleSortOptions();
+    });
+</script>
+
+<script>
+$(document).ready(function () {
     // Selectors
     const selectors = {
         reportFiltersForm: '#report-filters-form',
         reportTypeForm: '#report-type-form',
         outputOptionsForm: '#output-options-form',
-        generateBtn: '#output-options-form button[type="submit"]',
-        previewBtn: '#print-preview-btn'
     };
 
     // Routes
     const routes = {
-        generatePDF: '{{ route("report-management.generate-alumni-pdf") }}',
-        previewPDF: '{{ route("report-management.preview-alumni-report") }}'
+        generateReport: '{{ route("report-management.generate-alumni-report") }}',
     };
 
-    // Combine form data from multiple forms
-    function collectCombinedFormData(forms) {
-        const combinedData = {};
-        forms.forEach(selector => {
-            $(selector).serializeArray().forEach(item => {
-                if (combinedData[item.name]) {
-                    if (!Array.isArray(combinedData[item.name])) {
-                        combinedData[item.name] = [combinedData[item.name]];
-                    }
-                    combinedData[item.name].push(item.value);
-                } else {
-                    combinedData[item.name] = item.value;
-                }
-            });
-        });
-        return combinedData;
-    }
+    const $generateBtn = $('#generateReportBtn');
+    const $previewBtn = $('#previewReportBtn');
 
-    // Required fields
-    const requiredFields = [
-        `${selectors.reportFiltersForm} select[name="session_id"]`,
-        `${selectors.reportFiltersForm} select[name="year_status_id"]`,
-        `${selectors.reportFiltersForm} select[name="class_id"]`,
-        `${selectors.outputOptionsForm} select[name="export_format"]`
-    ];
-
-    const $generateBtn = $(selectors.generateBtn);
-    const $previewBtn = $(selectors.previewBtn);
-
-    // Disable buttons initially
-    $generateBtn.prop('disabled', true);
-    $previewBtn.prop('disabled', true);
-
-    function validateRequiredFields() {
-        let allFilled = true;
-
-        requiredFields.forEach(selector => {
-            const $field = $(selector);
-            if (!$field.val()) {
-                allFilled = false;
-            }
-        });
-
-        $generateBtn.prop('disabled', !allFilled);
-        $previewBtn.prop('disabled', !allFilled);
-    }
-
-    $(document).on('change', 'select', validateRequiredFields);
-    validateRequiredFields();
-
-    // Generate Report
-    $(selectors.outputOptionsForm).on('submit', function(e) {
+    $generateBtn.on('click', function (e) {
         e.preventDefault();
+        generateReport(false, $(this));
+    });
 
-        const $btn = $generateBtn;
-        const combinedData = collectCombinedFormData([
-            selectors.reportFiltersForm,
-            selectors.reportTypeForm,
-            selectors.outputOptionsForm
-        ]);
+    $previewBtn.on('click', function (e) {
+        e.preventDefault();
+        generateReport(true, $(this));
+    });
+
+    function generateReport(isPreview = false, $btn) {
+        const formData = {
+            school_year: $(`${selectors.reportFiltersForm} select[name="school_year"]`).val(),
+            year_status: $(`${selectors.reportFiltersForm} select[name="year_status"]`).val(),
+            report_type: $(`${selectors.reportTypeForm} input[name="report_type"]:checked`).val(),
+            export_format: $(`${selectors.outputOptionsForm} select[name="export_format"]`).val(),
+            sort_order: $(`${selectors.outputOptionsForm} input[name="sort_order"]:checked`).val(),
+            show_year: $(`${selectors.outputOptionsForm} input[name="show_year"]`).is(':checked') ? 1 : 0,
+            is_preview: isPreview ? 1 : 0,
+            _token: '{{ csrf_token() }}'
+        };
+
+        // Validation
+        if (!formData.school_year || !formData.year_status || !formData.report_type || !formData.export_format) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+
+        $btn.prop('disabled', true).text('Generating...');
 
         $.ajax({
-            url: routes.generatePDF,
+            url: routes.generateReport,
             method: 'POST',
-            data: combinedData,
-            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            data: formData,
             xhrFields: { responseType: 'blob' },
-            beforeSend: function() {
-                $btn.prop('disabled', true).text('Generating...');
-            },
-            success: function(response, status, xhr) {
-
-                // console.log(response);
-                // return;
-
-                const blob = new Blob([response], { type: 'application/pdf' });
-                const disposition = xhr.getResponseHeader('Content-Disposition');
-                let fileName = 'teacher-report.pdf';
-
-                if (disposition) {
-                    const matches = disposition.match(/filename="?([^"]*)"?.*$/);
-                    if (matches && matches[1]) fileName = matches[1];
+            success: function (response, status, xhr) {
+                if(formData.export_format === 'pdf') {
+                    if (isPreview) {
+                        previewPDF(response);
+                    } else {
+                        generatePDF(response, xhr);
+                    }
+                } else {
+                    alert('Unsupported export format.');
                 }
-
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 console.error('Error:', xhr.responseText || xhr.statusText);
                 alert('Failed to generate PDF. Check console for details.');
             },
-            complete: function() {
-                $btn.prop('disabled', false).text('Generate Reports');
+            complete: function () {
+                $btn.prop('disabled', false).text(isPreview ? 'Print Preview' : 'Generate Report');
             }
         });
-    });
+    }
 
-    // Print Preview
-    $(selectors.previewBtn).on('click', function(e) {
-        e.preventDefault();
+    function previewPDF(blob) {
+        const fileURL = window.URL.createObjectURL(blob);
+        const previewWindow = window.open(fileURL, '_blank');
+        if (previewWindow) {
+            previewWindow.onload = () => URL.revokeObjectURL(fileURL);
+        }
+    }
 
-        const $btn = $(this);
-        const combinedData = collectCombinedFormData([
-            selectors.reportFiltersForm,
-            selectors.reportTypeForm,
-            selectors.outputOptionsForm
-        ]);
+    function generatePDF(blob, xhr) {
+        const disposition = xhr.getResponseHeader('Content-Disposition');
+        let fileName = 'alumni-report.pdf';
 
-        $.ajax({
-            url: routes.previewPDF,
-            method: 'POST',
-            data: combinedData,
-            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-            xhrFields: { responseType: 'blob' },
-            beforeSend: function() {
-                $btn.prop('disabled', true).text('Generating...');
-            },
-            success: function(blob) {
-                const fileURL = window.URL.createObjectURL(blob);
-                const previewWindow = window.open(fileURL, '_blank');
-                if (previewWindow) {
-                    previewWindow.onload = () => URL.revokeObjectURL(fileURL);
-                }
-            },
-            error: function(xhr) {
-                const errorMsg = xhr.responseJSON?.message || 'Failed to generate preview.';
-                alert(errorMsg);
-                console.error('Preview error:', xhr);
-            },
-            complete: function() {
-                $btn.prop('disabled', false).text('Print Preview');
-            }
-        });
-    });
+        if (disposition) {
+            const matches = disposition.match(/filename="?([^"]*)"?.*$/);
+            if (matches && matches[1]) fileName = matches[1];
+        }
+
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }
 });
 </script>
 

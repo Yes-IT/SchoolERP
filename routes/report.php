@@ -18,6 +18,7 @@ use App\Http\Controllers\Report\AttendanceReportController;
 use App\Http\Controllers\Report\StudentReportController;
 use App\Http\Controllers\Report\TeacherReportController;
 use App\Http\Controllers\Report\AlumniReportController;
+use App\Http\Controllers\Report\ApplicantReportController;
 
 
 Route::middleware(saasMiddleware())->group(function () {
@@ -106,8 +107,11 @@ Route::middleware(saasMiddleware())->group(function () {
                     });
 
                     Route::controller(AlumniReportController::class)->group(function () {
-                        Route::post('/generate-alumni-pdf', 'generatePDF')->name('report-management.generate-alumni-pdf');
-                        Route::post('/preview-alumni-report', 'previewReport')->name('report-management.preview-alumni-report');
+                        Route::post('/generate-alumni-pdf', 'generateReport')->name('report-management.generate-alumni-report');
+                    });
+
+                    Route::controller(ApplicantReportController::class)->group(function () {
+                        Route::post('/generate-applicant-pdf', 'generateReport')->name('report-management.generate-applicant-report');
                     });
 
                     Route::post('/attendance/reports/generate', [AttendanceReportController::class, 'generate'])->name('attendance.reports.generate');
