@@ -29,8 +29,13 @@
                                 <div class="input-grp">
                                     <label>Applicant School Year</label>
                                     <select name="school_year" required>
-                                        <option value="1">2024-2025</option>
-                                        <option value="2">2025-2026</option>
+                                        @forelse($data['school_years'] as $schoolYear)
+                                            <option value="{{ $schoolYear->id}}">
+                                                {{ $schoolYear->start_date }} - {{ $schoolYear->end_date }}
+                                            </option>
+                                        @empty
+                                            <option value="">No school years available</option>
+                                        @endforelse
                                     </select>
                                 </div>
                             </div>
@@ -57,17 +62,17 @@
                                     </div>
                                     <div class="input-grp">
                                         <label>
-                                            <input type="radio" name="report_type" value="accepted_response"/>Accepted Applicant Response Reports
+                                            <input type="radio" name="report_type" value="accepted_response" />Accepted Applicant Response Reports
                                         </label>
                                     </div>
                                     <div class="input-grp">
                                         <label>
-                                            <input type="radio" name="report_type" value="application"/>Application Reports
+                                            <input type="radio" name="report_type" value="application" />Application Reports
                                         </label>
                                     </div>
                                     <div class="input-grp">
                                         <label>
-                                            <input type="radio" name="report_type" value="interview"/>Interview Reports
+                                            <input type="radio" name="report_type" value="interview" />Interview Reports
                                         </label>
                                     </div>
                                 </div>
@@ -84,19 +89,19 @@
                                         </div>
                                         <div class="input-grp">
                                             <label>
-                                                <input type="radio" name="report_option" value="applicant_status_by_school"/>
+                                                <input type="radio" name="report_option" value="applicant_status_by_school" />
                                                 Status List by High School
                                             </label>
                                         </div>
                                         <div class="input-grp">
                                             <label>
-                                                <input type="radio" name="report_option" value="applicant_status_by_camp"/>
+                                                <input type="radio" name="report_option" value="applicant_status_by_camp" />
                                                 Status List by Camp
                                             </label>
                                         </div>
                                         <div class="input-grp">
                                             <label>
-                                                <input type="radio" name="report_option" value="applicant_status_by_status"/>
+                                                <input type="radio" name="report_option" value="applicant_status_by_status" />
                                                 Status List by Status
                                             </label>
                                         </div>
@@ -113,7 +118,7 @@
                                         <div class="input-grp">
                                             <label>
                                                 <input type="radio" name="report_option" value="response_by_school"/>
-                                                Response List by Applicant Name
+                                                Response List by High School
                                             </label>
                                         </div>
                                         <div class="input-grp">
@@ -128,19 +133,19 @@
                                     <div class="report-column p-3" data-report="application" style="display: none;">
                                         <div class="input-grp">
                                             <label>
-                                                <input type="radio" name="report_option" value="application_amounts_by_school"/>
+                                                <input type="radio" name="report_option" value="application_amounts_by_school" />
                                                 Application Amounts by High School
                                             </label>
                                         </div>
                                         <div class="input-grp">
                                             <label>
-                                                <input type="radio" name="report_option" value="application_checklist"/>
+                                                <input type="radio" name="report_option" value="application_checklist" />
                                                 General Application Checklist
                                             </label>
                                         </div>
                                         <div class="input-grp">
                                             <label>
-                                                <input type="radio" name="report_option" value="application_missing_items"/>
+                                                <input type="radio" name="report_option" value="application_missing_items" />
                                                 Missing Items Report
                                             </label>
                                         </div>
@@ -150,25 +155,25 @@
                                     <div class="report-column p-3" data-report="interview" style="display: none;">
                                         <div class="input-grp">
                                             <label>
-                                                <input type="radio" name="report_option" value="interview_schedule_by_date"/>
+                                                <input type="radio" name="report_option" value="interview_schedule_by_date" />
                                                 Interview Schedule by Date
                                             </label>
                                         </div>
                                         <div class="input-grp">
                                             <label>
-                                                <input type="radio" name="report_option" value="interview_schedule_by_name"/>
+                                                <input type="radio" name="report_option" value="interview_schedule_by_name" />
                                                 Interview Schedule by Applicant Name
                                             </label>
                                         </div>
                                         <div class="input-grp">
                                             <label>
-                                                <input type="radio" name="report_option" value="interview_schedule_by_school"/>
+                                                <input type="radio" name="report_option" value="interview_schedule_by_school" />
                                                 Interview Schedule by High School
                                             </label>
                                         </div>
                                         <div class="input-grp">
                                             <label>
-                                                <input type="radio" name="report_option" value="interview_summary"/>
+                                                <input type="radio" name="report_option" value="interview_summary" />
                                                 General Interview Summary
                                             </label>
                                         </div>
@@ -184,73 +189,62 @@
             </div>
 
             <div class="w45 d-flex flex-column gap-4">
+
                 <div class="dsbdy-cmn-card output-options-card">
                     <div class="sec-head">
                         <h3 class="h2-title">Output Options</h3>
                     </div>
 
-                    <form class="request-leave-form output-options-filter" id="output-options-form" aria-labelledby="output-options-heading">
-                        <div class="input-grp">
-                            <label for="">Export Format</label>
-                            <select id="" name="export_format" required>
-                                <option value="pdf" selected>Pdf Document</option>
-                            </select>
-                        </div>
+                    <form class="output-options-filter" id="output-options-form" aria-labelledby="output-options-heading">
+                        <div class="output-options-current primary-label">
 
-                        <div class="input-grp">
-                            <label>Which High School(s) should be included?</label>
-                        </div>
-
-                        <div class="d-flex flex-column gap-3">
-                            <div>
-                                <input type="radio" name="sort_order" value="student_name" checked>
-                                <label for="student_name">All</label>
+                            <div class="input-grp">
+                                <label>Export Format</label>
+                                <select name="export_format">
+                                    <option value="pdf" default>PDF Document</option>
+                                </select>
                             </div>
-                            <div class="d-flex gap-1 align-content-start">
-                                <div style="width:fit-content">
-                                    <input type="radio" name="sort_order" value="student_name">
-                                </div>
-                                <div class="w-100">
-                                    <div><label for="student_name">Specific High School(s):</label></div>
-                                    <div>
-                                        <select>
-                                            <option value="">Select High School(s)</option>
+
+                            <div class="ooc-card inactive">
+                                <div class="input-grp input-grp-ooc">
+                                    <label class="txt-primary">Which high school(s) should be included?</label>
+                                    <label><input type="radio" name="include_high_school" value="all" checked> All</label>
+                                    <label><input type="radio" name="include_high_school" value="specific"> Specific high school(s)</label>
+                                    <div class="ooc-btm-cd">
+                                        <select name="high_school" disabled>
+                                            @forelse($data['high_school'] as $highSchool)
+                                                <option value="{{ $highSchool->id}}">
+                                                    {{ $highSchool->hs_name }}
+                                                </option>
+                                            @empty
+                                                <option value="">No school years available</option>
+                                            @endforelse
                                         </select>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="input-grp mb-0">
-                            <label for="state">Which dates should be included?</label>
-                        </div>
-
-                        <div class="d-flex flex-column gap-3">
-                            <div>
-                                <input type="radio" name="sort_order" value="student_name" checked>
-                                <label for="student_name">All</label>
-                            </div>
-                            <div class="">
-                                <div>
-                                    <input type="radio" name="sort_order" value="student_name" checked>
-                                    <label for="student_name">Specific dates:</label>
-                                </div>
-                                <div class="input-grp">
-                                  <label for="state">Enter Start Date</label>
-                                  <input type="date" name="start_date" required="">
-                                </div>
-    
-                                <div class="input-grp">
-                                  <label for="state">Enter End Date</label>
-                                  <input type="date" name="end_date" required="">
+                            <div class="ooc-card inactive">
+                                <div class="input-grp input-grp-ooc">
+                                    <label class="txt-primary">Which dates should be included?</label>
+                                    <label><input type="radio" name="all" id="all"> All</label>
+                                    <label><input type="radio" name="all" id="all"> Specific dates</label>
+                                    <div class="ooc-btm-cd">
+                                        <div class="input-grp">
+                                            <label>Enter Start Date:</label>
+                                            <input type="date" placeholder="14-09-2022">
+                                        </div>
+                                        <div class="input-grp">
+                                            <label>Enter End Date:</label>
+                                            <input type="date" placeholder="14-09-2022">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    
-                        <div class="opt-cta">
-                            <button type="submit" id="generateReportBtn" class="cmn-btn generate-btn">Generate Reports</button>
+                            <input type="submit" value="Generate Reports">
                         </div>
                     </form>
+
                 </div>
                 
                 <div class="dsbdy-cmn-card">
@@ -295,6 +289,24 @@ $(function() {
 </script>
 
 <script>
+$(function() {
+    const $dropdown = $('select[name="high_school"]');
+    const $radios = $('input[name="include_high_school"]');
+
+    function toggleDropdown() {
+        const selected = $('input[name="include_high_school"]:checked').val();
+        $dropdown.prop('disabled', selected !== 'specific');
+    }
+
+    // When the radio selection changes
+    $radios.on('change', toggleDropdown);
+
+    // Run once on page load
+    toggleDropdown();
+});
+</script>
+
+<script>
 $(document).ready(function () {
     // Selectors
     const selectors = {
@@ -327,12 +339,17 @@ $(document).ready(function () {
             report_type: $(`${selectors.reportTypeForm} input[name="report_type"]:checked`).val(),
             report_option: $(`${selectors.reportTypeForm} input[name="report_option"]:checked`).val(),
             export_format: $(`${selectors.outputOptionsForm} select[name="export_format"]`).val(),
+            include_high_school: $(`${selectors.outputOptionsForm} input[name="include_high_school"]:checked`).val(),
+            high_school: $(`${selectors.outputOptionsForm} select[name="high_school"]`).val(),
             is_preview: isPreview ? 1 : 0,
             _token: '{{ csrf_token() }}'
         };
 
+        if (formData.include_high_school === 'all') {
+            formData.high_school = 'all';
+        }
+
         console.log(formData);
-        return;
 
         // Validation
         if (!formData.school_year || !formData.report_type || !formData.report_option || !formData.export_format) {
