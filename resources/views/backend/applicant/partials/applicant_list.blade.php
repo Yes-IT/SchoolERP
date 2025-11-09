@@ -78,12 +78,12 @@
                 <td>
                     @if(in_array($interviewStatus, [0, 1, 2])) {{-- Pending, Scheduled, or Rescheduled --}}
                         @if($interviewStatus == 0) {{-- Pending --}}
-                            <a href="{{ route('applicant.schedule_interview', $applicant->id) }}" class="cmn-btn btn-sm">
+                            <a href="{{ route('applicant.schedule_interview', $applicant->id) }}" class="cmn-btn btn-sm single-centered-btn">
                                 <img src="{{ global_asset('backend/assets/images/calender-icon.svg') }}" alt="Image"> 
                                 Schedule Interview
                             </a>
                         @else {{-- Scheduled (1) or Rescheduled (2) --}}
-                            <a href="{{ route('applicant.reschedule_interview', $applicant->id) }}" class="cmn-btn btn-sm">
+                            <a href="{{ route('applicant.reschedule_interview', $applicant->id) }}" class="cmn-btn btn-sm single-centered-btn">
                                 <img src="{{ global_asset('backend/assets/images/calender-icon.svg') }}" alt="Image"> 
                                 Reschedule Interview
                             </a>

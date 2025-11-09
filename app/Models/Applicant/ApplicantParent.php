@@ -15,6 +15,18 @@ class ApplicantParent extends Model
         'applicant_id',
         'parent_id',
         'relation_type',
+        'father_last_name',
+        'father_title',
+        'father_name',
+        'father_email',
+        'father_cell',
+        'father_occupation',
+        'mother_title',
+        'mother_name',
+        'mother_email',
+        'mother_cell',
+        'mother_occupation',
+        'maiden_name',
         'address',
         'city',
         'state',
@@ -23,6 +35,8 @@ class ApplicantParent extends Model
         'marital_status',
         'marital_comment',
         'home_phone',
+        'additional_phone_no',
+        'additional_email_addresses',
         
     ];
 }

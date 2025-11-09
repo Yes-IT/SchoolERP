@@ -5,9 +5,9 @@ namespace App\Models\Applicant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\StudentInfo\ParentGuardian;
+// use App\Models\StudentInfo\ParentGuardian;
 use App\Enums\ApplicantStatus;
-use App\Models\Applicant\ApplicationProcessing;
+use App\Models\Applicant\{ApplicationProcessing,ApplicantConfirmation,PaymentTransaction,ApplicantParent};
 
 class Applicant extends Model
 {
@@ -34,7 +34,9 @@ class Applicant extends Model
         'cell',
         'number',
         'hdob',
-        'applicant_status'
+        'applicant_status',
+        'session_id',
+        'year_status_id',
         
     ];
 
@@ -42,31 +44,38 @@ class Applicant extends Model
         'applicant_status' => ApplicantStatus::class,
     ];
 
+    // public function parents()
+    // {
+    //     return $this->belongsToMany(
+    //         ParentGuardian::class,
+    //         'applicant_parents',
+    //         'applicant_id',
+    //         'parent_id'
+    //     )->withPivot([
+    //         'relation_type',
+    //         'address',
+    //         'city',
+    //         'state',
+    //         'zip_code',
+    //         'country',
+    //         'marital_status',
+    //         'marital_comment',
+    //         'home_phone',
+    //     ]);
+    // }
+
     public function parents()
     {
-        return $this->belongsToMany(
-            ParentGuardian::class,
-            'applicant_parents',
-            'applicant_id',
-            'parent_id'
-        )->withPivot([
-            'relation_type',
-            'address',
-            'city',
-            'state',
-            'zip_code',
-            'country',
-            'marital_status',
-            'marital_comment',
-            'home_phone',
-        ]);
+        return $this->hasMany(ApplicantParent::class, 'applicant_id', 'id')
+            ->whereNull('deleted_at');
     }
 
 
-    public function checklist()
-    {
-        return $this->hasOne(ApplicantCheckList::class);
-    }
+
+    // public function checklist()
+    // {
+    //     return $this->hasOne(ApplicantCheckList::class);
+    // }
 
     public function processing()
     {
@@ -83,5 +92,16 @@ class Applicant extends Model
     {
         return $this->hasOne(ApplicationProcessing::class, 'applicant_id', 'id');
     }
+      
+    public function confirmation()
+    {
+        return $this->hasOne(ApplicantConfirmation::class, 'applicant_id');
+    }
+
+    public function transaction()
+    {
+        return $this->hasOne(PaymentTransaction::class, 'applicant_id');
+    }
+
 
 }

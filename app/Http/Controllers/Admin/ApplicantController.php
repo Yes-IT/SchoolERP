@@ -11,6 +11,8 @@ use App\Models\Applicant\{Applicant,ApplicantParent,ApplicationProcessing,Applic
 use Carbon\Carbon;
 use App\Enums\ApplicantStatus;
 use App\Traits\ReturnFormatTrait;
+use App\Models\Academic\YearStatus;
+use App\Models\Session;
 
 
 
@@ -28,28 +30,61 @@ class ApplicantController extends Controller
         return view('backend.applicant.dashboard');
     }
 
+    // public function student_application_form(Request $request)
+    // {
+    //     try{
+    //             $search = $request->get('search');
+    //             $perPage = $request->get('per_page', 5);
+
+    //             $applicants = $this->applicantrepository->getAllApplicants($search, $perPage);
+
+    //             Log::info('listing of Applicants', ['applicants' => $applicants]);
+
+    //            if ($request->ajax() || $request->wantsJson()) {
+    //                 $html = view('backend.applicant.partials.applicant_list', compact('applicants'))->render();
+    //                 return response()->json(['html' => $html]);
+    //             }
+
+
+    //             return view('backend.applicant.index', compact('applicants'));
+    //     } catch(\Exception $e){
+    //         return redirect()->route('applicant.dashboard')->with('error', 'Failed to get applicants.');
+    //     }
+      
+    // }
+
+
     public function student_application_form(Request $request)
     {
-        try{
-                $search = $request->get('search');
-                $perPage = $request->get('per_page', 5);
+        try {
+            $search = $request->get('search');
+            $perPage = $request->get('per_page', 5);
+            $sessionId = $request->get('session_id');
+            $yearStatusId = $request->get('year_status_id');
+            $applicantName = $request->get('applicant_name'); // Add this line
 
-                $applicants = $this->applicantrepository->getAllApplicants($search, $perPage);
+            // Get applicant names for dropdown
+            $applicantNames = $this->applicantrepository->getApplicantNames();
 
-                Log::info('listing of Applicants', ['applicants' => $applicants]);
+            // Update your repository method to accept these parameters
+            $applicants = $this->applicantrepository->getAllApplicants($search, $perPage, $sessionId, $yearStatusId, $applicantName);
 
-               if ($request->ajax() || $request->wantsJson()) {
-                    $html = view('backend.applicant.partials.applicant_list', compact('applicants'))->render();
-                    return response()->json(['html' => $html]);
-                }
+            // Log::info('listing of Applicants', ['applicants' => $applicants]);
 
+            if ($request->ajax() || $request->wantsJson()) {
+                $html = view('backend.applicant.partials.applicant_list', compact('applicants'))->render();
+                return response()->json(['html' => $html]);
+            }
 
-                return view('backend.applicant.index', compact('applicants'));
-        } catch(\Exception $e){
+            $sessions = Session::all();
+            $yearStatuses = YearStatus::all();
+
+            return view('backend.applicant.index', compact('applicants', 'applicantNames','sessions', 'yearStatuses'));
+        } catch(\Exception $e) {
             return redirect()->route('applicant.dashboard')->with('error', 'Failed to get applicants.');
         }
-      
     }
+   
 
     public function applicant_update_status(Request $request)
     {
@@ -69,10 +104,10 @@ class ApplicantController extends Controller
 
             $mappedStatus = $statusMap[$validated['status']] ?? ApplicantStatus::Pending;
 
-            Log::info('Updating applicant status', [
-                'request' => $validated,
-                'mapped_to' => $mappedStatus,
-            ]);
+            // Log::info('Updating applicant status', [
+            //     'request' => $validated,
+            //     'mapped_to' => $mappedStatus,
+            // ]);
 
             $applicant = Applicant::findOrFail($validated['applicant_id']);
             
@@ -107,24 +142,6 @@ class ApplicantController extends Controller
        return view('backend.applicant.parent_contract');
    }
 
-   
-
-    // public function calender()
-    // {
-    //     $slots = ApplicationProcessing::select(
-    //         'interview_date', 'start_time', 'end_time', 'interview_location', 'interview_mode'
-    //     )->get();
-
-    //     // Remove empty ones
-    //     $slots = $slots->filter(function ($slot) {
-    //         return $slot->interview_date && $slot->start_time && $slot->end_time;
-    //     });
-
-    //     Log::info('Cleaned interview slots', ['slots' => $slots]);;
-
-    //     return view('backend.applicant.calender',compact('slots'));
-    // }
-
 
     public function calender(Request $request)
     {
@@ -134,7 +151,8 @@ class ApplicantController extends Controller
 
                 // Fetch all booked slots within this week
                 $slots = ApplicationProcessing::whereBetween('interview_date', [$startOfWeek, $endOfWeek])
-                    ->get();
+                        ->with('applicant')
+                        ->get();
 
                 
                 $timeSlots = [
@@ -148,11 +166,11 @@ class ApplicantController extends Controller
                     ['start' => '17:00:00', 'end' => '17:59:59'],
                 ];
 
-                Log::info('Weekly calendar view slots', [
-                    'range' => [$startOfWeek->toDateString(), $endOfWeek->toDateString()],
-                    'slots' => $slots,
-                    'count' => $slots->count(),
-                ]);
+                // Log::info('Weekly calendar view slots', [
+                //     'range' => [$startOfWeek->toDateString(), $endOfWeek->toDateString()],
+                //     'slots' => $slots,
+                //     'count' => $slots->count(),
+                // ]);
 
             return view('backend.applicant.calender', compact('slots', 'timeSlots', 'startOfWeek', 'endOfWeek'));
         }   
@@ -162,45 +180,6 @@ class ApplicantController extends Controller
         }
     }
 
-    // public function calendar_filter_slots(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'year' => 'required|integer',
-    //         'month' => 'required|integer',
-    //         'week' => 'required|string', 
-    //     ]);
-
-    //     try {
-    //         // Split week range
-    //         [$startDay, $endDay] = explode('-', $validated['week']);
-    //         $startDay = (int) $startDay;
-    //         $endDay = (int) $endDay;
-
-    //         // Generate date range
-    //         $startDate = Carbon::createFromDate($validated['year'], $validated['month'], $startDay);
-    //         $endDate   = Carbon::createFromDate($validated['year'], $validated['month'], $endDay);
-
-    //         Log::info('Filtering calendar slots', [
-    //             'range' => [$startDate->toDateString(), $endDate->toDateString()],
-    //         ]);
-
-    //         // Fetch slots from repository
-    //         $slots = $this->applicantrepository->getSlotsForWeek($startDate, $endDate);
-    //         Log::info('Filtered slots in calendar filter slots', ['slots' => $slots]);
-
-    //         $html = view('backend.applicant.partials.calendar-slots', [
-    //             'slots' => $slots,
-    //             'startOfWeek' => $startDate,
-    //             'endOfWeek' => $endDate,
-    //         ])->render();
-
-    //         return response()->json(['html' => $html]);
-
-    //     } catch (\Throwable $e) {
-    //         Log::error('Error in calendar_filter_slots: ' . $e->getMessage());
-    //         return response()->json(['error' => 'Invalid week range format.'], 400);
-    //     }
-    // }
 
     public function calendar_filter_slots(Request $request)
     {
@@ -223,7 +202,6 @@ class ApplicantController extends Controller
                 'carbon_month' => $carbonMonth
             ]);
 
-           
             $startDate = Carbon::createFromDate($validated['year'], $carbonMonth, $startDay)->startOfDay();
             $endDate   = Carbon::createFromDate($validated['year'], $carbonMonth, $endDay)->endOfDay();
 
@@ -275,8 +253,7 @@ class ApplicantController extends Controller
              $isReschedule = false;
              $existingInterview = null;
 
-
-             Log::info('Applicant details for scheduling interview', ['applicant' => $applicant]);
+              Log::info('Applicant details for scheduling interview', ['applicant' => $applicant]);
 
              return view('backend.applicant.schedule_interview',compact('applicant', 'isReschedule', 'existingInterview'));
         } catch(\Exception $e){
@@ -290,31 +267,33 @@ class ApplicantController extends Controller
         try {
             $validated = $request->validate([
                 'interview_date' => 'required|date',
-                'start_time' => 'required',
-                'end_time' => 'required',
+                'start_time' => 'nullable',
+                'end_time' => 'nullable',
                 'interview_mode' => 'sometimes|string'
             ]);
 
-            // Validate 1-hour duration for search as well
-            $start = strtotime($validated['start_time']);
-            $end = strtotime($validated['end_time']);
-            $duration = ($end - $start) / 3600;
+            // Validate time duration only if both start_time and end_time are provided
+            if (!empty($validated['start_time']) && !empty($validated['end_time'])) {
+                $start = strtotime($validated['start_time']);
+                $end = strtotime($validated['end_time']);
+                $duration = ($end - $start) / 3600;
 
-            if ($duration != 1) {
-                return response()->json([
-                    'success' => false, 
-                    'message' => 'Please select a time range of exactly 1 hour.'
-                ]);
+                if ($duration != 1) {
+                    return response()->json([
+                        'success' => false, 
+                        'message' => 'Please select a time range of exactly 1 hour.'
+                    ]);
+                }
             }
 
             $slots = $this->applicantrepository->getSlotsBetween(
                 $validated['interview_date'],
-                $validated['start_time'],
-                $validated['end_time'],
+                $validated['start_time'] ?? null,
+                $validated['end_time'] ?? null,
                 $validated['interview_mode'] ?? null
             );
 
-            // Log::info('Available interview slots', ['slots' => $slots]);
+            Log::info('Available interview slots', ['slots' => $slots]);
 
             $html = view('backend.applicant.partials.booked_slots', compact('slots'))->render();
 
@@ -332,7 +311,7 @@ class ApplicantController extends Controller
     public function assign_interview_slot(Request $request)
     {
         try {
-            Log::info('request for assign interview slot', ['request' => $request->all()]);
+            // Log::info('request for assign interview slot', ['request' => $request->all()]);
 
             $validated = $request->validate([
                 'applicant_id' => 'required|exists:applicants,id',
@@ -400,10 +379,10 @@ class ApplicantController extends Controller
             $isReschedule = true;
             $existingInterview = $applicant->interview;
 
-            Log::info('Applicant details for rescheduling interview', [
-                'applicant' => $applicant,
-                'existing_interview' => $existingInterview
-            ]);
+            // Log::info('Applicant details for rescheduling interview', [
+            //     'applicant' => $applicant,
+            //     'existing_interview' => $existingInterview
+            // ]);
 
             return view('backend.applicant.schedule_interview', compact('applicant', 'isReschedule', 'existingInterview'));
         } catch (\Exception $e) {
@@ -414,7 +393,7 @@ class ApplicantController extends Controller
     public function update_interview_slot(Request $request)
     {
         try {
-            Log::info('request for update interview slot', ['request' => $request->all()]);
+            // Log::info('request for update interview slot', ['request' => $request->all()]);
 
             $validated = $request->validate([
                 'applicant_id' => 'required|exists:applicants,id',
@@ -503,10 +482,18 @@ class ApplicantController extends Controller
         try{
             $applicant = $this->applicantrepository->getApplicantById($id);
 
-        //    Log::info('Applicant info details', ['applicant' => $applicant]);
+            // Log::info('Applicant info details', ['applicant' => $applicant]);
+            //     Log::info('Applicant parents check', [
+            //     'parents_count' => $applicant->parents->count(),
+            //     'parents' => $applicant->parents->toArray(),
+            // ]);
+
+
+            // $applicant->load(['confirmation', 'transaction']);
 
             return view('backend.applicant.view-applicant-info', compact('applicant'));
         }catch(\Exception $e){
+            Log::info('Error in view_applicant_info: ' . $e->getMessage());
             return redirect()->route('applicant.dashboard')->with('error', 'Failed to get applicant.');
         }
        
@@ -520,8 +507,10 @@ class ApplicantController extends Controller
                 return redirect()->back()->with('error', 'Applicant not found');
             }
 
-            Log::info("Editing applicant with ID: {$id}");
+            // Log::info("Editing applicant with ID: {$id}");
             Log::info('Applicant edit details', ['applicant' => $applicant]);
+
+            $highSchools = HighSchool::orderBy('name')->get();
 
             return view('backend.applicant.edit-applicant', compact('applicant'));
         } catch (\Exception $e) {

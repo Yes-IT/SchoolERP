@@ -13,4 +13,5 @@ interface ApplicantInterface
     public function saveInterviewSchedule($data);
     public function getSlotsForWeek($startDate, $endDate);
     public function updateInterviewSchedule($data);
+    public function getApplicantNames();
 }

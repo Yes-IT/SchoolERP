@@ -8,8 +8,8 @@
                    <div class="ds-breadcrumb">
                         <h1>Applicant</h1>
                         <ul>
-                            <li><a href="dashboard.html">Dashboard</a> /</li>
-                            <li><a href="#">Applicantion</a> /</li>
+                            <li><a href="{{route('applicant.dashboard')}}">Dashboard</a> /</li>
+                            <li><a href="#">Application</a> /</li>
                             <li><a href="{{route('applicant.student_application_form')}}">Applicants List</a> /</li>
                             <li>Applicants Info</li>
                         </ul>
@@ -57,7 +57,7 @@
                                           </tr>
                                           <tr>
                                             <td>Birthdate</td>
-                                             <td>{{ $applicant->birthdate ? \Carbon\Carbon::parse($applicant->birthdate)->format('d/m/Y') : 'N/A' }}</td>
+                                             <td>{{ $applicant->date_of_birth ? \Carbon\Carbon::parse($applicant->date_of_birth)->format('d/m/Y') : 'N/A' }}</td>
                                           </tr>
                                           <tr>
                                             <td>USA Cell</td>
@@ -82,8 +82,8 @@
                                      <table style="width:100%; border-collapse:collapse; font-family:sans-serif; font-size:14px;">
                                         <thead>
                                             <tr style="background-color:#f9f9f9; text-align:left;">
-                                                <th>Camp</th>
-                                                <th>Position</th>
+                                                <th>Name of school</th>
+                                                <th>Grade attended</th>
                                                 
                                             </tr>
                                         </thead>
@@ -98,56 +98,75 @@
                                 </div>
                             </div>
 
-                          @if($applicant->checklist)  
-                            <div class="dspr-bdy-content-sec border-0">
-                                 <h2>Application Check List</h2>
-                                <div class="dsbdy-cmn-table table-full-height ">
-                                    <table>
-                                        <tbody>
-                                          <tr>
-                                            <td>Fee</td>
-                                            <td>${{ number_format((float)optional($applicant->checklist)->fee, 2) }}</td>
+                       
+                        @if($applicant->transaction || $applicant->confirmation)
+                              <div class="dspr-bdy-content-sec border-0">
+                                  <h2>Application Check List</h2>
+                                  <div class="dsbdy-cmn-table table-full-height">
+                                      <table>
+                                          <tbody>
+                                        
+                                              {{-- Payment Info --}}
+                                              @if($applicant->transaction)
+                                                  <tr>
+                                                      <td>Fee</td>
+                                                      <td>${{ number_format((float)($applicant->transaction->amount ?? 0), 2) }}</td>
+                                                  </tr>
+                                                  <tr>
+                                                      <td>CC Last 4</td>
+                                                      <td>{{ $applicant->transaction->card_last4 ?? 'N/A' }}</td>
+                                                  </tr>
+                                                 
+                                              @endif
 
-                                          </tr>
-                                          <tr>
-                                            <td>CC Last 4</td>
-                                            <td>{{ $applicant->checklist->cc_last_4 ?? 'N/A' }}</td>
-                                          </tr>
-                                          <tr>
-                                            <td>Date Deposited</td>
-                                            <td>{{ $applicant->checklist->date_deposited ? \Carbon\Carbon::parse($applicant->checklist->date_deposited)->format('d/m/Y') : 'N/A' }}</td>
-                                          </tr>
-                                          <tr>
-                                            <td>Transcript Hebrew</td>
-                                            <td> <input  type="checkbox" disabled {{ $applicant->checklist->transcript_hebrew ? 'checked' : '' }}></td>
-                                          </tr>
-                                          <tr>
-                                            <td>Transcript English</td>
-                                            <td> <input  type="checkbox" disabled {{ $applicant->checklist->transcript_english ? 'checked' : '' }}></td>
-                                          </tr>
-                                          <tr>
-                                            <td>References</td>
-                                            <td>{{ $applicant->checklist->reference ?? 'N/A' }}</td>
-                                          </tr>
-                                          <tr>
-                                            <td>Pictures</td>
-                                            <td>{{ $applicant->checklist->pictures ?? 'N/A' }}</td>
-                                          </tr>
-                                         
-                                          
-                                        </tbody>
+                                               <tr>
+                                                  <td>Date Deposited</td>
+                                                  <td>
+                                                      {{ $applicant->confirmation->created_at 
+                                                          ? \Carbon\Carbon::parse($applicant->confirmation->created_at)->format('d/m/Y')
+                                                          : 'N/A' }}
+                                                  </td>
+                                                </tr>
+
+                                                <tr>
+                                                  <td>Transcript Hebrew</td>
+                                                  <td> <input  type="checkbox" disabled {{ $applicant->confirmation->transcript_hebrew ? 'checked' : '' }}></td>
+                                                </tr>
+                                                <tr>
+                                                  <td>Transcript English</td>
+                                                  <td> <input  type="checkbox" disabled {{ $applicant->confirmation->transcript_english ? 'checked' : '' }}></td>
+                                                </tr>
+                                                <tr>
+                                                  <td>References</td>
+                                                  <td>{{ $applicant->confirmation->reference ?? 'N/A' }}</td>
+                                                </tr>
+                                                <tr>
+                                                  <td>Pictures</td>
+                                                  <td>{{ $applicant->confirmation->reference ?? 'N/A' }}</td>
+                                                </tr>
+
+                                          </tbody>
                                       </table>
-                                </div>
-                            </div>
-                          @endif
+                                  </div>
+                              </div>
+                        @endif
 
-                          @if($applicant->processing)
+
+                              @if($applicant->processing)
 
                                <div class="dspr-bdy-content-sec border-0">
                                  <h2>Application Processing</h2>
                                 <div class="dsbdy-cmn-table table-full-height ">
                                     <table>
                                         <tbody>
+                                          @php
+                                            $statusMap = [
+                                                0 => 'Pending',
+                                                1 => 'Scheduled',
+                                                2 => 'Rescheduled',
+                                            ];
+                                            $interviewStatus = $applicant->processing->interview_status ?? null;
+                                        @endphp
                                           <tr>
                                             <td>Interview Date</td>
                                             <td>{{ $applicant->processing->interview_date ? \Carbon\Carbon::parse($applicant->processing->interview_date)->format('d/m/Y') : 'N/A' }}</td>
@@ -156,13 +175,28 @@
                                             <td>Interview Time</td>
                                             <td>{{ $applicant->processing->interview_time ?? 'N/A' }}</td>
                                           </tr>
-                                          <tr>
-                                            <td>Interview Location</td>
-                                            <td>{{ $applicant->processing->interview_location ?? 'N/A' }}</td>
+                                          
+                                           <tr>
+                                              <td>Interview Location / Link</td>
+                                              <td>
+                                                  @php
+                                                      $location = $applicant->processing->interview_location ?? null;
+                                                      $link = $applicant->processing->interview_link ?? null;
+                                                  @endphp
+
+                                                  @if($location && $link)
+                                                      {{ $location }} / <a href="{{ $link }}" target="_blank">{{ $link }}</a>
+                                                  @elseif($location)
+                                                      {{ $location }}
+                                                  @elseif($link)
+                                                      <a href="{{ $link }}" target="_blank">{{ $link }}</a>
+                                                  @endif
+                                              </td>
                                           </tr>
+
                                           <tr>
                                             <td>Status</td>
-                                            <td> {{ ucfirst($applicant->processing->status ?? 'N/A') }}</td>
+                                            <td>{{ $statusMap[$interviewStatus] ?? 'N/A' }}</td>
                                           </tr>
                                           <tr>
                                             <td>Letter Sent</td>
@@ -189,6 +223,7 @@
                                 </div>
                             </div>
                           @endif
+
 
 
                             <div class="dspr-bdy-content-sec">

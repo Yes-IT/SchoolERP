@@ -8,10 +8,10 @@
                     <div class="ds-breadcrumb">
                         <h1>Applicant</h1>
                         <ul>
-                            <li><a href="dashboard.html">Dashboard</a> /</li>
-                            <li><a href="#url">Applicantion</a> /</li>
-                            <li><a href="#url">Applicants List</a> /</li>
-                            <li><a href="#url">Applicant Info</a> /</li>
+                            <li><a href="{{route('applicant.dashboard')}}">Dashboard</a> /</li>
+                            <li><a href="#">Application</a> /</li>
+                            <li><a href="{{route('applicant.student_application_form')}}">Applicants List</a> /</li>
+                            {{-- <li><a href="#url">Applicant Info</a> /</li> --}}
                             <li>Add Applicant </li>
                         </ul>
 

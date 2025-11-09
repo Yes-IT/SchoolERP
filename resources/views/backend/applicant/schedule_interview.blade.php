@@ -4,7 +4,21 @@
     {{ @$data['title'] }}
 @endsection
 
-
+<style>
+    #searchSlotsForm .multi-input-grp-list .action-wrp .cmn-btn {
+    width: auto;
+    color: var(--white);
+    padding: 15px 30px;
+    background: var(--primary-clr);
+    align-items: center;
+    justify-content: center;
+    display: inline-flex;
+    gap: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--primary-clr);
+    height: 48px;
+}
+</style>
 @section('content')
            <div class="ds-breadcrumb">
                 {{-- <h1>Schedule Interview</h1> --}}
@@ -269,10 +283,21 @@ document.getElementById('searchSlotsForm').addEventListener('submit', function(e
         if (data.success) {
             container.innerHTML = data.html;
             
-            // Copy date/time values from search form to assign form
-            document.getElementById('assign_interview_date').value = document.getElementById('interview_date').value;
-            document.getElementById('assign_start_time').value = document.getElementById('interview_start_time').value;
-            document.getElementById('assign_end_time').value = document.getElementById('interview_end_time').value;
+             // Only copy values if they exist
+            const interviewDate = document.getElementById('interview_date').value;
+            const startTime = document.getElementById('interview_start_time').value;
+            const endTime = document.getElementById('interview_end_time').value;
+            
+            if (interviewDate) {
+                document.getElementById('assign_interview_date').value = interviewDate;
+            }
+            if (startTime) {
+                document.getElementById('assign_start_time').value = startTime;
+            }
+            if (endTime) {
+                document.getElementById('assign_end_time').value = endTime;
+            }
+            
         } else {
             container.innerHTML = `<p style="color:red;">${data.message}</p>`;
         }
@@ -495,8 +520,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const startTime = document.getElementById('interview_start_time').value;
         const endTime = document.getElementById('interview_end_time').value;
         
+        console.log("Start Time:", startTime);
+        console.log("End Time:", endTime);
+
         if (startTime && endTime && !validateTimeRange(startTime, endTime)) {
             e.preventDefault();
+           
             showNotification('Please select a time range of exactly 1 hour.');
             return;
         }

@@ -9,8 +9,11 @@
     color: #666 !important;
     cursor: not-allowed !important;
     opacity: 0.7;
-}
+   }
 
+   .single-centered-btn {
+    text-wrap: nowrap;
+}
 </style>
 
 @section('content')
@@ -18,7 +21,7 @@
                 <h1>Student Application Forms</h1>
                 <ul>
                     <li><a href="{{route('applicant.dashboard')}}">Dashboard</a> /</li>
-                    <li><a href="#">Student Application Forms</a> /</li>
+                    <li><a href="{{route('applicant.student_application_form')}}">Student Application Forms</a> /</li>
                     
                 </ul>
             </div>
@@ -29,23 +32,37 @@
                         <h2>Filters</h2>
                     </div>
                     <div class="atndnc-filter student-filter">
-                        <form>
+                        <form id="filterForm">
+                            @csrf
                             <div class="atndnc-filter-form">
                                 <div class="atndnc-filter-options multi-input-grp">
                                     <div class="input-grp">
-                                        <select>
-                                            <option value="select-year">Select Year</option>
-                                            <option value="2024">2024</option>
+                                        <select name="session_id" id="session_id">
+                                            <option value="">Select Year</option>
+                                            @foreach($sessions as $session)
+                                                <option value="{{ $session->id }}" 
+                                                    {{ request('session_id') == $session->id ? 'selected' : '' }}>
+                                                    {{ $session->name }} 
+                                                </option>
+                                            @endforeach
                                         </select>
                                     </div>
                                     <div class="input-grp">
-                                        <select>
-                                            <option value="select-year">Select Year Status</option>
-                                            <option value="2024">2024</option>
+                                        <select name="year_status_id" id="year_status_id">
+                                            <option value="">Select Year Status</option>
+                                            @foreach($yearStatuses as $yearStatus)
+                                                <option value="{{ $yearStatus->id }}"
+                                                    {{ request('year_status_id') == $yearStatus->id ? 'selected' : '' }}>
+                                                    {{ $yearStatus->name }}
+                                                </option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
                             
+                                <!-- Hidden field for applicant name -->
+                                 <input type="hidden" name="applicant_name" id="applicant_name" value="{{ request('applicant_name') }}">
+
                                 <!-- Search Button -->
                                 <button type="submit" class="btn-search">Search</button>
                             </div>
@@ -61,235 +78,35 @@
                         </div>
                         <div class="ds-cmn-filter-wrp">
                             <div class="dsbdy-filter-wrp p-0">
-                                <div class="dropdown-year" data-selected="Select Student">
+                                <div class="dropdown-year" data-selected="Select Applicant">
                                     <div class="dropdown-trigger">
-                                      <span class="dropdown-label">Select Student</span>
+                                      <span class="dropdown-label">Select Applicant</span>
                                       <i class="dropdown-arrow"></i>
                                     </div>
                                     <div class="dropdown-options">
-                                      <div class="dropdown-option">Student 1</div>
-                                      <div class="dropdown-option">Student 2</div>
-                                      <div class="dropdown-option">Student 3</div>
+                                        {{-- <div class="dropdown-option">Applicant 1</div>
+                                        <div class="dropdown-option">Applicant 2</div>
+                                        <div class="dropdown-option">Applicant 3</div> --}}
+                                          <div class="dropdown-option" data-value="">All Applicants</div>
+                                                @foreach($applicantNames as $applicant)
+                                                    <div class="dropdown-option" data-value="{{ $applicant->full_name }}">
+                                                        {{ $applicant->full_name }}
+                                                    </div>
+                                                @endforeach
+                                         </div>  
                                     </div>
-                                  </div>
-                                
+                                </div>
+
+                                 
                             </div>
                         </div>
                     </div>
 
                     <div class="ds-cmn-tble count-row " id="applicantTableContainer">
-                        {{-- <table>
-                            <thead>
-                                <tr>
-                                    <th>S. No</th>
-                                    <th>Last Name</th>
-                                    <th>First Name</th>
-                                    <th>High School</th>
-                                    <th>High School (Application)</th>
-                                    <th>City</th>
-                                    <th>Birth Date</th>
-                                    <th>Age</th>
-                                    <th>USA Cell</th>
-                                    <th>Email</th>
-                                    <th>Father Title</th>
-                                    <th>Father Name</th>
-                                    <th>Mother Title</th>
-                                    <th>Mother Name</th>
-                                    <th>Maiden Name</th>
-                                    <th>Address</th>
-                                    <th>Current State</th>
-                                    <th>Current Zipcode</th>
-                                    <th>Current Country</th>
-                                    <th>Marital Status</th>
-                                    <th>Marital Comment</th>
-                                    <th>Home Phone</th>
-                                    <th>Father Cell</th>
-                                    <th>Mother Cell</th>
-                                    <th>Father Email</th>
-                                    <th>Mother Email</th>
-                                    <th>Interview Status</th>
-                                    <th>Interview Mode</th>
-                                    <th>Interview Date</th>
-                                    <th>Interview Time</th>
-                                    <th>Interview Location</th>
-                                    <th>Meeting Link</th>
-                                    <th>Interview Action</th>
-                                    <th>Applicant Status</th>
-                                    <th>Applicant Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                  <td>1</td>
-                                  <td>High School Diploma</td>
-                                  <td>Central HS</td>
-                                  <td>Parent One</td>
-                                  <td>2006-03-12</td>
-                                  <td>א׳ ניסן תשס״ו</td>
-                                  <td>USA</td>
-                                  <td>000-00-0001</td>
-                                  <td>USA</td>
-                                  <td>P0000001</td>
-                                  <td>IPSUM LOREM</td>
-                                  <td>USA</td>
-                                  <td>2030-01-01</td>
-                                  <td>123456789</td>
-                                  <td>Yes</td>
-                                  <td>Full</td>
-                                  <td>lorem.ipsum1@example.com</td>
-                                  <td>+1-555-000-0001</td>
-                                  <td>+972-50-000-0001</td>
-                                  <td>123 Example St</td>
-                                  <td>USA</td>
-                                  <td>+1-555-111-0001</td>
-                                  <td>No</td>
-                                  <td>/images/lorem1.jpg</td>
-                                  <td>10A</td>
-                                  <td>Group 1</td>
-                                  <td>Division A</td>
-                                  <td>2</td>
-                                  <td>201</td>
-                                  <td>Signed</td>
-                                  <td>Received</td>
-                                  <td>Submitted</td>
-                                  <td>
-                                    <a href="#url" class="cmn-btn btn-sm"><img src="{{global_asset('backend/assets/images/calender-icon.svg')}}" alt="Image"> Reschedule Interview</a>
-                                  </td>
-                                  <td><span class="cmn-tbl-btn yellow-bg">Pending</span></td>
-                                  <td>
-                                    <div class="actions-wrp">
-                                        <button type="button" class="cmn-tbl-btn green-bg"><i class="fa-solid fa-check"></i> Approve</button>
-                                        <button type="button" class="cmn-tbl-btn red-bg"><i class="fa-solid fa-xmark"></i> Reject</button>
-                                    </div>
-                                  </td>
-                                </tr>
-                                <tr>
-                                    <td>1</td>
-                                    <td>High School Diploma</td>
-                                    <td>Central HS</td>
-                                    <td>Parent One</td>
-                                    <td>2006-03-12</td>
-                                    <td>א׳ ניסן תשס״ו</td>
-                                    <td>USA</td>
-                                    <td>000-00-0001</td>
-                                    <td>USA</td>
-                                    <td>P0000001</td>
-                                    <td>IPSUM LOREM</td>
-                                    <td>USA</td>
-                                    <td>2030-01-01</td>
-                                    <td>123456789</td>
-                                    <td>Yes</td>
-                                    <td>Full</td>
-                                    <td>lorem.ipsum1@example.com</td>
-                                    <td>+1-555-000-0001</td>
-                                    <td>+972-50-000-0001</td>
-                                    <td>123 Example St</td>
-                                    <td>USA</td>
-                                    <td>+1-555-111-0001</td>
-                                    <td>No</td>
-                                    <td>/images/lorem1.jpg</td>
-                                    <td>10A</td>
-                                    <td>Group 1</td>
-                                    <td>Division A</td>
-                                    <td>2</td>
-                                    <td>201</td>
-                                    <td>Signed</td>
-                                    <td>Received</td>
-                                    <td>Submitted</td>
-                                    <td>
-                                      <a href="#url" class="cmn-btn btn-sm"><img src="{{global_asset('backend/assets/images/calender-icon.svg')}}" alt="Image"> Reschedule Interview</a>
-                                    </td>
-                                    <td><span class="cmn-tbl-btn yellow-bg">Pending</span></td>
-                                    <td>
-                                      <div class="actions-wrp">
-                                          <button type="button" class="cmn-tbl-btn green-bg"><i class="fa-solid fa-check"></i> Approve</button>
-                                          <button type="button" class="cmn-tbl-btn red-bg"><i class="fa-solid fa-xmark"></i> Reject</button>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td>1</td>
-                                    <td>High School Diploma</td>
-                                    <td>Central HS</td>
-                                    <td>Parent One</td>
-                                    <td>2006-03-12</td>
-                                    <td>א׳ ניסן תשס״ו</td>
-                                    <td>USA</td>
-                                    <td>000-00-0001</td>
-                                    <td>USA</td>
-                                    <td>P0000001</td>
-                                    <td>IPSUM LOREM</td>
-                                    <td>USA</td>
-                                    <td>2030-01-01</td>
-                                    <td>123456789</td>
-                                    <td>Yes</td>
-                                    <td>Full</td>
-                                    <td>lorem.ipsum1@example.com</td>
-                                    <td>+1-555-000-0001</td>
-                                    <td>+972-50-000-0001</td>
-                                    <td>123 Example St</td>
-                                    <td>USA</td>
-                                    <td>+1-555-111-0001</td>
-                                    <td>No</td>
-                                    <td>/images/lorem1.jpg</td>
-                                    <td>10A</td>
-                                    <td>Group 1</td>
-                                    <td>Division A</td>
-                                    <td>2</td>
-                                    <td>201</td>
-                                    <td>Signed</td>
-                                    <td>Received</td>
-                                    <td>Submitted</td>
-                                    <td>
-                                      <a href="./schedule-interview.html" class="cmn-btn btn-sm"><img src="{{global_asset('backend/assets/images/calender-icon.svg')}}" alt="Image"> Schedule Interview</a>
-                                    </td>
-                                    <td><span class="cmn-tbl-btn red-bg">Rejected</span></td>
-                                    <td>
-                                      <div class="actions-wrp">
-                                          <button type="button" class="cmn-tbl-btn btn-disabled"><i class="fa-solid fa-check"></i> Approve</button>
-                                          <button type="button" class="cmn-tbl-btn btn-disabled"><i class="fa-solid fa-xmark"></i> Reject</button>
-                                      </div>
-                                    </td>
-                                  </tr>
-                              </tbody>
-                        </table> --}}
-
                          @include('backend.applicant.partials.applicant_list', ['applicants' => $applicants])
-
                     </div>
 
-                    {{-- <div class="tablepagination">
-                        <div class="tbl-pagination-inr">
-                            <ul>
-                                <li><a href="#url"><img src="{{global_asset('backend/assets/images/arrow-left.svg')}}" alt="Icon"></a></li>
-                                <li class="active"><a href="#url">1</a></li>
-                                <li><a href="#url">2</a></li>
-                                <li><a href="#url">3</a></li>
-                                <li><a href="#url"><img src="{{global_asset('backend/assets/images/arrow-right.svg')}}" alt="Icon"></a></li>
-                            </ul>
-                        </div>
-
-                        <div class="pages-select">
-                            <form>
-                                <div class="formfield">
-                                    <label>Per page</label>
-                                    <select>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
-                                        <option value="9">9</option>
-                                        <option value="10">10</option>
-                                    </select>
-                                </div>
-                            </form>
-                            <p>of 2 results</p>
-                        </div>
-                    </div> --}}
+                   
                 </div>
                   
             </div>
@@ -334,10 +151,168 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <script>
+// working script    
+// $(document).ready(function () {
+//     $('.applicant-action-btn').on('click', function () {
+//         let applicantId = $(this).data('id');
+//         let action = $(this).data('action'); // approved / rejected
+//         let $row = $(this).closest('tr');
+
+//         if (!confirm(`Are you sure you want to ${action} this applicant?`)) {
+//             return;
+//         }
+
+//         $.ajax({
+//             url: "{{ route('applicant.applicant_update_status') }}",
+//             type: "POST",
+//             data: {
+//                 _token: "{{ csrf_token() }}",
+//                 applicant_id: applicantId,
+//                 status: action
+//             },
+//             success: function (response) {
+//                 if (response.success) {
+//                     alert(response.message);
+
+//                     // Update status cell
+//                     let $statusCell = $row.find('td').eq(-2).find('span');
+//                     $statusCell.text(response.new_status);
+
+//                     // Reset color classes
+//                     $statusCell.removeClass('green-bg red-bg yellow-bg');
+
+//                     if (response.new_status === 'accept') {
+//                         $statusCell.addClass('green-bg');
+//                         $statusCell.text('Approved');
+//                     } else if (response.new_status === 'not_accepted') {
+//                         $statusCell.addClass('red-bg');
+//                         $statusCell.text('Rejected');
+//                     } else {
+//                         $statusCell.addClass('yellow-bg');
+//                         $statusCell.text('Pending');
+//                     }
+
+//                     // Disable or hide buttons
+//                     $row.find('.applicant-action-btn').prop('disabled', true);
+//                 } else {
+//                     alert('Error: ' + response.message);
+//                 }
+//             },
+//             error: function (xhr, status, error) {
+//                 console.error('Error:', error);
+//                 alert('Something went wrong while updating the status.');
+//             }
+//         });
+//     });
+// });
+
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const tableContainer = document.querySelector('#applicantTableContainer');
+    const filterForm = document.querySelector('#filterForm');
+    const resetFilter = document.querySelector('#resetFilter');
+    const applicantNameField = document.querySelector('#applicant_name');
+    const dropdownTrigger = document.querySelector('.dropdown-trigger');
+    const dropdownLabel = document.querySelector('.dropdown-label');
+    const dropdownOptions = document.querySelector('.dropdown-options');
+
+    // Dropdown functionality
+    dropdownTrigger.addEventListener('click', function() {
+        dropdownOptions.classList.toggle('active');
+    });
+
+    // Handle dropdown option selection
+    document.querySelectorAll('.dropdown-option').forEach(option => {
+        option.addEventListener('click', function() {
+            const applicantName = this.getAttribute('data-value');
+            const applicantText = this.textContent;
+            
+            // Update dropdown label
+            dropdownLabel.textContent = applicantText;
+            
+            // Set the hidden field value
+            applicantNameField.value = applicantName;
+            
+            // Close dropdown
+            dropdownOptions.classList.remove('active');
+            
+            // Apply filter immediately
+            applyFilter();
+        });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!dropdownTrigger.contains(event.target) && !dropdownOptions.contains(event.target)) {
+            dropdownOptions.classList.remove('active');
+        }
+    });
+
+    // Apply filter function
+    function applyFilter() {
+        const formData = new FormData(filterForm);
+        loadTableData('{{ route('applicant.student_application_form') }}', formData);
+    }
+
+    function loadTableData(url = '{{ route('applicant.student_application_form') }}', formData = null) {
+        let finalUrl = url;
+        
+        if (formData) {
+            const params = new URLSearchParams(formData);
+            finalUrl = `${url}?${params.toString()}`;
+        }
+
+        fetch(finalUrl, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(data => {
+            tableContainer.innerHTML = data.html;
+            attachPaginationListeners(); 
+        })
+        .catch(console.error);
+    }
+
+    function attachPaginationListeners() {
+        document.querySelectorAll('.tablepagination a').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const pageUrl = link.getAttribute('href');
+                const formData = new FormData(filterForm);
+                loadTableData(pageUrl, formData);
+            });
+        });
+    }
+
+    // Handle main filter form submission
+    filterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        applyFilter();
+    });
+
+    // Handle reset filter
+    if (resetFilter) {
+        resetFilter.addEventListener('click', function() {
+            filterForm.reset();
+            applicantNameField.value = '';
+            dropdownLabel.textContent = 'Select Applicant';
+            loadTableData('{{ route('applicant.student_application_form') }}');
+        });
+    }
+
+    attachPaginationListeners();
+});
+
+// Keep your existing applicant action script unchanged
 $(document).ready(function () {
     $('.applicant-action-btn').on('click', function () {
         let applicantId = $(this).data('id');
-        let action = $(this).data('action'); // approved / rejected
+        let action = $(this).data('action');
         let $row = $(this).closest('tr');
 
         if (!confirm(`Are you sure you want to ${action} this applicant?`)) {
@@ -356,11 +331,9 @@ $(document).ready(function () {
                 if (response.success) {
                     alert(response.message);
 
-                    // Update status cell
                     let $statusCell = $row.find('td').eq(-2).find('span');
                     $statusCell.text(response.new_status);
 
-                    // Reset color classes
                     $statusCell.removeClass('green-bg red-bg yellow-bg');
 
                     if (response.new_status === 'accept') {
@@ -374,7 +347,6 @@ $(document).ready(function () {
                         $statusCell.text('Pending');
                     }
 
-                    // Disable or hide buttons
                     $row.find('.applicant-action-btn').prop('disabled', true);
                 } else {
                     alert('Error: ' + response.message);
@@ -387,7 +359,6 @@ $(document).ready(function () {
         });
     });
 });
-
 </script>
 
     

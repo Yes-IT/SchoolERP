@@ -16,7 +16,7 @@ class ParentGuardian extends BaseModel
 {
     use HasFactory;
 
-      protected $table = 'parent_guardians';
+    protected $table = 'parent_guardians';
 
     protected $fillable = [
         'user_id',

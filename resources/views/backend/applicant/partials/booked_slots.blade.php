@@ -24,7 +24,7 @@
                                     <span class="avlble-slot-date">{{ $formattedDate }}</span>
                                     <span class="avlble-slot-time">{{ $formattedTime }}</span>
                                 </label>
-                                <input id="avaiable-slot-{{ $index + 1 }}" type="radio" name="avaiable-slot" value="{{ $slot->id }}" />
+                                {{-- <input id="avaiable-slot-{{ $index + 1 }}" type="radio" name="avaiable-slot" value="{{ $slot->id }}" /> --}}
                             </div>
                         @endforeach
                     </div>

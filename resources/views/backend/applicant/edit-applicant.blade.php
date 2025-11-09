@@ -8,10 +8,10 @@
                     <div class="ds-breadcrumb">
                         <h1>Edit Applicant</h1>
                         <ul>
-                            <li><a href="dashboard.html">Dashboard</a> /</li>
-                            <li><a href="#url">Applicantion</a> /</li>
-                            <li><a href="#url">Applicants List</a> /</li>
-                            <li><a href="#url">Applicant Info</a> /</li>
+                             <li><a href="{{route('applicant.dashboard')}}">Dashboard</a> /</li>
+                            <li><a href="#">Application</a> /</li>
+                            <li><a href="{{route('applicant.student_application_form')}}">Applicants List</a> /</li>
+                            {{-- <li><a href="#url">Applicant Info</a> /</li> --}}
                             <li>Edit Applicant </li>
                         </ul>
 
@@ -50,16 +50,22 @@
                                               <input type="text" id="high_school" name="high_school" value="{{ old('high_school', $applicant->high_school ?? '') }}" >
                                             </div>
                                             <div class="input-grp">
+                                              <label for="subject">Others High School</label>
+                                              <input type="text" id="high_school" name="high_school" value="{{ old('high_school', $applicant->high_school ?? '') }}" >
+                                            </div>
+
+                                            <div class="input-grp">
                                               <label for="">Birthdate</label>
                                               <input type="date" id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth', $applicant->date_of_birth ?? '') }}">
                                             </div>
+                                            
+                                        </div>
+                                      
+                                        <div class="multi-input-grp grp-3">
                                             <div class="input-grp">
                                               <label for="">USA Cell</label>
                                               <input type="text" id="usa_cell" name="usa_cell" value="{{ old('usa_cell', $applicant->usa_cell ?? '') }}" >
                                             </div>
-                                        </div>
-                                      
-                                        <div class="multi-input-grp grp-3">
                                             <div class="input-grp">
                                                 <label for="">Email</label>
                                                 <input type="text" id ="email" name="email" value="{{ old('email', $applicant->email ?? '') }}">

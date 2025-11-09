@@ -16,6 +16,9 @@ class ApplicationProcessing extends Model
     protected $fillable = [
         'applicant_id',
         'interview_mode',
+        'start_time',
+        'end_time',
+        'interview_mode',
         'interview_date',
         'interview_time',
         'interview_link',
