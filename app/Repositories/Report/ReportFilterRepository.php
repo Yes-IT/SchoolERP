@@ -8,6 +8,7 @@ use App\Models\StudentInfo\Student;
 use App\Models\Academic\Semester;
 use App\Models\Academic\YearStatus;
 use App\Models\Session;
+use App\Models\HighSchool;
 
 class ReportFilterRepository implements ReportFilterInterface
 {
@@ -34,5 +35,10 @@ class ReportFilterRepository implements ReportFilterInterface
     public function getschoolyears()
     {
         return Session::all();
+    }
+
+    public function getHighSchool()
+    {
+        return HighSchool::all();
     }
 }

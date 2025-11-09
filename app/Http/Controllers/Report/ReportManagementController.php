@@ -57,6 +57,10 @@ class ReportManagementController extends Controller
             $filters['students'] = $this->filterRepo->getStudents();
         }
 
+        if (in_array('high_school', $needed)) {
+            $filters['high_school'] = $this->filterRepo->getHighSchool();
+        }
+
         return $filters;
     }
 
@@ -104,8 +108,8 @@ class ReportManagementController extends Controller
 
     public function applicantReport()
     {
-        $data = $this->getFilterOption();
-        return view('backend.report.applicant_report.applicant-report', compact('data'));
+        $data = $this->getFilterOption(['school_years', 'high_school']);
+        return view('backend.report.applicant_reports.applicant-report', compact('data'));
     }
 
     public function tuitionReport()

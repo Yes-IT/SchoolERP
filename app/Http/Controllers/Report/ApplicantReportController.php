@@ -20,28 +20,31 @@ class ApplicantReportController extends Controller
         $this->repo = $repo;
     }
 
-    protected function getReportConfig(string $reportType): array
+    protected function getReportConfig(string $reportOption): array
     {
-        return match ($reportType) {
-            'alumni_list' => [
-                'view' => 'backend.report.alumni_reports.pdf.alumni_list_pdf',
-                'orientation' => 'landscape',
+        return match ($reportOption) {
+            'applicant_status_by_name' => [
+                'view' => 'backend.report.applicant_reports.pdf.applicant_status_by_name',
             ],
-            'alumni_home_address_labels' => [
-                'view' => 'backend.report.alumni_reports.pdf.alumni_home_address_labels_pdf',
+            'applicant_status_by_school' => [
+                'view' => 'backend.report.applicant_reports.pdf.applicant_status_by_school',
             ],
-            default => throw new Exception("Invalid report type: {$reportType}"),
+            'applicant_status_by_camp' => [
+                'view' => 'backend.report.applicant_reports.pdf.applicant_status_by_camp',
+            ],
+            'applicant_status_by_status' => [
+                'view' => 'backend.report.applicant_reports.pdf.applicant_status_by_status',
+            ],
+            default => throw new Exception("Invalid report type: {$reportOption}"),
         };
     }
 
     public function generateReport(Request $request)
     {
         $validated = Validator::make($request->all(), [
-            'report_type'       => 'required|string|in:alumni_list,alumni_home_address_labels',
+            'report_type'       => 'required|string',
+            'report_option'       => 'required|string',
             'school_year'        => 'required|integer',
-            'year_status'    => 'required|string',
-            'sort_order'        => 'required|string|in:name,year',
-            'show_year'        => 'sometimes|boolean',
             'export_format'    => 'required|string|in:pdf',
             'is_preview'       => 'required|boolean',
         ]);
@@ -55,18 +58,18 @@ class ApplicantReportController extends Controller
         }
 
         try {
-            $reportType = $request->input('report_type');
+            $reportOption = $request->input('report_option');
             $exportFormat = $request->input('export_format');
             $isPreview = $request->boolean('is_preview', false);
 
-            $config = $this->getReportConfig($reportType);
-            $data = $this->repo->generateReportData($reportType, $request);
+            $config = $this->getReportConfig($reportOption);
+            $data = $this->repo->generateReportData($reportOption, $request);
 
             switch ($exportFormat) {
                 case 'pdf':
                     return $isPreview
-                        ? $this->previewPDF($reportType, $config, $data)
-                        : $this->generatePDF($reportType, $config, $data);
+                        ? $this->previewPDF($reportOption, $config, $data)
+                        : $this->generatePDF($reportOption, $config, $data);
                 default:
                     return response()->json([
                         'success' => false,
@@ -83,21 +86,21 @@ class ApplicantReportController extends Controller
         }
     }
 
-    protected function generatePDF($reportType, array $config, $data)
+    protected function generatePDF($reportOption, array $config, $data)
     {
         $pdf = PDF::loadView($config['view'], compact('data'))
             ->setPaper('A4', $config['orientation'] ?? 'portrait');
 
-        $fileName = sprintf('%s_report_%s.pdf', $reportType, now()->format('Ymd_His'));
+        $fileName = sprintf('%s_report_%s.pdf', $reportOption, now()->format('Ymd_His'));
         return $pdf->download($fileName);
     }
 
-    protected function previewPDF($reportType, array $config, $data)
+    protected function previewPDF($reportOption, array $config, $data)
     {
         $pdf = PDF::loadView($config['view'], compact('data'))
             ->setPaper('A4', $config['orientation'] ?? 'portrait');
 
-        $fileName = sprintf('%s_preview_%s.pdf', $reportType, now()->format('Ymd_His'));
+        $fileName = sprintf('%s_preview_%s.pdf', $reportOption, now()->format('Ymd_His'));
         return $pdf->stream($fileName, [
             'Content-Type'  => 'application/pdf',
             'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
