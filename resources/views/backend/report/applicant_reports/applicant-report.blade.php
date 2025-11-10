@@ -205,11 +205,11 @@
                                 </select>
                             </div>
 
-                            <div class="ooc-card inactive">
+                            <div id="includeHighSchoolFilter" class="ooc-card inactive">
                                 <div class="input-grp input-grp-ooc">
                                     <label class="txt-primary">Which high school(s) should be included?</label>
-                                    <label><input type="radio" name="include_high_school" value="all" checked> All</label>
-                                    <label><input type="radio" name="include_high_school" value="specific"> Specific high school(s)</label>
+                                    <label><input type="radio" name="include_high_school" value="all" checked disabled> All</label>
+                                    <label><input type="radio" name="include_high_school" value="specific" disabled> Specific high school(s)</label>
                                     <div class="ooc-btm-cd">
                                         <select name="high_school" disabled>
                                             @forelse($data['high_school'] as $highSchool)
@@ -224,23 +224,33 @@
                                 </div>
                             </div>
 
-                            <div class="ooc-card inactive">
+                            <div id="includeDateFilter" class="ooc-card inactive">
                                 <div class="input-grp input-grp-ooc">
                                     <label class="txt-primary">Which dates should be included?</label>
-                                    <label><input type="radio" name="all" id="all"> All</label>
-                                    <label><input type="radio" name="all" id="all"> Specific dates</label>
+
+                                    <label>
+                                        <input type="radio" name="date_range" value="all" checked disabled>
+                                        All
+                                    </label>
+
+                                    <label>
+                                        <input type="radio" name="date_range" value="specific" disabled>
+                                        Specific dates
+                                    </label>
+
                                     <div class="ooc-btm-cd">
                                         <div class="input-grp">
                                             <label>Enter Start Date:</label>
-                                            <input type="date" placeholder="14-09-2022">
+                                            <input type="date" placeholder="14-09-2022" disabled>
                                         </div>
                                         <div class="input-grp">
                                             <label>Enter End Date:</label>
-                                            <input type="date" placeholder="14-09-2022">
+                                            <input type="date" placeholder="14-09-2022" disabled>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
                             <input type="submit" value="Generate Reports">
                         </div>
                     </form>
@@ -303,6 +313,72 @@ $(function() {
 
     // Run once on page load
     toggleDropdown();
+});
+</script>
+
+<script>
+$(function() {
+    const $dateFilter = $('#includeDateFilter');
+    const $dateInputs = $dateFilter.find('input[type="date"]');
+    const $dateRadios = $dateFilter.find('input[name="date_range"]');
+
+    // Watch for change in the radio inside the date filter
+    $dateFilter.on('change', 'input[name="date_range"]', function() {
+        if (this.value === 'specific') {
+            $dateInputs.prop('disabled', false);
+        } else {
+            $dateInputs.prop('disabled', true);
+        }
+    });
+});
+</script>
+
+<script>
+$(function() {
+    const $highSchoolFilter = $('#includeHighSchoolFilter');
+    const $dateFilter = $('#includeDateFilter');
+
+    const highSchoolOptions = [
+        'applicant_status_by_school',
+        'response_by_school',
+        'application_amounts_by_school',
+        'interview_schedule_by_school'
+    ];
+
+    const dateOptions = [
+        'interview_schedule_by_date',
+        'interview_summary'
+    ];
+
+    $('input[name="report_option"]').on('change', function() {
+        const value = this.value;
+
+        // High school filter toggle
+        if (highSchoolOptions.includes(value)) {
+            $highSchoolFilter
+                .removeClass('inactive')
+                .find('input, select')
+                .prop('disabled', false);
+        } else {
+            $highSchoolFilter
+                .addClass('inactive')
+                .find('input, select')
+                .prop('disabled', true);
+        }
+
+        // Date filter toggle
+        if (dateOptions.includes(value)) {
+            $dateFilter
+                .removeClass('inactive')
+                .find('input, select')
+                .prop('disabled', false);
+        } else {
+            $dateFilter
+                .addClass('inactive')
+                .find('input, select')
+                .prop('disabled', true);
+        }
+    });
 });
 </script>
 
