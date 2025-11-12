@@ -30,8 +30,8 @@ class ApplicantUpdateRequest extends FormRequest
             'last_name' => 'required|string|max:50',
             'email' => 'nullable|email|max:255',
             'usa_cell' => 'nullable|string|max:20',
-            'high_school_id' => 'required|exists:high_schools,id', 
-            'other_high_school' => 'nullable|string|max:255',
+            'high_school_id' => 'required', 
+            'high_school' => 'nullable|string|max:255|required_if:high_school_id,other',
             'date_of_birth' => 'nullable|date',
             'highschool_application' => 'nullable|string|max:50',
 
@@ -91,6 +91,13 @@ class ApplicantUpdateRequest extends FormRequest
             'processing.scholarship_comment' => 'nullable|string',
             'processing.tution_comment' => 'nullable|string',
             'processing.letter_sent' => 'nullable|boolean',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'high_school.required_if' => 'The other high school field is required when "Other" is selected.',
         ];
     }
 

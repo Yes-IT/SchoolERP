@@ -53,8 +53,14 @@
                                           </tr>
                                           <tr>
                                             <td>High School</td>
-                                            <td>{{ $applicant->highSchool->hs_name ?? 'N/A' }}</td>
+                                            {{-- <td>{{ $applicant->highSchool->hs_name ?? 'N/A' }}</td> --}}
+                                            <td>
+                                            {{ $applicant->highSchool->hs_name ?? (!empty($applicant->high_school) ? 'Other (' . $applicant->high_school . ')' : 'N/A') }}
+                                            </td>
                                           </tr>
+                                        
+
+
                                           <tr>
                                             <td>Birthdate</td>
                                              <td>{{ $applicant->date_of_birth ? \Carbon\Carbon::parse($applicant->date_of_birth)->format('d/m/Y') : 'N/A' }}</td>
@@ -77,27 +83,7 @@
                                 </div>
                             </div>
 
-                            {{-- <div class="dspr-bdy-content-sec">
-                                <h2>Camp (S) Attended</h2>
-                                <div class="dsbdy-cmn-table table-full-height pr-pg-tbl-wrp">
-                                     <table style="width:100%; border-collapse:collapse; font-family:sans-serif; font-size:14px;">
-                                        <thead>
-                                            <tr style="background-color:#f9f9f9; text-align:left;">
-                                                <th>Name of school</th>
-                                                <th>Grade attended</th>
-                                                
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>Sunday</td>
-                                                <td>2</td>
-                                               
-                                            </tr>
-                                        </tbody>
-                                      </table>
-                                </div>
-                            </div> --}}
+                           
                             <div class="dspr-bdy-content-sec">
                               <h2>Camp(s) Attended</h2>
                               <div class="dsbdy-cmn-table table-full-height pr-pg-tbl-wrp">
@@ -190,92 +176,6 @@
                                 </div>
                           @endif
 
-
-                        
-
-                          {{-- @php
-                              $processing = $applicant->processing;
-                          @endphp
-
-                          @if(!is_null($processing) && is_object($processing))
-                              @php
-                                  $statusMap = [
-                                      0 => 'Pending',
-                                      1 => 'Scheduled', 
-                                      2 => 'Rescheduled',
-                                  ];
-                                  $interviewStatus = $processing->interview_status ?? null;
-                              @endphp
-                              
-                              <div class="dspr-bdy-content-sec border-0">
-                                  <h2>Application Processing</h2>
-                                  <div class="dsbdy-cmn-table table-full-height ">
-                                      <table>
-                                          <tbody>
-                                              <tr>
-                                                  <td>Interview Date</td>
-                                                  <td>
-                                                      @if(!empty($processing->interview_date))
-                                                          {{ \Carbon\Carbon::parse($processing->interview_date)->format('d/m/Y') }}
-                                                      @else
-                                                          N/A
-                                                      @endif
-                                                  </td>
-                                              </tr>
-                                              <tr>
-                                                  <td>Interview Time</td>
-                                                  <td>{{ $processing->interview_time ?? 'N/A' }}</td>
-                                              </tr>
-                                              
-                                              <tr>
-                                                  <td>Interview Location / Link</td>
-                                                  <td>
-                                                      @php
-                                                          $location = $processing->interview_location ?? null;
-                                                          $link = $processing->interview_link ?? null;
-                                                      @endphp
-
-                                                      @if($location && $link)
-                                                          {{ $location }} / <a href="{{ $link }}" target="_blank">{{ $link }}</a>
-                                                      @elseif($location)
-                                                          {{ $location }}
-                                                      @elseif($link)
-                                                          <a href="{{ $link }}" target="_blank">{{ $link }}</a>
-                                                      @else
-                                                          N/A
-                                                      @endif
-                                                  </td>
-                                              </tr>
-
-                                              <tr>
-                                                  <td>Status</td>
-                                                  <td>{{ isset($interviewStatus) ? ($statusMap[$interviewStatus] ?? 'N/A') : 'N/A' }}</td>
-                                              </tr>
-                                              <tr>
-                                                  <td>Letter Sent</td>
-                                                  <td><input type="checkbox" disabled {{ !empty($processing->letter_sent) ? 'checked' : '' }}></td>
-                                              </tr>
-                                              <tr>
-                                                  <td>Coming</td>
-                                                  <td>{{ $processing->coming ?? 'N/A' }}</td>
-                                              </tr>
-                                              <tr>
-                                                  <td>Application Comment</td>
-                                                  <td>{{ $processing->application_comment ?? 'N/A' }}</td>
-                                              </tr>
-                                              <tr>
-                                                  <td>Scholarship Comment</td>
-                                                  <td>{{ $processing->scholarship_comment ?? 'N/A' }}</td>
-                                              </tr>
-                                              <tr>
-                                                  <td>Tuition Comment</td>
-                                                  <td>{{ $processing->tuition_comment ?? 'N/A' }}</td>
-                                              </tr>
-                                          </tbody>
-                                      </table>
-                                  </div>
-                              </div>
-                          @endif --}}
 
                             @php
                               $processing = $applicant->processing;
