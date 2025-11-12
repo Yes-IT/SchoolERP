@@ -233,7 +233,7 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::post('/store-applicant', 'store_applicant')->name('applicant.store_applicant')->middleware('PermissionCheck:applicant_read');
                     Route::get('/view-applicant-info/{id}', 'view_applicant_info')->name('applicant.view_applicant_info')->middleware('PermissionCheck:applicant_read');
                     Route::get('/edit-applicant/{id}', 'edit_applicant')->name('applicant.edit_applicant')->middleware('PermissionCheck:applicant_read');
-                    Route::post('/update-applicant/{id}',  'update_applicant')->name('applicant.update_applicant')->middleware('PermissionCheck:applicant_update');
+                    Route::post('/update-applicant/{id}',  'update_applicant')->name('applicant.update_applicant');
 
                     Route::get('/custom-applicant-chart', 'custom_applicant_chart')->name('applicant.custom_applicant_chart')->middleware('PermissionCheck:applicant_read');
                     Route::get('/contacts', 'contacts')->name('applicant.contacts')->middleware('PermissionCheck:applicant_read');

@@ -62,23 +62,27 @@
     <form action="{{ route($routeName) }}" method="GET" id="perPageForm">
         <div class="formfield">
             <label>Per page</label>
-            <select name="per_page">
-                @for ($i = 1; $i <= 10; $i++)
-                    <option value="{{ $i }}" {{ request('per_page', 2) == $i ? 'selected' : '' }}>
-                        {{ $i }}
-                    </option>
-                @endfor
+            <select name="per_page" id="perPageSelect">
+                <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                <option value="25" {{ request('per_page', 10) == 25 ? 'selected' : '' }}>25</option>
+                <option value="50" {{ request('per_page', 10) == 50 ? 'selected' : '' }}>50</option>
+                <option value="100" {{ request('per_page', 10) == 100 ? 'selected' : '' }}>100</option>
             </select>
-            {{-- Preserve filters --}}
-            @foreach ($queryParams as $key => $value)
-                @if (!in_array($key, ['per_page', 'page']))
+            
+            {{-- Preserve all filters except pagination --}}
+            @foreach(request()->except(['per_page', 'page']) as $key => $value)
+                @if(is_array($value))
+                    @foreach($value as $arrayValue)
+                        <input type="hidden" name="{{ $key }}[]" value="{{ $arrayValue }}">
+                    @endforeach
+                @else
                     <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                 @endif
             @endforeach
         </div>
     </form>
     <p>
-        Showing {{ $paginator->firstItem() }} – {{ $paginator->lastItem() }}
+        Showing {{ $paginator->firstItem() ?? 0 }} – {{ $paginator->lastItem() ?? 0 }}
         of {{ $total }} results
     </p>
 </div>

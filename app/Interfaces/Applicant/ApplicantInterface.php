@@ -14,4 +14,5 @@ interface ApplicantInterface
     public function getSlotsForWeek($startDate, $endDate);
     public function updateInterviewSchedule($data);
     public function getApplicantNames();
+    public function checkOverlappingSlots($date, $startTime, $endTime, $excludeApplicantId = null);
 }

@@ -7,14 +7,12 @@ use Illuminate\Http\Request;
 use App\Interfaces\Applicant\ApplicantInterface;
 use App\Http\Requests\Applicant\{ApplicantStoreRequest,ApplicantUpdateRequest};
 use Illuminate\Support\Facades\{DB,Log};
-use App\Models\Applicant\{Applicant,ApplicantParent,ApplicationProcessing,ApplicantCamps,ApplicantCheckList};
+use App\Models\Applicant\{Applicant,ApplicantParent,ApplicationProcessing,ApplicantCamps,ApplicantCheckList,ApplicantHistory};
 use Carbon\Carbon;
 use App\Enums\ApplicantStatus;
 use App\Traits\ReturnFormatTrait;
 use App\Models\Academic\YearStatus;
-use App\Models\Session;
-
-
+use App\Models\{Session,HighSchool};
 
 
 class ApplicantController extends Controller
@@ -30,50 +28,30 @@ class ApplicantController extends Controller
         return view('backend.applicant.dashboard');
     }
 
-    // public function student_application_form(Request $request)
-    // {
-    //     try{
-    //             $search = $request->get('search');
-    //             $perPage = $request->get('per_page', 5);
-
-    //             $applicants = $this->applicantrepository->getAllApplicants($search, $perPage);
-
-    //             Log::info('listing of Applicants', ['applicants' => $applicants]);
-
-    //            if ($request->ajax() || $request->wantsJson()) {
-    //                 $html = view('backend.applicant.partials.applicant_list', compact('applicants'))->render();
-    //                 return response()->json(['html' => $html]);
-    //             }
-
-
-    //             return view('backend.applicant.index', compact('applicants'));
-    //     } catch(\Exception $e){
-    //         return redirect()->route('applicant.dashboard')->with('error', 'Failed to get applicants.');
-    //     }
-      
-    // }
-
+   
 
     public function student_application_form(Request $request)
     {
         try {
             $search = $request->get('search');
-            $perPage = $request->get('per_page', 5);
+            $perPage = $request->get('per_page', 10);
             $sessionId = $request->get('session_id');
             $yearStatusId = $request->get('year_status_id');
-            $applicantName = $request->get('applicant_name'); // Add this line
+            $applicantName = $request->get('applicant_name'); 
 
-            // Get applicant names for dropdown
             $applicantNames = $this->applicantrepository->getApplicantNames();
 
-            // Update your repository method to accept these parameters
             $applicants = $this->applicantrepository->getAllApplicants($search, $perPage, $sessionId, $yearStatusId, $applicantName);
 
             // Log::info('listing of Applicants', ['applicants' => $applicants]);
 
             if ($request->ajax() || $request->wantsJson()) {
                 $html = view('backend.applicant.partials.applicant_list', compact('applicants'))->render();
-                return response()->json(['html' => $html]);
+                return response()->json([
+                    'html' => $html,
+                    'total' => $applicants->total(),
+                    'per_page' => $applicants->perPage()
+                ]);
             }
 
             $sessions = Session::all();
@@ -166,11 +144,11 @@ class ApplicantController extends Controller
                     ['start' => '17:00:00', 'end' => '17:59:59'],
                 ];
 
-                // Log::info('Weekly calendar view slots', [
-                //     'range' => [$startOfWeek->toDateString(), $endOfWeek->toDateString()],
-                //     'slots' => $slots,
-                //     'count' => $slots->count(),
-                // ]);
+                Log::info('Weekly calendar view slots', [
+                    'range' => [$startOfWeek->toDateString(), $endOfWeek->toDateString()],
+                    'slots' => $slots,
+                    'count' => $slots->count(),
+                ]);
 
             return view('backend.applicant.calender', compact('slots', 'timeSlots', 'startOfWeek', 'endOfWeek'));
         }   
@@ -308,10 +286,73 @@ class ApplicantController extends Controller
         }
     }
 
+    // public function assign_interview_slot(Request $request)
+    // {
+    //     try {
+    //         Log::info('request for assign interview slot', ['request' => $request->all()]);
+
+    //         $validated = $request->validate([
+    //             'applicant_id' => 'required|exists:applicants,id',
+    //             'interview_mode' => 'required|in:online,offline',
+    //             'interview_date' => 'required|date',
+    //             'start_time' => 'required',
+    //             'end_time' => 'required',
+    //             'interview_link' => 'nullable|required_if:interview_mode,online',
+    //             'interview_location' => 'nullable|required_if:interview_mode,offline',
+    //         ]);
+
+    //         // Validate 1-hour duration
+    //         $start = strtotime($validated['start_time']);
+    //         $end = strtotime($validated['end_time']);
+    //         $duration = ($end - $start) / 3600;
+
+    //         if ($duration != 1) {
+    //             // return response()->json([
+    //             //     'success' => false,
+    //             //     'message' => 'Interview slot must be exactly 1 hour long.'
+    //             // ]);
+    //             return response()->json($this->responseWithError('Interview slot must be exactly 1 hour long.'));
+
+    //         }
+
+    //         if ($validated['interview_mode'] === 'online' && empty($validated['interview_link'])) {
+    //             // return response()->json(['success' => false, 'message' => 'Meeting link is required for online mode.']);
+    //             return response()->json($this->responseWithError('Meeting link is required for online mode.'));
+
+    //         }
+
+    //         if ($validated['interview_mode'] === 'offline' && empty($validated['interview_location'])) {
+    //             // return response()->json(['success' => false, 'message' => 'Interview location is required for offline mode.']);
+    //             return response()->json($this->responseWithError('Interview location is required for offline mode.'));
+
+    //         }
+
+    //         $validated['interview_time'] = $request->start_time . ' - ' . $request->end_time;
+
+    //         $this->applicantrepository->saveInterviewSchedule($validated);
+
+    //         // return response()->json([
+    //         //     'success' => true,
+    //         //     'message' => 'Interview slot assigned successfully!'
+    //         // ]);
+
+    //         return response()->json($this->responseWithSuccess('Interview slot assigned successfully!'));
+
+    //     } catch (\Exception $e) {
+    //         Log::error('Failed to assign interview slot', [
+    //             'error' => $e->getMessage(),
+    //             'trace' => $e->getTraceAsString(),
+    //         ]);
+    //         // return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    //         return response()->json($this->responseWithError($e->getMessage()));
+
+    //     }
+    // }
+
     public function assign_interview_slot(Request $request)
     {
         try {
-            // Log::info('request for assign interview slot', ['request' => $request->all()]);
+            Log::info('request for assign interview slot', ['request' => $request->all()]);
 
             $validated = $request->validate([
                 'applicant_id' => 'required|exists:applicants,id',
@@ -329,34 +370,32 @@ class ApplicantController extends Controller
             $duration = ($end - $start) / 3600;
 
             if ($duration != 1) {
-                // return response()->json([
-                //     'success' => false,
-                //     'message' => 'Interview slot must be exactly 1 hour long.'
-                // ]);
                 return response()->json($this->responseWithError('Interview slot must be exactly 1 hour long.'));
+            }
 
+            // Check for overlapping slots with other applicants
+            $overlapping = $this->applicantrepository->checkOverlappingSlots(
+                $validated['interview_date'],
+                $validated['start_time'],
+                $validated['end_time'],
+                $validated['applicant_id'] // Exclude current applicant
+            );
+
+            if ($overlapping) {
+                return response()->json($this->responseWithError('This time slot conflicts with an existing interview for another applicant. Please choose a different time.'));
             }
 
             if ($validated['interview_mode'] === 'online' && empty($validated['interview_link'])) {
-                // return response()->json(['success' => false, 'message' => 'Meeting link is required for online mode.']);
                 return response()->json($this->responseWithError('Meeting link is required for online mode.'));
-
             }
 
             if ($validated['interview_mode'] === 'offline' && empty($validated['interview_location'])) {
-                // return response()->json(['success' => false, 'message' => 'Interview location is required for offline mode.']);
                 return response()->json($this->responseWithError('Interview location is required for offline mode.'));
-
             }
 
             $validated['interview_time'] = $request->start_time . ' - ' . $request->end_time;
 
             $this->applicantrepository->saveInterviewSchedule($validated);
-
-            // return response()->json([
-            //     'success' => true,
-            //     'message' => 'Interview slot assigned successfully!'
-            // ]);
 
             return response()->json($this->responseWithSuccess('Interview slot assigned successfully!'));
 
@@ -365,9 +404,7 @@ class ApplicantController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            // return response()->json(['success' => false, 'message' => $e->getMessage()]);
             return response()->json($this->responseWithError($e->getMessage()));
-
         }
     }
 
@@ -377,12 +414,12 @@ class ApplicantController extends Controller
         try {
             $applicant = $this->applicantrepository->getApplicantById($id);
             $isReschedule = true;
-            $existingInterview = $applicant->interview;
+            $existingInterview = $applicant->processing;
 
-            // Log::info('Applicant details for rescheduling interview', [
-            //     'applicant' => $applicant,
-            //     'existing_interview' => $existingInterview
-            // ]);
+            Log::info('Applicant details for rescheduling interview', [
+                'applicant' => $applicant,
+                'existing_interview' => $existingInterview
+            ]);
 
             return view('backend.applicant.schedule_interview', compact('applicant', 'isReschedule', 'existingInterview'));
         } catch (\Exception $e) {
@@ -393,7 +430,7 @@ class ApplicantController extends Controller
     public function update_interview_slot(Request $request)
     {
         try {
-            // Log::info('request for update interview slot', ['request' => $request->all()]);
+            Log::info('request for update interview slot', ['request' => $request->all()]);
 
             $validated = $request->validate([
                 'applicant_id' => 'required|exists:applicants,id',
@@ -478,19 +515,13 @@ class ApplicantController extends Controller
         }
     }
 
-    public function view_applicant_info($id){
+    public function view_applicant_info($id)
+    {
         try{
             $applicant = $this->applicantrepository->getApplicantById($id);
 
             // Log::info('Applicant info details', ['applicant' => $applicant]);
-            //     Log::info('Applicant parents check', [
-            //     'parents_count' => $applicant->parents->count(),
-            //     'parents' => $applicant->parents->toArray(),
-            // ]);
-
-
-            // $applicant->load(['confirmation', 'transaction']);
-
+           
             return view('backend.applicant.view-applicant-info', compact('applicant'));
         }catch(\Exception $e){
             Log::info('Error in view_applicant_info: ' . $e->getMessage());
@@ -508,11 +539,13 @@ class ApplicantController extends Controller
             }
 
             // Log::info("Editing applicant with ID: {$id}");
-            Log::info('Applicant edit details', ['applicant' => $applicant]);
+            // Log::info('Applicant edit details', ['applicant' => $applicant]);
 
-            $highSchools = HighSchool::orderBy('name')->get();
+            $highSchools = HighSchool::orderBy('hs_name')->get();
 
-            return view('backend.applicant.edit-applicant', compact('applicant'));
+            // Log::info('Applicant history data:', ['highschool'=> $applicant->highSchool,'history' => $applicant->history]);
+
+            return view('backend.applicant.edit-applicant', compact('applicant','highSchools'));
         } catch (\Exception $e) {
             Log::error("Error editing applicant: " . $e->getMessage());
             return redirect()->back()->with('error', 'Something went wrong.');
@@ -521,19 +554,98 @@ class ApplicantController extends Controller
 
     public function update_applicant(ApplicantUpdateRequest $request, $id)
     {
+        Log::info('request for update applicant', ['request' => $request->all()]);
+
         try {
+           
+            $allData = $request->all();
             $validatedData = $request->validated();
 
-            $this->applicantrepository->updateApplicant($id, $validatedData);
+            //  Log::info('Validated data:', $request->validated());
+            //  Log::info('Specific high_school_id value:', ['high_school_id' => $request->input('high_school_id')]);
+
+        //     Log::info('Checklist data received:', [
+        //     'all_checklist' => $request->input('checklist', []),
+        //     'references_value' => $request->input('checklist.references'),
+        //     'reference_value' => $request->input('checklist.reference')
+        // ]);
+
+             $processedCampData = $this->processCampData($request);
+            
+            $updateData = array_merge($validatedData, [
+                'processing' => $request->input('processing', []),
+                'parents' => $request->input('parents', []),
+                'transaction' => $request->input('transaction', []),
+                'checklist' => $request->input('checklist', []),
+                'school_name' => $processedCampData['school_name'],
+                'school_grades' => $processedCampData['school_grades']
+            ]);
+            
+            Log::info('Processed camp data:', $processedCampData);
+
+            $this->applicantrepository->updateApplicant($id, $updateData);
 
             Log::info("Applicant updated successfully", ['applicant_id' => $id]);
 
-            return redirect()->route('applicant.edit_applicant', $id)->with('success', 'Applicant updated successfully.');
+            return redirect()->route('applicant.student_application_form', $id)->with('success', 'Applicant updated successfully.');
         } catch (\Exception $e) {
-            Log::error("Applicant update failed: " . $e->getMessage());
+            Log::error("Applicant update failed: " . $e->getMessage(), [
+                'applicant_id' => $id,
+                'exception' => $e->getTraceAsString()
+            ]);
             return redirect()->back()->with('error', 'Failed to update applicant.');
         }
     }
+
+    private function processCampData($request)
+    {
+        $schoolNames = $request->input('school_name', []);
+        $schoolGrades = $request->input('school_grades', []);
+        $campDeleted = $request->input('camp_deleted', []);
+        
+        $processedSchoolNames = [];
+        $processedSchoolGrades = [];
+        
+        foreach ($schoolNames as $index => $schoolName) {
+            $isDeleted = $campDeleted[$index] ?? '0';
+            
+            if ($isDeleted === '1' || empty(trim($schoolName))) {
+                continue;
+            }
+            
+            $processedSchoolNames[] = $schoolName;
+            $processedSchoolGrades[] = $schoolGrades[$index] ?? '';
+        }
+        
+        return [
+            'school_name' => $processedSchoolNames,
+            'school_grades' => $processedSchoolGrades
+        ];
+    }
+
+    // public function update_applicant(ApplicantUpdateRequest $request, $id)
+    // {
+    //     Log::info('request for update applicant', ['request' => $request->all()]);
+
+    //     try {
+    //         // Use all data instead of just validated data
+    //         $allData = $request->all();
+            
+    //         Log::info('All data for update:', $allData);
+
+    //         $this->applicantrepository->updateApplicant($id, $allData);
+
+    //         Log::info("Applicant updated successfully", ['applicant_id' => $id]);
+
+    //         return redirect()->route('applicant.student_application_form', $id)->with('success', 'Applicant updated successfully.');
+    //     } catch (\Exception $e) {
+    //         Log::error("Applicant update failed: " . $e->getMessage(), [
+    //             'applicant_id' => $id,
+    //             'exception' => $e->getTraceAsString()
+    //         ]);
+    //         return redirect()->back()->with('error', 'Failed to update applicant.');
+    //     }
+    // }
 
     public function custom_applicant_chart(){
         return view('backend.applicant.custom-applicant-chart');

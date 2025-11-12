@@ -11,7 +11,7 @@ class ApplicantHistory extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'applicant_history';
+    protected $table = 'aplicant_history';
     protected $fillable = [
         'applicant_id',
         'school',
@@ -38,5 +38,11 @@ class ApplicantHistory extends Model
         'recommendation_upload',
 
     ];
+
+    protected $casts = [
+        'school_name' => 'array',
+        'school_grades' => 'array',
+    ];
+
 
 }

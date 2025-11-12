@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 // use App\Models\StudentInfo\ParentGuardian;
 use App\Enums\ApplicantStatus;
-use App\Models\Applicant\{ApplicationProcessing,ApplicantConfirmation,PaymentTransaction,ApplicantParent};
+use App\Models\Applicant\{ApplicationProcessing,ApplicantHistory,ApplicantConfirmation,PaymentTransaction,ApplicantParent};
+use App\Models\HighSchool;
 
 class Applicant extends Model
 {
@@ -19,6 +20,8 @@ class Applicant extends Model
         'last_name',
         'first_name',
         'high_school',
+        'high_school_id',
+        'other_high_school',
         'date_of_birth',
         'usa_cell',
         'email',
@@ -44,26 +47,6 @@ class Applicant extends Model
         'applicant_status' => ApplicantStatus::class,
     ];
 
-    // public function parents()
-    // {
-    //     return $this->belongsToMany(
-    //         ParentGuardian::class,
-    //         'applicant_parents',
-    //         'applicant_id',
-    //         'parent_id'
-    //     )->withPivot([
-    //         'relation_type',
-    //         'address',
-    //         'city',
-    //         'state',
-    //         'zip_code',
-    //         'country',
-    //         'marital_status',
-    //         'marital_comment',
-    //         'home_phone',
-    //     ]);
-    // }
-
     public function parents()
     {
         return $this->hasMany(ApplicantParent::class, 'applicant_id', 'id')
@@ -71,15 +54,14 @@ class Applicant extends Model
     }
 
 
-
-    // public function checklist()
+    // public function processing()
     // {
-    //     return $this->hasOne(ApplicantCheckList::class);
+    //     return $this->hasOne(ApplicationProcessing::class,'applicant_id');
     // }
 
     public function processing()
     {
-        return $this->hasOne(ApplicationProcessing::class);
+        return $this->hasOne(ApplicationProcessing::class, 'applicant_id')->withDefault();
     }
 
     public function camps()
@@ -87,11 +69,6 @@ class Applicant extends Model
         return $this->hasMany(ApplicantCamps::class);
     }
 
-
-    public function interview()
-    {
-        return $this->hasOne(ApplicationProcessing::class, 'applicant_id', 'id');
-    }
       
     public function confirmation()
     {
@@ -102,6 +79,18 @@ class Applicant extends Model
     {
         return $this->hasOne(PaymentTransaction::class, 'applicant_id');
     }
+
+    public function history()
+    {
+        return $this->hasMany(ApplicantHistory::class, 'applicant_id');
+    }
+
+    public function highSchool()
+    {
+        return $this->belongsTo(HighSchool::class, 'high_school_id');
+    }
+
+
 
 
 }

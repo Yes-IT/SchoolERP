@@ -128,6 +128,8 @@ use App\Repositories\Academic\AssignmentRepository;
 use App\Repositories\Report\AttendanceReportRepository;
 use App\Repositories\Report\ReportFilterRepository;
 use App\Interfaces\Report\AttendanceReportInterface;
+use App\Interfaces\Staff\TeacherInterface;
+use App\Repositories\Staff\TeacherRepository;
 
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -177,6 +179,7 @@ class RepositoryServiceProvider extends ServiceProvider
         // Staff
         $this->app->bind(DepartmentInterface::class,               DepartmentRepository::class);
         $this->app->bind(DesignationInterface::class,              DesignationRepository::class);
+        $this->app->bind(TeacherInterface::class,                  TeacherRepository::class);
         
         // Examination
         $this->app->bind(ExamTypeInterface::class,                 ExamTypeRepository::class);

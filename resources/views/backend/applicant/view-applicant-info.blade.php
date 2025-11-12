@@ -24,10 +24,10 @@
                                 <h2>Applicant Information</h2>
                             </div>
                             <div class="atndnc-filter student-filter">
-                                <a  class="cmn-btn" href="{{route('applicant.edit_applicant', $applicant->id)}}">
-                                  <img src="{{global_asset('backend/assets/images/edit-icon.svg')}}" alt="Icon">Edit Applicant
+                                <a class="cmn-btn" href="{{route('applicant.edit_applicant', $applicant->id)}}">
+                                  <img src="{{ global_asset('backend/assets/images/edit-icon.svg') }}" style="margin-right: 6px;" alt="Icon">Edit Applicant
                                 </a>
-                                <a href="{{ route('applicant.add_new_applicant') }}" class="cmn-btn ">
+                                <a href="{{ route('applicant.add_new_applicant') }}" class="cmn-btn">
                                     <i class="fa-solid fa-plus"></i> Add New Applicant
                                 </a>
 
@@ -53,7 +53,7 @@
                                           </tr>
                                           <tr>
                                             <td>High School</td>
-                                            <td>{{ $applicant->high_school ?? 'N/A' }}</td>
+                                            <td>{{ $applicant->highSchool->hs_name ?? 'N/A' }}</td>
                                           </tr>
                                           <tr>
                                             <td>Birthdate</td>
@@ -76,7 +76,8 @@
                                       </table>
                                 </div>
                             </div>
-                            <div class="dspr-bdy-content-sec">
+
+                            {{-- <div class="dspr-bdy-content-sec">
                                 <h2>Camp (S) Attended</h2>
                                 <div class="dsbdy-cmn-table table-full-height pr-pg-tbl-wrp">
                                      <table style="width:100%; border-collapse:collapse; font-family:sans-serif; font-size:14px;">
@@ -96,92 +97,230 @@
                                         </tbody>
                                       </table>
                                 </div>
-                            </div>
+                            </div> --}}
+                            <div class="dspr-bdy-content-sec">
+                              <h2>Camp(s) Attended</h2>
+                              <div class="dsbdy-cmn-table table-full-height pr-pg-tbl-wrp">
+                                  <table style="width:100%; border-collapse:collapse; font-family:sans-serif; font-size:14px;">
+                                      <thead>
+                                          <tr style="background-color:#f9f9f9; text-align:left;">
+                                              <th>Name of school</th>
+                                              <th>Grade attended</th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          @forelse($applicant->history as $history)
+                                              @php
+                                                  $schoolNames = $history->school_name ?? [];
+                                                  $schoolGrades = $history->school_grades ?? [];
+                                              @endphp
+                                              
+                                              @if(!empty($schoolNames) && is_array($schoolNames))
+                                                  @foreach($schoolNames as $index => $schoolName)
+                                                      <tr>
+                                                          <td>{{ $schoolName ?? 'N/A' }}</td>
+                                                          <td>{{ $schoolGrades[$index] ?? 'N/A' }}</td>
+                                                      </tr>
+                                                  @endforeach
+                                              @else
+                                                  <tr>
+                                                      <td colspan="2" style="text-align: center;">No camp records found</td>
+                                                  </tr>
+                                              @endif
+                                          @empty
+                                              <tr>
+                                                  <td colspan="2" style="text-align: center;">No camp records found</td>
+                                              </tr>
+                                          @endforelse
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
 
                        
-                        @if($applicant->transaction || $applicant->confirmation)
+                          @if($applicant->transaction || $applicant->confirmation)
+                                <div class="dspr-bdy-content-sec border-0">
+                                    <h2>Application Check List</h2>
+                                    <div class="dsbdy-cmn-table table-full-height">
+                                        <table>
+                                            <tbody>
+                                          
+                                                {{-- Payment Info --}}
+                                                @if($applicant->transaction)
+                                                    <tr>
+                                                        <td>Fee</td>
+                                                        <td>${{ number_format((float)($applicant->transaction->amount ?? 0), 2) }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>CC Last 4</td>
+                                                        <td>{{ $applicant->transaction->card_last4 ?? 'N/A' }}</td>
+                                                    </tr>
+                                                  
+                                                @endif
+
+                                                <tr>
+                                                    <td>Date Deposited</td>
+                                                    <td>
+                                                        {{ $applicant->confirmation->created_at 
+                                                            ? \Carbon\Carbon::parse($applicant->confirmation->created_at)->format('d/m/Y')
+                                                            : 'N/A' }}
+                                                    </td>
+                                                  </tr>
+
+                                                  <tr>
+                                                    <td>Transcript Hebrew</td>
+                                                    <td> <input  type="checkbox" disabled {{ $applicant->confirmation->transcript_hebrew ? 'checked' : '' }}></td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td>Transcript English</td>
+                                                    <td> <input  type="checkbox" disabled {{ $applicant->confirmation->transcript_english ? 'checked' : '' }}></td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td>References</td>
+                                                    <td>{{ $applicant->confirmation->reference ?? 'N/A' }}</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td>Pictures</td>
+                                                    <td>{{ $applicant->confirmation->pictures ?? 'N/A' }}</td>
+                                                  </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                          @endif
+
+
+                        
+
+                          {{-- @php
+                              $processing = $applicant->processing;
+                          @endphp
+
+                          @if(!is_null($processing) && is_object($processing))
+                              @php
+                                  $statusMap = [
+                                      0 => 'Pending',
+                                      1 => 'Scheduled', 
+                                      2 => 'Rescheduled',
+                                  ];
+                                  $interviewStatus = $processing->interview_status ?? null;
+                              @endphp
+                              
                               <div class="dspr-bdy-content-sec border-0">
-                                  <h2>Application Check List</h2>
-                                  <div class="dsbdy-cmn-table table-full-height">
+                                  <h2>Application Processing</h2>
+                                  <div class="dsbdy-cmn-table table-full-height ">
                                       <table>
                                           <tbody>
-                                        
-                                              {{-- Payment Info --}}
-                                              @if($applicant->transaction)
-                                                  <tr>
-                                                      <td>Fee</td>
-                                                      <td>${{ number_format((float)($applicant->transaction->amount ?? 0), 2) }}</td>
-                                                  </tr>
-                                                  <tr>
-                                                      <td>CC Last 4</td>
-                                                      <td>{{ $applicant->transaction->card_last4 ?? 'N/A' }}</td>
-                                                  </tr>
-                                                 
-                                              @endif
-
-                                               <tr>
-                                                  <td>Date Deposited</td>
+                                              <tr>
+                                                  <td>Interview Date</td>
                                                   <td>
-                                                      {{ $applicant->confirmation->created_at 
-                                                          ? \Carbon\Carbon::parse($applicant->confirmation->created_at)->format('d/m/Y')
-                                                          : 'N/A' }}
+                                                      @if(!empty($processing->interview_date))
+                                                          {{ \Carbon\Carbon::parse($processing->interview_date)->format('d/m/Y') }}
+                                                      @else
+                                                          N/A
+                                                      @endif
                                                   </td>
-                                                </tr>
+                                              </tr>
+                                              <tr>
+                                                  <td>Interview Time</td>
+                                                  <td>{{ $processing->interview_time ?? 'N/A' }}</td>
+                                              </tr>
+                                              
+                                              <tr>
+                                                  <td>Interview Location / Link</td>
+                                                  <td>
+                                                      @php
+                                                          $location = $processing->interview_location ?? null;
+                                                          $link = $processing->interview_link ?? null;
+                                                      @endphp
 
-                                                <tr>
-                                                  <td>Transcript Hebrew</td>
-                                                  <td> <input  type="checkbox" disabled {{ $applicant->confirmation->transcript_hebrew ? 'checked' : '' }}></td>
-                                                </tr>
-                                                <tr>
-                                                  <td>Transcript English</td>
-                                                  <td> <input  type="checkbox" disabled {{ $applicant->confirmation->transcript_english ? 'checked' : '' }}></td>
-                                                </tr>
-                                                <tr>
-                                                  <td>References</td>
-                                                  <td>{{ $applicant->confirmation->reference ?? 'N/A' }}</td>
-                                                </tr>
-                                                <tr>
-                                                  <td>Pictures</td>
-                                                  <td>{{ $applicant->confirmation->reference ?? 'N/A' }}</td>
-                                                </tr>
+                                                      @if($location && $link)
+                                                          {{ $location }} / <a href="{{ $link }}" target="_blank">{{ $link }}</a>
+                                                      @elseif($location)
+                                                          {{ $location }}
+                                                      @elseif($link)
+                                                          <a href="{{ $link }}" target="_blank">{{ $link }}</a>
+                                                      @else
+                                                          N/A
+                                                      @endif
+                                                  </td>
+                                              </tr>
 
+                                              <tr>
+                                                  <td>Status</td>
+                                                  <td>{{ isset($interviewStatus) ? ($statusMap[$interviewStatus] ?? 'N/A') : 'N/A' }}</td>
+                                              </tr>
+                                              <tr>
+                                                  <td>Letter Sent</td>
+                                                  <td><input type="checkbox" disabled {{ !empty($processing->letter_sent) ? 'checked' : '' }}></td>
+                                              </tr>
+                                              <tr>
+                                                  <td>Coming</td>
+                                                  <td>{{ $processing->coming ?? 'N/A' }}</td>
+                                              </tr>
+                                              <tr>
+                                                  <td>Application Comment</td>
+                                                  <td>{{ $processing->application_comment ?? 'N/A' }}</td>
+                                              </tr>
+                                              <tr>
+                                                  <td>Scholarship Comment</td>
+                                                  <td>{{ $processing->scholarship_comment ?? 'N/A' }}</td>
+                                              </tr>
+                                              <tr>
+                                                  <td>Tuition Comment</td>
+                                                  <td>{{ $processing->tuition_comment ?? 'N/A' }}</td>
+                                              </tr>
                                           </tbody>
                                       </table>
                                   </div>
                               </div>
-                        @endif
+                          @endif --}}
 
+                            @php
+                              $processing = $applicant->processing;
+                              $interviewStatus = optional($processing)->interview_status;
+                              
+                              $statusMap = [
+                                  0 => 'Pending',
+                                  1 => 'Scheduled', 
+                                  2 => 'Rescheduled',
+                                 
+                              ];
+                              
+                              // If no processing record exists, default to pending
+                              if (is_null($interviewStatus)) {
+                                  $interviewStatus = 0; // Pending
+                              }
+                          @endphp
 
-                              @if($applicant->processing)
-
-                               <div class="dspr-bdy-content-sec border-0">
-                                 <h2>Application Processing</h2>
-                                <div class="dsbdy-cmn-table table-full-height ">
-                                    <table>
-                                        <tbody>
-                                          @php
-                                            $statusMap = [
-                                                0 => 'Pending',
-                                                1 => 'Scheduled',
-                                                2 => 'Rescheduled',
-                                            ];
-                                            $interviewStatus = $applicant->processing->interview_status ?? null;
-                                        @endphp
+                          <div class="dspr-bdy-content-sec border-0">
+                              <h2>Application Processing</h2>
+                              <div class="dsbdy-cmn-table table-full-height ">
+                                  <table>
+                                      <tbody>
+                                          
                                           <tr>
-                                            <td>Interview Date</td>
-                                            <td>{{ $applicant->processing->interview_date ? \Carbon\Carbon::parse($applicant->processing->interview_date)->format('d/m/Y') : 'N/A' }}</td>
+                                              <td>Interview Date</td>
+                                              <td>
+                                                  @if(!empty($processing->interview_date))
+                                                      {{ \Carbon\Carbon::parse($processing->interview_date)->format('d/m/Y') }}
+                                                  @else
+                                                      N/A
+                                                  @endif
+                                              </td>
                                           </tr>
                                           <tr>
-                                            <td>Interview Time</td>
-                                            <td>{{ $applicant->processing->interview_time ?? 'N/A' }}</td>
+                                              <td>Interview Time</td>
+                                              <td>{{ $processing->interview_time ?? 'N/A' }}</td>
                                           </tr>
                                           
-                                           <tr>
+                                          <tr>
                                               <td>Interview Location / Link</td>
                                               <td>
                                                   @php
-                                                      $location = $applicant->processing->interview_location ?? null;
-                                                      $link = $applicant->processing->interview_link ?? null;
+                                                      $location = $processing->interview_location ?? null;
+                                                      $link = $processing->interview_link ?? null;
                                                   @endphp
 
                                                   @if($location && $link)
@@ -190,39 +329,40 @@
                                                       {{ $location }}
                                                   @elseif($link)
                                                       <a href="{{ $link }}" target="_blank">{{ $link }}</a>
+                                                  @else
+                                                      N/A
                                                   @endif
                                               </td>
                                           </tr>
+                                          <tr>
+                                              <td>Interview Status</td>
+                                              <td>{{ $statusMap[$interviewStatus] ?? 'Pending' }}</td>
+                                          </tr>
 
                                           <tr>
-                                            <td>Status</td>
-                                            <td>{{ $statusMap[$interviewStatus] ?? 'N/A' }}</td>
+                                              <td>Letter Sent</td>
+                                              <td><input type="checkbox" disabled {{ !empty($processing->letter_sent) ? 'checked' : '' }}></td>
                                           </tr>
                                           <tr>
-                                            <td>Letter Sent</td>
-                                            <td> <input  type="checkbox" disabled {{ $applicant->processing->letter_sent ? 'checked' : '' }}></td>
+                                              <td>Coming</td>
+                                              <td>{{ $processing->coming ?? 'N/A' }}</td>
                                           </tr>
                                           <tr>
-                                            <td>Coming</td>
-                                            <td>{{ $applicant->processing->coming ?? 'N/A' }}</td>
+                                              <td>Application Comment</td>
+                                              <td>{{ $processing->application_comment ?? 'N/A' }}</td>
                                           </tr>
                                           <tr>
-                                            <td>Application Comment </td>
-                                            <td>{{ $applicant->processing->application_comment ?? 'N/A' }}</td>
-                                          </tr>
-                                         <tr>
-                                            <td> Scholarship Comment</td>
-                                            <td>{{ $applicant->processing->scholarship_comment ?? 'N/A' }}</td>
+                                              <td>Scholarship Comment</td>
+                                              <td>{{ $processing->scholarship_comment ?? 'N/A' }}</td>
                                           </tr>
                                           <tr>
-                                            <td> Tuition Comment</td>
-                                            <td>{{ $applicant->processing->tuition_comment ?? 'N/A' }}</td>
+                                              <td>Tuition Comment</td>
+                                              <td>{{ $processing->tution_comment ?? 'N/A' }}</td>
                                           </tr>
-                                        </tbody>
-                                      </table>
-                                </div>
-                            </div>
-                          @endif
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
 
 
 
@@ -231,14 +371,15 @@
                                 <div class="dsbdy-cmn-table table-full-height pr-pg-tbl-wrp">
                                     <table>
                                         <tbody>
-                                          @foreach($applicant->parents as $parent)
+                                        
                                                 <tr>
                                                   <td class="td-lineremover" >ID</td>
-                                                  <td class="td-lineremover" >153342</td>
+                                                  <td class="td-lineremover" >{{$applicant->custom_id}}</td>
                                                 </tr>
+                                            @foreach($applicant->parents as $parent)
                                                 <tr>
                                                   <td class="td-lineremover" >Last Name</td>
-                                                  <td class="td-lineremover" >Thomas</td>
+                                                  <td class="td-lineremover" >{{ $parent->father_last_name ?? 'N/A' }}</td>
                                                 </tr>
                                                 <tr>
                                                   <td class="td-lineremover" >Father Title</td>
@@ -264,44 +405,44 @@
                                                 </tr>
                                                 <tr>
                                                   <td class="td-lineremover" >Address</td>
-                                                  <td class="td-lineremover" >{{ $parent->pivot->address ?? 'N/A' }}</td>
+                                                  <td class="td-lineremover" >{{ $parent->address ?? 'N/A' }}</td>
                                                 </tr>
                                                 <tr>
                                                   <td class="td-lineremover" >City</td>
-                                                  <td class="td-lineremover" >{{ $parent->pivot->city ?? 'N/A' }} </td>
+                                                  <td class="td-lineremover" >{{ $parent->city ?? 'N/A' }} </td>
                                                 </tr>
                                                 <tr>
                                                   <td class="td-lineremover" >State</td>
-                                                  <td class="td-lineremover" >{{ $parent->pivot->state ?? 'N/A' }} </td>
+                                                  <td class="td-lineremover" >{{ $parentstate ?? 'N/A' }} </td>
                                                 </tr>
                                                 <tr>
                                                   <td class="td-lineremover" >Zip Code</td>
-                                                  <td class="td-lineremover" >{{ $parent->pivot->zip_code ?? 'N/A' }} </td>
+                                                  <td class="td-lineremover" >{{ $parent->zip_code ?? 'N/A' }} </td>
                                                 </tr>
                                                 <tr>
                                                   <td class="td-lineremover" >Country</td>
-                                                  <td class="td-lineremover" >{{ $parent->pivot->country ?? 'N/A' }} </td>
+                                                  <td class="td-lineremover" >{{ $parent->country ?? 'N/A' }} </td>
                                                 </tr>
                                                 <tr>
                                                   <td class="td-lineremover" >Marital Status</td>
-                                                  <td class="td-lineremover" >{{ ucfirst($parent->pivot->marital_status ?? 'N/A') }} </td>
+                                                  <td class="td-lineremover" >{{ ucfirst($parent->parent->marital_status ?? 'N/A') }} </td>
                                                 </tr>
                                                 <tr>
                                                   <td class="td-lineremover" >Marital Comment</td>
-                                                  <td class="td-lineremover" >{{ $parent->pivot->marital_comment ?? 'N/A' }} </td>
+                                                  <td class="td-lineremover" >{{ $parent->parent->marital_comment ?? 'N/A' }} </td>
                                                 </tr>
 
                                                 <tr>
                                                   <td class="td-lineremover" >Home Phone</td>
-                                                  <td class="td-lineremover" >{{ $parent->pivot->home_phone ?? 'N/A' }} </td>
+                                                  <td class="td-lineremover" >{{ $parent->parent->home_phone ?? 'N/A' }} </td>
                                                 </tr>
                                                 <tr>
                                                   <td class="td-lineremover" >Father Cell</td>
-                                                  <td class="td-lineremover" >{{ $parent->father_mobile ?? 'N/A' }} </td>
+                                                  <td class="td-lineremover" >{{ $parent->father_cell ?? 'N/A' }} </td>
                                                 </tr>
                                                 <tr>
                                                   <td class="td-lineremover" >Mother Cell</td>
-                                                  <td class="td-lineremover" >{{ $parent->mother_mobile ?? 'N/A' }} </td>
+                                                  <td class="td-lineremover" >{{ $parent->mother_cell ?? 'N/A' }} </td>
                                                 </tr>
                                                 <tr>
                                                   <td class="td-lineremover" >Father Email</td>
@@ -313,19 +454,19 @@
                                                 </tr>
                                                 <tr>
                                                   <td class="td-lineremover" >Father Occupation</td>
-                                                  <td class="td-lineremover" > {{ ucfirst($parent->father_profession ?? 'N/A') }}</td>
+                                                  <td class="td-lineremover" > {{ ucfirst($parent->father_occupation ?? 'N/A') }}</td>
                                                 </tr>
                                                 <tr>
                                                   <td class="td-lineremover" >Mother Occupation</td>
-                                                  <td class="td-lineremover" >{{ $parent->mother_profession ?? 'N/A' }} </td>
+                                                  <td class="td-lineremover" >{{ $parent->mother_occupation ?? 'N/A' }} </td>
                                                 </tr>
                                                 <tr>
                                                   <td class="td-lineremover" >Additional Phone Numbers</td>
-                                                  <td class="td-lineremover" >{{ $parent->additional_mobile_numbers ?? 'N/A' }}</td>
+                                                  <td class="td-lineremover" >{{ $parent->additional_phone_no ?? 'N/A' }}</td>
                                                 </tr>
                                                 <tr>
                                                   <td class="td-lineremover" >Additional Email Addresses</td>
-                                                  <td class="td-lineremover" >{{ $parent->additional_emails ?? 'N/A' }}</td>
+                                                  <td class="td-lineremover" >{{ $parent->additional_email_addresses ?? 'N/A' }}</td>
                                                 </tr>
                                                 
                                           @endforeach

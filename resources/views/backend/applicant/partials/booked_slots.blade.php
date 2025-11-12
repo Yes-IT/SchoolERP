@@ -17,17 +17,23 @@
                             @php
                                 $formattedDate = \Carbon\Carbon::parse($slot->interview_date)->format('l, F d, Y');
                                 $formattedTime = date('h:i A', strtotime($slot->start_time)) . ' - ' . date('h:i A', strtotime($slot->end_time));
+                                $isCurrentApplicant = $slot->applicant_id == ($applicant->id ?? null);
+                               
                             @endphp
 
-                            <div class="avaiable-slots-cd" data-slot="{{ $slot->interview_date }}T{{ $slot->start_time }}">
+                            <div class="avaiable-slots-cd " data-slot="{{ $slot->interview_date }}T{{ $slot->start_time }}">
                                 <label for="avaiable-slot-{{ $index + 1 }}" tabindex="0">
                                     <span class="avlble-slot-date">{{ $formattedDate }}</span>
                                     <span class="avlble-slot-time">{{ $formattedTime }}</span>
+                                  
+                                    @if($isCurrentApplicant)
+                                        <span class="current-slot-badge">Your Current Slot</span>
+                                    @endif
                                 </label>
-                                {{-- <input id="avaiable-slot-{{ $index + 1 }}" type="radio" name="avaiable-slot" value="{{ $slot->id }}" /> --}}
                             </div>
                         @endforeach
                     </div>
+                    
                 </fieldset>
             </div>
         </form>

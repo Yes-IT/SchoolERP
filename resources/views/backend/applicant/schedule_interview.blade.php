@@ -107,7 +107,7 @@
                         </div>
                    </form>
 
-                    <form id="assignSlotForm" >
+                    <form id="assignSlotForm">
                       @csrf
                       
                         <input type="hidden" name="applicant_id" id="applicant_id" value="{{ $applicant->id }}">
@@ -116,10 +116,7 @@
                         <input type="hidden" name="end_time" id="assign_end_time">
                         <input type="hidden" name="is_reschedule" id="is_reschedule" value="{{ $isReschedule ? '1' : '0' }}">
 
-
-                         <!-- This changes when tab (Online/Offline) is clicked -->
-                         {{-- <input type="hidden" name="interview_mode" id="interview_mode" value="online"> --}}
-                          <input type="hidden" name="interview_mode" id="interview_mode" 
+                        <input type="hidden" name="interview_mode" id="interview_mode" 
                              value="{{ $isReschedule && $existingInterview ? $existingInterview->interview_mode : 'online' }}">
 
                             <div class="ds-content-head">
@@ -144,8 +141,11 @@
                             
                             </div>
                             <div class="avaiable-slots-actions">
-                                <button type="button" class="cmn-btn cancel-btn">Cancel</button>
-                                <button type="submit" class="cmn-btn primary-assign-btn">Assign Slot</button>
+                                <button type="button" class="cmn-btn cancel-btn" onclick="window.location.href='{{ route('applicant.student_application_form') }}'">Cancel</button>
+                                {{-- <button type="submit" class="cmn-btn primary-assign-btn">Assign Slot</button> --}}
+                                <button type="submit" class="cmn-btn primary-assign-btn">
+                                    {{ $isReschedule ? 'Reschedule Interview' : 'Assign Slot' }}
+                                </button>
                             </div>
                         </div>
 
@@ -235,22 +235,27 @@
         });
 
         // Auto-populate search form for reschedule
-        @if($isReschedule && $existingInterview)
-            if (!document.getElementById('interview_date').value) {
-                document.getElementById('interview_date').value = "{{ \Carbon\Carbon::parse($existingInterview->interview_date)->format('Y-m-d') }}";
-                document.getElementById('interview_start_time').value = "{{ $existingInterview->start_time }}";
-                document.getElementById('interview_end_time').value = "{{ $existingInterview->end_time }}";
-                
-                // Also set the assign form hidden fields
-                document.getElementById('assign_interview_date').value = "{{ \Carbon\Carbon::parse($existingInterview->interview_date)->format('Y-m-d') }}";
-                document.getElementById('assign_start_time').value = "{{ $existingInterview->start_time }}";
-                document.getElementById('assign_end_time').value = "{{ $existingInterview->end_time }}";
-                
-                // Trigger search automatically for reschedule
-                setTimeout(() => {
-                    searchForm.dispatchEvent(new Event('submit'));
-                }, 500);
-            }
+       @if($isReschedule && $existingInterview)
+            // Set the hidden assign form fields
+            document.getElementById('assign_interview_date').value = "{{ \Carbon\Carbon::parse($existingInterview->interview_date)->format('Y-m-d') }}";
+            document.getElementById('assign_start_time').value = "{{ $existingInterview->start_time }}";
+            document.getElementById('assign_end_time').value = "{{ $existingInterview->end_time }}";
+            
+            // Pre-fill meeting link or location based on current mode
+            @if($existingInterview->interview_mode === 'online' && $existingInterview->interview_link)
+                document.getElementById('interview_link').value = "{{ $existingInterview->interview_link }}";
+            @endif
+            
+            @if($existingInterview->interview_mode === 'offline' && $existingInterview->interview_location)
+                document.getElementById('interview_location').value = "{{ $existingInterview->interview_location }}";
+            @endif
+            
+            // Trigger search automatically for reschedule after a short delay
+            setTimeout(() => {
+                if (document.getElementById('interview_date').value) {
+                    document.getElementById('searchSlotsForm').dispatchEvent(new Event('submit'));
+                }
+            }, 500);
         @endif
     });
 </script>
@@ -311,120 +316,11 @@ document.getElementById('searchSlotsForm').addEventListener('submit', function(e
 
 <script>
 
-
-
-// document.addEventListener('DOMContentLoaded', function () {
-//     const form = document.getElementById('assignSlotForm');
-    
-//     // Function to validate time range is exactly 1 hour
-//     function validateTimeRange(startTime, endTime) {
-//         if (!startTime || !endTime) return false;
-        
-//         const start = new Date(`2000-01-01T${startTime}`);
-//         const end = new Date(`2000-01-01T${endTime}`);
-//         const diffMs = end - start;
-//         const diffHours = diffMs / (1000 * 60 * 60);
-        
-//         return diffHours === 1;
-//     }
-
-//     // Auto-set end time when start time changes (1 hour later)
-//     document.getElementById('interview_start_time').addEventListener('change', function() {
-//         if (this.value) {
-//             const startTime = new Date(`2000-01-01T${this.value}`);
-//             const endTime = new Date(startTime.getTime() + (60 * 60 * 1000)); // Add 1 hour
-            
-//             // Format to HH:MM
-//             const endTimeString = endTime.toTimeString().slice(0, 5);
-//             document.getElementById('interview_end_time').value = endTimeString;
-            
-//             // Also update the hidden fields for assign form
-//             document.getElementById('assign_start_time').value = this.value;
-//             document.getElementById('assign_end_time').value = endTimeString;
-//         }
-//     });
-
-//     // Validate end time when manually changed
-//     document.getElementById('interview_end_time').addEventListener('change', function() {
-//         const startTime = document.getElementById('interview_start_time').value;
-//         const endTime = this.value;
-        
-//         if (startTime && endTime) {
-//             if (!validateTimeRange(startTime, endTime)) {
-//                 alert('Time range must be exactly 1 hour. End time has been auto-adjusted.');
-                
-//                 // Auto-correct to 1 hour
-//                 const start = new Date(`2000-01-01T${startTime}`);
-//                 const correctEnd = new Date(start.getTime() + (60 * 60 * 1000));
-//                 const correctEndString = correctEnd.toTimeString().slice(0, 5);
-                
-//                 this.value = correctEndString;
-//                 document.getElementById('assign_end_time').value = correctEndString;
-//             }
-//         }
-//     });
-
-//     // Validate search form submission
-//     document.getElementById('searchSlotsForm').addEventListener('submit', function(e) {
-//         const startTime = document.getElementById('interview_start_time').value;
-//         const endTime = document.getElementById('interview_end_time').value;
-        
-//         if (startTime && endTime && !validateTimeRange(startTime, endTime)) {
-//             e.preventDefault();
-//             alert('Please select a time range of exactly 1 hour.');
-//             return;
-//         }
-        
-//         // If validation passes, copy values to assign form
-//         document.getElementById('assign_interview_date').value = document.getElementById('interview_date').value;
-//         document.getElementById('assign_start_time').value = startTime;
-//         document.getElementById('assign_end_time').value = endTime;
-//     });
-
-//     // Your existing form submission with added validation
-//     form.addEventListener('submit', function (e) {
-//         e.preventDefault();
-//         console.log("Assign Slot form submitted "); 
-
-//         // Validate time range before submitting
-//         const startTime = document.getElementById('assign_start_time').value;
-//         const endTime = document.getElementById('assign_end_time').value;
-        
-//         if (!validateTimeRange(startTime, endTime)) {
-//             alert('Time range must be exactly 1 hour. Please adjust your time selection.');
-//             return;
-//         }
-
-//         const formData = new FormData(this);
-//         console.log("Form Data:", formData);
-
-//         fetch("{{ route('applicant.assign_interview_slot') }}", {  
-//             method: 'POST',
-//             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-//             body: formData
-//         })
-//         .then(response => response.json())
-//         .then(data => {
-//             console.log("Server Response:", data);
-//             if (data.success) {
-//                 alert(data.message);
-//                 window.location.href = "{{ route('applicant.student_application_form') }}";
-//             } else {
-//                 alert(data.message);
-//             }
-//         })
-//         .catch(err => {
-//             console.error("Error:", err);
-//             alert('Error while assigning slot.');
-//         });
-//     });
-// });
-
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('assignSlotForm');
     
-    // Bootstrap Toast Notification Function
-    function showNotification(message, type = 'error') {
+    //  Toast Notification Function
+     function showNotification(message, type = 'success') { // Changed default to success
         // Create container if it doesn't exist
         let toastContainer = document.getElementById('notification-toast-container');
         if (!toastContainer) {
@@ -438,6 +334,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const toastId = 'toast-' + Date.now();
         const toast = document.createElement('div');
         toast.id = toastId;
+        // Fixed: Only use danger for errors, success for everything else
         toast.className = `toast align-items-center text-bg-${type === 'error' ? 'danger' : 'success'} border-0`;
         toast.setAttribute('role', 'alert');
         toast.setAttribute('aria-live', 'assertive');
@@ -483,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('interview_start_time').addEventListener('change', function() {
         if (this.value) {
             const startTime = new Date(`2000-01-01T${this.value}`);
-            const endTime = new Date(startTime.getTime() + (60 * 60 * 1000)); // Add 1 hour
+            const endTime = new Date(startTime.getTime() + (60 * 60 * 1000)); 
             
             // Format to HH:MM
             const endTimeString = endTime.toTimeString().slice(0, 5);
@@ -525,7 +422,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (startTime && endTime && !validateTimeRange(startTime, endTime)) {
             e.preventDefault();
-           
             showNotification('Please select a time range of exactly 1 hour.');
             return;
         }
@@ -536,61 +432,84 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('assign_end_time').value = endTime;
     });
 
-    // Your existing form submission with added validation
+    
+   // In your assignSlotForm submit handler
     form.addEventListener('submit', function (e) {
         e.preventDefault();
-        // console.log("Assign Slot form submitted "); 
-         console.log("Form submitted - Mode:", document.getElementById('is_reschedule').value);
-
 
         // Validate time range before submitting
         const startTime = document.getElementById('assign_start_time').value;
         const endTime = document.getElementById('assign_end_time').value;
         
         if (!validateTimeRange(startTime, endTime)) {
-            showNotification('Time range must be exactly 1 hour. Please adjust your time selection.');
+            showNotification('Time range must be exactly 1 hour. Please adjust your time selection.', 'error');
             return;
         }
 
         const formData = new FormData(this);
-        console.log("Form Data:", formData);
 
         const isReschedule = document.getElementById('is_reschedule').value === '1';
         const endpoint = isReschedule 
-                ? "{{ route('applicant.update_interview_slot') }}"
-                : "{{ route('applicant.assign_interview_slot') }}";
+            ? "{{ route('applicant.update_interview_slot') }}"
+            : "{{ route('applicant.assign_interview_slot') }}";
 
-        console.log("Submitting to:", endpoint);
+        console.log('Submitting to:', endpoint, 'isReschedule:', isReschedule);
+        
+        // Show loading state
+        const submitBtn = form.querySelector('.primary-assign-btn');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = isReschedule ? 'Rescheduling...' : 'Assigning Slot...';
+        submitBtn.disabled = true;
 
-        fetch(endpoint, {  
-            method: 'POST',
-            headers: { 
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json'
+        // Use proper AJAX with better error handling
+        $.ajax({
+            url: endpoint,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log("Server Response:", data);
-            if (data.success || data.status) {
-             const message = data.message || (isReschedule ? 'Interview rescheduled successfully!' : 'Interview slot assigned successfully!');
-
-                showNotification(message, 'success');
+            success: function(data) {
+                console.log('Response:', data);
+                    if (data.status) {
+                    const successMessage = isReschedule 
+                        ? 'Interview slot rescheduled successfully!' 
+                        : 'Interview slot assigned successfully!';
+                    
+                    showNotification(data.message || successMessage, 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = "{{ route('applicant.student_application_form') }}";
+                    }, 1500);
+                } else {
+                    showNotification(data.message || 'Operation failed. Please try again.', 'error');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", error);
+                console.error("Status:", status);
+                console.error("Response:", xhr.responseText);
                 
-                // Redirect after a short delay to show the success message
-                setTimeout(() => {
-                    window.location.href = "{{ route('applicant.student_application_form') }}";
-                }, 1500);
-            } else {
-                const errorMessage = data.message || (isReschedule ? 'Failed to reschedule interview.' : 'Failed to assign interview slot.');
-
+                let errorMessage = 'Error while assigning slot. Please try again.';
+                
+                // Try to parse error response
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.message) {
+                        errorMessage = response.message;
+                    }
+                } catch (e) {
+                    console.log("Failed to parse error response:", e);
+                }
+                
                 showNotification(errorMessage, 'error');
+            },
+            complete: function() {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
             }
-        })
-        .catch(err => {
-            console.error("Error:", err);
-            showNotification('Error while assigning slot. Please try again.', 'error');
         });
     });
 });

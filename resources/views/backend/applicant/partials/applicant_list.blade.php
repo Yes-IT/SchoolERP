@@ -19,7 +19,7 @@
     <tbody>
        @forelse ($applicants as $index => $applicant) 
          @php
-                        $interviewStatus = optional($applicant->interview)->interview_status;
+                        $interviewStatus = optional($applicant->processing)->interview_status;
                         $statusClass = 'yellow-bg'; // Default for pending/0
                         $statusText = '-';
                         $interviewButtonText = 'Schedule Interview';
@@ -33,10 +33,15 @@
                             $statusText = 'Rescheduled';
                             $interviewButtonText = 'View Details';
                         } elseif ($interviewStatus == 3) {
-                            $statusClass = 'blue-bg'; // Completed or other status
+                            $statusClass = 'blue-bg';  
                             $statusText = 'Cancelled';
                             $interviewButtonText = 'Schedule Interview';
                         } elseif ($interviewStatus == 0) {
+                            $statusText = 'Pending';
+                            $interviewButtonText = 'Schedule Interview';
+                        }else {
+                            // If no processing record exists, show as pending
+                            $statusClass = 'yellow-bg';
                             $statusText = 'Pending';
                             $interviewButtonText = 'Schedule Interview';
                         }
@@ -58,11 +63,11 @@
                     <span class="cmn-tbl-btn {{ $statusClass }}">{{ $statusText }}</span>
                 </td>
 
-                <td>{{optional($applicant->interview)->interview_mode ?? '-' }}</td>
-                <td>{{ optional($applicant->interview)->interview_date ? optional($applicant->interview)->interview_date->format('d/m/Y') : '-' }}</td>
-                <td>{{ optional($applicant->interview)->interview_time ?? '-' }}</td>
-                <td>{{ optional($applicant->interview)->interview_location ?? '-' }}</td>
-                <td>{{ optional($applicant->interview)->interview_link ?? '-' }}</td>
+                <td>{{optional($applicant->processing)->interview_mode ?? '-' }}</td>
+                <td>{{ optional($applicant->processing)->interview_date ? optional($applicant->processing)->interview_date->format('d/m/Y') : '-' }}</td>
+                <td>{{ optional($applicant->processing)->interview_time ?? '-' }}</td>
+                <td>{{ optional($applicant->processing)->interview_location ?? '-' }}</td>
+                <td>{{ optional($applicant->processing)->interview_link ?? '-' }}</td>
                 {{-- <td>
                    <a href="{{ route('applicant.schedule_interview', $applicant->id) }}" class="cmn-btn btn-sm"><img src="{{global_asset('backend/assets/images/calender-icon.svg')}}" alt="Image"> Schedule Interview</a>
                 </td> --}}
@@ -125,22 +130,6 @@
                     </span>
 
                 </td>
-
-                {{-- <td>
-                    <div class="actions-wrp">
-                        <button type="button"
-                          class="cmn-tbl-btn green-bg applicant-action-btn"
-                          data-id="{{ $applicant->id }}"
-                          data-action="approved">
-                          <i class="fa-solid fa-check"></i> Approve
-                        </button>
-                        <button type="button" class="cmn-tbl-btn red-bg applicant-action-btn"
-                          data-id="{{ $applicant->id }}"
-                          data-action="rejected">
-                          <i class="fa-solid fa-xmark"></i> Reject
-                        </button>
-                    </div>
-                </td> --}}
 
                 <td>
                     <div class="actions-wrp">

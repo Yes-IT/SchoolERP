@@ -4,6 +4,7 @@ namespace App\Http\Requests\Applicant;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+
 class ApplicantUpdateRequest extends FormRequest
 {
     /**
@@ -13,7 +14,7 @@ class ApplicantUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+       return true;
     }
 
     /**
@@ -25,39 +26,74 @@ class ApplicantUpdateRequest extends FormRequest
     {
         return [
             // Applicant info
-            'first_name' => 'required|string|max:100',
-            'last_name' => 'required|string|max:100',
+            'first_name' => 'required|string|max:50',
+            'last_name' => 'required|string|max:50',
             'email' => 'nullable|email|max:255',
             'usa_cell' => 'nullable|string|max:20',
-            'high_school' => 'nullable|string|max:255',
+            'high_school_id' => 'required|exists:high_schools,id', 
+            'other_high_school' => 'nullable|string|max:255',
             'date_of_birth' => 'nullable|date',
-            'highschool_application' => 'nullable|string|max:255',
+            'highschool_application' => 'nullable|string|max:50',
 
             // Parents (nested array)
             'parents' => 'array|nullable',
-            'parents.*.father_name' => 'nullable|string|max:100',
-            'parents.*.mother_name' => 'nullable|string|max:100',
-            'parents.*.father_email' => 'nullable|email|max:255',
-            'parents.*.mother_email' => 'nullable|email|max:255',
+            'parents.father_title' => 'nullable|string|max:50',
+            'parents.father_name' => 'nullable|string|max:100',
+            'parents.father_last_name' => 'nullable|string|max:100',
+            'parents.mother_title' => 'nullable|string|max:50',
+            'parents.mother_name' => 'nullable|string|max:100',
+            'parents.maiden_name' => 'nullable|string|max:100',
+            'parents.address' => 'nullable|string|max:255',
+            'parents.city' => 'nullable|string|max:100',
+            'parents.state' => 'nullable|string|max:100',
+            'parents.zip_code' => 'nullable|string|max:6',
+            'parents.country' => 'nullable|string|max:100',
+            'parents.marital_status' => 'nullable|string|max:50',
+            'parents.marital_comment' => 'nullable|string|max:255',
+            'parents.home_phone' => 'nullable|string|max:20',
+            'parents.father_cell' => 'nullable|string|max:20',
+            'parents.mother_cell' => 'nullable|string|max:20',
+            'parents.father_email' => 'nullable|email|max:255',
+            'parents.mother_email' => 'nullable|email|max:255',
+            'parents.father_occupation' => 'nullable|string|max:100',
+            'parents.mother_occupation' => 'nullable|string|max:100',
+            'parents.additional_phone_no' => 'nullable|string|max:20',
+            'parents.additional_emails' => 'nullable|string|max:255',
+            // 'parents.siblings' => 'nullable|integer|min:0',
 
-            // Camps
-            'camps' => 'array|nullable',
-            'camps.*.camp' => 'nullable|string|max:255',
-            'camps.*.position' => 'nullable|string|max:255',
+            // Camp history (arrays)
+            'school_name' => 'array|nullable',
+            'school_name.*' => 'nullable|string|max:255',
+            'school_grades' => 'array|nullable',
+            'school_grades.*' => 'nullable|string|max:50',
 
-            // Checklist
+            // Transaction
+            'transaction' => 'array|nullable',
+            'transaction.amount' => 'nullable|numeric',
+            'transaction.card_last4' => 'nullable|string|max:4',
+
+            // Checklist (Confirmation)
             'checklist' => 'array|nullable',
-            'checklist.fee' => 'nullable|string|max:50',
-            'checklist.cc_last_4' => 'nullable|string|max:10',
-            'checklist.date_deposited' => 'nullable|string|max:50',
+            'checklist.date_deposited' => 'nullable|date',
             'checklist.reference' => 'nullable|string|max:255',
+            'checklist.pictures' => 'nullable|string|max:50',
+            'checklist.transcript_hebrew' => 'nullable|boolean',
+            'checklist.transcript_english' => 'nullable|boolean',
 
             // Processing
             'processing' => 'array|nullable',
             'processing.interview_date' => 'nullable|date',
             'processing.interview_time' => 'nullable|string|max:50',
             'processing.interview_location' => 'nullable|string|max:255',
-            'processing.status' => 'nullable|string|max:50',
+            'processing.interview_status' => 'nullable|integer|in:0,1,2',
+            'processing.coming' => 'nullable|string|max:50',
+            'processing.application_comment' => 'nullable|string',
+            'processing.scholarship_comment' => 'nullable|string',
+            'processing.tution_comment' => 'nullable|string',
+            'processing.letter_sent' => 'nullable|boolean',
         ];
     }
+
+    
+   
 }
