@@ -20,6 +20,11 @@ class AlumniReportRepository
         }
     }
 
+    public function getSessions($id)
+    {
+        return Session::where('id', $id)->get(['id', 'name']);
+    }
+
     public function getAlumniList($request)
     {
         $query = Student::query()
