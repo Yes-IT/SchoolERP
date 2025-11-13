@@ -29,11 +29,13 @@ class TeacherController extends Controller
     public function teacher_info($id){
 
         $teacher = $this->repo->show($id)->load('upload');
+        $classes = $this->repo->fetchClasses($id);
+        // dd($classes->toArray()[0]['year_status']['name']);
         if (! $teacher) {
             abort(404, 'Teacher not found');
         }
 
-        return view('backend.teacher.teacher-info', compact('teacher'));
+        return view('backend.teacher.teacher-info', compact('teacher','classes'));
     }
 
     public function create(){

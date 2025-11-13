@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use App\Traits\ReturnFormatTrait;
 use App\Traits\CommonHelperTrait;
 use Carbon\Carbon;
+use App\Models\Academic\Classes;
 
 class TeacherRepository implements TeacherInterface
 {
@@ -136,6 +137,11 @@ class TeacherRepository implements TeacherInterface
     public function show($id)
     {
         return $this->model->with('upload')->find($id);
+    }
+
+    public function fetchClasses($id)
+    {
+        return Classes::where('teacher_id',$id)->with(['subject','session','yearStatus','semester'])->get();
     }
 
     public function update($request, $id)

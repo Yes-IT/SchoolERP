@@ -20,5 +20,7 @@ interface TeacherInterface
 
     public function filter($request);
 
+    public function fetchClasses($id);
+
     
 }
