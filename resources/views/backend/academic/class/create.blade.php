@@ -7,9 +7,9 @@
                      <div class="ds-breadcrumb">
                         <h1>Classes</h1>
                         <ul>
-                            <li><a href="../dashboard.html">Dashboard</a> /</li>
-                            <li><a href="{{route('classes.index')}}">Classes</a> /</li>
-                            <li><a href="./profile.html">Classes Info</a> /</li>
+                            <li><a href="../dashboard.html">Dashboard</a>/</li>
+                            <li><a href="{{route('classes.index')}}">Classes</a>/</li>
+                            {{-- <li><a href="./profile.html">Classes Info</a> /</li> --}}
                             <li>Add Class</li>
                         </ul>
                         <button  class="cmn-btn" >
@@ -142,11 +142,7 @@
                                                                 <option value="{{ $room->id }}">{{ $room->room_no }}</option>
                                                             @endforeach
                                                         </select>
-
-
-                                                        
                                                     </div>
-
                                                 </div>
                                                 <div class="added-elm-actions btn-grp">
                                                     <button type="submit" class="cmn-btn btn-sm"><img
@@ -337,46 +333,6 @@
                                            <button type="button" id="add-student-btn" class="cmn-btn btn-sm">Add <img src="{{global_asset('backend/assets/images/plus-circle.svg')}}" alt="Icon"></button>
                                        </div>
 
-                                        {{-- <div class="add-form-element">
-
-                                            <div class="added-element-card">
-                                                <span class="sl-count"></span>
-                                                <div class="multi-input-grp">
-                                                    <div class="multi-input-grp">
-                                                        <div class="input-grp">
-                                                            <input id="" name="" type="text" placeholder="Student Name"  >
-                                                        </div>
-                                                        <div class="input-grp">
-                                                            <input id="" name="" type="text" placeholder="Homeroom Class"  >
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="multi-input-grp">
-                                                    <div class="multi-input-grp">
-                                                        <div class="input-grp">
-                                                            <input id="" name="" type="text" placeholder="Division"  >
-                                                        </div>
-                                                        <div class="input-grp">
-                                                            <input id="" name="" type="text" placeholder="Group"  >
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="multi-input-grp">
-                                                    <div class="multi-input-grp">
-                                                        <div class="input-grp">
-                                                            <input id="" name="" type="text" placeholder="ID"  >
-                                                        </div>
-                                                        
-                                                    </div>
-                                                </div>
-                                                <div class="added-elm-actions btn-grp">
-                                                   
-                                                    <button type="submit" class="cmn-btn btn-sm">Delete</button>
-                                                </div>
-                                            </div>
-                                           
-                                        </div> --}}
-
                                         <div id="students-wrapper">
                                         </div>
 
@@ -474,7 +430,6 @@
         `;
         wrapper.appendChild(row);
 
-        // Remove from dropdown so we don't add twice
         select.remove(select.selectedIndex);
     });
 
@@ -484,23 +439,19 @@
 <script>
 
     $(document).ready(function() {
-        // Define the URL for fetching subject data
-        const getSubjectJsonUrl = "{{ route('classes.getSubjectJson', ['id' => '__ID__']) }}"; // Adjust route name as needed
+
+        const getSubjectJsonUrl = "{{ route('classes.getSubjectJson', ['id' => '__ID__']) }}"; 
 
         const $checkbox = $('#is_class_for_scheduling');
-        const $subjectInput = $('#subject'); // Note: ID is 'subject' not 'subject_id'
+        const $subjectInput = $('#subject');
         const $specWrapper = $('#class-specifications');
         const $specInputs = $specWrapper.find('input, textarea, select');
 
         // Function to enable/disable Class Specifications
         function toggleClassSpecs() {
             const isSchedulingOnly = $checkbox.is(':checked');
-            
-            // If checkbox IS checked (scheduling only), DISABLE specs
-            // If checkbox is NOT checked (regular class), ENABLE specs
             $specInputs.prop('disabled', isSchedulingOnly);
             
-            // Visual feedback
             if (isSchedulingOnly) {
                 $specWrapper.addClass('disabled-section');
             } else {
@@ -539,27 +490,21 @@
             });
         }
 
-        // Initial setup on page load
         toggleClassSpecs();
 
-        // Prepopulate on page load if checkbox NOT checked (regular class)
         if (!$checkbox.is(':checked') && $subjectInput.val()) {
             populateClassSpecs($subjectInput.val());
         }
 
-        // Event: When checkbox changes
         $checkbox.on('change', function() {
             toggleClassSpecs();
             
-            // If checkbox is being UNchecked (switching to regular class), prepopulate
             if (!$checkbox.is(':checked') && $subjectInput.val()) {
                 populateClassSpecs($subjectInput.val());
             }
         });
 
-        // Event: When subject changes
         $subjectInput.on('change', function() {
-            // Only prepopulate if checkbox is NOT checked (regular class)
             if (!$checkbox.is(':checked')) {
                 populateClassSpecs($(this).val());
             }

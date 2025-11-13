@@ -7,14 +7,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Schema;
 use App\Repositories\LanguageRepository;
 use App\Interfaces\Academic\ClassesInterface;
-use App\Http\Requests\Academic\Classes\ClassesStoreRequest;
-use App\Http\Requests\Academic\Classes\ClassesUpdateRequest;
+use App\Http\Requests\Academic\Classes\{ClassesStoreRequest,ClassesUpdateRequest};
 use App\Models\Academic\{SchoolYear,Semester,Subject,YearStatus,ClassRoom};
 use App\Models\Staff\Staff;
 use Illuminate\Support\Facades\{Log,DB};
-use Exception;
-use App\Models\StudentInfo\Student;
+use App\Models\StudentInfo\{Student,StudentInfo};
 use App\Models\Session;
+use Exception;
 
 
 
@@ -36,7 +35,7 @@ class ClassesController extends Controller
     public function index()
     {
         $data['classes'] = $this->classes->getAll();
-        Log::info('records in classes', ['classes' => $data['classes']]);
+        // Log::info('records in classes', ['classes' => $data['classes']]);
         $data['teachers'] = Staff::where('role_id', 5)->get();
 
         // dd($data['teachers']);
@@ -59,25 +58,25 @@ class ClassesController extends Controller
     public function create()
     {
         $data['title']       = ___('academic.create_class');
-        $subjects     = Subject::all(['id', 'name']);
-        $rooms    = ClassRoom::all();
-        $teachers     =  Staff::where('role_id', 5)
-                        ->select('id', 'first_name', 'last_name')
-                        ->get(); 
-        // $schoolYears  = SchoolYear::all(['id', 'name']);
-        $sessions  = Session::all(['id', 'name']); 
+        $subjects            = Subject::all(['id', 'name']);
+        $rooms               = ClassRoom::all();
+        $teachers            = Staff::where('role_id', 5)
+                                ->select('id', 'first_name', 'last_name')
+                                ->get(); 
 
-        $semesters    = Semester::all(['id', 'name']);
-        $yearStatuses = YearStatus::all(['id', 'name']);
-        $students = Student::all();
+        $currentYear = date('Y');
+        // dd($currentYear);
+        $sessions = Session::where('name', 'LIKE', "$currentYear-%")->get(['id', 'name']);
 
-        // Log::info('records in add classes', ['subjects' => $subjects,
-        //     'teachers' => $teachers,
-        //     'schoolYears' => $schoolYears,
-        //     'semesters' => $semesters,
-        //     'yearStatuses' => $yearStatuses
-        // ]);
+        // dd($sessions);
+        $semesters         = Semester::all(['id', 'name']);
+        $yearStatuses      = YearStatus::all(['id', 'name']);
+        // $students          = Student::all();
+        $students = Student::with([
+            'schoolDetail:id,student_id,homeroom_class,group,division'
+        ])->get(['id', 'first_name', 'last_name', 'user_id','student_id']);
 
+        Log::info('students', ['students' => $students]);
         $lastClass = $this->classes->all()->sortByDesc('id')->first();
         // Log::info('lastClass', ['lastClass' => $lastClass]);
         $nextNumber = $lastClass ? ((int) filter_var($lastClass->identification_number, FILTER_SANITIZE_NUMBER_INT)) + 1 : 1;

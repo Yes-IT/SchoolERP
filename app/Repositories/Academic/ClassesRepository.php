@@ -7,10 +7,11 @@ use App\Models\Academic\{Classes,Subject,ClassSchedule};
 use App\Traits\ReturnFormatTrait;
 use Illuminate\Support\Facades\{DB,Log};
 use App\Models\Academic\ClassSetup;
+use App\Models\StudentInfo\Student;
 use App\Interfaces\Academic\ClassesInterface;
 use App\Models\ClassTranslate;
 use Carbon\Carbon;
-use App\Models\StudentInfo\Student;
+
 
 
 class ClassesRepository implements ClassesInterface
@@ -40,13 +41,10 @@ class ClassesRepository implements ClassesInterface
 
     public function getAll()
     {
-        // return $this->classes->latest()->paginate(Settings::PAGINATE);
          return $this->classes
             ->with(['subject', 'teacher', 'session', 'yearStatus', 'semester']) 
             ->latest()
-            ->paginate(Settings::PAGINATE);
-
-        Log::info('records in classes', ['classes' => $this->classes]);    
+            ->paginate(Settings::PAGINATE); 
     }
 
     public function getSubjectDetails($subjectId)
@@ -84,83 +82,9 @@ class ClassesRepository implements ClassesInterface
         ];
     }
 
-   
-    // public function store($request)
-    // {
-    //     Log::info('request in class store', ['request' => $request->all()]);
-
-    //     try {
-    //         DB::beginTransaction();
-
-    //         // 1. Save Class
-    //         $classesStore = new $this->classes;
-    //         $classesStore->name                       = $request->class_name;
-    //         $classesStore->identification_number      = $request->identification_number;
-    //         $classesStore->subject_id                 = $request->subject_id;
-    //         $classesStore->teacher_id                 = $request->teacher_id;
-    //         $classesStore->school_year_id             = $request->school_year_id;
-    //         $classesStore->semester_id                = $request->semester_id;
-    //         $classesStore->year_status_id             = $request->year_status_id;
-    //         $classesStore->composite_average          = $request->composite_average ? 1 : 0;
-    //         $classesStore->composite_class_1          = $request->composite_class_1;
-    //         $classesStore->composite_class_2          = $request->composite_class_2;
-    //         $classesStore->composite_class_1_weight   = $request->composite_class_1_weight;
-    //         $classesStore->composite_class_2_weight   = $request->composite_class_2_weight;
-
-    //         $savedClass = $classesStore->save();
-    //         Log::info('Class save result', ['saved' => $savedClass, 'class_id' => $classesStore->id]);
-
-    //         // 2. Save Subject Specifications (if subject_id is selected)
-    //         if ($request->subject_id) {
-    //             $subject = Subject::find($request->subject_id);
-    //             if ($subject) {
-    //                 $subject->class_id                       = $classesStore->id;
-    //                 $subject->credits                        = $request->credits;
-    //                 $subject->allowed_absences               = $request->allowed_absences;
-    //                 $subject->allowed_penalty_amount         = $request->allowed_penalty_amount;
-    //                 $subject->number_latenesses_equal_absence= $request->number_latenesses_equal_absence;
-    //                 $subject->attendance_percent_auto_fail   = $request->attendance_percent_auto_fail ? 1 : 0;
-    //                 $subject->hebrew_attendance              = $request->hebrew_attendance ? 1 : 0;
-    //                 $subject->report_card                    = $request->report_card ? 1 : 0;
-    //                 $subject->attendance_percent_amount      = $request->attendance_percent_amount;
-    //                 $subject->attendance_percent_fail_grade  = $request->attendance_percent_fail_grade;
-    //                 $subject->gpa_weight                     = $request->gpa_weight;
-    //                 $subject->prec_rc                        = $request->prec_rc;
-    //                 $subject->transcript_name                = $request->transcript_name;
-    //                 $subject->course_number                  = $request->course_number;
-    //                 $subject->college_transcript             = $request->college_transcript ? 1 : 0;
-    //                 $subject->prec_transcript                = $request->prec_transcript;
-    //                 $subject->charter_oak_transcript         = $request->charter_oak_transcript ? 1 : 0;
-    //                 $subject->co_year_long                   = $request->co_year_long ? 1 : 0;
-    //                 $subject->co_department                  = $request->co_department;
-    //                 $subject->elective                       = $request->elective ? 1 : 0;
-    //                 $subject->comment                        = $request->comment;
-
-    //                 $savedSubject = $subject->save();
-    //                 Log::info('Subject update result', ['saved' => $savedSubject, 'subject_id' => $subject->id]);
-    //             } else {
-    //                 Log::warning('Subject not found', ['subject_id' => $request->subject_id]);
-    //             }
-    //         }
-
-    //         DB::commit();
-
-    //         return $this->responseWithSuccess(___('alert.class_created_successfully'), []);
-    //     } catch (\Throwable $th) {
-    //         DB::rollBack();
-    //         Log::error('Error in class store', [
-    //             'error_message' => $th->getMessage(),
-    //             'trace' => $th->getTraceAsString()
-    //         ]);
-    //         return $this->responseWithError(___('alert.something_went_wrong_please_try_again'), []);
-    //     }
-    // }
 
     public function store($request)
     {
-        // Log::info('request in class store', ['request' => $request->all()]);
-        // Log::info('Student IDs:', ['students' => $request->student_ids]);
-
         try {
             DB::beginTransaction();
 
@@ -182,8 +106,6 @@ class ClassesRepository implements ClassesInterface
             $class->composite_class_2_weight   = $request->composite_class_2_weight;
             $class->save();
 
-            // Log::info('Class created', ['class_id' => $class->id]);
-
             // Step 2: Create Schedule(s) for this class
             if ($request->has('schedules')) {
                 foreach ($request->schedules as $schedule) {
@@ -203,7 +125,6 @@ class ClassesRepository implements ClassesInterface
             }
 
             
-           //step 3: update subject common details wrt class
             if (!$request->has('is_class_for_scheduling')) {
                 $subject = Subject::find($request->subject_id);
                 if ($subject) {
@@ -272,7 +193,6 @@ class ClassesRepository implements ClassesInterface
         return $this->classes->with([
             'subject',
             'teacher', 
-            // 'schoolYear',
             'session',
             'yearStatus',
             'semester',
@@ -300,7 +220,6 @@ class ClassesRepository implements ClassesInterface
             $class->composite_class_1_weight = $request->composite_class_1_weight;
             $class->composite_class_2_weight = $request->composite_class_2_weight;
             $class->is_class_scheduling = $request->has('is_class_for_scheduling') ? 1 : 0;
-            // $class->save();
 
              // Save class specifications (only if not scheduling-only)
             if (!$class->is_class_scheduling)
@@ -384,7 +303,7 @@ class ClassesRepository implements ClassesInterface
                 'original_time' => $time12Hour,
                 'error' => $e->getMessage()
             ]);
-            return $time12Hour; // or return null, or throw exception
+            return $time12Hour; 
         }
     }
 
@@ -426,48 +345,26 @@ class ClassesRepository implements ClassesInterface
         }
     }
 
-
-    // public function filter($request)
-    // {
-    //     Log::info('request in filter', ['request' => $request->all()]);
-    //     $query = Classes::query()->with(['subject', 'teacher', 'schoolYear', 'yearStatus', 'semester']);
-
-       
-    //     if ($request->teacher_id && $request->teacher_id !== 'all') {
-    //         $query->where('teacher_id', $request->teacher_id);
-    //     }
-
-    //     Log::info('query in filter', ['query' => $query]);
-    //    return $query->paginate(
-    //         $request->per_page ?? 10, 
-    //         ['*'], 
-    //         'page', 
-    //         $request->page ?? 1
-    //     )->appends($request->except('page'));
-    // }
-
     public function filter($requestData)
     {
-        Log::info('Filter request received', $requestData);
+        // Log::info('Filter request received', $requestData);
 
-        Log::info('filter request data', [
-            'teacher_id' => $requestData['teacher_id'] ?? null,
-            'per_page' => $requestData['per_page'] ?? null,
-        ]);
+        // Log::info('filter request data', [
+        //     'teacher_id' => $requestData['teacher_id'] ?? null,
+        //     'per_page' => $requestData['per_page'] ?? null,
+        // ]);
 
-        
         $query = Classes::query()->with(['subject', 'teacher', 'schoolYear', 'yearStatus', 'semester']);
 
         if (isset($requestData['teacher_id']) && $requestData['teacher_id'] !== 'all') {
-            Log::info('Filtering by teacher_id: ' . $requestData['teacher_id']);
+            // Log::info('Filtering by teacher_id: ' . $requestData['teacher_id']);
             $query->where('teacher_id', $requestData['teacher_id']);
         }
 
         $perPage = $requestData['per_page'] ?? 10; 
-
         $results = $query->paginate($perPage);
 
-        Log::info('Query results', ['results' => $results, 'total' => $results->total()]);
+        // Log::info('Query results', ['results' => $results, 'total' => $results->total()]);
         
         return $results;
     }

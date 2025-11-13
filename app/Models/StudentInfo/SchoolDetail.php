@@ -23,6 +23,9 @@ class SchoolDetail extends BaseModel
         'division',
         'floor',
         'room',
+        'homeroom_id',
+        'group_id',
+        'division_id',
     ];
 
     public function student()
