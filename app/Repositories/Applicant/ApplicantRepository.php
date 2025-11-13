@@ -17,7 +17,6 @@ class ApplicantRepository implements ApplicantInterface
         $query = Applicant::with(['parents', 'processing'])
                     ->orderBy('created_at', 'desc');
 
-        // Search filter
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
@@ -26,17 +25,14 @@ class ApplicantRepository implements ApplicantInterface
             });
         }
 
-        // Session filter 
         if ($sessionId) {
             $query->where('session_id', $sessionId);
         }
 
-        // Year Status filter 
         if ($yearStatusId) {
             $query->where('year_status_id', $yearStatusId);
         }
 
-        // Applicant name filter from dropdown
         if ($applicantName) {
             $query->where(function ($q) use ($applicantName) {
                 $q->where('first_name', 'like', "%{$applicantName}%")
@@ -172,11 +168,10 @@ class ApplicantRepository implements ApplicantInterface
         DB::beginTransaction();
 
         try {
-            Log::info('Repository update started', ['applicant_id' => $id, 'all_data' => $data]);
+            // Log::info('Repository update started', ['applicant_id' => $id, 'all_data' => $data]);
             
             $applicant = Applicant::with(['processing','transaction','confirmation','parents'])->findOrFail($id);
 
-            // Update main applicant fields
             $applicantData = [
                 'first_name' => $data['first_name'] ?? $applicant->first_name,
                 'last_name' => $data['last_name'] ?? $applicant->last_name,
@@ -187,9 +182,10 @@ class ApplicantRepository implements ApplicantInterface
                 'high_school' => $data['high_school'] ?? $applicant->high_school,
             ];
             
-            // high_school_id
-            if (isset($data['high_school_id']) && $data['high_school_id'] !== '') {
+            if (isset($data['high_school_id']) && $data['high_school_id'] !== null) {
                 $applicantData['high_school_id'] = $data['high_school_id'];
+            } else {
+                $applicantData['high_school_id'] = null;
             }
             
             // Log::info('Applicant data before update:', $applicantData);
@@ -198,93 +194,71 @@ class ApplicantRepository implements ApplicantInterface
             // Log::info('Update result:', ['result' => $result]);
             
             $applicant->refresh();
-            
-            // Update Processing information - FIXED
+        
            if (isset($data['processing'])) {
-                Log::info('Updating processing with:', $data['processing']);
+                // Log::info('Updating processing with:', $data['processing']);
                 $processingData = $data['processing'];
                 
-                // Filter out empty values that would cause database errors
                 $processingData = array_filter($processingData, function($value) {
                     return $value !== '' && $value !== null;
                 });
                 
-                // Only proceed if we have actual data to save 
                 if (!empty($processingData)) {
                     $processingData['letter_sent'] = isset($processingData['letter_sent']) ? 1 : 0;
                     $processingData['interview_status'] = isset($processingData['interview_status']) ? (int)$processingData['interview_status'] : 0;
 
-                    // Check if processing record exists
                     $existingProcessing = ApplicationProcessing::where('applicant_id', $applicant->id)->first();
-                    
                     if ($existingProcessing) {
-                        // Update existing record
                         $existingProcessing->update($processingData);
-                       
                     } else {
-                        
                         $processingData['applicant_id'] = $applicant->id;
-                        
-                        // Ensure required fields have defaults if creating new record
                         $processingData['interview_status'] = $processingData['interview_status'] ?? 0;
                         $processingData['letter_sent'] = $processingData['letter_sent'] ?? 0;
                         
                         ApplicationProcessing::create($processingData);
-                        Log::info('New processing record created successfully');
                     }
                 } else {
                     Log::info('No meaningful processing data to save, skipping update');
                 }
             }
 
-            // Update Parents information
             if (isset($data['parents']) && $applicant->parents->isNotEmpty()) {
-                Log::info('Updating parents with:', $data['parents']);
+                // Log::info('Updating parents with:', $data['parents']);
                 $parent = $applicant->parents->first();
                 $parent->update($data['parents']);
             }
 
-            // Update Transaction information
             if (isset($data['transaction']) && $applicant->transaction) {
-                Log::info('Updating transaction with:', $data['transaction']);
+                // Log::info('Updating transaction with:', $data['transaction']);
                 $applicant->transaction->update($data['transaction']);
             }
 
-            // Update Checklist (Confirmation) information
             if (isset($data['checklist']) && $applicant->confirmation) {
-                Log::info('Updating checklist with:', $data['checklist']);
+                // Log::info('Updating checklist with:', $data['checklist']);
                 $checklistData = $data['checklist'];
                 $checklistData['transcript_hebrew'] = isset($checklistData['transcript_hebrew']) ? 1 : 0;
                 $checklistData['transcript_english'] = isset($checklistData['transcript_english']) ? 1 : 0;
-                $applicant->confirmation->update($checklistData);
-               
+                $applicant->confirmation->update($checklistData);   
             }
 
-           // Update History (Camp attended)
             if (isset($data['school_name']) || isset($data['school_grades'])) {
                 $history = ApplicantHistory::where('applicant_id', $id)->first();
-                
                 if ($history) {
                     $historyData = [];
                     if (isset($data['school_name'])) $historyData['school_name'] = $data['school_name'];
                     if (isset($data['school_grades'])) $historyData['school_grades'] = $data['school_grades'];
-                    $history->update($historyData);
-                   
+                    $history->update($historyData); 
                 } else {
-                    
                     Log::warning('No history record found for applicant', ['applicant_id' => $id]);
                 }
             }
             DB::commit();
-            Log::info("Applicant updated successfully in repository", ['applicant_id' => $id]);
-
+            // Log::info("Applicant updated successfully in repository", ['applicant_id' => $id]);
             return $applicant;
 
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error("Error updating applicant: " . $e->getMessage(), [
-                'applicant_id' => $id,
-                'data' => $data,
                 'exception' => $e->getTraceAsString()
             ]);
             throw $e;
@@ -298,38 +272,9 @@ class ApplicantRepository implements ApplicantInterface
         return true;
     }
 
-   
-    // public function getSlotsBetween($date, $startTime = null, $endTime = null, $interviewMode = null)
-    // {
-    //     $query = ApplicationProcessing::whereDate('interview_date', $date);
-
-    //     // Only apply time range filter if both start_time and end_time are provided
-    //     if ($startTime && $endTime) {
-    //         $query->where(function ($query) use ($startTime, $endTime) {
-    //             $query->where(function ($q) use ($startTime, $endTime) {
-    //                 $q->where('start_time', '<', $endTime)
-    //                 ->where('end_time', '>', $startTime);
-    //             });
-    //         });
-    //     }
-    //     // If only date is provided, get all slots for that date ordered by time
-    //     else {
-    //         $query->orderBy('start_time', 'asc');
-    //     }
-
-    //     // Filter by interview mode if provided
-    //     if ($interviewMode) {
-    //         $query->where('interview_mode', $interviewMode);
-    //     }
-
-    //     return $query->get(['id', 'applicant_id', 'interview_date', 'start_time', 'end_time', 'interview_mode', 'interview_location', 'interview_link']);
-    // }
-   
-    
-   
     public function getSlotsForWeek($startDate, $endDate)
     {
-        $daysToShow = [1, 2, 3, 4, 5, 0]; // Monday to Friday + Sunday (Carbon dayOfWeek values)
+        $daysToShow = [1, 2, 3, 4, 5, 0]; 
         
         return ApplicationProcessing::whereBetween('interview_date', [
             $startDate->startOfDay(), 
@@ -341,27 +286,6 @@ class ApplicantRepository implements ApplicantInterface
             return in_array($slotDay, $daysToShow);
         });
     }
-
-    // public function saveInterviewSchedule($data)
-    // {
-    //     Log::info('Saving interview schedule', ['data' => $data]);
-
-    //     $formattedTime = date('h:i A', strtotime($data['start_time'])) . ' - ' . date('h:i A', strtotime($data['end_time']));
-
-    //     return ApplicationProcessing::updateOrCreate(
-    //         ['applicant_id' => $data['applicant_id']],
-    //         [
-    //             'interview_mode'     => $data['interview_mode'],
-    //             'interview_date'     => $data['interview_date'],
-    //             'start_time'         => $data['start_time'],
-    //             'end_time'           => $data['end_time'],
-    //             'interview_time'     => $formattedTime,
-    //             'interview_location' => $data['interview_location'] ?? null,
-    //             'interview_link'     => $data['interview_link'] ?? null,
-    //             'interview_status'   => 1, // 1 = Scheduled
-    //         ]
-    //     );
-    // }
 
     public function getSlotsBetween($date, $startTime = null, $endTime = null, $interviewMode = null)
     {
@@ -376,15 +300,9 @@ class ApplicantRepository implements ApplicantInterface
                 });
             });
         }
-        // If only date is provided, get all slots for that date ordered by time
         else {
             $query->orderBy('start_time', 'asc');
         }
-
-        // Filter by interview mode if provided
-        // if ($interviewMode) {
-        //     $query->where('interview_mode', $interviewMode);
-        // }
 
         return $query->get(['id', 'applicant_id', 'interview_date', 'start_time', 'end_time', 'interview_mode', 'interview_location', 'interview_link']);
     }
@@ -394,30 +312,24 @@ class ApplicantRepository implements ApplicantInterface
         $query = ApplicationProcessing::whereDate('interview_date', $date)
             ->where(function($q) use ($startTime, $endTime) {
                 $q->where(function($inner) use ($startTime, $endTime) {
-                    // Check if new slot overlaps with any existing slot
                     $inner->where('start_time', '<', $endTime)
                         ->where('end_time', '>', $startTime);
                 });
             });
 
-        // Exclude current applicant's interview (for reschedule cases)
         if ($excludeApplicantId) {
             $query->where('applicant_id', '!=', $excludeApplicantId);
         }
-
         return $query->exists();
     }
 
     public function saveInterviewSchedule($data)
     {
-        Log::info('Saving interview schedule', ['data' => $data]);
-
-        // First check for overlapping slots with OTHER applicants
         $overlapping = $this->checkOverlappingSlots(
             $data['interview_date'],
             $data['start_time'],
             $data['end_time'],
-            $data['applicant_id'] // Exclude current applicant
+            $data['applicant_id'] 
         );
 
         if ($overlapping) {
@@ -444,8 +356,7 @@ class ApplicantRepository implements ApplicantInterface
 
     public function updateInterviewSchedule($data)
     {
-        Log::info('Updating interview schedule', ['data' => $data]);
-
+        // Log::info('Updating interview schedule', ['data' => $data]);
         $overlapping = $this->checkOverlappingSlots(
             $data['interview_date'],
             $data['start_time'],

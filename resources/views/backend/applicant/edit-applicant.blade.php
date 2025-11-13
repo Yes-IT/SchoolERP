@@ -55,11 +55,18 @@
                                                             {{ $school->hs_name }}
                                                         </option>
                                                     @endforeach
-                                                    <option value="other" {{ old('high_school_id') == 'other' ? 'selected' : '' }}>Other</option>
+                                                    {{-- <option value="other" {{ old('high_school_id') == 'other' ? 'selected' : '' }}>Other</option> --}}
+                                                    <option value="other" 
+                                                        {{ (old('high_school_id', $applicant->high_school_id ?? '') == 'other' || 
+                                                            (!empty($applicant->high_school) && empty($applicant->high_school_id))) ? 'selected' : '' }}>
+                                                        Other
+                                                    </option>
                                                 </select>
                                             </div>
-                                            <div class="input-grp">
-                                              <label for="subject">Others High School</label>
+                                            <div class="input-grp" id="other_high_school_group" 
+                                                style="{{ (old('high_school_id', $applicant->high_school_id ?? '') == 'other' || 
+                                                            (!empty($applicant->high_school) && empty($applicant->high_school_id))) ? '' : 'display: none;' }}">
+                                                <label for="other_high_school">Other High School</label>
                                                 <input 
                                                     type="text" 
                                                     id="other_high_school" 
@@ -67,6 +74,7 @@
                                                     value="{{ old('high_school', $applicant->high_school ?? '') }}" 
                                                     placeholder="Enter other high school name">
                                             </div>
+
 
                                             <div class="input-grp">
                                               <label for="">Birthdate</label>
@@ -234,11 +242,6 @@
                                                 <label for="">Interview Time</label>
                                                 <input type="text" name="processing[interview_time]" value="{{ old('processing.interview_time', $applicant->processing->interview_time ?? '') }}">
                                             </div>
-
-                                            {{-- <div class="input-grp">
-                                                <label for="">Interview Location</label>
-                                                 <input type="text" name="processing[interview_location]" value="{{ old('processing.interview_location', $applicant->processing->interview_location ?? '')}}">
-                                            </div> --}}
 
                                             <div class="input-grp">
                                                 <label for="">
@@ -432,135 +435,97 @@
 @endsection
 
 @push('script')
-
-<script>
-//  document.addEventListener("DOMContentLoaded", function () {
-//     const addRowBtn = document.getElementById("add-row-btn");
-//     const campList = document.getElementById("camp-attended-list");
-
-//     // Add new camp row
-//     addRowBtn.addEventListener("click", function (e) {
-//         e.preventDefault();
-
-//         const rowCount = campList.querySelectorAll('.schedule-row').length;
-        
-//         const newRow = document.createElement("div");
-//         newRow.classList.add("added-element-card", "schedule-row");
-//         newRow.style.cssText = "display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px;";
-//         newRow.innerHTML = `
-//             <span class="sl-count" style="margin-top: 25px; min-width: 30px;">${rowCount + 1}.</span>
-//             <div class="multi-input-grp input-grp-5" style="display: flex; gap: 15px; flex: 1;">
-//                 <div class="input-grp" style="flex: 1;">
-//                     <label for="">Name of School</label>
-//                     <input type="text" name="school_name[]" placeholder="Name of School" style="width: 100%;">
-//                 </div>
-//                 <div class="input-grp" style="flex: 1;">
-//                     <label for="">Grades Attended</label>
-//                     <input type="text" name="school_grades[]" placeholder="Grades Attended" style="width: 100%;">
-//                 </div>
-//             </div>
-//             <div class="added-elm-actions btn-grp" style="margin-top: 25px;">
-//                 <button type="button" class="cmn-btn btn-sm delete-row-btn">Delete</button>
-//             </div>
-//         `;
-        
-//         campList.appendChild(newRow);
-//         updateRowNumbers();
-//     });
-
-//     // Delete a row
-//     campList.addEventListener("click", function (e) {
-//         if (e.target.closest(".delete-row-btn")) {
-//             e.preventDefault();
-//             const row = e.target.closest(".schedule-row");
-//             row.remove();
-//             updateRowNumbers();
-//         }
-//     });
-
-//     // Update serial numbers
-//     function updateRowNumbers() {
-//         campList.querySelectorAll(".schedule-row").forEach((row, index) => {
-//             const span = row.querySelector('.sl-count');
-//             span.textContent = `${index + 1}.`;
-//         });
-//     }
-
-//     // Initialize row numbers
-//     updateRowNumbers();
-// });
-</script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-    const addRowBtn = document.getElementById("add-row-btn");
-    const campList = document.getElementById("camp-attended-list");
+        const addRowBtn = document.getElementById("add-row-btn");
+        const campList = document.getElementById("camp-attended-list");
 
-    // Add new camp row
-    addRowBtn.addEventListener("click", function (e) {
-        e.preventDefault();
+        // Add new camp row
+        addRowBtn.addEventListener("click", function (e) {
+            e.preventDefault();
 
-        const rowCount = campList.querySelectorAll('.schedule-row').length;
-        
-        const newRow = document.createElement("div");
-        newRow.classList.add("added-element-card", "schedule-row");
-        newRow.style.cssText = "display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px;";
-        newRow.innerHTML = `
-            <span class="sl-count" style="margin-top: 25px; min-width: 30px;">${rowCount + 1}.</span>
-            <div class="multi-input-grp input-grp-5" style="display: flex; gap: 15px; flex: 1;">
-                <div class="input-grp" style="flex: 1;">
-                    <label for="">Name of School</label>
-                    <input type="text" name="school_name[]" placeholder="Name of School" style="width: 100%;">
+            const rowCount = campList.querySelectorAll('.schedule-row').length;
+            
+            const newRow = document.createElement("div");
+            newRow.classList.add("added-element-card", "schedule-row");
+            newRow.style.cssText = "display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px;";
+            newRow.innerHTML = `
+                <span class="sl-count" style="margin-top: 25px; min-width: 30px;">${rowCount + 1}.</span>
+                <div class="multi-input-grp input-grp-5" style="display: flex; gap: 15px; flex: 1;">
+                    <div class="input-grp" style="flex: 1;">
+                        <label for="">Name of School</label>
+                        <input type="text" name="school_name[]" placeholder="Name of School" style="width: 100%;">
+                    </div>
+                    <div class="input-grp" style="flex: 1;">
+                        <label for="">Grades Attended</label>
+                        <input type="text" name="school_grades[]" placeholder="Grades Attended" style="width: 100%;">
+                    </div>
+                    <!-- Hidden fields for new records -->
+                    <input type="hidden" name="history_ids[]" value="">
+                    <input type="hidden" name="array_indexes[]" value="">
+                    <input type="hidden" name="camp_deleted[]" value="0" class="camp-deleted-flag">
                 </div>
-                <div class="input-grp" style="flex: 1;">
-                    <label for="">Grades Attended</label>
-                    <input type="text" name="school_grades[]" placeholder="Grades Attended" style="width: 100%;">
+                <div class="added-elm-actions btn-grp" style="margin-top: 25px;">
+                    <button type="button" class="cmn-btn btn-sm delete-row-btn">Delete</button>
                 </div>
-                <!-- Hidden fields for new records -->
-                <input type="hidden" name="history_ids[]" value="">
-                <input type="hidden" name="array_indexes[]" value="">
-                <input type="hidden" name="camp_deleted[]" value="0" class="camp-deleted-flag">
-            </div>
-            <div class="added-elm-actions btn-grp" style="margin-top: 25px;">
-                <button type="button" class="cmn-btn btn-sm delete-row-btn">Delete</button>
-            </div>
-        `;
-        
-        campList.appendChild(newRow);
+            `;
+            
+            campList.appendChild(newRow);
+            updateRowNumbers();
+        });
+
+        // Delete a row - SOFT DELETE
+        campList.addEventListener("click", function (e) {
+            if (e.target.closest(".delete-row-btn")) {
+                e.preventDefault();
+                const row = e.target.closest(".schedule-row");
+                
+                // Mark as deleted instead of removing
+                const deleteFlag = row.querySelector('.camp-deleted-flag');
+                if (deleteFlag) {
+                    deleteFlag.value = "1";
+                    console.log('Marked row as deleted:', deleteFlag.value);
+                }
+                
+                // Hide the row instead of removing it
+                row.style.display = 'none';
+                
+                updateRowNumbers();
+            }
+        });
+
+        // Update serial numbers
+        function updateRowNumbers() {
+            const visibleRows = campList.querySelectorAll('.schedule-row:not([style*="display: none"])');
+            visibleRows.forEach((row, index) => {
+                const span = row.querySelector('.sl-count');
+                span.textContent = `${index + 1}.`;
+            });
+        }
+
+        // Initialize row numbers
         updateRowNumbers();
     });
+</script>
 
-    // Delete a row - SOFT DELETE
-    campList.addEventListener("click", function (e) {
-        if (e.target.closest(".delete-row-btn")) {
-            e.preventDefault();
-            const row = e.target.closest(".schedule-row");
-            
-            // Mark as deleted instead of removing
-            const deleteFlag = row.querySelector('.camp-deleted-flag');
-            if (deleteFlag) {
-                deleteFlag.value = "1";
-                console.log('Marked row as deleted:', deleteFlag.value);
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const highSchoolSelect = document.getElementById('high_school_id');
+        const otherHighSchoolGroup = document.getElementById('other_high_school_group');
+        
+        function toggleOtherHighSchool() {
+            if (highSchoolSelect.value === 'other') {
+                otherHighSchoolGroup.style.display = 'block';
+            } else {
+                otherHighSchoolGroup.style.display = 'none';
+                document.getElementById('other_high_school').value = '';
             }
-            
-            // Hide the row instead of removing it
-            row.style.display = 'none';
-            
-            updateRowNumbers();
         }
+        
+        toggleOtherHighSchool();
+        
+        highSchoolSelect.addEventListener('change', toggleOtherHighSchool);
     });
-
-    // Update serial numbers
-    function updateRowNumbers() {
-        const visibleRows = campList.querySelectorAll('.schedule-row:not([style*="display: none"])');
-        visibleRows.forEach((row, index) => {
-            const span = row.querySelector('.sl-count');
-            span.textContent = `${index + 1}.`;
-        });
-    }
-
-    // Initialize row numbers
-    updateRowNumbers();
-});
 </script>
 
 
