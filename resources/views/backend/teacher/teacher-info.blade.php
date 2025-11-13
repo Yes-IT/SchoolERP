@@ -191,14 +191,17 @@
                                         </tr>
                                        </thead>
                                        <tbody>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>Child Development</td>
-                                            <td>Lorem Ipsum</td>
-                                            <td>2023-2024</td>
-                                            <td>Lorem Ipsum</td>
-                                            <td>First</td>
-                                        </tr>
+                                        @foreach($classes as $classe)
+                                            <tr>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ $classe->name }}</td>
+                                                <td>{{ $classe->subject->name }}</td>
+                                                <td>{{ $classe->session->name }}</td>
+                                                <td>{{ $classe->yearStatus->name }}</td>
+                                                <td>{{ $classe->semester->name }}</td>
+                                                
+                                            </tr>
+                                        @endforeach
                                        </tbody>
 
                                       </table>
