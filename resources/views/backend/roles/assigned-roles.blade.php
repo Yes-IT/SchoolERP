@@ -178,7 +178,7 @@
                                 <div class="input-grp">
                                     <label>Email Id</label>
                                     <input type="email" name="email" id="email" placeholder="Email Id" autocomplete="off" required>
-                                    <div class="error-message"></div>
+                                    <div class="error-message" data-error="email"></div>
                                 </div>
                             </div>
 
@@ -197,7 +197,7 @@
                                 <div class="input-grp">
                                     <label for="password">Password</label>
                                     <input type="password" id="password" name="password" placeholder="Password" autocomplete="new-password" required>
-                                    <div class="error-message"></div>
+                                    <div class="error-message" data-error="password"></div>
                                 </div>
                             </div>
 
@@ -205,7 +205,7 @@
                                 <div class="input-grp">
                                     <label for="password_confirmation">Confirm Password</label>
                                     <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Confirm Password" autocomplete="new-password" required>
-                                    <div class="error-message"></div>
+                                    <div class="error-message" data-error="password_confirmation"></div>
                                 </div>
                             </div>
 
@@ -258,11 +258,12 @@
                                 <div class="input-grp">
                                     <label>Full Name</label>
                                     <input type="text" name="name" placeholder="Full Name" autocomplete="off" required>
+                                    <div class="error-message" data-error="name"></div>
                                 </div>
                                 <div class="input-grp">
                                     <label>Email Id</label>
                                     <input type="email" name="email" id="edit-email" placeholder="Email Id" autocomplete="off" readonly>
-                                    <div class="error-message"></div>
+                                    <div class="error-message" data-error="email"></div>
                                 </div>
                             </div>
 
@@ -305,7 +306,7 @@
 </div>
 <!-- End Of Edit User Modal -->
 
-<!-- Request Leave Modal Begin -->
+<!-- Assigned Modal Begin -->
 <div class="modal fade cmn-popwrp pop800" id="assignedPermissons" tabindex="-1" role="dialog" aria-labelledby="assignedPermissons" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -326,7 +327,7 @@
         </div>
     </div>
 </div>
-<!-- End Of Request Leave Modal -->
+<!-- End Of Assigned Modal -->
 
 <!-- Delete Role Modal Begin -->
 <div class="modal fade cmn-popwrp popwrp w400" id="deleteUserModal" tabindex="-1" aria-hidden="true">
@@ -369,6 +370,7 @@
 
 <script>
 $(document).ready(function () {
+
     $('#addUserForm').on('submit', function (e) {
         e.preventDefault();
 
@@ -380,51 +382,56 @@ $(document).ready(function () {
         form.find('.error-message').text('');
         form.find('input, select').removeClass('error-input');
 
-        const email            = $('#email').val().trim();
-        const password         = $('#password').val();
-        const confirmPassword  = $('#password_confirmation').val();
+        const email            = form.find('[name="email"]').val().trim();
+        const password         = form.find('[name="password"]').val();
+        const confirmPassword  = form.find('[name="password_confirmation"]').val();
         const emailPattern     = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
 
         let valid = true;
 
         // Email validation
         if (!emailPattern.test(email)) {
-            $('#email').addClass('error-input');
-            $('#emailError').text('Please enter a valid email address.');
+            const emailField = form.find('[name="email"]');
+            emailField.addClass('error-input');
+            form.find('[data-error="email"]').text('Please enter a valid email address.');
             valid = false;
         }
 
-        // Confirm password validation (key must match error element name)
+        // Confirm password validation
         if (password !== confirmPassword) {
-            $('#password_confirmation').addClass('error-input');
-            $('#password_confirmationError').text('Passwords do not match.');
+            const confirmField = form.find('[name="password_confirmation"]');
+            confirmField.addClass('error-input');
+            form.find('[data-error="password_confirmation"]').text('Passwords do not match.');
             valid = false;
         }
 
         if (!valid) return;
 
-        const formData = form.serialize();
         btn.prop('disabled', true).text('Saving...');
 
         $.ajax({
             url: "{{ route('roles.user.create') }}",
             method: "POST",
-            data: formData,
+            data: form.serialize(),
             dataType: "json",
             success: function (response) {
                 if (response.success) {
                     form[0].reset();
+                    $('#addUserModal').modal('hide');
                     location.reload();
-                } else if (response.errors) {
-                    $.each(response.errors, function (key, value) {
-                        const field = form.find('[name="' + key + '"]');
-                        field.addClass('error-input');
-                        $('#' + key + 'Error').text(value[0]);
-                    });
                 }
             },
-            error: function () {
-                alert('An error occurred while saving user.');
+            error: function (xhr) {
+                if (xhr.status === 422) {
+                    const errors = xhr.responseJSON.errors;
+                    $.each(errors, function (key, value) {
+                        const field = form.find('[name="' + key + '"]');
+                        field.addClass('error-input');
+                        form.find('[data-error="' + key + '"]').text(value[0]);
+                    });
+                } else {
+                    alert('Something went wrong. Please try again.');
+                }
             },
             complete: function () {
                 btn.prop('disabled', false).text(originalBtnText);
@@ -435,7 +442,8 @@ $(document).ready(function () {
     // Real-time error clearing
     $('#addUserForm').on('input change', 'input, select', function () {
         $(this).removeClass('error-input');
-        $('#' + $(this).attr('name') + 'Error').text('');
+        const key = $(this).attr('name');
+        $(this).closest('form').find('[data-error="' + key + '"]').text('');
     });
 
 });
@@ -550,40 +558,74 @@ $(document).ready(function () {
         e.preventDefault();
 
         const form = $(this);
-        const btn = form.find('button[type="submit"]');
+        const btn  = form.find('button[type="submit"]');
         const originalText = btn.text();
 
         // Clear previous errors
         form.find('.error-message').text('');
         form.find('input, select').removeClass('error-input');
 
-        const formData = form.serialize();
         btn.prop('disabled', true).text('Saving...');
 
         $.ajax({
             url: "{{ route('roles.user.update') }}",
             method: "POST",
-            data: formData,
+            data: form.serialize(),
+            dataType: "json",
             success: function (response) {
                 if (response.status) {
                     $('#editUserModal').modal('hide');
                     location.reload();
-                } else if (response.errors) {
-                    $.each(response.errors, function (key, value) {
-                        let input = $('[name="' + key + '"]');
-                        input.addClass('error-input');
-                        $('#' + key + 'Error').text(value[0]);
-                    });
                 }
             },
-            error: function () {
-                alert('Update failed.');
+            error: function (xhr) {
+                if (xhr.status === 422) {
+                    const errors = xhr.responseJSON.errors;
+
+                    $.each(errors, function (key, value) {
+                        const input = form.find('[name="' + key + '"]');
+                        input.addClass('error-input');
+                        form.find('[data-error="' + key + '"]').text(value[0]);
+                    });
+
+                } else {
+                    alert('Update failed. Please try again.');
+                }
             },
             complete: function () {
                 btn.prop('disabled', false).text(originalText);
             }
         });
     });
+
+    $('#editUserForm').on('input change', 'input, select', function () {
+        const key = $(this).attr('name');
+        $(this).removeClass('error-input');
+        $(this).closest('form').find('[data-error="' + key + '"]').text('');
+    });
+
+    $('#addUserModal').on('hidden.bs.modal', function () {
+        const form = $('#addUserForm');
+        form[0].reset();
+
+        form.find('.error-message').text('');
+        form.find('input, select').removeClass('error-input');
+
+        const btn = form.find('button[type="submit"]');
+        btn.prop('disabled', false).text('Save');
+    });
+
+    $('#editUserModal').on('hidden.bs.modal', function () {
+        const form = $('#editUserForm');
+
+        form[0].reset();
+        form.find('.error-message').text('');
+        form.find('input, select').removeClass('error-input');
+
+        const btn = form.find('button[type="submit"]');
+        btn.prop('disabled', false).text('Save');
+    });
+
 });
 </script>
 
