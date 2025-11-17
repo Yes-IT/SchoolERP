@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\LiveChat\Entities\Message;
 use Modules\VehicleTracker\Entities\EnrollmentReport;
 use Modules\VehicleTracker\Entities\StudentRouteEnrollment;
+use App\Models\StudentInfo\SchoolDetail;
 
 class Student extends BaseModel
 {
@@ -166,4 +167,8 @@ class Student extends BaseModel
     {
         return $this->hasMany(\App\Models\FormChecklist::class, 'student_id');
     }
+
+   
+
+
 }

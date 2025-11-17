@@ -32,6 +32,7 @@ class ApplicationProcessing extends Model
         'tution_comment',
         'letter_sent',
         'interview_status',
+        'interview_state',
          
         ];
 

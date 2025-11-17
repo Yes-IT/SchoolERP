@@ -132,8 +132,6 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::post('/transcript/college/store', 'storeCollege')->name('transcript.college.store');
                 });
 
-
-
                 Route::controller(SubjectController::class)->group(function () {
                     Route::get('superadmin/subject', 'index')->name('superadmin.subject.index')->middleware('PermissionCheck:subject_read');
                     Route::get('superadmin/subject/view-details/{id}', 'viewSubjectDetails')->name('admin.subject.viewSubjectDetails')->middleware('PermissionCheck:subject_read');
@@ -194,14 +192,27 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::delete('/{id}', 'destroy')->name('room_management.destroy')->middleware('PermissionCheck:room_management_delete');
                 });
 
-                Route::controller(AssignmentController::class)->prefix('assignment')->group(function () {   //assignment routes
-                    Route::get('assignment', 'index')->name('assignment.index')->middleware('PermissionCheck:assignment_read');
-                    Route::get('assignment/{id}/details', 'assignment_details')->name('assignment.details')->middleware('PermissionCheck:assignment_read');
-                    Route::get('assignment/{id}/evaluation_details', 'evaluation_details')->name('assignment.evalulation_details')->middleware('PermissionCheck:assignment_read');
-                    Route::post('assignment/{id}/approve',  'approve_assignment')->name('assignment.approve_assignment')->middleware('PermissionCheck:assignment_read');
-                    Route::post('assignment/{id}/reject',  'reject_assignment')->name('assignment.reject_assignment')->middleware('PermissionCheck:assignment_read');
-                    Route::get('/assignment/filter', 'filter')->name('assignments.filter')->middleware('PermissionCheck:assignment_read');
+                // Route::controller(AssignmentController::class)->prefix('assignment')->group(function () {   //assignment routes
+                //     Route::get('assignment', 'index')->name('assignment.index')->middleware('PermissionCheck:assignment_read');
+                //     Route::get('assignment/{id}/details', 'assignment_details')->name('assignment.details')->middleware('PermissionCheck:assignment_read');
+                //     Route::get('assignment/{id}/evaluation_details', 'evaluation_details')->name('assignment.evalulation_details')->middleware('PermissionCheck:assignment_read');
+                //     Route::post('assignment/{id}/approve',  'approve_assignment')->name('assignment.approve_assignment')->middleware('PermissionCheck:assignment_read');
+                //     Route::post('assignment/{id}/reject',  'reject_assignment')->name('assignment.reject_assignment')->middleware('PermissionCheck:assignment_read');
+                //     Route::get('/assignment/filter', 'filter')->name('assignments.filter')->middleware('PermissionCheck:assignment_read');
+                // });
+
+                Route::prefix('superadmin')->name('superadmin.')->group(function () {
+                    Route::controller(AssignmentController::class)->prefix('assignment')->name('assignment.')->group(function () {
+                        Route::get('/', 'index')->name('index')->middleware('PermissionCheck:assignment_read');
+                        Route::get('/{id}/details', 'assignment_details')->name('details')->middleware('PermissionCheck:assignment_read');
+                        Route::get('/{id}/evaluation-details', 'evaluation_details')->name('evalulation_details')->middleware('PermissionCheck:assignment_read');
+                        Route::post('/{id}/approve', 'approve_assignment')->name('approve_assignment')->middleware('PermissionCheck:assignment_read');
+                        Route::post('/{id}/reject', 'reject_assignment')->name('reject_assignment')->middleware('PermissionCheck:assignment_read');
+                        Route::post('/filter', 'filter')->name('filter')->middleware('PermissionCheck:assignment_read');
+                        Route::post('filter-classes', 'filterClasses')->name('filter_classes')->middleware('PermissionCheck:assignment_read');
+                    });
                 });
+
 
               //Applicant routes
                 Route::controller(ApplicantController::class)->prefix('applicant')->group(function(){
@@ -223,10 +234,7 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::post('/fetch-interview-slots', 'fetch_interview_slots')->name('applicant.fetch_interview_slots');
                     Route::post('/assign-interview-slot', 'assign_interview_slot')->name('applicant.assign_interview_slot');
                     
-
-
-                    // Route::post('/interview_store',  'store_schedule_interview')->name('applicant.store_schedule_interview');
-
+                    Route::post('/toggle-interview-details/{id}',  'toggle_interview_details')->name('applicant.toggle_interview_details');
 
                     Route::get('/profile', 'profile')->name('applicant.profile')->middleware('PermissionCheck:applicant_read');
                     Route::get('/add-new-applicant', 'add_new_applicant')->name('applicant.add_new_applicant')->middleware('PermissionCheck:applicant_read');

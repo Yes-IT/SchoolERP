@@ -12,7 +12,7 @@
         <td>{{ $class->abbreviation ?? '--' }}</td>
         <td>{{ $class->subject?->name ?? 'N/A' }}</td>
         <td>{{ $class->teacher?->first_name . ' ' . $class->teacher?->last_name }}</td>
-        <td>{{ $class->schoolYear?->name ?? 'N/A' }}</td>
+        <td>{{ $class->session?->name ?? 'N/A' }}</td>
         <td>{{ $class->yearStatus?->name ?? 'N/A' }}</td>
         <td>{{ $class->semester?->name ?? 'N/A' }}</td>
 

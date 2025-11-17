@@ -94,7 +94,7 @@ class ClassesRepository implements ClassesInterface
             $class->abbreviation                       = $request->abbreviation;
             $class->subject_id                         = $request->subject_id; 
             $class->teacher_id                         = $request->teacher_id;
-            $class->school_year_id                     = $request->school_year_id;
+            $class->session_id                         = $request->school_year_id;
             $class->semester_id                        = $request->semester_id;
             $class->year_status_id                     = $request->year_status_id;
 
@@ -345,29 +345,75 @@ class ClassesRepository implements ClassesInterface
         }
     }
 
-    public function filter($requestData)
-    {
-        // Log::info('Filter request received', $requestData);
 
-        // Log::info('filter request data', [
-        //     'teacher_id' => $requestData['teacher_id'] ?? null,
-        //     'per_page' => $requestData['per_page'] ?? null,
-        // ]);
+public function filter($requestData)
+{
+    Log::info('Filter request data:', $requestData);
 
-        $query = Classes::query()->with(['subject', 'teacher', 'schoolYear', 'yearStatus', 'semester']);
+    $query = Classes::query()->with([
+        'subject',
+        'teacher', 
+        'session',
+        'yearStatus',
+        'semester'
+    ]);
 
-        if (isset($requestData['teacher_id']) && $requestData['teacher_id'] !== 'all') {
-            // Log::info('Filtering by teacher_id: ' . $requestData['teacher_id']);
-            $query->where('teacher_id', $requestData['teacher_id']);
-        }
-
-        $perPage = $requestData['per_page'] ?? 10; 
-        $results = $query->paginate($perPage);
-
-        // Log::info('Query results', ['results' => $results, 'total' => $results->total()]);
+    // ============= SESSION FILTERS =============
+    if (!empty($requestData['session_id']) && 
+        $requestData['session_id'] !== "" && 
+        $requestData['session_id'] !== "School Year" &&
+        is_numeric($requestData['session_id'])) {
         
-        return $results;
+        $query->where('session_id', $requestData['session_id']);
+        Log::info('Applied session filter:', ['session_id' => $requestData['session_id']]);
     }
+
+     if (!empty($requestData['year_status_id']) && 
+        $requestData['year_status_id'] !== "" && 
+        $requestData['year_status_id'] !== "Year Status" &&
+        is_numeric($requestData['year_status_id'])) {
+        
+        $query->where('year_status_id', $requestData['year_status_id']);
+        Log::info('Applied year status filter:', ['year_status_id' => $requestData['year_status_id']]);
+    }
+
+    if (!empty($requestData['semester_id']) && 
+        $requestData['semester_id'] !== "" && 
+        $requestData['semester_id'] !== "Semester" &&
+        is_numeric($requestData['semester_id'])) {
+        
+        $query->where('semester_id', $requestData['semester_id']);
+        Log::info('Applied semester filter:', ['semester_id' => $requestData['semester_id']]);
+    }
+
+    // ============= TEACHER FILTER =============
+if (!empty($requestData['teacher_id']) && $requestData['teacher_id'] !== "all") {
+        $query->where('teacher_id', $requestData['teacher_id']);
+        Log::info('Applied teacher filter:', ['teacher_id' => $requestData['teacher_id']]);
+    } else {
+        Log::info('No teacher filter applied or showing all teachers');
+     }
+
+    Log::info('SQL Query:', ['sql' => $query->toSql()]); // Debug the final SQL
+
+
+    // =============== PAGINATION ================
+    $perPage = $requestData['per_page'] ?? 10;
+    $page = $requestData['page'] ?? 1;
+
+    $results = $query->paginate($perPage, ['*'], 'page', $page);
+
+    
+    Log::info('Filter results:', [
+        'total' => $results->total(),
+        'count' => $results->count(),
+        'current_page' => $results->currentPage(),
+        'per_page' => $results->perPage()
+    ]);
+
+    return $results;
+}
+
 
 
 

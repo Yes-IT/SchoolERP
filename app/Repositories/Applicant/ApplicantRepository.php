@@ -168,7 +168,7 @@ class ApplicantRepository implements ApplicantInterface
         DB::beginTransaction();
 
         try {
-            // Log::info('Repository update started', ['applicant_id' => $id, 'all_data' => $data]);
+            Log::info('Repository update started', ['applicant_id' => $id, 'all_data' => $data]);
             
             $applicant = Applicant::with(['processing','transaction','confirmation','parents'])->findOrFail($id);
 
@@ -241,17 +241,41 @@ class ApplicantRepository implements ApplicantInterface
                 $applicant->confirmation->update($checklistData);   
             }
 
-            if (isset($data['school_name']) || isset($data['school_grades'])) {
+            // if (isset($data['camp_names']) || isset($data['camp_years'])) {
+            //     $history = ApplicantHistory::where('applicant_id', $id)->first();
+            //     Log::info('Updating history with:', $data);
+            //     if ($history) {
+            //         $historyData = [];
+            //         if (isset($data['camp_names'])) $historyData['camp_names'] = $data['camp_names'];
+            //         if (isset($data['camp_years'])) $historyData['camp_years'] = $data['camp_years'];
+            //         $history->update($historyData); 
+            //     } else {
+            //         Log::warning('No history record found for applicant', ['applicant_id' => $id]);
+            //     }
+            // }
+
+            if (isset($data['camp_names']) || isset($data['camp_years'])) {
                 $history = ApplicantHistory::where('applicant_id', $id)->first();
+                
+                Log::info('Updating camp history with:', [
+                    'camp_names' => $data['camp_names'] ?? [],
+                    'camp_years' => $data['camp_years'] ?? []
+                ]);
+                
                 if ($history) {
                     $historyData = [];
-                    if (isset($data['school_name'])) $historyData['school_name'] = $data['school_name'];
-                    if (isset($data['school_grades'])) $historyData['school_grades'] = $data['school_grades'];
+                    if (isset($data['camp_names'])) $historyData['camp_names'] = $data['camp_names'];
+                    if (isset($data['camp_years'])) $historyData['camp_years'] = $data['camp_years'];
+                    
+                    Log::info('Updating existing history record:', $historyData);
                     $history->update($historyData); 
                 } else {
-                    Log::warning('No history record found for applicant', ['applicant_id' => $id]);
+         
+                   Log::warning('No history record found for applicant', ['applicant_id' => $id]);
+                    
                 }
             }
+
             DB::commit();
             // Log::info("Applicant updated successfully in repository", ['applicant_id' => $id]);
             return $applicant;
@@ -384,6 +408,22 @@ class ApplicantRepository implements ApplicantInterface
             ]
         );
     }
+
+    public function toggleInterviewDetails($id)
+    {
+        $processing = ApplicationProcessing::where('applicant_id', $id)->firstOrFail();
+
+        if ($processing->interview_status !== 'scheduled') {
+            throw new \Exception('Interview state can only be changed when interview is scheduled');
+        }
+
+        // Toggle state
+        $processing->interview_state = $processing->interview_state == 1 ? 0 : 1;
+        $processing->save();
+
+        return $processing;
+    }
+
 
 
 }

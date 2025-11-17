@@ -41,7 +41,7 @@
                                 <div class="input-grp">
                                     <select name="year_id" id="year_id">
                                         <option value="">Select Year</option>
-                                        @foreach($years as $year)
+                                        @foreach($sessions as $year)
                                             <option value="{{ $year->id }}">{{ $year->name }}</option>
                                         @endforeach
                                     </select>
@@ -78,8 +78,46 @@
                                         @endforeach
                                     </select>
                                 </div>
+
                                 <div class="input-grp">
-                                    <input type="text" name="dates" value="">
+                                    <div class="date-range-wrp">
+                                        <div class="date-range-picker">
+                                            {{-- <label class="dr-label">Date Range</label> --}}
+                                            <div class="dr-row">
+                                            <div class="dr-input-wrap">
+                                                <input class="dr-input" readonly placeholder="DD/MM/YYYY - DD/MM/YYYY" />
+                                                <button class="dr-icon-btn" type="button" aria-label="Open calendar">📅</button>
+                                            </div>
+                                            {{-- <button class="dr-search-btn cmn-btn" type="button">Search</button> --}}
+                                            </div>
+                                        
+                                            <!-- popup -->
+                                            <div class="dr-popup right" aria-hidden="true" role="dialog" aria-label="Select date range">
+                                                <div class="dr-popup-inner">
+                                                    <div class="dr-header">
+                                                        <button class="dr-nav dr-prev" type="button" aria-label="Previous months">‹</button>
+                                                        <div class="dr-months">
+                                                            <div class="dr-month dr-month-left"></div>
+                                                            <div class="dr-month dr-month-right"></div>
+                                                        </div>
+                                                        <button class="dr-nav dr-next" type="button" aria-label="Next months">›</button>
+                                                    </div>
+                                                    <div class="dr-calendars">
+                                                        <div class="dr-cal dr-cal-left"></div>
+                                                        <div class="dr-cal dr-cal-right"></div>
+                                                    </div>
+                                                    <div class="dr-footer">
+                                                        <div class="dr-selected">—</div>
+                                                        <div class="dr-actions">
+                                                            <button class="dr-btn dr-cancel" type="button">CANCEL</button>
+                                                            <button class="dr-btn dr-apply" type="button">Apply</button>
+                                                        </div>
+                                                    </div>
+                                            
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <!-- Search Button -->
@@ -121,7 +159,7 @@
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $assignment->subject->name ?? 'N/A' }}</td>
                                     <td>{{ $assignment->title }}</td>
-                                    <td>{{ $assignment->created_at->format('d/m/Y') }}</td>
+                                    <td>{{ $assignment->assigned_date ? \Carbon\Carbon::parse($assignment->assigned_date)->format('d/m/Y') : 'N/A' }}</td>
                                     <td>{{ $assignment->due_date ? \Carbon\Carbon::parse($assignment->due_date)->format('d/m/Y') : 'N/A' }}</td>
                                     <td>{{ $assignment->creator->name ?? 'N/A' }}</td>
                                     <td>
@@ -655,7 +693,7 @@
             let assignmentId = $(this).data('id');
             console.log('assigned id ', assignmentId);
 
-            let url = "{{ route('assignment.details', ':id') }}";
+            let url = "{{ route('superadmin.assignment.details', ':id') }}";
             url = url.replace(':id', assignmentId);
 
             // Open modal first
@@ -724,7 +762,7 @@
     <script>
         $(document).on('click', '.view-attachment-btn', function () {
             let assignmentId = $(this).data('id');
-            let url = "{{ route('assignment.details', ':id') }}";
+            let url = "{{ route('superadmin.assignment.details', ':id') }}";
             url = url.replace(':id', assignmentId);
 
             $.ajax({
@@ -780,7 +818,7 @@
         // When "Accept" button inside confirmation modal is clicked
         $(document).on('click', '#success .cmn-btn:contains("Accept")', function () {
             let assignmentId = $('#success').data('id');
-            let url = "{{ route('assignment.approve_assignment', ':id') }}";
+            let url = "{{ route('superadmin.assignment.approve_assignment', ':id') }}";
             url = url.replace(':id', assignmentId);
 
             $.ajax({
@@ -813,7 +851,7 @@
         // Reject request
         $(document).on('click', '.red-bg', function () {
             let assignmentId = $('#PendingAssignmentAttachments').data('id');
-            let url = "{{ route('assignment.reject_assignment', ':id') }}";
+            let url = "{{ route('superadmin.assignment.reject_assignment', ':id') }}";
             url = url.replace(':id', assignmentId);
 
             $.ajax({
@@ -836,7 +874,7 @@
             let assignmentId = $(this).data('id');
             console.log('assignment id in eval details', assignmentId);
 
-            let url = "{{ route('assignment.evalulation_details', ':id') }}";
+            let url = "{{ route('superadmin.assignment.evalulation_details', ':id') }}";
             url = url.replace(':id', assignmentId);
 
             $.ajax({
@@ -900,97 +938,442 @@
         });
     </script>
 
-    <script>
-        // $(document).on('submit', '#filterForm', function (e) {
-        //     e.preventDefault();
+<script>
+    // Add this script in your blade file or separate JS file
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     // Filter form submission
+    //     const filterForm = document.querySelector('.atndnc-filter-form');
+    //     const searchBtn = document.querySelector('.btn-search');
+        
+    //     if (filterForm) {
+    //         filterForm.addEventListener('submit', function(e) {
+    //             e.preventDefault();
+    //             filterAssignments();
+    //         });
+    //     }
+        
+    //     // Function to handle filtering
+    //     function filterAssignments() {
+    //         const formData = new FormData(filterForm);
+            
+    //         // Show loading state
+    //         searchBtn.innerHTML = 'Loading...';
+    //         searchBtn.disabled = true;
+            
+    //         fetch('{{ route("superadmin.assignment.filter") }}', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'X-Requested-With': 'XMLHttpRequest',
+    //                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
+    //             },
+    //             body: formData
+    //         })
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             updateAssignmentsTable(data.assignments);
+    //         })
+    //         .catch(error => {
+    //             console.error('Error:', error);
+    //             alert('Error filtering assignments');
+    //         })
+    //         .finally(() => {
+    //             // Reset button state
+    //             searchBtn.innerHTML = 'Search';
+    //             searchBtn.disabled = false;
+    //         });
+    //     }
+        
+    //     // Function to update the assignments table
+    //     function updateAssignmentsTable(assignments) {
+    //         const tbody = document.querySelector('#ViewAssignmentTableContainer tbody');
+            
+    //         if (assignments.length === 0) {
+    //             tbody.innerHTML = '<tr><td colspan="10" class="text-center">No assignments found.</td></tr>';
+    //             return;
+    //         }
+            
+    //         let html = '';
+    //         assignments.forEach((assignment, index) => {
+    //             html += `
+    //                 <tr>
+    //                     <td>${index + 1}</td>
+    //                     <td>${assignment.subject?.name || 'N/A'}</td>
+    //                     <td>${assignment.title}</td>
+    //                     <td>${new Date(assignment.created_at).toLocaleDateString('en-GB')}</td>
+    //                     <td>${assignment.due_date ? new Date(assignment.due_date).toLocaleDateString('en-GB') : 'N/A'}</td>
+    //                     <td>${assignment.creator?.name || 'N/A'}</td>
+    //                     <td>${assignment.submitted_count} / ${assignment.total_students}</td>
+    //                     <td>${assignment.grade || '-'}</td>
+    //                     <td>
+    //                         <button class="view-attachment-btn view-assignment" 
+    //                                 data-bs-target="#assignmentActions" 
+    //                                 data-bs-toggle="modal"
+    //                                 data-id="${assignment.id}">
+    //                             <img src="{{ asset('backend/assets/images/eye-white.svg') }}" alt="View">
+    //                         </button>
+    //                     </td>
+    //                     <td>
+    //                         <button class="view-attachment-btn evaluation-details" 
+    //                                 data-bs-target="#evaluationDetails" 
+    //                                 data-bs-toggle="modal"
+    //                                 data-id="${assignment.id}">
+    //                             <img src="{{ asset('backend/assets/images/eye-white.svg') }}" alt="Details">
+    //                         </button>
+    //                     </td>
+    //                 </tr>
+    //             `;
+    //         });
+            
+    //         tbody.innerHTML = html;
+            
+    //         // Re-attach event listeners for modal buttons if needed
+    //         attachModalEventListeners();
+    //     }
+        
+    //     // Function to re-attach event listeners after table update
+    //     function attachModalEventListeners() {
+    //         // Add your modal event listeners here if needed
+    //     }
+        
+    //     // Optional: Add change events for dependent dropdowns
+    //     const yearSelect = document.getElementById('year_id');
+    //     const classSelect = document.getElementById('class_id');
+        
+    //     if (yearSelect && classSelect) {
+    //         yearSelect.addEventListener('change', function() {
+    //             // You can add logic to filter classes based on selected year
+    //             filterClassesByYear(this.value);
+    //         });
+    //     }
+        
+    //     function filterClassesByYear(yearId) {
+    //         if (!yearId) {
+    //             // Reset classes if no year selected
+    //             resetClassDropdown();
+    //             return;
+    //         }
+            
+    //         fetch(`/get-classes-by-year/${yearId}`)
+    //             .then(response => response.json())
+    //             .then(classes => {
+    //                 updateClassDropdown(classes);
+    //             })
+    //             .catch(error => console.error('Error:', error));
+    //     }
+        
+    //     function updateClassDropdown(classes) {
+    //         classSelect.innerHTML = '<option value="">Select Class</option>';
+    //         classes.forEach(cls => {
+    //             classSelect.innerHTML += `<option value="${cls.id}">${cls.name}</option>`;
+    //         });
+    //     }
+        
+    //     function resetClassDropdown() {
+    //         const originalClasses = @json($classes);
+    //         classSelect.innerHTML = '<option value="">Select Class</option>';
+    //         originalClasses.forEach(cls => {
+    //             classSelect.innerHTML += `<option value="${cls.id}">${cls.name}</option>`;
+    //         });
+    //     }
+    // });
 
-        //     $.ajax({
-        //         url: "{{ route('assignments.filter') }}",
-        //         type: 'GET',
-        //         data: $(this).serialize(),
-        //         beforeSend: function() {
-        //             $('#ViewAssignmentTableContainer tbody').html('<tr><td colspan="10" class="text-center">Loading...</td></tr>');
-        //             $('#pendingAssignments tbody').html('<tr><td colspan="8" class="text-center">Loading...</td></tr>');
-        //         },
-        //         success: function(response) {
-
-        //             // === Assignments Overview ===
-        //             let htmlAccepted = '';
-        //             if (response.assignments.length > 0) {
-        //                 $.each(response.assignments, function(index, assignment) {
-        //                     htmlAccepted += `
-        //                         <tr>
-        //                             <td>${index + 1}</td>
-        //                             <td>${assignment.subject?.name ?? 'N/A'}</td>
-        //                             <td>${assignment.title}</td>
-        //                             <td>${assignment.created_at ? moment(assignment.created_at).format('DD/MM/YYYY') : '-'}</td>
-        //                             <td>${assignment.due_date ? moment(assignment.due_date).format('DD/MM/YYYY') : 'N/A'}</td>
-        //                             <td>${assignment.creator?.name ?? 'N/A'}</td>
-        //                             <td>${assignment.submitted_count ?? 0} / ${assignment.total_students ?? 0}</td>
-        //                             <td>${assignment.grade ?? '-'}</td>
-        //                             <td>
-        //                                 <button class="view-attachment-btn view-assignment"
-        //                                     data-bs-target="#assignmentActions"
-        //                                     data-bs-toggle="modal"
-        //                                     data-id="${assignment.id}">
-        //                                     <img src="{{ asset('backend/assets/images/eye-white.svg') }}" alt="View">
-        //                                 </button>
-        //                             </td>
-        //                             <td>
-        //                                 <button class="view-attachment-btn evaluation-details"
-        //                                     data-bs-target="#evaluationDetails"
-        //                                     data-bs-toggle="modal"
-        //                                     data-id="${assignment.id}">
-        //                                     <img src="{{ asset('backend/assets/images/eye-white.svg') }}" alt="Details">
-        //                                 </button>
-        //                             </td>
-        //                         </tr>
-        //                     `;
-        //                 });
-        //             } else {
-        //                 htmlAccepted = `<tr><td colspan="10" class="text-center">No assignments found.</td></tr>`;
-        //             }
-        //             $('#ViewAssignmentTableContainer tbody').html(htmlAccepted);
-
-
-        //             // === Pending Assignments ===
-        //             let htmlPending = '';
-        //             if (response.pendingAssignments.length > 0) {
-        //                 $.each(response.pendingAssignments, function(index, assignment) {
-        //                     htmlPending += `
-        //                         <tr>
-        //                             <td>${index + 1}</td>
-        //                             <td>${assignment.created_at ? moment(assignment.created_at).format('DD/MM/YYYY') : '-'}</td>
-        //                             <td>${assignment.class?.name ?? '-'}</td>
-        //                             <td>${assignment.subject?.name ?? '-'}</td>
-        //                             <td>${assignment.title ?? '-'}</td>
-        //                             <td>${assignment.due_date ? moment(assignment.due_date).format('DD/MM/YYYY') : '-'}</td>
-        //                             <td>${assignment.creator?.name ?? '-'}</td>
-        //                             <td>
-        //                                 <button class="view-attachment-btn"
-        //                                     data-id="${assignment.id}"
-        //                                     data-bs-target="#PendingAssignmentAttachments"
-        //                                     data-bs-toggle="modal">
-        //                                     <img src="{{ asset('backend/assets/images/eye-white.svg') }}" alt="View">
-        //                                 </button>
-        //                             </td>
-        //                         </tr>
-        //                     `;
-        //                 });
-        //             } else {
-        //                 htmlPending = `<tr><td colspan="8" class="text-center">No pending assignments found.</td></tr>`;
-        //             }
-        //             $('#pendingAssignments tbody').html(htmlPending);
-        //         },
-        //         error: function() {
-        //             $('#ViewAssignmentTableContainer tbody').html('<tr><td colspan="10" class="text-center text-danger">Error loading data</td></tr>');
-        //             $('#pendingAssignments tbody').html('<tr><td colspan="8" class="text-center text-danger">Error loading data</td></tr>');
-        //         }
-        //     });
-        // });
-
-
-    </script>
-
+    document.addEventListener('DOMContentLoaded', function() {
+    // Filter form submission
+    const filterForm = document.querySelector('.atndnc-filter-form');
+    const searchBtn = document.querySelector('.btn-search');
+    
+    if (filterForm) {
+        filterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            filterAssignments();
+        });
+    }
+    
+    // Initialize date range functionality
+    initializeDateRange();
+    
+    // Function to handle filtering
+    function filterAssignments() {
+        const formData = new FormData(filterForm);
+        
+        // Add date range to form data if available
+        const dateRange = getSelectedDateRange();
+        if (dateRange.startDate) {
+            formData.append('start_date', dateRange.startDate);
+        }
+        if (dateRange.endDate) {
+            formData.append('end_date', dateRange.endDate);
+        }
+        
+        // Show loading state
+        searchBtn.innerHTML = 'Loading...';
+        searchBtn.disabled = true;
+        
+        fetch('{{ route("superadmin.assignment.filter") }}', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                updateAssignmentsTable(data.assignments);
+            } else {
+                throw new Error(data.message || 'Error filtering assignments');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error filtering assignments: ' + error.message);
+        })
+        .finally(() => {
+            // Reset button state
+            searchBtn.innerHTML = 'Search';
+            searchBtn.disabled = false;
+        });
+    }
+    
+    // Function to update the assignments table
+    function updateAssignmentsTable(assignments) {
+        const tbody = document.querySelector('#ViewAssignmentTableContainer tbody');
+        
+        if (!tbody) {
+            console.error('Table body not found');
+            return;
+        }
+        
+        if (assignments.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" class="text-center">No assignments found.</td></tr>';
+            return;
+        }
+        
+        let html = '';
+        assignments.forEach((assignment, index) => {
+            // Format dates safely
+            const createdDate = assignment.created_at ? new Date(assignment.assigned_date).toLocaleDateString('en-GB') : 'N/A';
+            const dueDate = assignment.due_date ? new Date(assignment.due_date).toLocaleDateString('en-GB') : 'N/A';
+            
+            html += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${assignment.subject?.name || 'N/A'}</td>
+                    <td>${assignment.title || 'N/A'}</td>
+                    <td>${createdDate}</td>
+                    <td>${dueDate}</td>
+                    <td>${assignment.creator?.name || 'N/A'}</td>
+                    <td>${assignment.submitted_count || 0} / ${assignment.total_students || 0}</td>
+                    <td>${assignment.grade || '-'}</td>
+                    <td>
+                        <button class="view-attachment-btn view-assignment" 
+                                data-bs-target="#assignmentActions" 
+                                data-bs-toggle="modal"
+                                data-id="${assignment.id}">
+                            <img src="{{ asset('backend/assets/images/eye-white.svg') }}" alt="View">
+                        </button>
+                    </td>
+                    <td>
+                        <button class="view-attachment-btn evaluation-details" 
+                                data-bs-target="#evaluationDetails" 
+                                data-bs-toggle="modal"
+                                data-id="${assignment.id}">
+                            <img src="{{ asset('backend/assets/images/eye-white.svg') }}" alt="Details">
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        tbody.innerHTML = html;
+        
+        // Re-attach event listeners for modal buttons
+        attachModalEventListeners();
+    }
+    
+    // Function to re-attach event listeners after table update
+    function attachModalEventListeners() {
+        // Add modal event listeners here if needed
+        document.querySelectorAll('.view-assignment').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const assignmentId = this.getAttribute('data-id');
+                // Handle view assignment modal
+            });
+        });
+        
+        document.querySelectorAll('.evaluation-details').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const assignmentId = this.getAttribute('data-id');
+                // Handle evaluation details modal
+            });
+        });
+    }
+    
+    // Date Range Functionality
+    function initializeDateRange() {
+        const applyBtn = document.querySelector('.dr-apply');
+        const cancelBtn = document.querySelector('.dr-cancel');
+        const dateInput = document.querySelector('.dr-input');
+        
+        if (applyBtn) {
+            applyBtn.addEventListener('click', function() {
+                const selectedRange = document.querySelector('.dr-selected')?.textContent;
+                if (selectedRange && selectedRange !== '—') {
+                    const dates = selectedRange.split(' - ');
+                    if (dates.length === 2) {
+                        const startDate = formatDateForInput(dates[0].trim());
+                        const endDate = formatDateForInput(dates[1].trim());
+                        
+                        // Update the date input field
+                        if (dateInput) {
+                            dateInput.value = `${dates[0].trim()} - ${dates[1].trim()}`;
+                        }
+                        
+                        // Store dates in data attributes for later use
+                        dateInput.setAttribute('data-start-date', startDate);
+                        dateInput.setAttribute('data-end-date', endDate);
+                    }
+                }
+            });
+        }
+        
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', function() {
+                // Clear date input and stored dates
+                if (dateInput) {
+                    dateInput.value = '';
+                    dateInput.removeAttribute('data-start-date');
+                    dateInput.removeAttribute('data-end-date');
+                }
+            });
+        }
+    }
+    
+    function getSelectedDateRange() {
+        const dateInput = document.querySelector('.dr-input');
+        if (dateInput) {
+            return {
+                startDate: dateInput.getAttribute('data-start-date'),
+                endDate: dateInput.getAttribute('data-end-date')
+            };
+        }
+        return { startDate: null, endDate: null };
+    }
+    
+    function formatDateForInput(dateString) {
+        // Convert from DD/MM/YYYY to YYYY-MM-DD
+        const parts = dateString.split('/');
+        if (parts.length === 3) {
+            return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        }
+        return dateString;
+    }
+    
+    // Dependent dropdown functionality for classes
+    const yearSelect = document.getElementById('year_id');
+    const semesterSelect = document.getElementById('semester_id');
+    const yearStatusSelect = document.getElementById('year_status_id');
+    const classSelect = document.getElementById('class_id');
+    
+    // Add event listeners for dependent dropdowns
+    if (yearSelect) {
+        yearSelect.addEventListener('change', function() {
+            filterClasses();
+        });
+    }
+    
+    if (semesterSelect) {
+        semesterSelect.addEventListener('change', function() {
+            filterClasses();
+        });
+    }
+    
+    if (yearStatusSelect) {
+        yearStatusSelect.addEventListener('change', function() {
+            filterClasses();
+        });
+    }
+    
+    function filterClasses() {
+        const yearId = yearSelect?.value || '';
+        const semesterId = semesterSelect?.value || '';
+        const yearStatusId = yearStatusSelect?.value || '';
+        
+        // If no filters selected, show all classes
+        if (!yearId && !semesterId && !yearStatusId) {
+            resetClassDropdown();
+            return;
+        }
+        
+        // Show loading in class dropdown
+        classSelect.innerHTML = '<option value="">Loading classes...</option>';
+        classSelect.disabled = true;
+        
+        // Prepare filter data
+        const filterData = new FormData();
+        if (yearId) filterData.append('year_id', yearId);
+        if (semesterId) filterData.append('semester_id', semesterId);
+        if (yearStatusId) filterData.append('year_status_id', yearStatusId);
+        
+        fetch('{{ route("superadmin.assignment.filter_classes") }}', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: filterData
+        })
+        .then(response => response.json())
+        .then(data => {
+            updateClassDropdown(data.classes || []);
+        })
+        .catch(error => {
+            console.error('Error filtering classes:', error);
+            resetClassDropdown();
+        })
+        .finally(() => {
+            classSelect.disabled = false;
+        });
+    }
+    
+    function updateClassDropdown(classes) {
+        if (!classSelect) return;
+        
+        classSelect.innerHTML = '<option value="">Select Class</option>';
+        
+        if (classes.length === 0) {
+            classSelect.innerHTML += '<option value="" disabled>No classes found</option>';
+            return;
+        }
+        
+        classes.forEach(cls => {
+            classSelect.innerHTML += `<option value="${cls.id}">${cls.name}</option>`;
+        });
+    }
+    
+    function resetClassDropdown() {
+        if (!classSelect) return;
+        
+        const originalClasses = @json($classes);
+        classSelect.innerHTML = '<option value="">Select Class</option>';
+        
+        if (originalClasses && originalClasses.length > 0) {
+            originalClasses.forEach(cls => {
+                classSelect.innerHTML += `<option value="${cls.id}">${cls.name}</option>`;
+            });
+        }
+    }
+    
+    // Initial attachment of modal listeners
+    attachModalEventListeners();
+});
+</script>
+   
     
 @endpush

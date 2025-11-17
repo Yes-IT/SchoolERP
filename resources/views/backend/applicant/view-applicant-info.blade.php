@@ -73,10 +73,10 @@
                                             <td>Email</td>
                                            <td>{{ $applicant->email ?? 'N/A' }}</td>
                                           </tr>
-                                          <tr>
+                                          {{-- <tr>
                                             <td>High School (Application)</td>
                                             <td>{{ $applicant->highschool_application ?? 'N/A' }}</td>
-                                          </tr>
+                                          </tr> --}}
                                           
                                         </tbody>
                                       </table>
@@ -90,22 +90,22 @@
                                   <table style="width:100%; border-collapse:collapse; font-family:sans-serif; font-size:14px;">
                                       <thead>
                                           <tr style="background-color:#f9f9f9; text-align:left;">
-                                              <th>Name of school</th>
-                                              <th>Grade attended</th>
+                                              <th>Name of Camp</th>
+                                              <th>Years Attended</th>
                                           </tr>
                                       </thead>
                                       <tbody>
                                           @forelse($applicant->history as $history)
                                               @php
-                                                  $schoolNames = $history->school_name ?? [];
-                                                  $schoolGrades = $history->school_grades ?? [];
+                                                  $campNames = $history->camp_names ?? [];
+                                                  $campYears = $history->camp_years ?? [];
                                               @endphp
                                               
-                                              @if(!empty($schoolNames) && is_array($schoolNames))
-                                                  @foreach($schoolNames as $index => $schoolName)
+                                              @if(!empty($campNames) && is_array($campNames))
+                                                  @foreach($campNames as $index => $campName)
                                                       <tr>
-                                                          <td>{{ $schoolName ?? 'N/A' }}</td>
-                                                          <td>{{ $schoolGrades[$index] ?? 'N/A' }}</td>
+                                                          <td>{{ $campName ?? 'N/A' }}</td>
+                                                          <td>{{ $campYears[$index] ?? 'N/A' }}</td>
                                                       </tr>
                                                   @endforeach
                                               @else

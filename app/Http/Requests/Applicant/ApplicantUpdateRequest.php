@@ -62,10 +62,13 @@ class ApplicantUpdateRequest extends FormRequest
             // 'parents.siblings' => 'nullable|integer|min:0',
 
             // Camp history (arrays)
-            'school_name' => 'array|nullable',
-            'school_name.*' => 'nullable|string|max:255',
-            'school_grades' => 'array|nullable',
-            'school_grades.*' => 'nullable|string|max:50',
+            'camp_names' => 'array|nullable',
+            'camp_names.*' => 'nullable|string|max:255',
+            
+            'camp_years' => 'array|nullable',
+            // 'camp_years.*' => 'nullable|integer|min:1990|max:2050',
+            'camp_years.*' => 'nullable|digits:4',
+
 
             // Transaction
             'transaction' => 'array|nullable',
@@ -75,7 +78,7 @@ class ApplicantUpdateRequest extends FormRequest
             // Checklist (Confirmation)
             'checklist' => 'array|nullable',
             'checklist.date_deposited' => 'nullable|date',
-            'checklist.reference' => 'nullable|string|max:255',
+            'checklist.reference' => 'nullable|integer|min:1|max:9',
             'checklist.pictures' => 'nullable|string|max:50',
             'checklist.transcript_hebrew' => 'nullable|boolean',
             'checklist.transcript_english' => 'nullable|boolean',

@@ -14,15 +14,12 @@
                         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}"> {{ ___('common.dashboard') }} </a></li>
                         <li class="breadcrumb-item"><a href="{{ route('classes.index') }}">{{ $data['title'] }}</a></li>
                         <li class="breadcrumb-item"><a href="#">Classes Info</a></li>
-
                         <li class="breadcrumb-item">{{ ___('common.Edit class') }}</li>
 
                     </ul>
                 </div>
           
         {{-- bradecrumb Area E n d --}}
-
-       
 
           <div class="ds-pr-body">
                         <div class="ds-cmn-table-wrp">

@@ -3,6 +3,32 @@
 @section('title')
     {{ @$data['title'] }}
 @endsection
+<style>
+    .d-flex {
+    display: flex;
+}
+.justify-between {
+    justify-content: space-between;
+}
+.align-center {
+    align-items: center;
+}
+.gap-1 {
+    gap: 4px;
+}
+.gap-2 {
+    gap: 8px;
+}
+.flex-grow {
+    flex: 1;
+}
+.mb-3 {
+    margin-bottom: 1rem;
+}
+
+
+
+</style>
 @section('content')
                      <div class="ds-breadcrumb">
                         <h1>Classes</h1>
@@ -107,7 +133,7 @@
                                                 <div class="multi-input-grp input-grp-5">
                                                     <div class="input-grp">
                                                        <select name="schedules[0][day]" class="day-select">
-                                                            <option value="">Select Day</option>
+                                                            <option value="">Day</option>
                                                             @foreach(\App\Enums\Days::all() as $day)
                                                                 <option value="{{ $day }}">{{ $day }}</option>
                                                             @endforeach
@@ -115,29 +141,24 @@
                                                     </div>
                                                     <div class="input-grp">
                                                        <select name="schedules[0][period]" class="period-select">
-                                                            <option value="">Select Period</option>
-                                                            <option value="1">Period 1</option>
-                                                            <option value="2">Period 2</option>
-                                                            <option value="3">Period 3</option>
+                                                            <option value="">Pd</option>
+                                                             @foreach($periods as $period)
+                                                                <option value="{{ $period->id }}">{{ $period->period_number }}</option>
+                                                            @endforeach
                                                         </select>
                                                     </div>
                                                     <div class="input-grp">
-                                                        <select name="schedules[0][start_time]" class="start-time-select">
-                                                            <option value="">Start Time</option>
-                                                            <option value="09:00 AM">09:00 AM</option>
-                                                            <option value="10:00 AM">10:00 AM</option>
-                                                        </select>
+                                                        <label for="">Start Time</label>
+                                                        <input type="time" name="schedules[0][start_time]" id="" placeholder="start time">
                                                     </div>
                                                     <div class="input-grp">
-                                                        <select name="schedules[0][end_time]" class="end-time-select">
-                                                            <option value="">End Time</option>
-                                                            <option value="09:00 AM">09:00 AM</option>
-                                                            <option value="10:00 AM">10:00 AM</option>
-                                                        </select>
+                                                        <label for="">End Time</label>
+                                                        <input type="time"  name="schedules[0][end_time]" id="" placeholder="end time">
+
                                                     </div>
                                                     <div class="input-grp">
                                                         <select name="schedules[0][room_id]" class="room-select">
-                                                            <option value="">Select Room</option>
+                                                            <option value="">Room</option>
                                                             @foreach($rooms as $room)
                                                                 <option value="{{ $room->id }}">{{ $room->room_no }}</option>
                                                             @endforeach
@@ -305,11 +326,11 @@
                                         </div>
                                     </div>
 
-                                    <div class="new-request-form">
-                                       
-                                         <div class="sec-head">
+                                    {{-- <div class="new-request-form">
+                                        <div class="sec-head">
                                            <h3>Students in this class</h3>
-                                           <a href="#" class="cmn-btn btn-sm"><i class="fa-solid fa-plus"></i> Assign Students</a>
+                                           <button type="button" class="cmn-btn btn-sm"  data-bs-target="#assign_students_modal" data-bs-toggle="modal"><i class="fa-solid fa-plus"></i>  Assign Students</button>
+
                                         </div>
                                         
                                        <div class="multi-input-grp">
@@ -320,9 +341,9 @@
                                                             <option value="{{ $student->id }}"
                                                                 data-first_name="{{ $student->first_name }}"
                                                                 data-last_name="{{ $student->last_name }}"
-                                                                data-homeroom="{{ $student->homeroom_class }}"
-                                                                data-division="{{ $student->division }}"
-                                                                data-group="{{ $student->group }}"
+                                                                data-homeroom="{{ $student->schoolDetail->homeroomClass->name ?? '' }}"
+                                                                data-division="{{ optional(optional($student->schoolDetail)->division)->division_name ?? 'N/A' }}"
+                                                                data-group="{{ optional(optional($student->schoolDetail)->group)->group_name ?? 'N/A' }}"
                                                                 data-studentid="{{ $student->student_id }}"
                                                             >
                                                                 {{ $student->first_name }} {{ $student->last_name }}
@@ -336,7 +357,46 @@
                                         <div id="students-wrapper">
                                         </div>
 
-                                    </div>
+                                    </div> --}}
+
+                                    <div class="new-request-form">
+                                        <div class="sec-head d-flex justify-between align-center mb-3">
+                                            <h3 class="m-0">Students in this class</h3>
+                                            <button type="button" 
+                                                class="cmn-btn btn-sm"  
+                                                data-bs-target="#assign_students_modal" 
+                                                data-bs-toggle="modal">
+                                                <i class="fa-solid fa-plus me-1"></i> Assign Students
+                                            </button>
+                                        </div>
+
+                                        <div class="multi-input-grp ">
+                                            <div class="input-grp ">
+                                                <select id="student-select" name="student_id" class="form-select">
+                                                    <option value="">Select Student</option>
+                                                    @foreach($students as $student)
+                                                        <option value="{{ $student->id }}"
+                                                            data-first_name="{{ $student->first_name }}"
+                                                            data-last_name="{{ $student->last_name }}"
+                                                            data-homeroom="{{ optional(optional($student->schoolDetail)->homeroomClass)->name ?? '' }}"
+                                                            data-division="{{ optional(optional($student->schoolDetail)->division)->division_name ?? 'N/A' }}"
+                                                            data-group="{{ optional(optional($student->schoolDetail)->group)->group_name ?? 'N/A' }}"
+                                                            data-studentid="{{ $student->student_id }}">
+                                                            {{ $student->first_name }} {{ $student->last_name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>  
+                                            </div>
+
+                                            <button type="button" id="add-student-btn" class="cmn-btn btn-sm d-flex align-center gap-1">
+                                                <span>Add</span>
+                                                <img src="{{ global_asset('backend/assets/images/plus-circle.svg') }}" alt="Icon" width="16">
+                                            </button>
+                                        </div>
+
+                                        <div id="students-wrapper"></div>
+                                  </div>
+
 
                                     <div class="form-submission btn-sm align-right">
                                         <button type="submit" class="cmn-btn btn-sm">Save Class</button>
@@ -346,6 +406,82 @@
 
                         </div>
                     </div>
+
+    <!-- Add Room Modal Begin -->
+           <div class="modal fade cmn-popwrp pop800" id="assign_students_modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+
+                        <!-- Close Button -->
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">
+                                <img src="{{ global_asset('backend/assets/images/cross-icon.svg') }}" alt="Icon">
+                            </span>
+                        </button>
+
+                        <div class="modal-body">
+                            <div class="cmn-pop-inr-content-wrp">
+                                <h2>Assign Group of Students to Class</h2>
+
+                                <form id="assignStudentsForm" method="POST">
+                                    @csrf
+                                    <div class="request-leave-form">
+
+                                        <!-- Radio Options -->
+                                        <div class="radio-group mb-3">
+                                            <label><input type="radio" name="assign_type" value="class"> Students of one class</label><br>
+                                            <label><input type="radio" name="assign_type" value="current"> All current students</label><br>
+                                            {{-- <label><input type="radio" name="assign_type" value="specific"> Students already assigned to a specific class</label><br> --}}
+                                            <label><input type="radio" name="assign_type" value="division"> Students of one division</label><br>
+                                            <label><input type="radio" name="assign_type" value="group"> Students of one group</label>
+                                        </div>
+
+                                        <div id="class-section" class="conditional-section" style="display:none;">
+                                            <label>Select Class</label>
+                                            <select name="class_id" class="form-select">
+                                                <option value="">Choose a class</option>
+                                                @foreach($classes as $class)
+                                                    <option value="{{ $class->id }}">{{ $class->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div id="division-section" class="conditional-section" style="display:none;">
+                                            <label>Select Division</label>
+                                            <select name="division_id" class="form-select">
+                                                <option value="">Choose a division</option>
+                                                @foreach($divisions as $division)
+                                                    <option value="{{ $division->id }}">{{ $division->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div id="group-section" class="conditional-section" style="display:none;">
+                                            <label>Select Group</label>
+                                            <select name="group_id" class="form-select">
+                                                <option value="">Choose a group</option>
+                                                @foreach($groups as $group)
+                                                    <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <!-- Buttons -->
+                                        <div class="mt-4 d-flex gap-2">
+                                            <button type="submit" class="cmn-btn btn-sm">Assign Students</button>
+                                            <button type="button" class="cmn-btn btn-sm btn-outline" data-bs-dismiss="modal">Cancel</button>
+                                        </div>
+
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+         </div>
+
+    <!-- End Of Add Room Modal -->                
 @endsection
 
 @push('script')
@@ -360,11 +496,7 @@
             scheduleIndex++;
 
             let newRow = scheduleWrapper.querySelector('.schedule-row').cloneNode(true);
-            
-            // Reset values in cloned row
             newRow.querySelectorAll('select').forEach(select => select.value = '');
-
-            // Update name attributes to use new index
             newRow.querySelectorAll('select').forEach(select => {
                 select.name = select.name.replace(/\[\d+\]/, `[${scheduleIndex}]`);
             });
@@ -372,7 +504,6 @@
             scheduleWrapper.appendChild(newRow);
         });
 
-        // Event delegation for delete buttons
         scheduleWrapper.addEventListener('click', function (e) {
             if (e.target.closest('.delete-row-btn')) {
                 e.preventDefault();
@@ -385,56 +516,51 @@
     });
 </script>
 
-
 <script>
-
     document.getElementById('add-student-btn').addEventListener('click', function () {
         const select = document.getElementById('student-select');
         const selected = select.options[select.selectedIndex];
 
         if (!selected.value) return;
 
-        // console.log(selected);
         console.log(selected.dataset);
-        // Create a new row
+        
         let wrapper = document.getElementById('students-wrapper');
-
         let row = document.createElement('div');
         row.classList.add('added-element-card');
         row.innerHTML = `
-            <input type="hidden" name="student_ids[]" value="${selected.value}">
-            <div class="multi-input-grp">
-                <div class="input-grp">
-                <input type="text" value="${selected.dataset.first_name} ${selected.dataset.last_name}" readonly>
+                <input type="hidden" name="student_ids[]" value="${selected.value}">
+                <div class="multi-input-grp">
+                    <div class="input-grp">
+                    <input type="text" value="${selected.dataset.studentid}" readonly>
+                    </div>
                 </div>
-                <div class="input-grp">
-                <input type="text" value="${selected.dataset.homeroom}" placeholder="Homeroom Class" readonly>
+                <div class="multi-input-grp">
+                    <div class="input-grp">
+                    <input type="text" value="${selected.dataset.first_name} ${selected.dataset.last_name}" readonly>
+                    </div>
+                    <div class="input-grp">
+                    <input type="text" value="${selected.dataset.homeroom}" placeholder="Homeroom Class" readonly>
+                    </div>
                 </div>
-            </div>
-            <div class="multi-input-grp">
-                <div class="input-grp">
-                <input type="text" value="${selected.dataset.division}" placeholder="Division" readonly>
+                <div class="multi-input-grp">
+                    <div class="input-grp">
+                    <input type="text" value="${selected.dataset.division}" placeholder="Division" readonly>
+                    </div>
+                    <div class="input-grp">
+                    <input type="text" value="${selected.dataset.group}" placeholder="Group" readonly>
+                    </div>
                 </div>
-                <div class="input-grp">
-                <input type="text" value="${selected.dataset.group}" placeholder="Group" readonly>
+                
+                <div class="added-elm-actions btn-grp">
+                    <button type="button" class="cmn-btn btn-sm remove-student-btn">Delete</button>
                 </div>
-            </div>
-            <div class="multi-input-grp">
-                <div class="input-grp">
-                <input type="text" value="${selected.dataset.studentid}" readonly>
-                </div>
-            </div>
-            <div class="added-elm-actions btn-grp">
-                <button type="button" class="cmn-btn btn-sm remove-student-btn">Delete</button>
-            </div>
-        `;
+             `;
         wrapper.appendChild(row);
 
         select.remove(select.selectedIndex);
     });
-
 </script>
-
 
 <script>
 
@@ -447,7 +573,6 @@
         const $specWrapper = $('#class-specifications');
         const $specInputs = $specWrapper.find('input, textarea, select');
 
-        // Function to enable/disable Class Specifications
         function toggleClassSpecs() {
             const isSchedulingOnly = $checkbox.is(':checked');
             $specInputs.prop('disabled', isSchedulingOnly);
@@ -459,7 +584,6 @@
             }
         }
 
-        // Function to prepopulate Class Specifications from subject
         function populateClassSpecs(subjectId) {
             if (!subjectId || subjectId === '') return;
 
@@ -511,5 +635,28 @@
         });
     });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const radioButtons = document.querySelectorAll('input[name="assign_type"]');
+    const sections = document.querySelectorAll('.conditional-section');
+
+    radioButtons.forEach(radio => {
+        radio.addEventListener('change', () => {
+            sections.forEach(section => section.style.display = 'none'); 
+            const selected = radio.value;
+
+           
+            if (selected === 'class') {
+                document.getElementById('class-section').style.display = 'block';
+            } else if (selected === 'division') {
+                document.getElementById('division-section').style.display = 'block';
+            } else if (selected === 'group') {
+                document.getElementById('group-section').style.display = 'block';
+            }
+        });
+    });
+});
+</script>
+
 
 @endpush

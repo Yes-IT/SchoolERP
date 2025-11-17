@@ -5,14 +5,86 @@
 @endsection
 <style>
     .gray-bg {
-    background-color: #c0c0c0 !important;
-    color: #666 !important;
-    cursor: not-allowed !important;
-    opacity: 0.7;
-   }
+        background-color: #c0c0c0 !important;
+        color: #666 !important;
+        cursor: not-allowed !important;
+        opacity: 0.7;
+    }
 
    .single-centered-btn {
-    text-wrap: nowrap;
+        text-wrap: nowrap;
+    }
+
+    .availability-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+ 
+/* --- Text Section --- */
+.status-text {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+ 
+.unavailable {
+    color: #777777;
+}
+ 
+.available {
+    color: green;
+}
+ 
+/* --- Toggle Switch --- */
+.toggle-label {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 25px;
+    margin: 0;
+}
+ 
+.toggle-label input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+ 
+/* --- Slider Background --- */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #E21919;
+    transition: 0.4s;
+    border-radius: 25px;
+}
+ 
+/* --- Slider Knob --- */
+.slider::before {
+    position: absolute;
+    content: "";
+    height: 19px;
+    width: 19px;
+    left: 3px;
+    bottom: 3px;
+    background-color: var(--white);
+    transition: 0.4s;
+    border-radius: 50%;
+}
+ 
+/* --- Checked State --- */
+.toggle-label input:checked + .slider {
+    background-color: #008000;
+}
+ 
+.toggle-label input:checked + .slider::before {
+    transform: translateX(25px);
 }
 
 
@@ -81,7 +153,13 @@
                             <h2>Application Forms List</h2>
                         </div>
                         <div class="ds-cmn-filter-wrp">
-                            <div class="dsbdy-filter-wrp p-0">
+                           
+                            <div class="dsbdy-filter-wrp p-0 align-items-start">
+                                <div class="input-grp search-field mb-0">
+                                    <input type="text" id="searchInput" placeholder="Search...">
+                                    <input type="submit" value="Search" id="searchButton">
+                                </div>
+
                                 <div class="dropdown-year" data-selected="Select Applicant">
                                     <div class="dropdown-trigger">
                                       <span class="dropdown-label">Select Applicant</span>
@@ -105,11 +183,9 @@
                                          </div>  
                                     </div>
                                 </div>
-
-                               <input type="hidden" name="applicant_name" id="applicant_name" value="">
-                                
-                                 
+                               <input type="hidden" name="applicant_name" id="applicant_name" value="">   
                             </div>
+                            
                         </div>
                     </div>
 
@@ -241,7 +317,7 @@
                 finalUrl = `${url}?${params.toString()}`;
             }
 
-           console.log('Loading table data from:', finalUrl); // Debug log
+           console.log('Loading table data from:', finalUrl); 
 
             fetch(finalUrl, { 
                 headers: { 
@@ -312,7 +388,7 @@
                     // Use filter form data and add per_page
                     const formData = new FormData(filterForm);
                     formData.set('per_page', perPage);
-                    formData.delete('page'); // Reset to first page when changing per_page
+                    formData.delete('page'); 
                     
                     console.log("Form data with per_page:", Object.fromEntries(formData));
                     
@@ -373,6 +449,52 @@
             });
         });
     });
+
+   
+
+</script>
+<script>
+    $(document).on('change', '.toggle-interview-state', function() {
+        let applicantId = $(this).data('id');
+        console.log('Toggling interview state for applicant ID:', applicantId);
+
+        $.ajax({
+            url: "{{ route('applicant.toggle_interview_details', '') }}/" + applicantId,
+            type: "POST",
+            data: {
+                _token: $('input[name="_token"]').val()
+            },
+            success: function (response) {
+                if (response.success) {
+                    console.log("Interview state updated: " + response.interview_state);
+                    // Update UI to reflect new state
+                    updateToggleUI($(this), response.interview_state);
+                } else {
+                    // alert("Failed to update status");
+                    
+                    $(this).prop('checked', !$(this).prop('checked'));
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", error);
+                // alert("Server error!");
+                $(this).prop('checked', !$(this).prop('checked'));
+            }
+        });
+    });
+
+    function updateToggleUI(toggleElement, interviewState) {
+        let container = toggleElement.closest('.availability-toggle');
+        let statusTexts = container.find('.status-text span');
+        
+        if (interviewState == 1) {
+            statusTexts.first().addClass('inactive');
+            statusTexts.last().removeClass('inactive');
+        } else {
+            statusTexts.first().removeClass('inactive');
+            statusTexts.last().addClass('inactive');
+        }
+    }
 </script>
 
 <script>

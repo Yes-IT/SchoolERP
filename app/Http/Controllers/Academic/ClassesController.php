@@ -13,6 +13,7 @@ use App\Models\Staff\Staff;
 use Illuminate\Support\Facades\{Log,DB};
 use App\Models\StudentInfo\{Student,StudentInfo};
 use App\Models\Session;
+use App\Models\Academic\{Classes,Division,Group,Period};
 use Exception;
 
 
@@ -34,14 +35,25 @@ class ClassesController extends Controller
 
     public function index()
     {
-        $data['classes'] = $this->classes->getAll();
-        // Log::info('records in classes', ['classes' => $data['classes']]);
-        $data['teachers'] = Staff::where('role_id', 5)->get();
+        try{
+            $data['classes'] = $this->classes->getAll();
+            // Log::info('records in classes', ['classes' => $data['classes']]);
+            $data['teachers'] = Staff::where('role_id', 5)->get();
 
-        // dd($data['teachers']);
+            $currentYear = date('Y');
+            $sessions = Session::where('name', 'LIKE', "$currentYear-%")->get(['id', 'name']);
+            $semesters         = Semester::all(['id', 'name']);
+            $yearStatuses      = YearStatus::all(['id', 'name']);
 
-        $data['title'] = ___('academic.class');
-        return view('backend.academic.class.index', compact('data'));
+            // dd($data['teachers']);
+
+            $data['title'] = ___('academic.class');
+            return view('backend.academic.class.index', compact('data','semesters', 'sessions', 'yearStatuses'));
+        } catch(Exception $e){
+            Log::error('Error loading classes', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return redirect()->route('classes.index')->with('error', 'Failed to load classes.');
+        }
+        
     }
 
     public function getSubjectJson($id)
@@ -57,45 +69,82 @@ class ClassesController extends Controller
 
     public function create()
     {
-        $data['title']       = ___('academic.create_class');
-        $subjects            = Subject::all(['id', 'name']);
-        $rooms               = ClassRoom::all();
-        $teachers            = Staff::where('role_id', 5)
-                                ->select('id', 'first_name', 'last_name')
-                                ->get(); 
+        try{
 
-        $currentYear = date('Y');
-        // dd($currentYear);
-        $sessions = Session::where('name', 'LIKE', "$currentYear-%")->get(['id', 'name']);
+            $data['title']       = ___('academic.create_class');
+            $subjects            = Subject::all(['id', 'name']);
+            $rooms               = ClassRoom::all();
+            $teachers            = Staff::where('role_id', 5)
+                                    ->select('id', 'first_name', 'last_name')
+                                    ->get(); 
 
-        // dd($sessions);
-        $semesters         = Semester::all(['id', 'name']);
-        $yearStatuses      = YearStatus::all(['id', 'name']);
-        // $students          = Student::all();
-        $students = Student::with([
-            'schoolDetail:id,student_id,homeroom_class,group,division'
-        ])->get(['id', 'first_name', 'last_name', 'user_id','student_id']);
+            $currentYear = date('Y');
+            $sessions = Session::where('name', 'LIKE', "$currentYear-%")->get(['id', 'name']);
+            $semesters         = Semester::all(['id', 'name']);
+            $yearStatuses      = YearStatus::all(['id', 'name']);
 
-        Log::info('students', ['students' => $students]);
-        $lastClass = $this->classes->all()->sortByDesc('id')->first();
-        // Log::info('lastClass', ['lastClass' => $lastClass]);
-        $nextNumber = $lastClass ? ((int) filter_var($lastClass->identification_number, FILTER_SANITIZE_NUMBER_INT)) + 1 : 1;
-        // dd($nextNumber);
-        $nextClassId = 'CLS' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+            $students = Student::with([
+                'schoolDetail.homeroomClass:id,name',
+                'schoolDetail.group:id,group_name',
+                'schoolDetail.division:id,division_name'
+            ])->get(['id', 'first_name', 'last_name', 'user_id', 'student_id']);
 
-        // Log::info('nextClassId', ['nextClassId' => $nextClassId]);
+            // Log::info('students', ['students' => $students]);
 
-        return view('backend.academic.class.create', compact('data','sessions','nextClassId','students','subjects', 'teachers', 'semesters', 'rooms','yearStatuses'));
+            $classes = Classes::all(['id', 'name']); 
+            $groups = Group::all(['id', 'group_name as name']);
+            $divisions = Division::all(['id', 'division_name as name']);
+            $periods =Period::all(['id', 'period_number']);
+            // dd($periods);
+
+            $lastClass = $this->classes->all()->sortByDesc('id')->first();
+            // Log::info('lastClass', ['lastClass' => $lastClass]);
+            $nextNumber = $lastClass ? ((int) filter_var($lastClass->identification_number, FILTER_SANITIZE_NUMBER_INT)) + 1 : 1;
+            $nextClassId = 'CLS' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+            // Log::info('nextClassId', ['nextClassId' => $nextClassId]);
+
+            return view('backend.academic.class.create', compact('data',
+                'classes',
+                'groups',
+                'divisions', 
+                'sessions',
+                'nextClassId',
+                'students',
+                'subjects',
+                'teachers',
+                'semesters', 
+                'rooms',
+                'yearStatuses',
+                'periods'
+            ));
+        }catch(Exception $e){
+            Log::error('Error fetching class details', ['message' => $e->getMessage()]);
+            return redirect()->route('classes.index')->with('error', 'Failed to get classes.');
+            
+        }
+       
     }
 
     public function store(ClassesStoreRequest $request)
     {
-        $result = $this->classes->store($request);
-        if($result['status']){
-            return redirect()->route('classes.index')->with('success', $result['message']);
+        try {
+            Log::info('Store method triggered', ['data' => $request->all()]);
+
+            $result = $this->classes->store($request);
+
+            Log::info('Store method result', ['result' => $result]);
+
+            if ($result['status']) {
+                return redirect()->route('classes.index')->with('success', $result['message']);
+            }
+
+            return back()->with('danger', $result['message']);
+        } catch (Exception $e) {
+            Log::error('Error creating class', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return redirect()->route('classes.index')->with('error', 'Failed to create class.');
         }
-        return back()->with('danger', $result['message']);
     }
+
 
 
     public function translate($id)
@@ -144,7 +193,7 @@ class ClassesController extends Controller
             return !in_array($student->id, $assignedStudentIds);
         });
 
-        dd($classes->subjects);
+        // dd($classes->subjects);
 
         if(!$classes){
             return redirect()->route('classes.index')->with('danger', 'Class not found');
@@ -196,10 +245,14 @@ class ClassesController extends Controller
 
     public function filter(Request $request)
     {
-        // Log::info('Filter request received', $request->all());
+        Log::info('Filter request received in ClassController', $request->all());
         
         try {
             $classes = $this->classes->filter($request->all()); 
+
+            Log::info('Filtered classes', ['classes' => $classes]);
+            Log::info('Filtered classes count', ['count' => $classes->count()]);
+
 
             $html = view('backend.academic.class.partials.class-rows', compact('classes'))->render();
             $pagination = view('backend.academic.class.partials.class-pagination', compact('classes'))->render();

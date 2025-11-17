@@ -52,7 +52,7 @@ class ExamTypeRepository implements ExamTypeInterface
 
     public function update($request, $id)
     {
-       Log::info('request',[$request->all()]);
+    //    Log::info('request',[$request->all()]);
         try {
             $row                = $this->model->findOrfail($id);
             $row->name          = $request->exam_name;

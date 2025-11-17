@@ -123,8 +123,8 @@
                     Assign Role
                 </a>
             </li>
-            <li class="{{ request()->routeIs('assignment.*') ? 'active' : '' }}">
-                <a href="{{ route('assignment.index') }}">
+            <li class="{{ request()->routeIs('superadmin.assignment.*') ? 'active' : '' }}">
+                <a href="{{ route('superadmin.assignment.index') }}">
                     <img src="{{ asset('backend') }}/assets/images/new_images/superadmin-panel/sidebar-icon-12.svg"
                         alt="Sidebar Icon">
                     Assignment

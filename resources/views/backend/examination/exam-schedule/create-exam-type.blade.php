@@ -29,9 +29,7 @@
                         <div class="ds-cmn-filter-wrp">
                             <div class="dsbdy-filter-wrp p-0">
                                 <div class="dropdown-year" data-selected="Select Teacher">
-                                
                                   <button type="button" class="cmn-btn btn-sm"  data-bs-target="#createNewExamTypeModal" data-bs-toggle="modal"><i class="fa-solid fa-plus"></i> Create New Type</button>
-                                 
                             </div>
                         </div>
 
@@ -300,7 +298,7 @@
                     </div>
                 </div>
             </div>
-            <!-- End Of Add Room Modal -->
+    <!-- End Of Add Room Modal -->
 
 
             <!-- Edit Room Modal Begin -->
@@ -402,7 +400,6 @@ $(document).ready(function () {
     $('.editExamTypeBtn').on('click', function () {
         let id = $(this).data('id');
 
-        // Use Laravel route helper & replace :id dynamically
         let url = "{{ route('exam-type.editExamType', ':id') }}";
         url = url.replace(':id', id);
         console.log('url', url);
@@ -413,14 +410,11 @@ $(document).ready(function () {
             success: function (response) {
                 console.log('data in edit',response);
                 if (response.status) {
-                    // Populate form fields
-
                     console.log(response.data);
                     $('#exam_names').val(response.data.name);
                     $('textarea[name="description"]').val(response.data.description);
                     $('#status').prop('checked', response.data.status == 1);
 
-                    // Dynamically set form action using route helper
                     let updateUrl = "{{ route('exam-type.updateExamType', ':id') }}";
                     updateUrl = updateUrl.replace(':id', id);
                     $('#editExamTypeForm').attr('action', updateUrl);

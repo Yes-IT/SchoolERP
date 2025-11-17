@@ -79,10 +79,13 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::get('/exam-type', 'createExamType')->name('exam-schedule.createExamType')->middleware('PermissionCheck:exam_schedule_create');
                     Route::post('/store-exam-type', 'storeExamType')->name('exam-type.storeExamType')->middleware('PermissionCheck:exam_type_create', 'DemoCheck');
                     Route::get('/edit-exam-type/{id}', 'editExamType')->name('exam-type.editExamType')->middleware('PermissionCheck:exam_type_update');
-
+                    Route::delete('/delete-exam-type/{id}',   'deleteExamType')->name('exam-schedule.deleteExamType')->middleware('PermissionCheck:exam_type_delete');
+                   
                     Route::put('/update-exam-type/{id}', 'updateExamType')->name('exam-type.updateExamType')->middleware('PermissionCheck:exam_type_update', 'DemoCheck');
                     Route::get('/exam-schedule-type', 'createExamScheduleType')->name('exam-schedule.createExamScheduleType')->middleware('PermissionCheck:exam_schedule_create');
-                    Route::get('/check-availablity', 'checkAvailablity')->name('exam-schedule.checkAvailablity')->middleware('PermissionCheck:exam_schedule_create');
+                    Route::get('/check-availablity/{id}', 'checkAvailablity')->name('exam-schedule.checkAvailablity')->middleware('PermissionCheck:exam_schedule_create');
+                    Route::post('/assign-exam/{id}','assignExam')->name('exam-schedule.assignExam')->middleware('PermissionCheck:exam_schedule_create');
+
                     Route::get('/room-availability', 'roomAvailability')->name('exam-schedule.roomAvailability')->middleware('PermissionCheck:exam_schedule_create');
                 });
                 

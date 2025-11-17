@@ -8,7 +8,7 @@
                 </li>
             @else
                 <li>
-                    <a href="{{ $classes->previousPageUrl() }}">
+                    <a href="#" data-page="{{ $classes->currentPage() - 1 }}">
                         <img src="{{ global_asset('backend/assets/images/arrow-left.svg') }}" alt="Icon">
                     </a>
                 </li>
@@ -17,14 +17,14 @@
             {{-- Page Numbers --}}
             @foreach ($classes->getUrlRange(1, $classes->lastPage()) as $page => $url)
                 <li class="{{ $page == $classes->currentPage() ? 'active' : '' }}">
-                    <a href="{{ $url }}">{{ $page }}</a>
+                    <a href="#" data-page="{{ $page }}">{{ $page }}</a>
                 </li>
             @endforeach
 
             {{-- Next Page Link --}}
             @if ($classes->hasMorePages())
                 <li>
-                    <a href="{{ $classes->nextPageUrl() }}">
+                    <a href="#" data-page="{{ $classes->currentPage() + 1 }}">
                         <img src="{{ global_asset('backend/assets/images/arrow-right.svg') }}" alt="Icon">
                     </a>
                 </li>

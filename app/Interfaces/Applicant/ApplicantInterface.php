@@ -15,4 +15,5 @@ interface ApplicantInterface
     public function updateInterviewSchedule($data);
     public function getApplicantNames();
     public function checkOverlappingSlots($date, $startTime, $endTime, $excludeApplicantId = null);
+    public function toggleInterviewDetails($id);
 }

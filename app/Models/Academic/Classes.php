@@ -134,4 +134,9 @@ class Classes extends BaseModel
          ->withTimestamps();        
     }
 
+    public function assignments()
+    {
+        return $this->hasMany(Assignment::class, 'class_id');
+    }
+
 }

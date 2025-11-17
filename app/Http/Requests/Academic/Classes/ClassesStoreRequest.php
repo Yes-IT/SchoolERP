@@ -25,10 +25,9 @@ class ClassesStoreRequest extends FormRequest
     {
         return [
             'class_name'      => 'required|max:255|unique:classes,name',
-            // 'status' => 'required',
             'subject_id' => 'required|exists:subjects,id',
             'teacher_id' => 'required|exists:staff,id',
-            'school_year_id' => 'required|exists:school_years,id',
+            'session_id' => 'required|exists:sessions,id',
             'semester_id' => 'required|exists:semesters,id',
             'year_status_id' => 'required|exists:year_status,id',
             

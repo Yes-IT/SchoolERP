@@ -368,6 +368,12 @@ select{
 .dr-popup-inner {
     padding: 10px;
 }
+
+.dr-popup.right {
+    left: auto;
+    right: 0;
+}
+
 /* header */
 .dr-header {
     display: flex;

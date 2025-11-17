@@ -27,6 +27,8 @@ class ApplicantHistory extends Model
         'relation_relationship',
         'school_name',
         'school_grades',
+        'camp_names',
+        'camp_years',
         'modified',
         'allergies',
         'medication',
@@ -42,6 +44,8 @@ class ApplicantHistory extends Model
     protected $casts = [
         'school_name' => 'array',
         'school_grades' => 'array',
+        'camp_names' => 'array',
+        'camp_years' => 'array',
     ];
 
 

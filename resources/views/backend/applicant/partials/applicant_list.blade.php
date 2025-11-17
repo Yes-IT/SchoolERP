@@ -4,13 +4,18 @@
             <th>S. No</th>
             <th>Last Name</th>
             <th>First Name</th>
+            <th>High School</th>
+            <th>Interview City</th>
+            <th>Status</th>
+            <th>Date of Deposit/Entry Date</th>
             <th>View</th>
+            <th>Interview Details State</th>
             <th>Interview Status</th>
             <th>Interview Mode</th>
             <th>Interview Date</th>
             <th>Interview Time</th>
             <th>Interview Location</th>
-            <th>Meeting Link</th>
+            {{-- <th>Meeting Link</th> --}}
             <th>Interview Action</th>
             <th>Applicant Status</th>
             <th>Applicant Action</th>
@@ -18,7 +23,7 @@
     </thead>
     <tbody>
        @forelse ($applicants as $index => $applicant) 
-         @php
+                 @php
                         $interviewStatus = optional($applicant->processing)->interview_status;
                         $statusClass = 'yellow-bg'; // Default for pending/0
                         $statusText = '-';
@@ -47,39 +52,60 @@
                         }
                         
                        
-                    @endphp
+                 @endphp
             <tr>
                 <td>{{ $applicants->firstItem() + $index }}</td>
                 <td>{{ $applicant->last_name }}</td>
                 <td>{{ $applicant->first_name }}</td>
+                <td>{{ $applicant->highSchool->hs_name ?? (!empty($applicant->high_school) ? 'Other (' . $applicant->high_school . ')' : 'N/A') }}</td>
+                <td>{{ $applicant->interview_city ?? '-' }}</td>
+                @php
+                    $statusLabels = [
+                        0 => 'Pending',
+                        1 => 'Approved',
+                        2 => 'Rejected',
+                        3 => 'Accepted',
+                        4 => 'Not Accepted',
+                        5 => 'Priority Pending',
+                    ];
+                @endphp
+                <td>
+                    {{ $statusLabels[$applicant->processing->status ?? null] ?? '-' }}
+                </td>
+                <td>{{ optional($applicant->confirmation)->created_at ? optional($applicant->confirmation)->created_at->format('d/m/Y') : '-' }}</td>
                  <td>
                     <a href="{{ route('applicant.view_applicant_info', ['id' => $applicant->id]) }}" class="view-attachment-btn">
                         <img src="{{ global_asset('backend/assets/images/eye-white.svg') }}" alt="Eye Icon">
                     </a>
                 </td>
-                
-                {{-- <td><span class="cmn-tbl-btn yellow-bg">{{ optional($applicant->interview)->interview_status ?? '-' }}</span></td> --}}
+                <td>
+                    <div class="availability-toggle">
+                        <div class="status-text">
+                            <span class="unavailable {{ $applicant->processing->interview_state == 0 ? '' : 'inactive' }}">Suspend</span>
+
+                            <label class="toggle-label">
+                                <input 
+                                    type="checkbox" 
+                                    class="availability-switch toggle-interview-state"
+                                    data-id="{{ $applicant->id }}"
+                                    {{ $applicant->processing->interview_state == 1 ? 'checked' : '' }}>
+                                <span class="slider"></span>
+                            </label>
+
+                            <span class="available {{ $applicant->processing->interview_state == 1 ? '' : 'inactive' }}">Active</span>
+                        </div>
+                    </div>
+                </td>
+
+
                 <td>
                     <span class="cmn-tbl-btn {{ $statusClass }}">{{ $statusText }}</span>
                 </td>
-
                 <td>{{optional($applicant->processing)->interview_mode ?? '-' }}</td>
                 <td>{{ optional($applicant->processing)->interview_date ? optional($applicant->processing)->interview_date->format('d/m/Y') : '-' }}</td>
                 <td>{{ optional($applicant->processing)->interview_time ?? '-' }}</td>
                 <td>{{ optional($applicant->processing)->interview_location ?? '-' }}</td>
-                <td>{{ optional($applicant->processing)->interview_link ?? '-' }}</td>
-                {{-- <td>
-                   <a href="{{ route('applicant.schedule_interview', $applicant->id) }}" class="cmn-btn btn-sm"><img src="{{global_asset('backend/assets/images/calender-icon.svg')}}" alt="Image"> Schedule Interview</a>
-                </td> --}}
-
-                 <!-- Interview Action -->
-                {{-- <td>
-                   <a href="{{ route('applicant.schedule_interview', $applicant->id) }}"  class="cmn-btn btn-sm" >
-                       <img src="{{ global_asset('backend/assets/images/calender-icon.svg') }}" alt="Image"> 
-                       {{ $interviewButtonText }}
-                   </a>
-                </td> --}}
-                <!-- Interview Action -->
+                {{-- <td>{{ optional($applicant->processing)->interview_link ?? '-' }}</td> --}}
                 <td>
                     @if(in_array($interviewStatus, [0, 1, 2])) {{-- Pending, Scheduled, or Rescheduled --}}
                         @if($interviewStatus == 0) {{-- Pending --}}
@@ -106,7 +132,6 @@
                     @endif
                 </td>
 
-                {{-- <td><span class="cmn-tbl-btn yellow-bg">{{ $applicant->applicant_status ?? '-' }}</span></td> --}}
                 <td>
                     @php
                         $applicantStatus = $applicant->applicant_status?->value ?? '-';

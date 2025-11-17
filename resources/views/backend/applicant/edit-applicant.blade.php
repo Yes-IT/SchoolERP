@@ -3,6 +3,21 @@
 @section('title')
     {{ @$data['title'] }}
 @endsection
+<style>
+   .comment-box {
+    width: 1000px !important;
+    height: 60px !important;  
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px 12px 15px 12px;
+    resize: vertical;             
+    line-height: 1.4;
+    font-size: 14px;
+    Justify:space-between;
+}
+
+
+</style>
 
 @section('content')
                     <div class="ds-breadcrumb">
@@ -92,14 +107,14 @@
                                                 <label for="">Email</label>
                                                 <input type="text" id ="email" name="email" value="{{ old('email', $applicant->email ?? '') }}">
                                             </div>
-                                            <div class="input-grp">
+                                            {{-- <div class="input-grp">
                                                 <label for="">High School (Application)</label>
                                                 <input type="text" id="highschool_application" name="highschool_application" value="{{ old('highschool_application', $applicant->highschool_application ?? '') }}">
-                                            </div>
+                                            </div> --}}
                                         </div>
                                     </div>
 
-                                  <div class="new-request-form">
+                                <div class="new-request-form">
                                         <h3>Camp(s) Attended</h3>
 
                                         <button type="button" id="add-row-btn" class="cmn-btn btn-sm">Add  
@@ -111,18 +126,18 @@
                                                 $campRecords = [];
                                                 if(isset($applicant->history) && !empty($applicant->history)) {
                                                     foreach($applicant->history as $history) {
-                                                        $schoolNames = $history->school_name ?? [];
-                                                        $schoolGrades = $history->school_grades ?? [];
+                                                        $campNames = $history->camp_names ?? [];
+                                                        $campYears = $history->camp_years ?? [];
                                                         
-                                                        if(!empty($schoolNames)) {
-                                                            foreach($schoolNames as $key => $schoolName) {
+                                                        if(!empty($campNames)) {
+                                                            foreach($campNames as $key => $campName) {
                                                                
-                                                                if(!empty(trim($schoolName))) {
+                                                                if(!empty(trim($campName))) {
                                                                     $campRecords[] = [
                                                                         'history_id' => $history->id,
                                                                         'array_index' => $key,
-                                                                        'school_name' => $schoolName,
-                                                                        'school_grades' => $schoolGrades[$key] ?? ''
+                                                                        'camp_names' => $campName,
+                                                                        'camp_years' => $campYears[$key] ?? ''
                                                                     ];
                                                                 }
                                                             }
@@ -136,16 +151,16 @@
                                                     <span class="sl-count" style="margin-top: 25px; min-width: 30px;">{{ $index + 1 }}.</span>
                                                     <div class="multi-input-grp input-grp-5" style="display: flex; gap: 15px; flex: 1;">
                                                         <div class="input-grp" style="flex: 1;">
-                                                            <label for="">Name of School</label>
-                                                            <input type="text" name="school_name[]" 
-                                                                value="{{ old("school_name.$index", $record['school_name']) }}" 
-                                                                placeholder="Name of School" style="width: 100%;">
+                                                            <label for="">Name of Camp</label>
+                                                            <input type="text" name="camp_names[]" 
+                                                                value="{{ old("camp_names.$index", $record['camp_names']) }}" 
+                                                                placeholder="Name of Camp" style="width: 100%;">
                                                         </div>
                                                         <div class="input-grp" style="flex: 1;">
-                                                            <label for="">Grades Attended</label>
-                                                            <input type="text" name="school_grades[]" 
-                                                                value="{{ old("school_grades.$index", $record['school_grades']) }}" 
-                                                                placeholder="Grades Attended" style="width: 100%;">
+                                                            <label for="">Years Attended</label>
+                                                            <input type="text" name="camp_years[]" 
+                                                                value="{{ old("camp_years.$index", $record['camp_years']) }}" 
+                                                                placeholder="Years Attended" style="width: 100%;">
                                                         </div>
                                                       
                                                         <input type="hidden" name="camp_deleted[]" value="0" class="camp-deleted-flag">
@@ -158,7 +173,7 @@
                                                 {{-- No camp records found --}}
                                             @endforelse
                                         </div>
-                                    </div>    
+                                </div>    
 
                                    <div class="new-request-form" id="">
                                         <h3>Application Check List</h3>
@@ -188,9 +203,20 @@
 
                                             <div class="input-grp">
                                                 <label for="">References</label>
-                                                <input id="references" name="checklist[reference]" type="text" 
+                                                {{-- <input type="text" id="references" name="checklist[reference]"  
                                                     value="{{ old('checklist.reference', $applicant->confirmation->reference ?? '') }}" 
-                                                    placeholder="Enter References">
+                                                    placeholder="Enter References"> --}}
+                                                    <input 
+                                                    type="number" 
+                                                    id="references"
+                                                    name="checklist[reference]"
+                                                    min="1"
+                                                    max="9"
+                                                    maxlength="1"
+                                                    oninput="this.value = this.value.slice(0,1)" 
+                                                    value="{{ old('checklist.reference', $applicant->confirmation->reference ?? '') }}"
+                                                    placeholder="Enter Reference Number (1–9)"
+                                                >
                                             </div>
                                             
                                             <div class="input-grp">
@@ -285,22 +311,22 @@
                                         <div class="multi-input-grp grp-1">
                                             <div class="input-grp">
                                                 <label for="comment">Application Comment</label>
-                                                <textarea  name="processing[application_comment]" >{{ old('processing.application_comment', $applicant->processing->application_comment ?? '') }}</textarea>
+                                                <textarea  class="comment-box" name="processing[application_comment]" >{{ old('processing.application_comment', $applicant->processing->application_comment ?? '') }}</textarea>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="new-request-form" id="">
-                                          <div class="multi-input-grp grp-1">
+                                        <div class="multi-input-grp grp-1">
                                             <div class="input-grp">
                                                 <label for="comment">Scholarship Comment</label>
-                                                <textarea name="processing[scholarship_comment]" >{{ old('processing.scholarship_comment', $applicant->processing->scholarship_comment ?? '') }}</textarea>
+                                                <textarea   class="comment-box" name="processing[scholarship_comment]" >{{ old('processing.scholarship_comment', $applicant->processing->scholarship_comment ?? '') }}</textarea>
                                             </div>
                                         </div>
                                           <div class="multi-input-grp grp-1">
                                             <div class="input-grp">
                                                 <label for="comment">Tuition Comment</label>
-                                                <textarea name="processing[tution_comment]" >{{ old('processing.tution_comment', $applicant->processing->tution_comment ?? '') }}</textarea>
+                                                <textarea  class="comment-box" name="processing[tution_comment]" >{{ old('processing.tution_comment', $applicant->processing->tution_comment ?? '') }}</textarea>
                                             </div>
                                         </div>
 
@@ -453,12 +479,12 @@
                 <span class="sl-count" style="margin-top: 25px; min-width: 30px;">${rowCount + 1}.</span>
                 <div class="multi-input-grp input-grp-5" style="display: flex; gap: 15px; flex: 1;">
                     <div class="input-grp" style="flex: 1;">
-                        <label for="">Name of School</label>
-                        <input type="text" name="school_name[]" placeholder="Name of School" style="width: 100%;">
+                        <label for="">Name of Camp</label>
+                        <input type="text" name="camp_names[]" placeholder="Name of Camp" style="width: 100%;">
                     </div>
                     <div class="input-grp" style="flex: 1;">
-                        <label for="">Grades Attended</label>
-                        <input type="text" name="school_grades[]" placeholder="Grades Attended" style="width: 100%;">
+                        <label for="">Years Attended</label>
+                        <input type="text" name="camp_years[]" placeholder="Years Attended" style="width: 100%;">
                     </div>
                     <!-- Hidden fields for new records -->
                     <input type="hidden" name="history_ids[]" value="">
@@ -480,14 +506,12 @@
                 e.preventDefault();
                 const row = e.target.closest(".schedule-row");
                 
-                // Mark as deleted instead of removing
                 const deleteFlag = row.querySelector('.camp-deleted-flag');
                 if (deleteFlag) {
                     deleteFlag.value = "1";
                     console.log('Marked row as deleted:', deleteFlag.value);
                 }
                 
-                // Hide the row instead of removing it
                 row.style.display = 'none';
                 
                 updateRowNumbers();

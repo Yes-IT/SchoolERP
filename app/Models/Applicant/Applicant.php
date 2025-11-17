@@ -61,7 +61,10 @@ class Applicant extends Model
 
     public function processing()
     {
-        return $this->hasOne(ApplicationProcessing::class, 'applicant_id')->withDefault();
+        return $this->hasOne(ApplicationProcessing::class, 'applicant_id')->withDefault([
+            'interview_state' => 0,
+            'interview_status' => 'pending',
+        ]);
     }
 
     public function camps()

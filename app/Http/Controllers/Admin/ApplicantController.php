@@ -450,7 +450,7 @@ class ApplicantController extends Controller
         try{
             $applicant = $this->applicantrepository->getApplicantById($id);
 
-            // Log::info('Applicant info details', ['applicant' => $applicant]);
+            Log::info('Applicant info details', ['applicant' => $applicant]);
            
             return view('backend.applicant.view-applicant-info', compact('applicant'));
         }catch(\Exception $e){
@@ -484,7 +484,7 @@ class ApplicantController extends Controller
 
     public function update_applicant(ApplicantUpdateRequest $request, $id)
     {
-        Log::info('request for update applicant', ['request' => $request->all()]);
+        // Log::info('request for update applicant', ['request' => $request->all()]);
 
         try {
            
@@ -501,14 +501,19 @@ class ApplicantController extends Controller
             }
          
             $processedCampData = $this->processCampData($request);
+
+            // Log::info('Processed camp data for update:', $processedCampData);
+            // Log::info('Camp names from request:', ['camp_names' => $request->input('camp_names', [])]);
+            // Log::info('Camp years from request:', ['camp_years' => $request->input('camp_years', [])]);
+        
             
             $updateData = array_merge($validatedData, [
                 'processing' => $request->input('processing', []),
                 'parents' => $request->input('parents', []),
                 'transaction' => $request->input('transaction', []),
                 'checklist' => $request->input('checklist', []),
-                'school_name' => $processedCampData['school_name'],
-                'school_grades' => $processedCampData['school_grades']
+                'camp_names' => $processedCampData['camp_names'],
+                'camp_years' => $processedCampData['camp_years']
             ]);
             
             Log::info('Processed camp data:', $processedCampData);
@@ -529,53 +534,52 @@ class ApplicantController extends Controller
 
     private function processCampData($request)
     {
-        $schoolNames = $request->input('school_name', []);
-        $schoolGrades = $request->input('school_grades', []);
+        $campNames = $request->input('camp_names', []);
+        $campYears = $request->input('camp_years', []);
         $campDeleted = $request->input('camp_deleted', []);
         
-        $processedSchoolNames = [];
-        $processedSchoolGrades = [];
+        $processedCampNames = [];
+        $processedCampYears = [];
         
-        foreach ($schoolNames as $index => $schoolName) {
+        foreach ($campNames as $index => $campName) {
             $isDeleted = $campDeleted[$index] ?? '0';
             
-            if ($isDeleted === '1' || empty(trim($schoolName))) {
+            if ($isDeleted === '1' || empty(trim($campName))) {
                 continue;
             }
             
-            $processedSchoolNames[] = $schoolName;
-            $processedSchoolGrades[] = $schoolGrades[$index] ?? '';
+            $processedCampNames[] = $campName;
+            $processedCampYears[] = $campYears[$index] ?? '';
         }
         
         return [
-            'school_name' => $processedSchoolNames,
-            'school_grades' => $processedSchoolGrades
+            'camp_names' => $processedCampNames, // Fixed field name
+            'camp_years' => $processedCampYears  // Fixed field name
         ];
     }
 
-    // public function update_applicant(ApplicantUpdateRequest $request, $id)
-    // {
-    //     Log::info('request for update applicant', ['request' => $request->all()]);
+    public function toggle_interview_details(Request $request, $id)
+    {
+        Log::info('Toggle interview details', ['request data'=>$request->all(),'id' => $id]);
+        try {
+            $processing = $this->applicantrepository->toggleInterviewDetails($id);
 
-    //     try {
-    //         // Use all data instead of just validated data
-    //         $allData = $request->all();
-            
-    //         Log::info('All data for update:', $allData);
+            return response()->json([
+                'success' => true,
+                'interview_state' => $processing->interview_state
+            ]);
 
-    //         $this->applicantrepository->updateApplicant($id, $allData);
+        } catch (\Exception $e) {
+            Log::error("Toggle error: " . $e->getMessage());
 
-    //         Log::info("Applicant updated successfully", ['applicant_id' => $id]);
+            return response()->json([
+                'success' => false
+            ], 500);
+        }
+    }
 
-    //         return redirect()->route('applicant.student_application_form', $id)->with('success', 'Applicant updated successfully.');
-    //     } catch (\Exception $e) {
-    //         Log::error("Applicant update failed: " . $e->getMessage(), [
-    //             'applicant_id' => $id,
-    //             'exception' => $e->getTraceAsString()
-    //         ]);
-    //         return redirect()->back()->with('error', 'Failed to update applicant.');
-    //     }
-    // }
+
+
 
     public function custom_applicant_chart(){
         return view('backend.applicant.custom-applicant-chart');

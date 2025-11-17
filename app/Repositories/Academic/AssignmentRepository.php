@@ -87,19 +87,59 @@ class AssignmentRepository implements AssignmentInterface
 
     public function getPendingAssignmentRequests()
     {
-        return Assignment::where('status', 0)// 0 = requested
+        return Assignment::where('status', 0)
             ->with(['class', 'subject', 'creator'])
             ->orderByDesc('created_at')
             ->get();
     }
 
-    public function getAcceptedAssignmentRequests()
+    public function getAcceptedAssignmentRequests($request = null)
     {
-        return Assignment::where('status', 1) 
-            ->with(['class', 'subject', 'creator'])
-            ->orderByDesc('assigned_date')
-            ->get();
+        $query = Assignment::where('status', 1) 
+            ->with(['class', 'subject', 'creator']);
+
+        // If request object is provided, apply filters
+        if ($request) {
+            // Apply filters from request
+            if ($request->has('year_id') && $request->year_id != '') {
+                $query->whereHas('class.session', function($q) use ($request) {
+                    $q->where('id', $request->year_id);
+                });
+            }
+            
+            if ($request->has('year_status_id') && $request->year_status_id != '') {
+                $query->whereHas('class.yearStatus', function($q) use ($request) {
+                    $q->where('id', $request->year_status_id);
+                });
+            }
+            
+            if ($request->has('semester_id') && $request->semester_id != '') {
+                $query->whereHas('class.semester', function($q) use ($request) {
+                    $q->where('id', $request->semester_id);
+                });
+            }
+            
+            if ($request->has('class_id') && $request->class_id != '') {
+                $query->where('class_id', $request->class_id);
+            }
+            
+            if ($request->has('subject_id') && $request->subject_id != '') {
+                $query->where('subject_id', $request->subject_id);
+            }
+            
+            // Date range filter
+            if ($request->has('start_date') && $request->start_date != '') {
+                $query->whereDate('assigned_date', '>=', $request->start_date);
+            }
+            
+            if ($request->has('end_date') && $request->end_date != '') {
+                $query->whereDate('assigned_date', '<=', $request->end_date);
+            }
+        }
+
+        return $query->orderByDesc('assigned_date')->get();
     }
+
 
     public function getRejectedAssignmentRequests()
     {
