@@ -1,130 +1,212 @@
 @extends('backend.master')
+
 @section('title')
     {{ @$data['title'] }}
 @endsection
-@section('content')
-    <div class="page-content">
 
-        {{-- bradecrumb Area S t a r t --}}
-        <div class="page-header">
-            <div class="row">
-                <div class="col-sm-6">
-                    <h4 class="bradecrumb-title mb-1">{{ $data['title'] }}</h1>
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ ___('common.home') }}</a></li>
-                        <li class="breadcrumb-item">{{ $data['title'] }}</li>
-                    </ol>
+@section('content')
+
+    <div class="ds-breadcrumb">
+        <h1>Assigned Roles</h1>
+        <ul>
+            <li><a href="../dashboard.html">Dashboard</a> /</li>
+            <li>Assigned Roles</li>
+        </ul>
+    </div>
+
+    <div class="ds-pr-body">
+        
+        <div class="atndnc-filter-wrp w-100">
+            <div class="sec-head">
+                <h2>Filters</h2>
+            </div>
+            <div class="atndnc-filter student-filter">
+                <form>
+                    <div class="atndnc-filter-form">
+                        <div class="atndnc-filter-options grp-3 multi-input-grp">
+                            <div class="input-grp">
+                                <input type="text" placeholder="Search Users..." />
+                            </div>
+                            <div class="input-grp">
+                                <select>
+                                    <option value="select-year">Select Role</option>
+                                    <option value="2024">2024</option>
+                                </select>
+                            </div>
+                            <div class="input-grp">
+                                <select>
+                                    <option value="select-year">Select Module</option>
+                                    <option value="2024">2024</option>
+                                </select>
+                            </div>
+                            
+                        </div>
+                    
+                        <button type="submit" class="btn-search">Search</button>
+                    </div>
+                </form>
+            </div> 
+        </div>
+
+        <div class="ds-cmn-table-wrp">
+            
+            <div class="ds-content-head has-drpdn">
+                <div class="sec-head">
+                    <h2>View Assigned Roles</h2>
+                </div>
+                <div class="ds-cmn-filter-wrp">
+                    <div class="dsbdy-filter-wrp p-0">
+                        <button  data-bs-toggle="modal" data-bs-target="#addNewUserModal" class="cmn-btn btn-sm"><i class="fa-solid fa-plus"></i> Add New User</button>
+                    </div>
                 </div>
             </div>
+
+            <div class="ds-cmn-tble count-row">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>S. No</th>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Assigned Roles</th>
+                            <th>Assigned Permissions</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    
+                    
+                        <tbody>
+                        
+                            <tr>
+                                <td>1</td>
+                                <td>Lorem</td>
+                                    <td>Lorem</td>
+                                    <td>Lorem</td>
+                                <td>
+                                    <a href="#" class="view-attachment-btn">
+                                        <img src="{{ global_asset('backend/assets/images/eye-white.svg') }}" alt="Eye Icon">
+                                    </a>
+                                </td>
+                            
+                                <td>
+                                    
+                                    <div class="actions-wrp">
+                                        <button type="button" data-bs-toggle="modal" data-bs-target="#editNewUser">
+                                            <img src="{{ global_asset('backend/assets/images/edit-icon-primary.svg') }}" alt="Icon">
+                                        </button>
+
+                                        <button type="button" data-bs-toggle="modal" data-bs-target="#deleteLeaveRequest">
+                                            <img src="{{ global_asset('backend/assets/images/bin-icon.svg') }}" alt="Icon">
+                                        </button>
+
+                                    </div>
+                                </td>
+                            </tr>
+                    
+                        </tbody>
+                    
+
+                </table>
+            </div>
+
+        
+
+                <div id="class-pagination">
+                {{-- @include('backend.academic.class.partials.class-pagination', ['classes' => $data['classes']]) --}}
+            </div>
         </div>
-        {{-- bradecrumb Area E n d --}}
+            
+    </div>
 
-        <!--  table content start -->
-        <div class="table-content table-basic mt-20">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">{{ ___('users_roles.roles') }}</h4>
-                    @if (hasPermission('role_create'))
-                        <a href="{{ route('roles.create') }}" class="btn btn-lg ot-btn-primary">
-                            <span><i class="fa-solid fa-plus"></i> </span>
-                            <span class="">{{ ___('users_roles.add_role') }}</span>
-                        </a>
-                    @endif
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered role-table">
-                            <thead class="thead">
-                                <tr>
-                                    <th class="serial">{{ ___('common.sr_no') }}</th>
-                                    <th class="purchase">{{ ___('common.name') }}</th>
-                                    <th class="purchase">{{ ___('users_roles.permissions') }}</th>
-                                    <th class="purchase">{{ ___('common.status') }}</th>
-                                    @if (hasPermission('role_update') || hasPermission('role_delete'))
-                                        <th class="action">{{ ___('common.action') }}</th>
-                                    @endif
-                                </tr>
-                            </thead>
-                            <tbody class="tbody">
-                                @forelse ($data['roles'] as $key => $row)
-                                <tr id="row_{{ $row->id }}">
-                                    <td class="serial">{{ ++$key }}</td>
-                                    <td>{{ $row->name }}</td>
-                                    <td><span
-                                            class="badge-basic-success-text">{{ $row->permissions != '' ? count($row->permissions) : '0' }}</span>
-                                    </td>
-                                    <td>
-                                        @if ($row->status == App\Enums\Status::ACTIVE)
-                                            <span class="badge-basic-success-text">{{ ___('common.active') }}</span>
-                                        @else
-                                            <span class="badge-basic-danger-text">{{ ___('common.inactive') }}</span>
-                                        @endif
-                                    </td>
-                                    <td class="action">
-                                        @if ($row->id != 1 && (hasPermission('role_update') || hasPermission('role_delete')))
-                                            <div class="dropdown dropdown-action">
-                                                <button type="button" class="btn-dropdown" data-bs-toggle="dropdown"
-                                                    aria-expanded="false">
-                                                    <i class="fa-solid fa-ellipsis"></i>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-end ">
-                                                    @if (hasPermission('role_update'))
-                                                        <li>
-                                                            <a class="dropdown-item"
-                                                                href="{{ route('roles.edit', $row->id) }}"><span
-                                                                    class="icon mr-8"><i
-                                                                        class="fa-solid fa-pen-to-square"></i></span>
-                                                                {{ ___('common.edit') }}</a>
-                                                        </li>
-                                                    @endif
-                                                    @if (hasPermission('role_delete') && $row->id > 7)
-                                                        <li>
-                                                            <a class="dropdown-item" href="javascript:void(0);"
-                                                                onclick="delete_row('roles/delete', {{ $row->id }})">
-                                                                <span class="icon mr-8"><i
-                                                                        class="fa-solid fa-trash-can"></i></span>
-                                                                <span>{{ ___('common.delete') }}</span>
-                                                            </a>
-                                                        </li>
-                                                    @endif
-                                                </ul>
-                                            </div>
-                                        @endif
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="100%" class="text-center gray-color">
-                                        <img src="{{ asset('images/no_data.svg') }}" alt="" class="mb-primary" width="100">
-                                        <p class="mb-0 text-center">{{ ___('common.no_data_available') }}</p>
-                                        <p class="mb-0 text-center text-secondary font-size-90">
-                                            {{ ___('common.please_add_new_entity_regarding_this_table') }}</p>
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                    <!--  table end -->
-                    <!--  pagination start -->
 
-                        <div class="ot-pagination pagination-content d-flex justify-content-end align-content-center py-3">
-                            <nav aria-label="Page navigation example">
-                                <ul class="pagination justify-content-between">
-                                    {!!$data['roles']->links() !!}
-                                </ul>
-                            </nav>
+    <!-- Add addNewUserModal  Begin -->
+    <div class="modal fade cmn-popwrp pop800" id="addNewUserModal" tabindex="-1" role="dialog" aria-labelledby="addNewUserModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><img src="{{global_asset('backend/assets/images/cross-icon.svg')}}" alt="Icon"></span>
+                </button>
+
+                <div class="modal-body">
+                    <div class="cmn-pop-content-wrapper">
+                        <div class="cmn-pop-head">
+                            <h2>Add New User</h2>
                         </div>
 
-                    <!--  pagination end -->
+                        <div class="cmn-pop-inr-content-wrp">
+                            
+
+                            <div class="cmn-tab-content">
+                                <div class="upload-list">
+                                    
+                                    <div class="multi-input-grp grp-2 mt-3">
+                                        <div class="input-grp">
+                                            <label for="title">Full Name</label>
+                                            <input id="title" name="title" type="text" placeholder="Full Name" />
+                                        </div>
+                                        
+                                        <div class="input-grp">
+                                            <label for="author">Email Id</label>
+                                            <input id="author" name="author" type="text" placeholder="Email Id" />
+                                        </div>
+                                        </div>
+                                        
+                                        <div class="multi-input-grp grp-2">
+                                        <div class="input-grp">
+                                            <label for="categories">Designation</label>
+                                            <input id="categories" name="categories" type="text" placeholder="Designation" />
+                                        </div>
+                                        
+                                        <div class="input-grp">
+                                            <label for="date">Password</label>
+                                            <input  type="text" placeholder="Password" />
+                                        </div>
+                                        </div>
+
+                                        {{-- <div class="multi-input-grp ">
+                                        <div class="input-grp">
+                                            <label for="date">Confirm Password</label>
+                                            <input  type="text" placeholder="Confirm Password" />
+                                        </div>
+                                        </div> --}}
+                                        <div class="multi-input-grp ">
+                                        <div class="input-grp">
+                                            <label for="date">Role Selection</label>
+                                                <select name="" id="">
+                                                <option value="">Select Role</option>
+                                                <option value="">Lorem</option>
+                                                <option value="">Lorem</option>
+                                                </select>
+                                        </div>
+                                        <div class="input-grp">
+                                            <label for="date">Role Modules</label>
+                                                <select name="" id="">
+                                                <option value="">Select Module</option>
+                                                <option value="">Lorem</option>
+                                                <option value="">Lorem</option>
+                                                </select>
+                                        </div>
+                                        </div>
+                                        
+                                    <div class="btn-wrp justify-content-end">
+                                        
+                                        <button class="btn-sm cmn-btn">Save</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
+                
             </div>
         </div>
-        <!--  table content end -->
-
     </div>
+    <!-- End Of addNewUser Modal -->
+
 @endsection
 
+
 @push('script')
-    @include('backend.partials.delete-ajax')
+    
 @endpush

@@ -15,6 +15,9 @@ use App\Interfaces\ReligionInterface;
 use App\Repositories\GenderRepository;
 use App\Interfaces\BloodGroupInterface;
 use App\Interfaces\PermissionInterface;
+use App\Interfaces\ModuleInterface;
+use App\Interfaces\PanelInterface;
+use App\Interfaces\RolePanelPermissionInterface;
 use App\Repositories\SessionRepository;
 use App\Repositories\SettingRepository;
 use Illuminate\Support\ServiceProvider;
@@ -25,6 +28,9 @@ use App\Interfaces\Fees\FeesTypeInterface;
 use App\Repositories\BloodGroupRepository;
 use App\Repositories\Gmeet\GmeetInterface;
 use App\Repositories\PermissionRepository;
+use App\Repositories\ModuleRepository;
+use App\Repositories\PanelRepository;
+use App\Repositories\RolePanelPermissionRepository;
 use App\Interfaces\Academic\ShiftInterface;
 use App\Interfaces\Fees\FeesGroupInterface;
 use App\Interfaces\GeneralSettingInterface;
@@ -147,6 +153,9 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(AuthenticationRepositoryInterface::class, AuthenticationRepository::class);
         $this->app->bind(RoleInterface::class,                     RoleRepository::class);
         $this->app->bind(PermissionInterface::class,               PermissionRepository::class);
+        $this->app->bind(RolePanelPermissionInterface::class,      RolePanelPermissionRepository::class);
+        $this->app->bind(ModuleInterface::class,                   ModuleRepository::class);
+        $this->app->bind(PanelInterface::class,                    PanelRepository::class);
         $this->app->bind(UserInterface::class,                     UserRepository::class);
         $this->app->bind(GeneralSettingInterface::class,           GeneralSettingRepository::class);
         $this->app->bind(SettingInterface::class,                  SettingRepository::class);
@@ -196,7 +205,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PromoteStudentInterface::class,           PromoteStudentRepository::class);
         
          //superadmin's Applicant module
-        $this->app->bind(ApplicantInterface::class,                 ApplicantRepository::class);
+        $this->app->bind(ApplicantInterface::class,                ApplicantRepository::class);
         
         // Student panel
         $this->app->bind(DashboardInterface::class,                          DashboardRepository::class);

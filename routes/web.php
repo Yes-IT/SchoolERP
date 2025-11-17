@@ -143,6 +143,15 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::get('dashboard/crm',   [DashboardController::class, 'crmDashboard'])->name('crm_dashboard');
                     Route::post('searchMenuData', [DashboardController::class, 'searchMenuData'])->name('searchMenuData');
 
+                    // Route::controller(RoleController::class)->middleware('FeatureCheck:staff_manage')->prefix('roles')->group(function () {
+                    //     Route::get('/',                 'index')->name('roles.index')->middleware('PermissionCheck:role_read');
+                    //     Route::get('/create',           'create')->name('roles.create')->middleware('PermissionCheck:role_create');
+                    //     Route::post('/store',           'store')->name('roles.store')->middleware('PermissionCheck:role_create', 'DemoCheck');
+                    //     Route::get('/edit/{id}',        'edit')->name('roles.edit')->middleware('PermissionCheck:role_update');
+                    //     Route::put('/update/{id}',      'update')->name('roles.update')->middleware('PermissionCheck:role_update', 'DemoCheck');
+                    //     Route::delete('/delete/{id}',   'delete')->name('roles.delete')->middleware('PermissionCheck:role_delete', 'DemoCheck');
+                    // });
+
                     Route::controller(RoleController::class)->middleware('FeatureCheck:staff_manage')->prefix('roles')->group(function () {
                         Route::get('/',                 'index')->name('roles.index')->middleware('PermissionCheck:role_read');
                         Route::get('/create',           'create')->name('roles.create')->middleware('PermissionCheck:role_create');
@@ -150,6 +159,15 @@ Route::middleware(saasMiddleware())->group(function () {
                         Route::get('/edit/{id}',        'edit')->name('roles.edit')->middleware('PermissionCheck:role_update');
                         Route::put('/update/{id}',      'update')->name('roles.update')->middleware('PermissionCheck:role_update', 'DemoCheck');
                         Route::delete('/delete/{id}',   'delete')->name('roles.delete')->middleware('PermissionCheck:role_delete', 'DemoCheck');
+                        Route::get('/assign-access',   'assignAccess')->name('roles.assign-access')->middleware('PermissionCheck:role_update');
+                        Route::post('/modules-by-panels',   'modulesByPanel')->name('roles.modules-by-panels')->middleware('PermissionCheck:role_read');
+                        Route::post('/save-permissions',   'storePermission')->name('roles.save-permissions')->middleware('PermissionCheck:role_update');
+                        Route::get('/assigned-roles',   'assignedRole')->name('roles.assigned-roles')->middleware('PermissionCheck:role_update');
+                        Route::post('/create-user',   'storeUser')->name('roles.user.create')->middleware('PermissionCheck:role_read');
+                        Route::get('/show-user/{id}',   'showUser')->name('roles.user.show')->middleware('PermissionCheck:role_read');
+                        Route::post('/update-user',   'updateUser')->name('roles.user.update')->middleware('PermissionCheck:role_update');
+                        Route::get('/user-permissions/{id}' ,   'fetchUserPanelsAndPermissions')->name('roles.user.fetch-permission')->middleware('PermissionCheck:role_update');
+                        Route::post('/user-role-delete' ,   'deleteRoleUser')->name('roles.user.delete')->middleware('PermissionCheck:role_update');
                     });
 
                     Route::controller(GenderController::class)->prefix('genders')->group(function () {
@@ -269,8 +287,6 @@ Route::middleware(saasMiddleware())->group(function () {
                         Route::put('/general-settings/translate/update',                'translateUpdate')->name('settings.general-settings.translate.update')->middleware('PermissionCheck:general_settings_update');
 
                     });
-
-
 
                     Route::controller(NotificaticaSettingController::class)->middleware('FeatureCheck:setting')->prefix('/')->group(function () {
 

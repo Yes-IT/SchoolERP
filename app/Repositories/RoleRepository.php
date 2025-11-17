@@ -26,6 +26,21 @@ class RoleRepository implements RoleInterface
         return $this->model->active()->get();
     }
 
+    public function custom()
+    {
+        return $this->model->customRole()->get();
+    }
+
+    public function customLatest()
+    {
+        return $this->model->customRole()->latest()->get();
+    }
+
+    public function getLatest()
+    {
+        return $this->model->latest()->get();
+    }
+
     public function getAll()
     {
         return Role::latest()->paginate(10);
@@ -36,9 +51,10 @@ class RoleRepository implements RoleInterface
         try {
             $roleStore              = new $this->model;
             $roleStore->name        = $request->name;
+            $roleStore->description = $request->description;
             $roleStore->slug        = Str::slug($request->name);
-            $roleStore->status      = $request->status;
-            $roleStore->permissions = $request->permissions;
+            $roleStore->status      = 1;
+            $roleStore->permissions = [];
             $roleStore->save();
             return true;
         } catch (\Throwable $th) {
