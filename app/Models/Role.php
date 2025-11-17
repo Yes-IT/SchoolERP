@@ -20,4 +20,32 @@ class Role extends BaseModel
     {
         return $query->where('status', \App\Enums\Status::ACTIVE);
     }
+
+    public function scopeCustomRole($query)
+    {
+        return $query->where('is_system', false);
+    }
+
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
+
+    public function rolePanelPermissions()
+    {
+        return $this->hasMany(RolePanelPermission::class);
+    }
+
+    public function panels()
+    {
+        return $this->belongsToMany(
+            Panel::class,
+            'role_panel_permissions',
+            'role_id',   // FK in pivot
+            'panel_id'   // FK to panels
+        )
+        ->select('panels.id', 'panels.name')
+        ->distinct();
+    }
+
 }

@@ -14,4 +14,9 @@ class Permission extends BaseModel
     protected $casts = [
         'keywords' => 'array',
     ];
+
+    public function module()
+    {
+        return $this->belongsTo(Module::class, 'attribute', 'slug');
+    }
 }

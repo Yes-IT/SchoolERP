@@ -14,6 +14,7 @@ use Database\Seeders\FlagIconSeeder;
 use Database\Seeders\LanguageSeeder;
 use App\Models\Academic\TimeSchedule;
 use Database\Seeders\PermissionSeeder;
+use Database\Seeders\ModulesTableSeeder;
 use Database\Seeders\Staff\StaffSeeder;
 use Database\Seeders\Fees\FeesTypeSeeder;
 use Database\Seeders\Academic\ShiftSeeder;
@@ -176,6 +177,7 @@ class DatabaseSeeder extends Seeder
                 PageSeeder::class,
                 // Library
                 CurrencySeeder::class,
+                ModulesTableSeeder::class,
             ];
 
             // Check if the module is enabled and add its seeders

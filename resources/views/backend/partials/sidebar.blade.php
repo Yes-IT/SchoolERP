@@ -116,8 +116,8 @@
                 </ul>
             </li>
 
-            <li>
-                <a href="#url">
+            <li class="{{ request()->routeIs('roles.*') ? 'active' : '' }}">
+                <a href="{{ route('roles.index') }}">
                     <img src="{{ asset('backend') }}/assets/images/new_images/superadmin-panel/sidebar-icon-11.svg"
                         alt="Sidebar Icon">
                     Assign Role

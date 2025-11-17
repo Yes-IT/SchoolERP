@@ -7,7 +7,13 @@ interface RoleInterface
 
     public function all();
 
+    public function custom();
+
+    public function customLatest();
+
     public function getAll();
+    
+    public function getLatest();
 
     public function store($request);
 
