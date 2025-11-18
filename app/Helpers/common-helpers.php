@@ -29,6 +29,17 @@ function getPagination($ITEM)
     return view('common.pagination', compact('ITEM'));
 }
 
+function currentSessionId()
+{
+    if (session()->has('session_id')) {
+        return session('session_id');
+    }
+
+    $id = Session::latest('id')->value('id');
+    session(['session_id' => $id]);
+
+    return $id;
+}
 
 function setting($name)
 {
