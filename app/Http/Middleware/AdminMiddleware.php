@@ -20,7 +20,7 @@ class AdminMiddleware
         if ((auth()->check()) && (auth()->user()->role_id == RoleEnum::ADMIN || auth()->user()->role_id == RoleEnum::SUPERADMIN || auth()->user()->role_id == RoleEnum::STAFF)) {
             return $next($request);
         } else if ((auth()->check()) && (auth()->user()->role_id == RoleEnum::TEACHER)) {
-            return redirect('instructor/dashboard')->with('error', ___('alert.You are not authorized to access this page'));
+            return redirect('staff.dashboard')->with('error', ___('alert.You are not authorized to access this page'));
         } else if ((auth()->check()) && (auth()->user()->role_id == RoleEnum::STUDENT)) {
             return redirect('student/dashboard')->with('error', ___('alert.You are not authorized to access this page'));
         } else if ((auth()->check()) && (auth()->user()->role_id == RoleEnum::GUARDIAN)) {

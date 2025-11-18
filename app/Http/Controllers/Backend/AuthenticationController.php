@@ -68,15 +68,15 @@ class AuthenticationController extends Controller
             return back()->with('danger', ___('users_roles.this_user_role_is_inactive'));
         }
         if ($this->loginRepository->login($request->all())) {
-
-            if ($user->role_id == 6)
+            if( $user->role_id == 5)
+                return redirect()->route('staff.dashboard');
+            elseif ($user->role_id == 6)
                 return redirect()->route('student_dashboard');
             elseif ($user->role_id == 7)
                 return redirect()->route('parent-panel-dashboard.index');
             elseif ($user->role_id == 8)
                 return redirect()->route('applicant.process');
             else
-
                 return redirect()->route('dashboard');
         }
 
