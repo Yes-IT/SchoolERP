@@ -116,26 +116,46 @@
                             </div>
 
                             <!-- Month and Year Selector -->
-                            <div class="dr-input-wrap">
-                                <button type="button" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false" id="toggle-date">
-                                    <span class="label" id="range-display">{{ now()->format('F, Y') }}</span>
-                                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                            <div class="dropdown date-dropdown">
+                                <button type="button" class="dropdown-toggle">
+                                    <span class="label">January, 2025</span> <i class="fa-regular fa-calendar"></i>
                                 </button>
-                                <div class="dropdown-menu datepicker-body-wrp" role="menu" aria-labelledby="toggle-date">
-                                    <div class="month-year-picker">
-                                        <select id="month-select" name="month">
-                                            <!-- Populated by JavaScript -->
-                                        </select>
-                                        <select id="year-select" name="year">
-                                            <!-- Populated by JavaScript -->
-                                        </select>
-                                        <div class="picker-actions">
-                                            <button type="button" id="btn-apply">Apply</button>
-                                            <button type="button" id="btn-cancel">Cancel</button>
-                                        </div>
+                                <div class="dropdown-menu date-menu">
+                                    <select class="year-select">
+                                        <!-- Options 2020–2030 -->
+                                        <option value="2020">2020</option>
+                                        <option value="2021">2021</option>
+                                        <option value="2022">2022</option>
+                                        <option value="2023">2023</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2025" selected>2025</option>
+                                        <option value="2026">2026</option>
+                                        <option value="2027">2027</option>
+                                        <option value="2028">2028</option>
+                                        <option value="2029">2029</option>
+                                        <option value="2030">2030</option>
+                                    </select>
+                                    <select class="month-select">
+                                        <option value="1" selected>January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                    <div class="actions">
+                                        <button type="button" class="btn-cancel">Cancel</button>
+                                        <button type="button" class="btn-apply">Apply</button>
                                     </div>
                                 </div>
                             </div>
+
                         </div>
 
                         <!-- Search Button -->
@@ -144,6 +164,7 @@
                         </div>
                     </form>
                 </div>
+                
             </div>
 
             <div class="ds-cmn-table-wrp" id="attendance-table">

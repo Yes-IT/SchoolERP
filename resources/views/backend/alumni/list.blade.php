@@ -45,7 +45,7 @@
                 <tr>
                     <td>{{ $alumni->firstItem() + $index }}</td>
                     <td>
-                        <a href="{{ route('alumni_flow.alumni-list-info', $student->id) }}">
+                        <a href="{{ route('alumni_flow.alumni_list_info', $student->id) }}">
                             {{ $student->first_name . ' ' . $student->last_name }}
                         </a>
                     </td>
@@ -65,12 +65,12 @@
                     <td>{{ $student->first_name ?? '--' }}</td>
 
                     <td>{{ $student->parent->father_name ?? '--' }}</td>
-                    <td>{{ $student->parent->guardian_address ?? '--' }}</td>
+                    <td>{{ $student->guardian_address ?? '--' }}</td>
                     <td>{{ $student->parent->parents_city ?? '--' }}</td>
                     <td>{{ $student->parent->parents_state ?? '--' }}</td>
                     <td>{{ $student->parent->parents_zipcode ?? '--' }}</td>
                     <td>{{ $student->parent->parents_country ?? '--' }}</td>
-                    <td>{{ $student->parent->parents_home_phone ?? '--' }}</td>
+                    <td>{{ $student->parent->guardian_home_phone ?? '--' }}</td>
 
                     <td>{{ $student->updated_last_name ?? '--' }}</td>
                     <td>{{ $student->updated_title_name ?? '--' }}</td>

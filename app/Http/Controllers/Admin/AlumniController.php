@@ -5,12 +5,18 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Interfaces\AlumniGalleryRepositoryInterface as InterfacesAlumniGalleryRepositoryInterface;
 use App\Interfaces\RecordedClassRepositoryInterface;
+use App\Models\Academic\Classes;
+use App\Models\Academic\Semester;
+use App\Models\Academic\YearStatus;
+use App\Models\Session;
 use App\Models\StudentInfo\Student;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use ZipArchive;
+use App\Models\StudentClassMapping;
+use App\Models\StudentInfo\SchoolDetail;
 
 class AlumniController extends Controller
 {
@@ -32,32 +38,78 @@ class AlumniController extends Controller
             return $this->getFiltered($request);
         }
 
-        $allStudents = Student::with([
-            'parent' => function ($query) {
-                $query->with([
-                    'user',
-                    'lastMessage',
-                    'unreadMessages'
-                ])->active();
-            }
-        ])
-        ->selectRaw("CONCAT(first_name, ' ', last_name) as name")
-        ->distinct()
-        ->get();
+        $years = Session::orderByDesc('id') ->get();
+        $yearStatuses = YearStatus::orderByDesc('id') ->get();
+        $semesters = Semester::orderByDesc('id')->get();
 
-        return view('backend.alumni.index', compact('allStudents'));
+        $allStudents = Student::with([
+                'parent' => fn($q) => $q->with('user')->active()
+            ])
+            ->selectRaw("CONCAT(first_name, ' ', last_name) as name")
+            ->distinct()
+            ->get();
+
+        return view('backend.alumni.index', compact(
+            'allStudents',
+            'years',
+            'yearStatuses',
+            'semesters'
+        ));
     }
+
 
     public function getFiltered(Request $request)
     {
-        $perPage = $request->query('per_page', 10); // default 10
-        $query = Student::query();
+        $perPage = $request->query('per_page', 10);
+
+        // -------------------------------------------------
+        // 1. Build the query with school details
+        // -------------------------------------------------
+        $query = Student::query()
+            ->join('student_class_mapping', 'students.id', '=', 'student_class_mapping.student_id')
+            ->join('classes', 'student_class_mapping.class_id', '=', 'classes.id')
+            ->leftJoin('sessions', 'classes.session_id', '=', 'sessions.id')
+            ->leftJoin('year_status', 'classes.year_status_id', '=', 'year_status.id')  // Fixed
+            ->leftJoin('semesters', 'classes.semester_id', '=', 'semesters.id')
+            ->leftJoin('school_details', 'students.id', '=', 'school_details.student_id') 
+            ->leftJoin('parent_guardians', 'students.id', '=', 'parent_guardians.student_id')
+            ->select([
+                'students.*',
+                'classes.name as class_name',
+                'classes.abbreviation as class_abbr',
+                'sessions.name as session_name',
+                'year_status.name as year_status_name',
+                'semesters.name as semester_name',
+                'school_details.*',
+                'parent_guardians.*',
+            ])
+            ->distinct();
+
+        // -------------------------------------------------
+        // 2. Apply filters
+        // -------------------------------------------------
 
         if ($studentName = $request->query('student_name')) {
-            $query->whereRaw("CONCAT(first_name, ' ', last_name) = ?", [$studentName]);
+            $query->whereRaw("CONCAT(students.first_name, ' ', students.last_name) = ?", [$studentName]);
         }
 
-        // Use paginate instead of manually creating paginator
+        if ($schoolYear = $request->query('school_year')) {
+            $query->where('classes.session_id', $schoolYear);
+        }
+
+        if ($yearStatus = $request->query('year_status')) {
+            $query->where('classes.year_status_id', $yearStatus);
+        }
+
+        if ($semester = $request->query('semester')) {
+            $query->where('classes.semester_id', $semester);
+        }
+
+        $query->where('student_class_mapping.status', 1);
+
+        // -------------------------------------------------
+        // 3. Paginate & render
+        // -------------------------------------------------
         $alumni = $query->paginate($perPage)->appends($request->query());
 
         $html = view('backend.alumni.list', compact('alumni', 'perPage'))->render();
@@ -70,16 +122,14 @@ class AlumniController extends Controller
     {
         $alumniInfo = Student::with([
             'parent' => function ($query) {
-                $query->with([
-                    'user',
-                    'lastMessage',
-                    'unreadMessages'
-                ])->active();
-            }
+                $query->with(['user'])->active();
+            },
+            'schoolDetail'
         ])->findOrFail($id);
 
         return view('backend.alumni.alumni-list-info', compact('alumniInfo'));
     }
+
 
     public function gallery()
     {

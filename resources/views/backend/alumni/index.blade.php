@@ -33,21 +33,30 @@
                             <div class="input-grp">
                                 <select name="school_year" id="school_year">
                                     <option value="">Select Year</option>
-                                    <option value="2024" {{ request('school_year') == '2024' ? 'selected' : '' }}>2024</option>
+                                    @foreach ($years as $year)
+                                        <option value="{{ $year->id }}">{{ $year->name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
+
                             <div class="input-grp">
                                 <select name="year_status" id="year_status">
                                     <option value="">Select Year Status</option>
-                                    <option value="Graduated" {{ request('year_status') == 'Graduated' ? 'selected' : '' }}>Graduated</option>
+                                    @foreach ($yearStatuses as $ys)
+                                        <option value="{{ $ys->id }}">{{ $ys->name ?? $ys->year }}</option>
+                                    @endforeach
                                 </select>
                             </div>
+
                             <div class="input-grp">
                                 <select name="semester" id="semester">
                                     <option value="">Select Semester</option>
-                                    <option value="2024" {{ request('semester') == '2024' ? 'selected' : '' }}>2024</option>
+                                    @foreach ($semesters as $sem)
+                                        <option value="{{ $sem->id }}">{{ $sem->name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
+
                         </div>
                         <!-- Search Button -->
                         <button type="submit" class="btn-search">Search</button>

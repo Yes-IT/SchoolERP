@@ -30,6 +30,21 @@ class RoomManagementController extends Controller
         return view('backend.room-management.room-availability');
     }
 
+    public function getRoomAvailability(Request $request)
+    {
+        $request->validate([
+            'from_date' => 'required|date_format:Y-m-d',
+            'to_date'   => 'required|date_format:Y-m-d|after_or_equal:from_date'
+        ]);
+
+        $data = $this->roomRepository->getAvailabilityGrid(
+            $request->from_date,
+            $request->to_date
+        );
+
+        return response()->json($data);
+    }
+
     public function storeRoom(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -121,4 +136,5 @@ class RoomManagementController extends Controller
             ], 404);
         }
     }
+
 }
