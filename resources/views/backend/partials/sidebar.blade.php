@@ -103,16 +103,16 @@
                     Subject
                 </a>
             </li>
-            <li class="menu-item-has-children {{ request()->routeIs('attendance.*') ? 'active' : '' }}">
-                <a href="{{ route('alumni_flow.index') }}">
-                    <img src="{{ asset('backend') }}/assets/images/new_images/superadmin-panel/sidebar-icon-10.svg"
-                        alt="Sidebar Icon">
+
+            <li class="menu-item-has-children {{ request()->routeIs('daily.index','monthl.index') ? 'active' : '' }}">
+                <a href="{{ route('daily.index') }}">
+                    <img src="{{ asset('backend') }}/assets/images/new_images/superadmin-panel/sidebar-icon-10.svg" alt="Sidebar Icon">
                     Attendance
-                </a>
+                </a><span class="clickD"></span>
                 <ul class="sub-menu">
-                    <li><a href="{{ route('attendance.index') }}">Attendance View</a></li>
-                    <li><a href="{{ route('attendance.report') }}">Attendance Report</a></li>
-                    <li><a href="{{ route('alumni_flow.alumni_gallery') }}">Attendance Submission Tracker</a></li>
+                    <li><a href="{{ route('daily.index') }}">Attendance View</a></li>
+                    <li><a href="{{ route('student-report.index') }}">Attendance Report</a></li>
+                    <li><a href="{{ route('submission-tracker.index') }}">Attendance Submission Tracker</a></li>
                 </ul>
             </li>
 

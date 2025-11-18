@@ -2,6 +2,7 @@
 @section('title')
     Attendance Management
 @endsection
+
 @section('content')
     <!-- Dashboard Body Begin -->
     <div class="dashboard-body dspr-body-outer">
@@ -15,135 +16,115 @@
 
             <div class="dropdown-year" data-selected="Subject Grade Report">
                 <div class="dropdown-trigger" aria-expanded="false">
-                    <span class="dropdown-label">
-                        Daily Attendance
-                    </span>
+                    <span class="dropdown-label">Daily Attendance</span>
                     <i class="dropdown-arrow"></i>
                 </div>
                 <div class="dropdown-options">
-                    <div class="dropdown-option {{ request()->routeIs('daily.index') ? 'active' : '' }}" 
-                        data-url="{{ route('daily.index') }}">
-                        Daily Attendance
-                    </div>
-                    <div class="dropdown-option {{ request()->routeIs('monthly.index') ? 'active' : '' }}" 
-                        data-url="{{ route('monthly.index') }}">
-                        Monthly Attendance
-                    </div>
-                    <div class="dropdown-option {{ request()->routeIs('total.index') ? 'active' : '' }}" 
-                        data-url="{{ route('total.index') }}">
-                        Semester Total Attendance
-                    </div>
+                    <div class="dropdown-option {{ request()->routeIs('daily.index') ? 'active' : '' }}"
+                         data-url="{{ route('daily.index') }}">Daily Attendance</div>
+                    <div class="dropdown-option {{ request()->routeIs('monthly.index') ? 'active' : '' }}"
+                         data-url="{{ route('monthly.index') }}">Monthly Attendance</div>
+                    <div class="dropdown-option {{ request()->routeIs('total.index') ? 'active' : '' }}"
+                         data-url="{{ route('total.index') }}">Semester Total Attendance</div>
                 </div>
             </div>
-
         </div>
+
         <div class="ds-pr-body">
             <div class="atndnc-filter-wrp w-100">
-                <div class="sec-head">
-                    <h2>Select Criteria</h2>
-                </div>
-                
+                <div class="sec-head"><h2>Select Criteria</h2></div>
+
                 <div class="atndnc-filter">
                     <form class="atndnc-filter-form" id="attendance-filter-form">
                         @csrf
+
+                        {{-- ====================== FIRST ROW ====================== --}}
                         <div class="atndnc-filter-options">
-                            <!-- Select Year -->
-                            <div class="dropdown year-dropdown" style="width: 160px;">
-                                <button type="button" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false" id="toggle-year">
+                            {{-- Year (radio) --}}
+                            <div class="dropdown year-dropdown">
+                                <button type="button" class="dropdown-toggle" id="toggle-year">
                                     <span class="label">Select Year</span>
-                                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-chevron-down"></i>
                                 </button>
                                 <div class="dropdown-menu" role="menu" aria-labelledby="toggle-year">
                                     <label><input type="radio" name="school_year" value=""> All Years</label>
                                     @foreach($schoolYears as $year)
-                                        <label><input type="radio" name="school_year" value="{{ $year->id }}">&nbsp;{{ $year->name }}</label>
+                                        <label><input type="radio" name="school_year" value="{{ $year->id }}">
+                                            &nbsp;{{ $year->name }}</label>
                                     @endforeach
                                 </div>
                             </div>
 
-                            <!-- Select Year Status -->
+                            {{-- Year Status (radio) --}}
                             <div class="dropdown year-status-dropdown">
-                                <button type="button" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false" id="toggle-year-status">
+                                <button type="button" class="dropdown-toggle" id="toggle-year-status">
                                     <span class="label">Select Year Status</span>
-                                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-chevron-down"></i>
                                 </button>
                                 <div class="dropdown-menu" role="menu" aria-labelledby="toggle-year-status">
                                     <label><input type="radio" name="year_status" value=""> All Statuses</label>
                                     @foreach($yearStatuses as $status)
-                                        <label><input type="radio" name="year_status" value="{{ $status->id }}">&nbsp;{{ $status->name }}</label>
+                                        <label><input type="radio" name="year_status" value="{{ $status->id }}">
+                                            &nbsp;{{ $status->name }}</label>
                                     @endforeach
                                 </div>
                             </div>
 
-                            <!-- Select Semester -->
+                            {{-- Semester (radio) --}}
                             <div class="dropdown semester-dropdown">
-                                <button type="button" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false" id="toggle-semester">
+                                <button type="button" class="dropdown-toggle" id="toggle-semester">
                                     <span class="label">Select Semester</span>
-                                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-chevron-down"></i>
                                 </button>
                                 <div class="dropdown-menu" role="menu" aria-labelledby="toggle-semester">
                                     <label><input type="radio" name="semester" value=""> All Semesters</label>
                                     @foreach($semesters as $semester)
-                                        <label><input type="radio" name="semester" value="{{ $semester->id }}">&nbsp;{{ $semester->name }}</label>
+                                        <label><input type="radio" name="semester" value="{{ $semester->id }}">
+                                            &nbsp;{{ $semester->name }}</label>
                                     @endforeach
                                 </div>
                             </div>
                         </div>
 
+                        {{-- ====================== SECOND ROW ====================== --}}
                         <div class="atndnc-filter-options">
-                            <!-- Select Class -->
+                            {{-- Class (radio) --}}
                             <div class="dropdown class-dropdown">
-                                <button type="button" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false" id="toggle-class">
+                                <button type="button" class="dropdown-toggle" id="toggle-class">
                                     <span class="label">Select Class</span>
-                                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-chevron-down"></i>
                                 </button>
                                 <div class="dropdown-menu" role="menu" aria-labelledby="toggle-class">
                                     <label><input type="radio" name="class_id" value=""> All Classes</label>
                                     @foreach($classes as $class)
-                                        <label><input type="radio" name="class_id" value="{{ $class->id }}">&nbsp;{{ $class->name }}</label>
+                                        <label><input type="radio" name="class_id" value="{{ $class->id }}">
+                                            &nbsp;{{ $class->name }}</label>
                                     @endforeach
                                 </div>
                             </div>
 
-                            <!-- Select Subject -->
-                            <div class="dropdown subject-dropdown" style="width:180px;">
-                                <button type="button" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false" id="toggle-subject">
+                            {{-- Subject (radio) --}}
+                            <div class="dropdown subject-dropdown">
+                                <button type="button" class="dropdown-toggle" id="toggle-subject">
                                     <span class="label">Select Subject</span>
-                                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-chevron-down"></i>
                                 </button>
                                 <div class="dropdown-menu" role="menu" aria-labelledby="toggle-subject">
-                                    <label><input type="checkbox" name="subject_id[]" value="all" checked> All Subjects</label>
+                                    <label><input type="radio" name="subject_id" value=""> All Subjects</label>
                                     @foreach($subjects as $subject)
-                                        <label><input type="checkbox" name="subject_id[]" value="{{ $subject->id }}">&nbsp;{{ $subject->name }}</label>
+                                        <label><input type="radio" name="subject_id" value="{{ $subject->id }}">
+                                            &nbsp;{{ $subject->name }}</label>
                                     @endforeach
                                 </div>
                             </div>
 
-                            <!-- Date Input -->
-                            <div class="dr-input-wrap">
-                                <div class="classes-schedule-filter">
-                                    <div class="datepicker">
-                                        <div class="datepicker__header">
-                                            <img src="{{ asset('backend/assets/images/calender-icon.svg') }}" alt="Icon">
-                                            <span id="range-display"> Jan, 2025</span>
-                                        </div>
-                                        <div class="datepicker-body-wrp">
-                                            <div class="datepicker__body">
-                                                <select id="year-select" name="year"></select>
-                                                <select id="month-select" name="month"></select>
-                                                <select id="week-select" name="week"></select>
-                                            </div>
-                                            <div class="datepicker__footer">
-                                                <button class="datepicker__btn datepicker__btn--cancel cmn-btn" id="btn-cancel">Cancel</button>
-                                                <button class="datepicker__btn datepicker__btn--apply cmn-btn" id="btn-apply">Apply</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                            {{-- Single Date Picker --}}
+                            <div>
+                                <input type="date" id="date" name="date" class="form-control">
                             </div>
                         </div>
 
-                        <!-- Search Button -->
+                        {{-- Search Button --}}
                         <div class="atndnc-filter-actions">
                             <button type="submit" class="btn-search">Search</button>
                         </div>
@@ -152,53 +133,48 @@
             </div>
 
             <div class="ds-cmn-table-wrp" id="attendance-table">
-                {{-- @include('backend.attendance.partials.daily_attendance_list', ['data' => ['attendance' => []]]) --}}
+                {{-- Initial empty table will be filled by AJAX --}}
             </div>
         </div>
     </div>
     <!-- Dashboard Body End -->
-
-    @endsection
+@endsection
 
 @push('script')
-
 <script>
-    $(document).ready(function() {
-        // Load initial data
+    $(document).ready(function () {
+        /* --------------------------------------------------------------
+           1. INITIAL LOAD
+        -------------------------------------------------------------- */
         loadAttendanceData();
 
-        // Handle attendance type dropdown page change
-        $('.dropdown-options .dropdown-option').on('click', function() {
+        /* --------------------------------------------------------------
+           2. ATTENDANCE TYPE DROPDOWN (Daily / Monthly / Total)
+        -------------------------------------------------------------- */
+        $('.dropdown-options .dropdown-option').on('click', function () {
             const url = $(this).data('url');
-            if (url) {
-                window.location.href = url;
-            }
+            if (url) window.location.href = url;
         });
 
-        // Form submission
-        $('#attendance-filter-form').on('submit', function(e) {
+        /* --------------------------------------------------------------
+           3. FILTER FORM SUBMIT
+        -------------------------------------------------------------- */
+        $('#attendance-filter-form').on('submit', function (e) {
             e.preventDefault();
-            loadAttendanceData();
+            loadAttendanceData();               // <-- AJAX call
         });
 
-        // Handle attendance type change
-        $('#attendance-type').on('change', function() {
-            loadAttendanceData();
-        });
-
-        // Function to load attendance data
+        /* --------------------------------------------------------------
+           4. MAIN AJAX FUNCTION
+        -------------------------------------------------------------- */
         function loadAttendanceData(url = '{{ route("daily.search") }}') {
+            // Serialize ONLY the checked radios + other inputs
             let formData = $('#attendance-filter-form').serialize();
-            formData += '&attendance_type=' + $('#attendance-type').val();
 
-            // Include per_page value if present
-            let perPage = $('select[name="per_page"]').val() || '{{ request("per_page", 2) }}';
-            formData += '&per_page=' + perPage;
-
-            // Extract query parameters from URL (for pagination)
+            // Preserve pagination / per_page from URL (if any)
             if (url.includes('?')) {
-                let queryString = url.split('?')[1];
-                formData += '&' + queryString; // Append page and other query params
+                const query = url.split('?')[1];
+                formData += (formData ? '&' : '') + query;
             }
 
             $.ajax({
@@ -206,45 +182,74 @@
                 type: 'POST',
                 data: formData,
                 headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Ensure CSRF token
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                success: function(response) {
+                success: function (response) {
                     $('#attendance-table').html(response.data);
-                    // $('.tbl-pagination-inr').html(response.pagination);
                     attachPaginationListeners();
                     attachPerPageListener();
                 },
-                error: function(xhr) {
-                    console.log('Error:', xhr.responseText);
-                    alert('An error occurred while loading data. Please try again.');
+                error: function (xhr) {
+                    console.error('AJAX Error:', xhr);
+                    alert('Failed to load attendance data. Check console.');
                 }
             });
         }
 
-        // Function to attach click listeners to pagination links
+        /* --------------------------------------------------------------
+           5. PAGINATION LINKS
+        -------------------------------------------------------------- */
         function attachPaginationListeners() {
-            $('.tbl-pagination-inr a').off('click').on('click', function(e) {
+            $('.tbl-pagination-inr a').off('click').on('click', function (e) {
                 e.preventDefault();
-                const url = $(this).attr('href');
-                loadAttendanceData(url);
+                const href = $(this).attr('href');
+                loadAttendanceData(href);
             });
         }
 
-        // Function to attach change listener to per-page select
+        /* --------------------------------------------------------------
+           6. PER-PAGE SELECT (if you have one inside the table)
+        -------------------------------------------------------------- */
         function attachPerPageListener() {
-            const perPageSelect = $('select[name="per_page"]');
-            if (perPageSelect.length) {
-                perPageSelect.off('change').on('change', function() {
-                    loadAttendanceData(); // Reload with new per_page value
+            const $perPage = $('select[name="per_page"]');
+            if ($perPage.length) {
+                $perPage.off('change').on('change', function () {
+                    loadAttendanceData();   // reload with new per_page
                 });
             }
         }
 
-        // Initialize
-        populateDatepicker();
-        attachPaginationListeners();
-        attachPerPageListener();
-        
+        /* --------------------------------------------------------------
+           7. OPTIONAL: Keep dropdown label in sync with selected radio
+        -------------------------------------------------------------- */
+        $('.dropdown').each(function () {
+            const $dd = $(this);
+            const $toggle = $dd.find('.dropdown-toggle .label');
+            const $menu   = $dd.find('.dropdown-menu');
+
+            // open/close
+            $dd.find('.dropdown-toggle').on('click', function () {
+                $menu.toggleClass('show');
+            });
+
+            // select radio → update button text
+            $menu.find('input[type="radio"]').on('change', function () {
+                const text = $(this).parent().text().trim();
+                $toggle.text(text || $toggle.data('default') || 'Select');
+                $menu.removeClass('show');
+            });
+
+            // set default text
+            const checked = $menu.find('input[type="radio"]:checked').parent().text().trim();
+            if (checked) $toggle.text(checked);
+        });
+
+        // close dropdowns when clicking outside
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('.dropdown').length) {
+                $('.dropdown-menu.show').removeClass('show');
+            }
+        });
     });
 </script>
 

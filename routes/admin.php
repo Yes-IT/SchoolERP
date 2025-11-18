@@ -186,6 +186,7 @@ Route::middleware(saasMiddleware())->group(function () {
                 Route::prefix('room-management')->controller(RoomManagementController::class)->group(function () {
                     Route::get('/', 'index')->name('room_management.index')->middleware('PermissionCheck:room_management_read');
                     Route::get('/room_availability', 'room_availability')->name('room_management.room_availability')->middleware('PermissionCheck:room_management_read');
+                    Route::post('/room_availability/data', 'getRoomAvailability')->name('room_management.availability.data')->middleware('PermissionCheck:room_management_read');
                     Route::post('/', 'storeRoom')->name('room_management.store')->middleware('PermissionCheck:room_management_create');
                     Route::get('/{id}', 'show')->name('room_management.show')->middleware('PermissionCheck:room_management_read');
                     Route::put('/{id}', 'update')->name('room_management.update')->middleware('PermissionCheck:room_management_update');

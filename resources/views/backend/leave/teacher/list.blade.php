@@ -16,7 +16,7 @@
             @forelse ($pendingLeaves as $index => $leave)
                 <tr>
                     <td style="color: #000">{{ $pendingLeaves->firstItem() + $index }}</td>
-                    <td>{{ $leave->teacher ? $leave->teacher->full_name : 'N/A' }}</td>
+                    <td>{{ $leave->teacher_first_name ?? 'N/A' }} {{ $leave->teacher_last_name ?? 'N/A' }}</td>
                     <td>{{ \Carbon\Carbon::parse($leave->apply_date)->format('d/m/Y') }}</td>
                     <td>{{ \Carbon\Carbon::parse($leave->from_date)->format('d/m/Y') }}</td>
                     <td>{{ \Carbon\Carbon::parse($leave->to_date)->format('d/m/Y') }}</td>
@@ -59,7 +59,7 @@
             @forelse ($appliedLeaves as $index => $leave)
                 <tr>
                     <td style="color: #000">{{ $appliedLeaves->firstItem() + $index }}</td>
-                    <td>{{ $leave->teacher ? $leave->teacher->full_name : 'N/A' }}</td>
+                    <td>{{ $leave->teacher->first_name ?? 'N/A' }} {{ $leave->teacher->last_name ?? 'N/A' }}</td>
                     <td>{{ \Carbon\Carbon::parse($leave->apply_date)->format('d/m/Y') }}</td>
                     <td>{{ \Carbon\Carbon::parse($leave->from_date)->format('d/m/Y') }}</td>
                     <td>{{ \Carbon\Carbon::parse($leave->to_date)->format('d/m/Y') }}</td>

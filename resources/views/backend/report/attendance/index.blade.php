@@ -107,9 +107,8 @@
                             <div class="input-grp">
                                 <label for="export_format">Export Format</label>
                                 <select id="export_format" name="export_format" required>
-                                    <option value="" disabled selected>Pdf Document</option>
-                                    <option value="pdf">PDF</option>
-                                    <option value="excel">Excel</option>
+                                    <option value="">Pdf Document</option>
+                                    <option value="pdf" selected>PDF</option>
                                 </select>
                             </div>
 
@@ -173,6 +172,8 @@
     <!-- Dashboard Body End -->
 @endsection
 
+@include('backend.partials.alert-message')
+
 @push('script')
 
     <script>
@@ -233,8 +234,8 @@
                 }
 
                 // ---- Disable buttons ----
-                $('.generate-btn').prop('disabled', true).text('Generating...');
-                $('#print_preview_btn').prop('disabled', true).text('Preparing...');
+                // $('.generate-btn').prop('disabled', true).text('Generating...');
+                // $('#print_preview_btn').prop('disabled', true).text('Preparing...');
 
                 $.ajax({
                     url: '{{ route("attendance.reports.generate") }}',

@@ -3,6 +3,71 @@
     {{ $data['title'] }}
 @endsection
 @section('content')
+
+<style>
+    .tablist-below {
+        display: flex;
+        align-items: center;
+        border-radius: 5px;
+        margin: 24px 0 20px;
+        overflow: hidden;
+        background: var(--secondary-clr);
+    }
+    
+    .tablist-below button {
+        background: transparent;
+        border: 0;
+        padding: 5px 12px;
+        margin: 0;
+        width: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        color: var(--text-clr);
+        transition: all ease-in-out .3s;
+        font-size: 15px;
+    }
+
+    .tablist-below button:first-child {
+        border-right: 1px solid var(--primary-clr);
+    }
+
+    .tablist-below button:hover,
+    .tablist-below button.active {
+        color: var(--white);
+        background: var(--primary-clr);
+    }
+
+    .tablist-below button img {
+        transition: all ease-in-out .3s;
+    }
+
+    .tablist-below button:hover img,
+    .tablist-below button.active img {
+        filter: brightness(0) invert(1);
+    }
+
+    /* Responsive font size adjustments */
+    @media screen and (min-width:1201px) and (max-width:1400px) {
+        .tablist-below button {
+            font-size: 12px;
+        }
+    }
+
+    @media screen and (min-width:901px) and (max-width:1200px) {
+        .tablist-below button {
+            font-size: 10px;
+        }
+    }
+
+    @media screen and (min-width:600px) and (max-width:900px) {
+        .tablist-below button {
+            font-size: 9px;
+        }
+    }
+</style>
+
     <div class="login-flow has-texture">
         <div class="container">
             <div class="textures">
@@ -37,15 +102,36 @@
                                     </div>
                                     <button type="submit" class="btn-submit">Submit <i class="fa-solid fa-arrow-right"></i></button>
                                 </form>
-                                <div role="tablist" aria-label="Login type" class="tablist-container">
-                                    <button role="tab" id="tab-student" aria-selected="true" aria-controls="panel-student" class="active" tabindex="0">
-                                        <img src="{{ asset('backend') }}/assets/images/new_images/user-icon.svg" alt="icon"> Student
+                                <!-- Student / Parent / Alumni Tabs -->
+                                <div role="tablist" aria-label="Student login type" class="tablist-container">
+                                    <button role="tab" id="tab-student"   aria-selected="true"  aria-controls="panel-student"   class="active" tabindex="0">
+                                        <img src="{{ asset('backend') }}/assets/images/new_images/user-icon.svg" alt="Student icon"> Student
                                     </button>
-                                    <button role="tab" id="tab-parent" aria-selected="false" aria-controls="panel-parent" tabindex="-1">
-                                        <img src="{{ asset('backend') }}/assets/images/new_images/multi-user-icon.svg" alt="Icon"> Parent
+                                    <button role="tab" id="tab-parent"    aria-selected="false" aria-controls="panel-parent"    class="" tabindex="-1">
+                                        <img src="{{ asset('backend') }}/assets/images/new_images/multi-user-icon.svg" alt="Parent icon"> Parent
                                     </button>
-                                    <button role="tab" id="tab-alumni" aria-selected="false" aria-controls="panel-alumni" tabindex="-1">
-                                        <img src="{{ asset('backend') }}/assets/images/new_images/alumni-icon.svg" alt="Icon"> Alumni
+                                    <button role="tab" id="tab-alumni"    aria-selected="false" aria-controls="panel-alumni"    class="" tabindex="-1">
+                                        <img src="{{ asset('backend') }}/assets/images/new_images/alumni-icon.svg" alt="Alumni icon"> Alumni
+                                    </button>
+                                </div>
+
+                                <!-- Teacher / Dormitory Tabs -->
+                                <div role="tablist" aria-label="Staff login type" class="tablist-container">
+                                    <button role="tab" id="tab-teacher"    aria-selected="true"  aria-controls="panel-teacher"    class="" tabindex="0">
+                                        <img src="{{ asset('staff') }}/assets/images/teacher.svg" alt="Teacher icon"> Teacher
+                                    </button>
+                                    <button role="tab" id="tab-dormitory"  aria-selected="false" aria-controls="panel-dormitory"  class="" tabindex="-1">
+                                        <img src="{{ asset('staff') }}/assets/images/Dormitory.svg" alt="Dormitory icon"> Dormitory
+                                    </button>
+                                </div>
+
+                                <!-- Chinuch & Administration / Executive Tabs -->
+                                <div role="tablist" aria-label="Administration login type" class="tablist-below">
+                                    <button role="tab" id="tab-chinuch"     aria-selected="true"  aria-controls="panel-chinuch"     class="" tabindex="0">
+                                        <img src="{{ asset('staff') }}/assets/images/Group.svg" alt="Chinuch icon"> Chinuch &amp; Administration
+                                    </button>
+                                    <button role="tab" id="tab-executive"   aria-selected="false" aria-controls="panel-executive"   class="" tabindex="-1">
+                                        <img src="{{ asset('staff') }}/assets/images/executive.svg" alt="Executive icon"> Executive
                                     </button>
                                 </div>
                                 <p class="forgot-password">

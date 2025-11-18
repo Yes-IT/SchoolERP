@@ -115,8 +115,6 @@
                                 </div>
                             </div>
 
-                            <!-- Month and Year Selector -->
-                            
                         </div>
 
                         <!-- Search Button -->
@@ -133,4 +131,105 @@
             
         </div>
     </div>
+
 @endsection
+
+
+@push('script')
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('attendance-filter-form');
+        const tableContainer = document.getElementById('attendance-table');
+
+        // Handle form submission
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            searchAttendance();
+        });
+
+        // Handle pagination clicks
+        document.addEventListener('click', function (e) {
+            if (e.target.closest('.pagination a')) {
+                e.preventDefault();
+                const url = e.target.closest('a').getAttribute('href');
+                searchAttendance(url);
+            }
+        });
+
+        // Handle student dropdown change in the partial
+        tableContainer.addEventListener('change', function (e) {
+            if (e.target.closest('.student-dropdown input[name="student_id"]')) {
+                searchAttendance(); // Trigger search when student filter changes
+            }
+        });
+
+        function searchAttendance(url = '{{ route('total.search') }}') {
+            const formData = new FormData(form);
+            
+            // Append student_id from the partial if selected
+            const studentInput = document.querySelector('input[name="student_id"]:checked');
+            if (studentInput) {
+                formData.append('student_id', studentInput.value);
+            }
+
+            // Show loading state
+            // tableContainer.innerHTML = '<div>Loading...</div>';
+
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || 
+                        document.querySelector('input[name="_token"]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update table content
+                tableContainer.innerHTML = data.data;
+                // Update pagination links
+                const paginationContainer = tableContainer.querySelector('.pagination');
+                if (paginationContainer) {
+                    paginationContainer.outerHTML = data.pagination;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                tableContainer.innerHTML = '<div>Error loading data. Please try again.</div>';
+            });
+        }
+
+        // Handle dropdown label updates (for better UX)
+        document.querySelectorAll('.dropdown-menu input').forEach(input => {
+            input.addEventListener('change', function () {
+                const dropdown = this.closest('.dropdown');
+                const label = dropdown.querySelector('.dropdown-toggle .label');
+                const checkedInputs = dropdown.querySelectorAll('input:checked');
+                let selectedText = 'Select Option';
+
+                if (this.type === 'checkbox') {
+                    // For subjects (checkboxes)
+                    if (checkedInputs.length === 0 || (checkedInputs.length === 1 && checkedInputs[0].value === 'all')) {
+                        selectedText = 'All Subjects';
+                    } else {
+                        const labels = Array.from(checkedInputs)
+                            .filter(input => input.value !== 'all')
+                            .map(input => input.parentElement.textContent.trim());
+                        selectedText = labels.length > 0 ? labels.join(', ') : 'Select Subject';
+                    }
+                } else {
+                    // For radio inputs
+                    selectedText = checkedInputs.length > 0 
+                        ? checkedInputs[0].parentElement.textContent.trim() 
+                        : dropdown.querySelector('.label').textContent;
+                }
+
+                label.textContent = selectedText.length > 20 ? selectedText.substring(0, 17) + '...' : selectedText;
+            });
+        });
+    });
+</script>
+
+@endpush

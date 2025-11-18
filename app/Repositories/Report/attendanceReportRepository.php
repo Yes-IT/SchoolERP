@@ -234,25 +234,100 @@ class AttendanceReportRepository implements AttendanceReportInterface
         ];
     }
 
+
     protected function handleExcessiveAbsenceClass(array $data): array
     {
-        $threshold = $data['absence_threshold'] ?? 15;
-        $classes = Classes::whereHas('attendances', function ($q) use ($data, $threshold) {
-            $q->where('session_id', $data['school_year'])
-              ->where('year_status_id', $data['year_status'])
-              ->where('semester_id', $data['semester'])
-              ->where('attendance', 4)
-              ->groupBy('class_id')
-              ->havingRaw('COUNT(*) > ?', [$threshold]);
-        })->get();
+        $start = Carbon::parse($data['start_date']);
+        $end   = Carbon::parse($data['end_date']);
 
+        // -------------------------------------------------
+        // 1. Get ONE sample to determine class_id
+        // -------------------------------------------------
+        $sample = Attendance::where('session_id', $data['school_year'])
+            ->where('year_status_id', $data['year_status'])
+            ->where('semester_id', $data['semester'])
+            ->whereBetween('date', [$start, $end])
+            ->first();
+
+        if (!$sample) {
+            return [
+                'viewData' => [
+                    'class'        => null,
+                    'students'     => collect(),
+                    'semesterName' => Semester::find($data['semester'])->name ?? 'N/A',
+                    'noData'       => true,
+                    'dateRange'    => [
+                        'start' => $start->format('d M Y'),
+                        'end'   => $end->format('d M Y'),
+                    ],
+                ],
+                'filename_id' => 'no_data',
+            ];
+        }
+
+        $classId = $sample->classes_id;
+        $class   = Classes::find($classId);
+
+        // -------------------------------------------------
+        // 2. Query attendance stats per student in this class
+        // -------------------------------------------------
+        $stats = Attendance::selectRaw('
+                student_id,
+                COUNT(CASE WHEN attendance = 1 THEN 1 END) as present,
+                COUNT(CASE WHEN attendance = 3 THEN 1 END) as late,
+                COUNT(*) as total
+            ')
+            ->where('classes_id', $classId)
+            ->where('session_id', $data['school_year'])
+            ->where('year_status_id', $data['year_status'])
+            ->where('semester_id', $data['semester'])
+            ->whereBetween('date', [$start, $end])
+            ->groupBy('student_id')
+            ->get();
+
+        // -------------------------------------------------
+        // 3. Load all students in the class (to include those with 0 attendance)
+        // -------------------------------------------------
+        $allStudents = Student::select('id', 'first_name', 'last_name', 'admission_no')
+            ->get()
+            ->keyBy('id');
+
+        // -------------------------------------------------
+        // 4. Merge stats with student info + calculate percentage
+        // -------------------------------------------------
+        $students = $allStudents->map(function ($student) use ($stats) {
+            $stat = $stats->firstWhere('student_id', $student->id);
+
+            $P       = $stat->present ?? 0;
+            $P_star  = $stat->late ?? 0;
+            $total   = $stat->total ?? 0;
+
+            $percent = $total > 0 ? round((($P + $P_star) / $total) * 100, 1) . '%' : '0%';
+
+            return [
+                'student' => $student,
+                'P'       => $P,
+                'P_star'  => $P_star,
+                'percent' => $percent,
+                'total'   => $total,
+            ];
+        })->values();
+
+        // -------------------------------------------------
+        // 5. Return correct filename_id = class_id
+        // -------------------------------------------------
         return [
             'viewData' => [
-                'classes' => $classes,
-                'threshold' => $threshold,
-                'semesterName' => Semester::find($data['semester'])->name,
+                'class'        => $class,
+                'students'     => $students,
+                'semesterName' => Semester::find($data['semester'])->name ?? 'N/A',
+                'noData'       => false,
+                'dateRange'    => [
+                    'start' => $start->format('d M Y'),
+                    'end'   => $end->format('d M Y'),
+                ],
             ],
-            'filename_id' => 'excessive_class'
+            'filename_id' => $classId, // Fixed: now uses actual class ID
         ];
     }
 

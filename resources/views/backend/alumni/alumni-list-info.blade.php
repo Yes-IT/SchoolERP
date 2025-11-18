@@ -202,45 +202,43 @@
                     <tbody>
                       <tr>
                         <td class="td-lineremover" >ID</td>
-                        <td class="td-lineremover" >2356</td>
+                        <td class="td-lineremover" >{{ $alumniInfo->schoolDetail->id ?? '--'  }}</td>
                       </tr>
                       <tr>
                         <td class="td-lineremover" >School Year</td>
-                        <td class="td-lineremover" >2023-2024</td>
+                        <td class="td-lineremover" >{{ $alumniInfo->schoolDetail->school_year ?? '--'  }}</td>
                       </tr>
                       <tr>
                         <td class="td-lineremover" >Year Status</td>
-                        <td class="td-lineremover" >Shana Alef</td>
+                        <td class="td-lineremover" >{{ $alumniInfo->schoolDetail->year_status ?? '--'  }}</td>
                       </tr>
                       <tr>
                         <td class="td-lineremover" >College</td>
-                        <td class="td-lineremover" >Charter Oak</td>
+                        <td class="td-lineremover" >{{ $alumniInfo->schoolDetail->college ?? '--'  }}</td>
                       </tr>
                       <tr>
                         <td class="td-lineremover" >Withdraw Date</td>
-                        <td class="td-lineremover" >--</td>
+                        <td class="td-lineremover" >{{ $alumniInfo->schoolDetail->withdraw_date ?? '--'  }}</td>
                       </tr>
                       <tr>
                         <td class="td-lineremover" >Homeroom Class</td>
-                        <td class="td-lineremover" >ג</td>
+                        <td class="td-lineremover" >{{ $alumniInfo->schoolDetail->homeroom_class ?? '--'  }}</td>
                       </tr>
                       <tr>
                         <td class="td-lineremover" >Group</td>
-                        <td class="td-lineremover" >Mrs. Kaye
-                            
-                        </td>
+                        <td class="td-lineremover" >{{ $alumniInfo->schoolDetail->group ?? '--'  }}</td>
                       </tr>
                       <tr>
                         <td class="td-lineremover" >Division</td>
-                        <td class="td-lineremover" >A</td>
+                        <td class="td-lineremover" >{{ $alumniInfo->schoolDetail->division ?? '--'  }}</td>
                       </tr>
                       <tr>
                         <td class="td-lineremover" >Floor</td>
-                        <td class="td-lineremover" >2</td>
+                        <td class="td-lineremover" >{{ $alumniInfo->schoolDetail->floor ?? '--'  }}</td>
                       </tr>
                       <tr>
                         <td class="td-lineremover" >Room</td>
-                        <td class="td-lineremover" >201</td>
+                        <td class="td-lineremover" >{{ $alumniInfo->schoolDetail->room ?? '--'  }}</td>
                       </tr>
                     </tbody>
                   </table>

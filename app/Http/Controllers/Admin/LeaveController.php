@@ -4,10 +4,16 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Interfaces\Leaves\LeaveRepositoryInterface;
+use App\Models\Academic\Classes;
+use App\Models\Academic\SchoolYear;
+use App\Models\Academic\Semester;
+use App\Models\Academic\Subject;
+use App\Models\Academic\YearStatus;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\Transcript;
 use App\Models\College;
 use App\Models\Leave;
+use App\Models\Session;
 use Illuminate\Http\Request;
 
 class LeaveController extends Controller
@@ -21,8 +27,20 @@ class LeaveController extends Controller
 
     public function studentIndex()
     {
+
+        $classes = Classes::all();
+        $yearStatuses = YearStatus::all();
+        $semesters = Semester::all();
+        $schoolYears = Session::all();
+        $subjects = Subject::all();
+    
         return view('backend.leave.student.index', [
-            'title' => 'Student Leaves'
+            'title' => 'Student Leaves',
+            'classes' => $classes,
+            'yearStatuses' => $yearStatuses,
+            'semesters' => $semesters,
+            'schoolYears' => $schoolYears,
+            'subjects' => $subjects,
         ]);
     }
 
@@ -34,8 +52,19 @@ class LeaveController extends Controller
 
     public function teacherIndex()
     {
+        $classes = Classes::all();
+        $yearStatuses = YearStatus::all();
+        $semesters = Semester::all();
+        $schoolYears = Session::all();
+        $subjects = Subject::all();
+
         return view('backend.leave.teacher.index', [
-            'title' => 'Teacher Leaves'
+            'title' => 'Student Leaves',
+            'classes' => $classes,
+            'yearStatuses' => $yearStatuses,
+            'semesters' => $semesters,
+            'schoolYears' => $schoolYears,
+            'subjects' => $subjects,
         ]);
     }
 

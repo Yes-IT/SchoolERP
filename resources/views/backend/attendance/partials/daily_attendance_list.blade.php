@@ -17,36 +17,41 @@
             </tr>
         </thead>
         <tbody class="tbody">
-            @forelse ($data['attendance'] as $key => $attendance)
+            @forelse ($attendance as $key => $row)
                 <tr>
-                    <td>{{ $data['attendance'] instanceof \Illuminate\Pagination\LengthAwarePaginator ? $data['attendance']->firstItem() + $key : $key + 1 }}</td>
-                    <td>{{ $attendance->student_id }}</td>
-                    <td>{{ $attendance->first_name }} {{ $attendance->last_name }}</td>
-                    <td>{{ date('h:i A', strtotime($attendance->start_time)) }}</td>
+                    <td>{{ $attendance->firstItem() + $key }}</td>
+                    <td>{{ $row->student_code }}</td>
+                    <td>{{ $row->first_name }} {{ $row->last_name }}</td>
                     <td>
-                        @if ($attendance->attendance == 1)
+                        {{ $row->start_time ? \Carbon\Carbon::parse($row->start_time)->format('h:i A') : '--' }}
+                    </td>
+
+                    <td>
+                        @if ($row->attendance == 1)
                             <p class="green-bg cmn-tbl-btn">Present</p>
-                        @elseif($attendance->attendance == 2)
-                            <p class="cmn-tbl-btn yellow-bg">Late</p>
+                        @elseif ($row->attendance == 2)
+                            <p class="yellow-bg cmn-tbl-btn">Late</p>
                         @else
                             <p class="red-bg cmn-tbl-btn">Absent</p>
                         @endif
                     </td>
+
                     <td>
-                        @if (is_null($attendance->is_approved))
-                            --
-                        @elseif ($attendance->is_approved == 1)
+                        @if (is_null($row->leave_status))
+                            <span>--</span>
+                        @elseif ($row->leave_status == 1)
                             <p class="green-bg cmn-tbl-btn">
-                                Approved {{ $attendance->approved_date ? date('d-m-Y', strtotime($attendance->approved_date)) : '' }}
+                                Approved
+                                {{ $row->leave_approved_date ? \Carbon\Carbon::parse($row->leave_approved_date)->format('d-m-Y') : '' }}
                             </p>
-                        @elseif ($attendance->is_approved == 0)
+                        @elseif ($row->leave_status == 0)
                             <p class="red-bg cmn-tbl-btn">Rejected</p>
                         @endif
                     </td>
-                    </tr>
-                @empty
+                </tr>
+            @empty
                 <tr>
-                    <td colspan="6">No attendance records found.</td>
+                    <td colspan="6" class="text-center">No attendance records found.</td>
                 </tr>
             @endforelse
         </tbody>
@@ -54,7 +59,5 @@
 </div>
 
 <div class="tablepagination">
-    @if ($data['attendance'] instanceof \Illuminate\Pagination\LengthAwarePaginator)
-        {{ $data['attendance']->links('backend.partials.pagination', ['routeName' => 'daily.index']) }}
-    @endif
+    {{ $attendance->links('backend.partials.pagination', ['routeName' => 'daily.index']) }}
 </div>
