@@ -1068,7 +1068,7 @@ h1,.h1-title{
     font-size: 0;
     border: 1px solid var(--primary-clr);
     padding: 5px;
-    background: url(./images/search-icon.svg) no-repeat center var(--primary-clr);
+    background: url(../images/search-icon.svg) no-repeat center var(--primary-clr);
     background-size: 15px;
     border-radius: 7px;
     position: absolute;

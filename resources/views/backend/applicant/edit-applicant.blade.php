@@ -249,10 +249,13 @@
                                        @php
                                             $statusMap = [
                                                 0 => 'Pending',
-                                                1 => 'Scheduled', 
-                                                2 => 'Rescheduled',
+                                                // 1 => 'Approve', 
+                                                // 2 => 'Reject',
+                                                3 => 'Accept',
+                                                4 => 'Not Accept',
+                                                5 => 'Priority Pending'
                                             ];
-                                            $interviewStatus = $applicant->processing->interview_status ?? null;
+                                            $interviewStatus = $applicant->processing->status ?? null;
                                             $statusText = $statusMap[$interviewStatus] ?? 'N/A';
                                             $interviewMode = $applicant->processing->interview_mode ?? 'offline';
 
@@ -288,9 +291,12 @@
                                                 {{-- <input type="text"  value="{{ $statusText }}">
                                                 <input type="hidden" name="processing[interview_status]" value="{{ $interviewStatus }}"> --}}
                                                  <select name="processing[interview_status]">
-                                                        <option value="0" {{ old('processing.interview_status', $applicant->processing->interview_status ?? 0) == 0 ? 'selected' : '' }}>Pending</option>
-                                                        <option value="1" {{ old('processing.interview_status', $applicant->processing->interview_status ?? 0) == 1 ? 'selected' : '' }}>Scheduled</option>
-                                                        <option value="2" {{ old('processing.interview_status', $applicant->processing->interview_status ?? 0) == 2 ? 'selected' : '' }}>Rescheduled</option>
+                                                        <option value="0" {{ old('processing.status', $applicant->processing->status ?? 0) == 0 ? 'selected' : '' }}>Pending</option>
+                                                        {{-- <option value="1" {{ old('processing.status', $applicant->processing->status ?? 0) == 1 ? 'selected' : '' }}>Approve</option>
+                                                        <option value="2" {{ old('processing.status', $applicant->processing->status ?? 0) == 2 ? 'selected' : '' }}>Reject</option> --}}
+                                                        <option value="3" {{ old('processing.status', $applicant->processing->status ?? 0) == 3 ? 'selected' : '' }}>Accept</option>
+                                                        <option value="4" {{ old('processing.status', $applicant->processing->status ?? 0) == 4 ? 'selected' : '' }}>Not Accept</option>
+                                                        <option value="5" {{ old('processing.status', $applicant->processing->status ?? 0) == 5 ? 'selected' : '' }}>Priority Pending</option>
                                                         
                                                 </select>
                                             </div>

@@ -203,39 +203,6 @@
 @endsection
 
 @push('script')
-<script>
-// document.addEventListener('DOMContentLoaded', function () {
-//     const tableContainer = document.querySelector('#applicantTableContainer');
-
-//     function loadTableData(url = '{{ route('applicant.student_application_form') }}') {
-//         fetch(url, {
-//             headers: { 'X-Requested-With': 'XMLHttpRequest' }
-//         })
-//         .then(response => {
-//             if (!response.ok) throw new Error('Network response was not ok');
-//             return response.json();
-//         })
-//         .then(data => {
-//             tableContainer.innerHTML = data.html;
-//             attachPaginationListeners(); 
-//         })
-//         .catch(console.error);
-//     }
-
-//     function attachPaginationListeners() {
-//         document.querySelectorAll('.tablepagination a').forEach(link => {
-//             link.addEventListener('click', e => {
-//                 e.preventDefault();
-//                 const pageUrl = link.getAttribute('href');
-//                 loadTableData(pageUrl);
-//             });
-//         });
-//     }
-
-//     attachPaginationListeners();
-// });
-
-</script>
 
 <script>
    
@@ -250,6 +217,29 @@
         const dropdownSearchInput = document.querySelector('#dropdownSearch');
         const perPageSelect = document.querySelector('#perPageSelect');
         const perPageForm = document.querySelector('#perPageForm');
+
+        const searchInput = document.querySelector('#searchInput');
+        const searchButton = document.querySelector('#searchButton');
+
+        // Add event listener for search button
+        if (searchButton) {
+            searchButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Search button clicked, search value:', searchInput.value);
+                applyFilter();
+            });
+        }
+        // Add event listener for Enter key in search input
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    console.log('Enter pressed in search, value:', searchInput.value);
+                    applyFilter();
+                }
+            });
+        }
+
 
         dropdownTrigger.addEventListener('click', function (e) {
             e.stopPropagation();
@@ -303,6 +293,16 @@
         function applyFilter() {
             const formData = new FormData(filterForm);
 
+            // ADD THIS
+            if (searchInput) {
+                formData.set('search', searchInput.value);
+            }
+
+            // keep applicant name
+            if (applicantNameField) {
+                formData.set('applicant_name', applicantNameField.value);
+            }
+            
             if (perPageSelect) {
                 formData.set('per_page', perPageSelect.value);
             }
@@ -344,6 +344,9 @@
                 e.preventDefault();
                 const pageUrl = link.getAttribute('href');
                 const formData = new FormData(filterForm);
+
+                formData.set('search', searchInput.value);
+                formData.set('applicant_name', applicantNameField.value);
                 
                 // Add per_page to pagination links
                 if (perPageSelect) {

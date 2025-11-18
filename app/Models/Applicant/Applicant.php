@@ -54,10 +54,7 @@ class Applicant extends Model
     }
 
 
-    // public function processing()
-    // {
-    //     return $this->hasOne(ApplicationProcessing::class,'applicant_id');
-    // }
+    
 
     public function processing()
     {

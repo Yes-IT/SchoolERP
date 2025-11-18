@@ -316,203 +316,241 @@ document.getElementById('searchSlotsForm').addEventListener('submit', function(e
 
 <script>
 
-document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('assignSlotForm');
-    
-    //  Toast Notification Function
-     function showNotification(message, type = 'success') { // Changed default to success
-        // Create container if it doesn't exist
-        let toastContainer = document.getElementById('notification-toast-container');
-        if (!toastContainer) {
-            toastContainer = document.createElement('div');
-            toastContainer.id = 'notification-toast-container';
-            toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
-            toastContainer.style.zIndex = '9999';
-            document.body.appendChild(toastContainer);
-        }
-
-        const toastId = 'toast-' + Date.now();
-        const toast = document.createElement('div');
-        toast.id = toastId;
-        // Fixed: Only use danger for errors, success for everything else
-        toast.className = `toast align-items-center text-bg-${type === 'error' ? 'danger' : 'success'} border-0`;
-        toast.setAttribute('role', 'alert');
-        toast.setAttribute('aria-live', 'assertive');
-        toast.setAttribute('aria-atomic', 'true');
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('assignSlotForm');
         
-        toast.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">
-                    ${message}
+        //  Toast Notification Function
+        function showNotification(message, type = 'success') { // Changed default to success
+            // Create container if it doesn't exist
+            let toastContainer = document.getElementById('notification-toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'notification-toast-container';
+                toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                toastContainer.style.zIndex = '9999';
+                document.body.appendChild(toastContainer);
+            }
+
+            const toastId = 'toast-' + Date.now();
+            const toast = document.createElement('div');
+            toast.id = toastId;
+            // Fixed: Only use danger for errors, success for everything else
+            toast.className = `toast align-items-center text-bg-${type === 'error' ? 'danger' : 'success'} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        `;
+            `;
 
-        toastContainer.appendChild(toast);
-        
-        // Initialize and show the toast
-        const bsToast = new bootstrap.Toast(toast, {
-            autohide: true,
-            delay: 5000
-        });
-        bsToast.show();
-        
-        // Remove from DOM after hide
-        toast.addEventListener('hidden.bs.toast', () => {
-            toast.remove();
-        });
-    }
-
-    // Function to validate time range is exactly 1 hour
-    function validateTimeRange(startTime, endTime) {
-        if (!startTime || !endTime) return false;
-        
-        const start = new Date(`2000-01-01T${startTime}`);
-        const end = new Date(`2000-01-01T${endTime}`);
-        const diffMs = end - start;
-        const diffHours = diffMs / (1000 * 60 * 60);
-        
-        return diffHours === 1;
-    }
-
-    // Auto-set end time when start time changes (1 hour later)
-    document.getElementById('interview_start_time').addEventListener('change', function() {
-        if (this.value) {
-            const startTime = new Date(`2000-01-01T${this.value}`);
-            const endTime = new Date(startTime.getTime() + (60 * 60 * 1000)); 
+            toastContainer.appendChild(toast);
             
-            // Format to HH:MM
-            const endTimeString = endTime.toTimeString().slice(0, 5);
-            document.getElementById('interview_end_time').value = endTimeString;
+            // Initialize and show the toast
+            const bsToast = new bootstrap.Toast(toast, {
+                autohide: true,
+                delay: 5000
+            });
+            bsToast.show();
             
-            // Also update the hidden fields for assign form
-            document.getElementById('assign_start_time').value = this.value;
-            document.getElementById('assign_end_time').value = endTimeString;
+            // Remove from DOM after hide
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
         }
-    });
 
-    // Validate end time when manually changed
-    document.getElementById('interview_end_time').addEventListener('change', function() {
-        const startTime = document.getElementById('interview_start_time').value;
-        const endTime = this.value;
-        
-        if (startTime && endTime) {
-            if (!validateTimeRange(startTime, endTime)) {
-                showNotification('Time range must be exactly 1 hour. End time has been auto-adjusted.');
+        // Fixed 20 minutes duration
+        const INTERVIEW_DURATION = 20;
+
+        // Function to validate time range is exactly 1 hour
+        function validateTimeRange(startTime, endTime) {
+            if (!startTime || !endTime) return false;
+            
+            const start = new Date(`2000-01-01T${startTime}`);
+            const end = new Date(`2000-01-01T${endTime}`);
+            const diffMs = end - start;
+            // const diffHours = diffMs / (1000 * 60 * 60);
+             const diffMinutes = diffMs / (1000 * 60);
+            // return diffHours === 1;
+            return diffMinutes === INTERVIEW_DURATION;
+        }
+
+        // Auto-set end time when start time changes (1 hour later)
+        // document.getElementById('interview_start_time').addEventListener('change', function() {
+        //     if (this.value) {
+        //         const startTime = new Date(`2000-01-01T${this.value}`);
+        //         const endTime = new Date(startTime.getTime() + (60 * 60 * 1000)); 
                 
-                // Auto-correct to 1 hour
-                const start = new Date(`2000-01-01T${startTime}`);
-                const correctEnd = new Date(start.getTime() + (60 * 60 * 1000));
-                const correctEndString = correctEnd.toTimeString().slice(0, 5);
+        //         // Format to HH:MM
+        //         const endTimeString = endTime.toTimeString().slice(0, 5);
+        //         document.getElementById('interview_end_time').value = endTimeString;
                 
-                this.value = correctEndString;
-                document.getElementById('assign_end_time').value = correctEndString;
+        //         // Also update the hidden fields for assign form
+        //         document.getElementById('assign_start_time').value = this.value;
+        //         document.getElementById('assign_end_time').value = endTimeString;
+        //     }
+        // });
+
+        document.getElementById('interview_start_time').addEventListener('change', function() {
+            if (this.value) {
+                const startTime = new Date(`2000-01-01T${this.value}`);
+                const endTime = new Date(startTime.getTime() + (INTERVIEW_DURATION * 60 * 1000)); 
+                
+                // Format to HH:MM
+                const endTimeString = endTime.toTimeString().slice(0, 5);
+                document.getElementById('interview_end_time').value = endTimeString;
+                
+                // Also update the hidden fields for assign form
+                document.getElementById('assign_start_time').value = this.value;
+                document.getElementById('assign_end_time').value = endTimeString;
             }
-        }
-    });
+        });
 
-    // Validate search form submission
-    document.getElementById('searchSlotsForm').addEventListener('submit', function(e) {
-        const startTime = document.getElementById('interview_start_time').value;
-        const endTime = document.getElementById('interview_end_time').value;
+        // Validate end time when manually changed
+        // document.getElementById('interview_end_time').addEventListener('change', function() {
+        //     const startTime = document.getElementById('interview_start_time').value;
+        //     const endTime = this.value;
+            
+        //     if (startTime && endTime) {
+        //         if (!validateTimeRange(startTime, endTime)) {
+        //             showNotification('Time range must be exactly 1 hour. End time has been auto-adjusted.');
+                    
+        //             // Auto-correct to 1 hour
+        //             const start = new Date(`2000-01-01T${startTime}`);
+        //             const correctEnd = new Date(start.getTime() + (60 * 60 * 1000));
+        //             const correctEndString = correctEnd.toTimeString().slice(0, 5);
+                    
+        //             this.value = correctEndString;
+        //             document.getElementById('assign_end_time').value = correctEndString;
+        //         }
+        //     }
+        // });
+
+        document.getElementById('interview_end_time').addEventListener('change', function() {
+            const startTime = document.getElementById('interview_start_time').value;
+            const endTime = this.value;
+            
+            if (startTime && endTime) {
+                if (!validateTimeRange(startTime, endTime)) {
+                    showNotification('Time range must be exactly 20 minutes. End time has been auto-adjusted.');
+                    
+                    // Auto-correct to 20 minutes
+                    const start = new Date(`2000-01-01T${startTime}`);
+                    const correctEnd = new Date(start.getTime() + (INTERVIEW_DURATION * 60 * 1000));
+                    const correctEndString = correctEnd.toTimeString().slice(0, 5);
+                    
+                    this.value = correctEndString;
+                    document.getElementById('assign_end_time').value = correctEndString;
+                }
+            }
+        });
+
+
+        // Validate search form submission
+        document.getElementById('searchSlotsForm').addEventListener('submit', function(e) {
+            const startTime = document.getElementById('interview_start_time').value;
+            const endTime = document.getElementById('interview_end_time').value;
+            
+            console.log("Start Time:", startTime);
+            console.log("End Time:", endTime);
+
+            if (startTime && endTime && !validateTimeRange(startTime, endTime)) {
+                e.preventDefault();
+                showNotification('Please select a time range of exactly 20 minutes.');
+                return;
+            }
+            
+            // If validation passes, copy values to assign form
+            document.getElementById('assign_interview_date').value = document.getElementById('interview_date').value;
+            document.getElementById('assign_start_time').value = startTime;
+            document.getElementById('assign_end_time').value = endTime;
+        });
+
         
-        console.log("Start Time:", startTime);
-        console.log("End Time:", endTime);
-
-        if (startTime && endTime && !validateTimeRange(startTime, endTime)) {
+    // In your assignSlotForm submit handler
+        form.addEventListener('submit', function (e) {
             e.preventDefault();
-            showNotification('Please select a time range of exactly 1 hour.');
-            return;
-        }
-        
-        // If validation passes, copy values to assign form
-        document.getElementById('assign_interview_date').value = document.getElementById('interview_date').value;
-        document.getElementById('assign_start_time').value = startTime;
-        document.getElementById('assign_end_time').value = endTime;
-    });
 
-    
-   // In your assignSlotForm submit handler
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        // Validate time range before submitting
-        const startTime = document.getElementById('assign_start_time').value;
-        const endTime = document.getElementById('assign_end_time').value;
-        
-        if (!validateTimeRange(startTime, endTime)) {
-            showNotification('Time range must be exactly 1 hour. Please adjust your time selection.', 'error');
-            return;
-        }
-
-        const formData = new FormData(this);
-
-        const isReschedule = document.getElementById('is_reschedule').value === '1';
-        const endpoint = isReschedule 
-            ? "{{ route('applicant.update_interview_slot') }}"
-            : "{{ route('applicant.assign_interview_slot') }}";
-
-        console.log('Submitting to:', endpoint, 'isReschedule:', isReschedule);
-        
-        // Show loading state
-        const submitBtn = form.querySelector('.primary-assign-btn');
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = isReschedule ? 'Rescheduling...' : 'Assigning Slot...';
-        submitBtn.disabled = true;
-
-        // Use proper AJAX with better error handling
-        $.ajax({
-            url: endpoint,
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            success: function(data) {
-                console.log('Response:', data);
-                    if (data.status) {
-                    const successMessage = isReschedule 
-                        ? 'Interview slot rescheduled successfully!' 
-                        : 'Interview slot assigned successfully!';
-                    
-                    showNotification(data.message || successMessage, 'success');
-                    
-                    setTimeout(() => {
-                        window.location.href = "{{ route('applicant.student_application_form') }}";
-                    }, 1500);
-                } else {
-                    showNotification(data.message || 'Operation failed. Please try again.', 'error');
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error("AJAX Error:", error);
-                console.error("Status:", status);
-                console.error("Response:", xhr.responseText);
-                
-                let errorMessage = 'Error while assigning slot. Please try again.';
-                
-                // Try to parse error response
-                try {
-                    const response = JSON.parse(xhr.responseText);
-                    if (response.message) {
-                        errorMessage = response.message;
-                    }
-                } catch (e) {
-                    console.log("Failed to parse error response:", e);
-                }
-                
-                showNotification(errorMessage, 'error');
-            },
-            complete: function() {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
+            // Validate time range before submitting
+            const startTime = document.getElementById('assign_start_time').value;
+            const endTime = document.getElementById('assign_end_time').value;
+            
+            if (!validateTimeRange(startTime, endTime)) {
+                showNotification('Time range must be exactly  20 minutes. Please adjust your time selection.', 'error');
+                return;
             }
+
+            const formData = new FormData(this);
+
+            const isReschedule = document.getElementById('is_reschedule').value === '1';
+            const endpoint = isReschedule 
+                ? "{{ route('applicant.update_interview_slot') }}"
+                : "{{ route('applicant.assign_interview_slot') }}";
+
+            console.log('Submitting to:', endpoint, 'isReschedule:', isReschedule);
+            
+            // Show loading state
+            const submitBtn = form.querySelector('.primary-assign-btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = isReschedule ? 'Rescheduling...' : 'Assigning Slot...';
+            submitBtn.disabled = true;
+
+            $.ajax({
+                url: endpoint,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                success: function(data) {
+                    console.log('Response:', data);
+                        if (data.status) {
+                        const successMessage = isReschedule 
+                            ? 'Interview slot rescheduled successfully!' 
+                            : 'Interview slot assigned successfully!';
+                        
+                        showNotification(data.message || successMessage, 'success');
+                        
+                        setTimeout(() => {
+                            window.location.href = "{{ route('applicant.student_application_form') }}";
+                        }, 1500);
+                    } else {
+                        showNotification(data.message || 'Operation failed. Please try again.', 'error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX Error:", error);
+                    console.error("Status:", status);
+                    console.error("Response:", xhr.responseText);
+                    
+                    let errorMessage = 'Error while assigning slot. Please try again.';
+                    
+                    // Try to parse error response
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.message) {
+                            errorMessage = response.message;
+                        }
+                    } catch (e) {
+                        console.log("Failed to parse error response:", e);
+                    }
+                    
+                    showNotification(errorMessage, 'error');
+                },
+                complete: function() {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }
+            });
         });
     });
-});
 
 </script>
 <script>

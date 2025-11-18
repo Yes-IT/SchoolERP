@@ -88,7 +88,7 @@ class ApplicantUpdateRequest extends FormRequest
             'processing.interview_date' => 'nullable|date',
             'processing.interview_time' => 'nullable|string|max:50',
             'processing.interview_location' => 'nullable|string|max:255',
-            'processing.interview_status' => 'nullable|integer|in:0,1,2',
+            'processing.status' => 'nullable|integer|in:0,1,2,3,4,5',
             'processing.coming' => 'nullable|string|max:50',
             'processing.application_comment' => 'nullable|string',
             'processing.scholarship_comment' => 'nullable|string',

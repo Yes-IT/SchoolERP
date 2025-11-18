@@ -12,36 +12,129 @@ class ApplicantRepository implements ApplicantInterface
 {
 
    
+    // public function getAllApplicants($search = null, $perPage = 5, $sessionId = null, $yearStatusId = null, $applicantName = null)
+    // {
+    //     $query = Applicant::with(['parents', 'processing'])
+    //                 ->orderBy('created_at', 'desc');
+
+    //     if ($search) {
+    //         $query->where(function ($q) use ($search) {
+    //             // Applicant personal info
+    //             $q->where('first_name', 'like', "%{$search}%")
+    //             ->orWhere('last_name', 'like', "%{$search}%")
+    //             ->orWhere('high_school', 'like', "%{$search}%")
+    //             ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"]);
+                
+    //             // Interview details from processing table
+    //             $q->orWhereHas('processing', function ($processingQuery) use ($search) {
+    //                 $processingQuery->where('interview_city', 'like', "%{$search}%")
+    //                             ->orWhere('interview_status', 'like', "%{$search}%")
+    //                             ->orWhere('interview_mode', 'like', "%{$search}%")
+    //                             ->orWhere('interview_location', 'like', "%{$search}%");
+    //             });
+    //         });
+    //     }
+
+    //     if ($sessionId) {
+    //         $query->where('session_id', $sessionId);
+    //     }
+
+    //     if ($yearStatusId) {
+    //         $query->where('year_status_id', $yearStatusId);
+    //     }
+
+    //     if ($applicantName) {
+    //         $query->where(function ($q) use ($applicantName) {
+    //             $q->where('first_name', 'like', "%{$applicantName}%")
+    //             ->orWhere('last_name', 'like', "%{$applicantName}%")
+    //             ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$applicantName}%"]);
+    //         });
+    //     }
+
+    //     return $query->paginate($perPage);
+    // }
+
     public function getAllApplicants($search = null, $perPage = 5, $sessionId = null, $yearStatusId = null, $applicantName = null)
     {
-        $query = Applicant::with(['parents', 'processing'])
-                    ->orderBy('created_at', 'desc');
+        try {
+            // Log::info('=== START getAllApplicants ===');
+            // Log::info('Search parameters:', [
+            //     'search' => $search,
+            //     'perPage' => $perPage,
+            //     'sessionId' => $sessionId,
+            //     'yearStatusId' => $yearStatusId,
+            //     'applicantName' => $applicantName
+            // ]);
 
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('first_name', 'like', "%{$search}%")
-                  ->orWhere('last_name', 'like', "%{$search}%");
+            $query = Applicant::with(['parents', 'processing'])
+                        ->orderBy('created_at', 'desc');
+
+            if ($search) {
+                Log::info('Processing search term:', ['search' => $search]);
                 
-            });
-        }
+                $query->where(function ($q) use ($search) {
+                    Log::info('Building search query for term: ' . $search);
+                    
+                    // Applicant personal info
+                    $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('high_school', 'like', "%{$search}%")
+                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"]);
+                    
+                    // Interview details from processing table
+                    $q->orWhereHas('processing', function ($processingQuery) use ($search) {
+                        Log::info('Adding processing table search for: ' . $search);
+                        
+                        $processingQuery->where('interview_city', 'like', "%{$search}%")
+                                    ->orWhere('interview_status', 'like', "%{$search}%")
+                                    ->orWhere('interview_mode', 'like', "%{$search}%")
+                                    ->orWhere('interview_location', 'like', "%{$search}%");
+                    });
+                    
+                    Log::info('All search conditions added for term: ' . $search);
+                });
+            }
 
-        if ($sessionId) {
-            $query->where('session_id', $sessionId);
-        }
+            if ($sessionId) {
+                Log::info('Applying session filter:', ['sessionId' => $sessionId]);
+                $query->where('session_id', $sessionId);
+            }
 
-        if ($yearStatusId) {
-            $query->where('year_status_id', $yearStatusId);
-        }
+            if ($yearStatusId) {
+                Log::info('Applying year status filter:', ['yearStatusId' => $yearStatusId]);
+                $query->where('year_status_id', $yearStatusId);
+            }
 
-        if ($applicantName) {
-            $query->where(function ($q) use ($applicantName) {
-                $q->where('first_name', 'like', "%{$applicantName}%")
-                ->orWhere('last_name', 'like', "%{$applicantName}%")
-                ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$applicantName}%"]);
-            });
-        }
+            if ($applicantName) {
+                Log::info('Applying applicant name filter:', ['applicantName' => $applicantName]);
+                $query->where(function ($q) use ($applicantName) {
+                    $q->where('first_name', 'like', "%{$applicantName}%")
+                    ->orWhere('last_name', 'like', "%{$applicantName}%")
+                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$applicantName}%"]);
+                });
+            }
 
-        return $query->paginate($perPage);
+            $results = $query->paginate($perPage);
+            
+            // Log::info('Query results:', [
+            //     'total_results' => $results->total(),
+            //     'current_page' => $results->currentPage(),
+            //     'per_page' => $results->perPage(),
+            //     'has_more' => $results->hasMorePages()
+            // ]);
+            
+            
+            return $results;
+            
+        } catch (\Exception $e) {
+            Log::error('Error in getAllApplicants:', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
     }
 
     public function getApplicantNames()
@@ -205,14 +298,14 @@ class ApplicantRepository implements ApplicantInterface
                 
                 if (!empty($processingData)) {
                     $processingData['letter_sent'] = isset($processingData['letter_sent']) ? 1 : 0;
-                    $processingData['interview_status'] = isset($processingData['interview_status']) ? (int)$processingData['interview_status'] : 0;
+                    $processingData['status'] = isset($processingData['status']) ? (int)$processingData['status'] : 0;
 
                     $existingProcessing = ApplicationProcessing::where('applicant_id', $applicant->id)->first();
                     if ($existingProcessing) {
                         $existingProcessing->update($processingData);
                     } else {
                         $processingData['applicant_id'] = $applicant->id;
-                        $processingData['interview_status'] = $processingData['interview_status'] ?? 0;
+                        $processingData['status'] = $processingData['status'] ?? 0;
                         $processingData['letter_sent'] = $processingData['letter_sent'] ?? 0;
                         
                         ApplicationProcessing::create($processingData);
