@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        return "This is from COntroller";
+        return 'This is Teacher'; // This is better than echo + exit
     }
 }
