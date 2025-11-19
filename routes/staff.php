@@ -19,13 +19,13 @@ Route::middleware([ 'web',])->group(function () {
     Route::middleware(saasMiddleware()) // your custom SAAS middleware stack
         ->middleware('XssSanitizer')
         ->group(function () {
- 
+
         // All staff management features (departments, designations, etc.)
         Route::middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage'])->group(function () {
- 
+
             // Authenticated admin routes (your custom guard/middleware)
             Route::middleware(['auth.routes', 'AdminPanel'])->group(function () {
- 
+
                 // Departments
                 Route::prefix('department')->name('department.')->controller(DepartmentController::class)->group(function () {
                     Route::get('/', 'index')->name('index')->middleware('PermissionCheck:department_read');
@@ -35,7 +35,7 @@ Route::middleware([ 'web',])->group(function () {
                     Route::put('/update/{id}', 'update')->name('update')->middleware(['PermissionCheck:department_update', 'DemoCheck']);
                     Route::delete('/delete/{id}', 'delete')->name('delete')->middleware(['PermissionCheck:department_delete', 'DemoCheck']);
                 });
- 
+
                 // Designations
                 Route::prefix('designation')->name('designation.')->controller(DesignationController::class)->group(function () {
                     Route::get('/', 'index')->name('index')->middleware('PermissionCheck:designation_read');
@@ -45,22 +45,21 @@ Route::middleware([ 'web',])->group(function () {
                     Route::put('/update/{id}', 'update')->name('update')->middleware(['PermissionCheck:designation_update', 'DemoCheck']);
                     Route::delete('/delete/{id}', 'delete')->name('delete')->middleware(['PermissionCheck:designation_delete', 'DemoCheck']);
                 });
-               
+                
             });
- 
+
         });
- 
+
         Route::prefix('staff')->name('staff.')->middleware(['lang', 'CheckSubscription'])->group(function () {
- 
+
             Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('FeatureCheck:staff_manage');
- 
+
             // Profile Module
             Route::prefix('profile')->name('profile.')->controller(ProfileController::class)->group(function () {
- 
+
                 Route::get('/', 'index')->name('index')->middleware('PermissionCheck:profile_read');
- 
+
             });
         });
     });
- 
 });

@@ -17,14 +17,11 @@ class ProfileController extends Controller
 
     public function index()
     {
+        $data['title'] = 'Profile';
         $user = auth()->user();
-        $data = $this->profileRepo->getProfile($user);
+        $data['user'] = $this->profileRepo->getProfile($user);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Profile fetched successfully',
-            'data' => $data,
-        ]);
+        return view('staff.profile.profile-index', compact('data'));
     }
 
     public function show(Request $request)
