@@ -38,7 +38,6 @@
         <!-- end sidebar -->
 
         <div class="dashboard-body">
-
             <!-- start header -->
             @include('staff.partials.header')
             <!-- end header -->
@@ -46,60 +45,60 @@
             <!-- start main content -->
             @yield('content')
             <!-- end main content -->
-
         </div>
     </div>
 
     <!-- Modal Popup -->
     <div id="customPopup" class="popup-overlay">
-    <div class="popup-box">
-        <img src="./images/material-cancel.svg" class="cancelpopup" onclick="closeCustomPopup()" />
-        
-        <h2>Selection Session</h2>
-
-        <!-- Year Dropdown -->
-        <div class="form-row">
-        <label class="form-label" for="customYear">Year</label>
-        <div class="studentBtns">
-                    <div class="dropdown-week">
-                    <button class="subjectbox-session" onclick="toggleDropdowndash()">2024-2025<img
-                        src="./images/dropdown-arrow.svg" alt="Icon"></button>
-                    <ul class="dropdown-menu-dash">
-                        <li>2021-2022</li>
-                        <li class="active-week">2022-2023</li>
-                        <li>2023-2024</li>
-                        <li>2024-2025</li>
-                    </ul>
-                    </div>
-                </div>
-        </div>
-
-        <!-- Year Status Dropdown -->
-        <div class="form-row">
-        <label class="form-label" for="customYearStatus">Year Status</label>
-        <div class="custom-dropdown custom-year-status" id="customYearStatus">
-            <div class="dropdown-selected">Shana Alef</div>
-            <img src="./images/sessionarrow.svg" class="dropdown-arrow" />
+        <div class="popup-box">
+            <img src="./images/material-cancel.svg" class="cancelpopup" onclick="closeCustomPopup()" />
             
-        </div>
-        </div>
+            <h2>Selection Session</h2>
 
-        <!-- Semester Dropdown -->
-        <div class="form-row">
-        <label class="form-label" for="customSemester">Semester</label>
-        <div class="studentBtns">
+            <!-- Year Dropdown -->
+            <div class="form-row">
+                <label class="form-label" for="customYear">Year</label>
+                <div class="studentBtns">
                     <div class="dropdown-week">
-                    <button class="subjectbox-session" onclick="toggleDropdownsem()">First Semester<img
-                        src="./images/dropdown-arrow.svg" alt="Icon"></button>
-                    <ul class="dropdown-menu-sem">
-                        <li>First Semester</li>
-                        <li class="active-week">Second Semester</li>
-                    
-                    </ul>
+                        <button class="subjectbox-session" onclick="toggleDropdowndash()">
+                            2024-2025<img src="./images/dropdown-arrow.svg" alt="Icon">
+                        </button>
+                        <ul class="dropdown-menu-dash">
+                            <li>2021-2022</li>
+                            <li class="active-week">2022-2023</li>
+                            <li>2023-2024</li>
+                            <li>2024-2025</li>
+                        </ul>
                     </div>
                 </div>
+            </div>
+
+            <!-- Year Status Dropdown -->
+            <div class="form-row">
+                <label class="form-label" for="customYearStatus">Year Status</label>
+                <div class="custom-dropdown custom-year-status" id="customYearStatus">
+                    <div class="dropdown-selected">Shana Alef</div>
+                    <img src="./images/sessionarrow.svg" class="dropdown-arrow" />
+                </div>
+            </div>
+
+            <!-- Semester Dropdown -->
+            <div class="form-row">
+                <label class="form-label" for="customSemester">Semester</label>
+                <div class="studentBtns">
+                    <div class="dropdown-week">
+                        <button class="subjectbox-session" onclick="toggleDropdownsem()">
+                            First Semester
+                            <img src="./images/dropdown-arrow.svg" alt="Icon">
+                        </button>
+                        <ul class="dropdown-menu-sem">
+                            <li>First Semester</li>
+                            <li class="active-week">Second Semester</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
     </div>
     <!-- End Of Dashboard -->
 
