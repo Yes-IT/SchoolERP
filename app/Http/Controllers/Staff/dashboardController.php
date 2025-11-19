@@ -8,6 +8,6 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        return 'This is Teacher'; // This is better than echo + exit
+        return view('staff.dashboard');
     }
 }

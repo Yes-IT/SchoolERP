@@ -1,3 +1,7 @@
+@extends('staff.master')
+
+@section('content')
+
 <div class="ds-bdy-content-wrp">
 
     <div class="dsbdy-filter-wrp">
@@ -673,3 +677,5 @@
     </div>
 
 </div>
+    
+@endsection
