@@ -3,6 +3,8 @@
 
 use App\Http\Controllers\Staff\AttendanceController;
 use App\Http\Controllers\Staff\DashboardController;
+use App\Http\Controllers\Staff\AssignmentController;
+use App\Http\Controllers\Staff\ApplyLeaveController;
 use App\Http\Controllers\Staff\ProfileController;
 use App\Http\Controllers\Staff\DepartmentController;
 use App\Http\Controllers\Staff\DesignationController;
@@ -66,9 +68,15 @@ Route::middleware([ 'web',])->group(function () {
 
             // Profile Module
             Route::prefix('profile')->name('profile.')->controller(ProfileController::class)->group(function () {
-
                 Route::get('/', 'index')->name('index')->middleware('PermissionCheck:profile_read');
+            });
 
+            Route::prefix('assignment')->name('assignment.')->controller(AssignmentController::class)->group(function () {
+                Route::get('/', 'index')->name('index')->middleware('PermissionCheck:assignment_read');
+            });
+
+            Route::prefix('apply-leave')->name('apply-leave.')->controller(ApplyLeaveController::class)->group(function () {
+                Route::get('/', 'index')->name('index')->middleware('PermissionCheck:apply_leave_read');
             });
 
             Route::prefix('students')->name('students.')->controller(StudentController::class)->group(function () {

@@ -9,7 +9,7 @@
 <div class="ds-breadcrumb">
     <h1>My Profile</h1>
     <ul>
-        <li><a href="dashboard.html">Dashboard</a> /</li>
+        <li><a href="{{ route('staff.dashboard') }}">Dashboard</a> /</li>
         <li>My Profile</li>
     </ul>
 </div>
@@ -19,11 +19,11 @@
 
         <div class="dspr-profile-cd-upr">
             <div class="dspr-profile-cd-img">
-                <img src="./images/user-round.svg" alt="Profile Image">
+                <img src="{{ asset($data['staff']->upload?->path ?? 'images/default.png') }}" alt="Profile Image">
             </div>
             <div class="dspr-profile-cd-info">
-                <h2>Madelyn Lubin</h2>
-                <p>מדלין לובין</p>
+                <h2>{{ $data['staff']->first_name }} {{ $data['staff']->last_name }}</h2>
+                <p>{{ $data['staff']->hebrew_first_name }} {{ $data['staff']->hebrew_last_name }}</p>
             </div>
         </div>
 
@@ -32,11 +32,11 @@
                 <table>
                     <tr>
                         <td>Staff Name</td>
-                        <td>Madelyn Lubin</td>
+                        <td>{{ $data['staff']->first_name }} {{ $data['staff']->last_name }}</td>
                     </tr>
                     <tr>
                         <td>Position</td>
-                        <td>Lorem Ipsum</td>
+                        <td>{{ $data['staff']->position ?? ''}}</td>
                     </tr>
                     <tr>
                         <td>Year</td>
@@ -64,40 +64,40 @@
                 <table>
                     <tbody>
                         <tr>
-                        <td>Date of Birth</td>
-                        <td>03/11/1998</td>
+                            <td>Date of Birth</td>
+                            <td>{{ $data['staff']->dob ? \Carbon\Carbon::parse($data['staff']->dob)->format('d/m/Y') : '' }}</td>
                         </tr>
                         <tr>
-                        <td>Hebrew Birthday</td>
-                        <td>13 Adar I, 5758</td>
+                            <td>Hebrew Birthday</td>
+                            <td>{{ $data['staff']->hebrew_dob ? \Carbon\Carbon::parse($data['staff']->hebrew_dob)->format('d/m/Y') : '' }}</td>
                         </tr>
                         <tr>
-                        <td>Email</td>
-                        <td>edwardthomas09@gmail.com</td>
+                            <td>Email</td>
+                            <td>{{ $data['staff']->email ?? ''}}</td>
                         </tr>
                         <tr>
-                        <td>Neighborhood</td>
-                        <td>Lorem Ipsum</td>
+                            <td>Neighborhood</td>
+                            <td>{{ $data['staff']->neighborhood ?? ''}}</td>
                         </tr>
                         <tr>
-                        <td>City</td>
-                        <td>USA</td>
+                            <td>City</td>
+                            <td>{{ $data['staff']->city ?? ''}}</td>
                         </tr>
                         <tr>
-                        <td>Zip Code</td>
-                        <td>1564564</td>
+                            <td>Zip Code</td>
+                            <td>{{ $data['staff']->zip_code ?? ''}}</td>
                         </tr>
                         <tr>
-                        <td>Cell Phone</td>
-                        <td>+972 50-123-4567</td>
+                            <td>Cell Phone</td>
+                            <td>{{ $data['staff']->cell_phone ?? ''}}</td>
                         </tr>
                         <tr>
-                        <td>Home Phone</td>
-                        <td>+972 50-123-4567</td>
+                            <td>Home Phone</td>
+                            <td>{{ $data['staff']->phone ?? ''}}</td>
                         </tr>
                         <tr>
-                        <td>SSN</td>
-                        <td>34826841</td>
+                            <td>SSN</td>
+                            <td>{{ $data['staff']->ssn ?? ''}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -111,7 +111,7 @@
                     <tbody>
                         <tr>
                             <td>Home Address</td>
-                            <td>56 Main Street, Suite 3, Brooklyn, NY 11210‑0000</td>
+                            <td>{{ $data['staff']->current_address ?? ''}}</td>
                         </tr>
                     </tbody>
                 </table>
