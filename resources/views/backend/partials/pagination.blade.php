@@ -7,7 +7,7 @@
 
     // Query parameters to append
     $queryParams = request()->query();
-    unset($queryParams['page']); // Remove page parameter to avoid conflicts
+    unset($queryParams['page']); 
 
     // Calculate pagination range
     $range = 2; // Number of pages to show before/after current page

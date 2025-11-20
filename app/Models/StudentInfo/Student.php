@@ -21,12 +21,15 @@ use Modules\LiveChat\Entities\Message;
 use Modules\VehicleTracker\Entities\EnrollmentReport;
 use Modules\VehicleTracker\Entities\StudentRouteEnrollment;
 use App\Models\StudentInfo\SchoolDetail;
+use App\Models\Academic\Classes;
+use App\Models\Attendance\Attendance;
+
 
 class Student extends BaseModel
 {
     use HasFactory;
 
-    protected $appends = ['full_name'];
+    protected $appends = ['full_name','parent_full_name'];
 
     protected $casts = [
         'upload_documents' => 'array',
@@ -92,9 +95,14 @@ class Student extends BaseModel
         return $this->belongsTo(BloodGroup::class, 'blood_group_id', 'id');
     }
 
+    // public function parent()
+    // {
+    //     return $this->belongsTo(ParentGuardian::class, 'parent_guardian_id', 'id');
+    // }
+
     public function parent()
     {
-        return $this->belongsTo(ParentGuardian::class, 'parent_guardian_id', 'id');
+        return $this->hasOne(ParentGuardian::class, 'student_id', 'id');
     }
 
     public function sessionStudentDetails()
@@ -160,7 +168,7 @@ class Student extends BaseModel
 
     public function classMappings()
     {
-        return $this->hasMany(\App\Models\StudentClassMapping::class, 'student_id');
+        return $this->hasMany(\App\Models\StudentClassMapping::class, 'student_id', 'id');
     }
 
     public function formChecklists()
@@ -168,7 +176,73 @@ class Student extends BaseModel
         return $this->hasMany(\App\Models\FormChecklist::class, 'student_id');
     }
 
+    public function classes()
+    {
+        return $this->belongsToMany(Classes::class, 'student_class_mapping', 'student_id', 'class_id');
+    }
+
+    public function getParentFullNameAttribute()
+    {
+        if (!$this->parent) {
+            return '-';
+        }
+
+        $father = $this->parent->father_name;
+        $mother = $this->parent->mother_name;
+
+        $names = [];
+
+        if (!empty($father)) $names[] = $father;
+        if (!empty($mother)) $names[] = $mother;
+
+        return implode(' & ', $names);
+    }
+
+    public function getParentMobileNumberAttribute()
+    {
+        if (!$this->parent) {
+            return '-';
+        }
+
+        $fatherMobile = $this->parent->father_mobile;
+        $motherMobile = $this->parent->mother_mobile;
+
+        $mobiles = [];
+
+        if (!empty($fatherMobile)) $mobiles[] = $fatherMobile;
+        if (!empty($motherMobile)) $mobiles[] = $motherMobile;
+
+        return !empty($mobiles) ? implode(' & ', $mobiles) : '-';
+    }
+
    
+    public function getAttendancePercentageAttribute()
+    {
+        // Fetch all attendance rows for this student
+        $att = Attendance::where('student_id', $this->id)->get();
+
+        if ($att->count() == 0) {
+            return '0%';
+        }
+
+        $present = $att->where('attendance', 1)->count();
+        $late = $att->where('attendance', 2)->count();
+        $absent = $att->where('attendance', 3)->count();
+        $half = $att->where('attendance', 4)->count();
+
+        // Formula
+        $totalDays = $att->count();
+        $earned = $present + $late + ($half * 0.5);
+
+        $percentage = ($earned / $totalDays) * 100;
+
+        return round($percentage) . '%';
+    }
+
+    
+
+
+
 
 
 }

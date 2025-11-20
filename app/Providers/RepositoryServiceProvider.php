@@ -136,6 +136,8 @@ use App\Repositories\Report\ReportFilterRepository;
 use App\Interfaces\Report\AttendanceReportInterface;
 use App\Interfaces\Staff\TeacherInterface;
 use App\Repositories\Staff\TeacherRepository;
+use App\Interfaces\Staff\StudentInterface;
+use App\Repositories\Staff\StudentRepository;
 
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -189,6 +191,8 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(DepartmentInterface::class,               DepartmentRepository::class);
         $this->app->bind(DesignationInterface::class,              DesignationRepository::class);
         $this->app->bind(TeacherInterface::class,                  TeacherRepository::class);
+        $this->app->bind(StudentInterface::class,                  StudentRepository::class);
+
         
         // Examination
         $this->app->bind(ExamTypeInterface::class,                 ExamTypeRepository::class);

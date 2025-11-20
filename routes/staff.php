@@ -4,6 +4,8 @@ use App\Http\Controllers\Staff\DashboardController;
 use App\Http\Controllers\Staff\ProfileController;
 use App\Http\Controllers\Staff\DepartmentController;
 use App\Http\Controllers\Staff\DesignationController;
+use App\Http\Controllers\Staff\{StudentController,ExamScheduleController};   
+
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -59,6 +61,16 @@ Route::middleware([ 'web',])->group(function () {
 
                 Route::get('/', 'index')->name('index')->middleware('PermissionCheck:profile_read');
 
+            });
+
+            Route::prefix('students')->name('students.')->controller(StudentController::class)->group(function () {
+                Route::get('/', 'index')->name('index')->middleware('PermissionCheck:student_read');
+                Route::get('/filter',  'Filter')->name('filter')->middleware('PermissionCheck:student_filter');
+
+            });
+
+            Route::prefix('exam-schedule')->name('exam-schedule.')->controller(ExamScheduleController::class)->group(function () {
+                Route::get('/', 'index')->name('index')->middleware('PermissionCheck:exam_schedule_read');
             });
         });
     });

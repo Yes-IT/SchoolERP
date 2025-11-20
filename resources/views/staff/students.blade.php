@@ -1,4 +1,15 @@
 @extends('staff.master')
+<style>
+    .dropdown-menu-subject,
+    .dropdown-menu-status {
+        display: none;
+    }
+
+    .dropdown-menu-subject.show,
+    .dropdown-menu-status.show {
+        display: block;
+    }
+</style>
 
 @section('content')
                 <div class="dashboard-body dspr-body-outer">
@@ -15,34 +26,54 @@
                                        <div class="filters">
                                             <div class="studentBtns">
                                                 <div class="dropdown-week">
-                                                    <button class="subjectbox" onclick="toggleDropdownSubject()">Select Year Status<img
-                                                      src="{{global_asset('staff/assets/images/dropdown-arrow.svg')}}" alt="Icon"></button>
+                                                    <button class="subjectbox"  onclick="toggleDropdownSubject()">Select Year Status
+                                                        <img src="{{global_asset('staff/assets/images/dropdown-arrow.svg')}}" alt="Icon">
+                                                    </button>
                                                     <ul class="dropdown-menu-subject">
-                                                        <li>All </li>
-                                                        <li class="active-week">Shana Alef</li>
-                                                        <li>Shana Bais</li>
+                                                        
+                                                        <li class="{{ request('year_status') == 'all' ? 'active-week' : '' }}"
+                                                            onclick="applyFilter('year_status', 'all')">
+                                                            All
+                                                        </li>
+                                                        @foreach($yearstatuses as $ys)
+                                                            <li class="{{ request('year_status') == $ys->id ? 'active-week' : '' }}" 
+                                                                 onclick="applyFilter('year_status', '{{ $ys->id }}')">
+                                                                {{ $ys->name }}
+                                                            </li>
+                                                        @endforeach
                                                     </ul>
                                                 </div>
                                             </div>
+
+                                           <form id="filterForm" method="GET" style="display: none;">
+                                                <input type="hidden" name="year_status" id="yearStatusInput" value="">
+                                                <input type="hidden" name="subject" id="subjectInput" value="">
+                                                <input type="hidden" name="filter" value="true">
+                                            </form>
                                             
                                             <div class="studentBtns">
                                                 <div class="dropdown-week">
                                                     <button class="subjectbox" onclick="toggleDropdownstatus()">Select Subject <img
-                                                        src="./images/dropdown-arrow.svg" alt="Icon"></button>
+                                                        src="{{global_asset('staff/assets/images/dropdown-arrow.svg')}}" alt="Icon"></button>
                                                     <ul class="dropdown-menu-status">
-                                                        <li>All</li>
-                                                        <li class="active-week">Melachim</li>
-                                                        <li>Principles of Education</li>
-                                                        <li>Lorem ipsum dolor sit amet </li>
-                                                        <li>Lorem ipsum dolor sit amet </li>
+                                                        <li class="{{ request('subject') == 'all' ? 'active-week' : '' }}"
+                                                            onclick="applyFilter('subject', 'all')">
+                                                            All
+                                                        </li>
+                                                        @foreach($subjects as $subject)
+                                                            <li class="{{ request('subject') == $subject->id ? 'active-week' : '' }}"
+                                                                onclick="applyFilter('subject', '{{ $subject->id }}')">
+                                                                {{ $subject->name }}
+                                                            </li>
+                                                        @endforeach
                                                     </ul>
                                                 </div>
                                             </div>
                                         </div>
-                            </div>
+                                  </div>
 
                             <div class="responsive-table-wrapper">
-                                <table class="student-table">
+                                {{-- <table class="student-table">
                                     <thead>
                                         <tr>
                                         <th>S. No</th>
@@ -62,193 +93,76 @@
                                         <th>Hebrew Birth</th>
                                         </tr>
                                     </thead>
+                                   
+
                                     <tbody>
-                                        <tr>
-                                        <td>1</td>
-                                        <td>Shana Bais</td>
-                                        <td>Edward Thomas</td>
-                                        <td>Lorem ipsum dolor sit amet</td>
-                                        <td>90%</td>
-                                        <td>A</td>
-                                        <td>87446334747</td>
-                                        <td>example@gmail.com</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>87446334747</td>
-                                        <td>56 Main Street, Suite 3, Brooklyn, NY 11210-0000</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>USA</td>
-                                        <td>10-02-1997</td>
-                                        <td>׳ג אדר׳ תשנ״ז</td>
-                                        </tr>
+                                       @foreach($students as $student)
+                                            <tr>
+                                                <td>{{ $loop->iteration }}</td>
 
-                                        <tr>
-                                        <td>2</td>
-                                        <td>Shana Alef</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>Lorem ipsum dolor sit amet</td>
-                                        <td>20%</td>
-                                        <td>A-</td>
-                                        <td>87446334747</td>
-                                        <td>example@gmail.com</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>87446334747</td>
-                                        <td>56 Main Street, Suite 3, Brooklyn, NY 11210-0000</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>Israel</td>
-                                        <td>10-02-1997</td>
-                                        <td>׳ג אדר׳ תשנ״ז</td>
-                                        </tr>
+                                                <td>
+                                                    @foreach($student->classes as $class)
+                                                        {{ $class->yearStatus->name ?? '-' }}
+                                                    @endforeach
+                                                </td>
 
-                                        <tr>
-                                        <td>3</td>
-                                        <td>Shana Bais</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>Lorem ipsum dolor sit amet</td>
-                                        <td>50%</td>
-                                        <td>B</td>
-                                        <td>87446334747</td>
-                                        <td>example@gmail.com</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>87446334747</td>
-                                        <td>56 Main Street, Suite 3, Brooklyn, NY 11210-0000</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>USA</td>
-                                        <td>10-02-1997</td>
-                                        <td>׳ג אדר׳ תשנ״ז</td>
-                                        </tr>
+                                                <td>{{ $student->first_name }} {{ $student->last_name }}</td>
 
-                                        <tr>
-                                        <td>4</td>
-                                        <td>Shana Bais</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>Lorem ipsum dolor sit amet</td>
-                                        <td>70%</td>
-                                        <td>F</td>
-                                        <td>87446334747</td>
-                                        <td>example@gmail.com</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>87446334747</td>
-                                        <td>56 Main Street, Suite 3, Brooklyn, NY 11210-0000</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>USA</td>
-                                        <td>10-02-1997</td>
-                                        <td>׳ג אדר׳ תשנ״ז</td>
-                                        </tr>
+                                                <td>{{ $student->high_school }}</td>
 
+                                                <td>{{ $student->attendance_percentage }}</td>
 
-                                        <tr>
-                                        <td>5</td>
-                                        <td>Shana Alef</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>Lorem ipsum dolor sit amet</td>
-                                        <td>88%</td>
-                                        <td>C</td>
-                                        <td>87446334747</td>
-                                        <td>example@gmail.com</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>87446334747</td>
-                                        <td>56 Main Street, Suite 3, Brooklyn, NY 11210-0000</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>USA</td>
-                                        <td>10-02-1997</td>
-                                        <td>׳ג אדר׳ תשנ״ז</td>
-                                        </tr>
+                                                <td>—</td>
 
+                                                <td>{{ $student->mobile }}</td>
+                                                <td>{{ $student->email }}</td>
 
-                                        <tr>
-                                        <td>6</td>
-                                        <td>Shana Alef</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>Lorem ipsum dolor sit amet</td>
-                                        <td>90%</td>
-                                        <td>A+</td>
-                                        <td>87446334747</td>
-                                        <td>example@gmail.com</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>87446334747</td>
-                                        <td>56 Main Street, Suite 3, Brooklyn, NY 11210-0000</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>Israel</td>
-                                        <td>10-02-1997</td>
-                                        <td>׳ג אדר׳ תשנ״ז</td>
-                                        </tr>
+                                                <td>{{ $student->parent_full_name }}</td>
 
+                                               <td>{{ $student->parent_mobile_number }}</td>
 
-                                        <tr>
-                                        <td>7</td>
-                                        <td>Shana Bais</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>Lorem ipsum dolor sit amet</td>
-                                        <td>91.6%</td>
-                                        <td>A</td>
-                                        <td>87446334747</td>
-                                        <td>example@gmail.com</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>87446334747</td>
-                                        <td>56 Main Street, Suite 3, Brooklyn, NY 11210-0000</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>Israel</td>
-                                        <td>10-02-1997</td>
-                                        <td>׳ג אדר׳ תשנ״ז</td>
-                                        </tr>
+                                                <td>{{ $student->residance_address }}</td>
 
+                                                <td>{{ $student->hebrew_first_name }} {{ $student->hebrew_last_name }}</td>
 
-                                        <tr>
-                                        <td>8</td>
-                                        <td>Shana Alef</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>Lorem ipsum dolor sit amet</td>
-                                        <td>55%</td>
-                                        <td>B-</td>
-                                        <td>87446334747</td>
-                                        <td>example@gmail.com</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>87446334747</td>
-                                        <td>56 Main Street, Suite 3, Brooklyn, NY 11210-0000</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>Israel</td>
-                                        <td>10-02-1997</td>
-                                        <td>׳ג אדר׳ תשנ״ז</td>
-                                        </tr>
+                                                <td>{{ $student->place_of_birth }}</td>
 
+                                                <td>{{ $student->dob }}</td>
 
-                                        <tr>
-                                        <td>9</td>
-                                        <td>Shana Bais</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>Lorem ipsum dolor sit amet</td>
-                                        <td>78%</td>
-                                        <td>I</td>
-                                        <td>87446334747</td>
-                                        <td>example@gmail.com</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>87446334747</td>
-                                        <td>56 Main Street, Suite 3, Brooklyn, NY 11210-0000</td>
-                                        <td>Lorem ipsum</td>
-                                        <td>USA</td>
-                                        <td>10-02-1997</td>
-                                        <td>׳ג אדר׳ תשנ״ז</td>
-                                        </tr>
-                                        <!-- Add more <tr> rows as needed -->
+                                                <td>{{ $student->hebrew_dob }}</td>
+                                            </tr>
+                                        @endforeach
+
                                     </tbody>
-                                </table>
-                            </div>
 
-                            <div class="paginationdiv">
-                                <div class="pagination-leftside">
-                                    <img src="./images/leftArrowstu.svg" class="paginationArrow" />
-                                    <p class="page1">1</p>
-                                    <p>2</p>
-                                    <p>3</p>
-                                    <img src="./images/rightArrowstu.svg" class="paginationArrow" />
+                                </table> --}}
+
+                                <div id="studentTableContainer">
+                                    @include('staff.partials.student_list', ['students' => $students])
                                 </div>
 
-                                <div class="pagination-rightside">
-                                    <p>Per page</p>
-                                    <p class="paginationsecond">09 <img src="./images/heroicons.svg" class="heroicons" /></p>
-                                    <p>of 170 results</p>
-                                </div>
                             </div>
+
+                          
+                          <div id="paginationContainer">
+                                @if($students->hasPages())
+                                    <div class="pagination-wrapper" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                                        @include('backend.partials.pagination', [
+                                            'paginator' => $students, 
+                                            'routeName' => 'staff.students.index',
+                                            'queryParams' => request()->except('page')
+                                        ])
+                                        
+                                        <div class="pagination-info" style="text-align: right;">
+                                            <p>
+                                                {{-- Showing {{ $students->firstItem() ?? 0 }} – {{ $students->lastItem() ?? 0 }}
+                                                of {{ $students->total() }} results --}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+
                         </div>
 
                             
@@ -260,3 +174,153 @@
 
 
  @endsection
+
+ @push('script')
+<script>
+    // Toggle dropdown functions
+   function toggleDropdownSubject() {
+        const dropdown = document.querySelector('.dropdown-menu-subject');
+        const otherDropdown = document.querySelector('.dropdown-menu-status');
+        
+        dropdown.classList.toggle('show');
+        otherDropdown.classList.remove('show');
+    }
+
+    function toggleDropdownstatus() {
+    const dropdown = document.querySelector('.dropdown-menu-status');
+    const otherDropdown = document.querySelector('.dropdown-menu-subject');
+    
+        dropdown.classList.toggle('show');
+        otherDropdown.classList.remove('show');
+    }
+
+    // Apply filter function
+    
+    function applyFilter(type, value) {
+        let yearStatus = document.getElementById('yearStatusInput').value;
+        let subject = document.getElementById('subjectInput').value;
+
+        // Update selected filter
+        if (type === 'year_status') yearStatus = value;
+        if (type === 'subject') subject = value;
+
+        // Save updated values
+        document.getElementById('yearStatusInput').value = yearStatus;
+        document.getElementById('subjectInput').value = subject;
+
+        // Update button text immediately
+        updateButtonText(type, value);
+        
+        // Close dropdown
+        document.querySelector('.dropdown-menu-subject').classList.remove('show');
+        document.querySelector('.dropdown-menu-status').classList.remove('show');
+
+        fetchFilteredResults();
+    }
+
+    function updateButtonText(type, value) {
+        const buttons = document.querySelectorAll('.subjectbox');
+        
+        if (type === 'year_status') {
+            const button = buttons[0];
+            if (value === 'all') {
+                button.innerHTML = 'Select Year Status <img src="{{global_asset('staff/assets/images/dropdown-arrow.svg')}}" alt="Icon">';
+            } else {
+                const selectedItem = document.querySelector(`[onclick="applyFilter('year_status', '${value}')"]`);
+                if (selectedItem) {
+                    button.innerHTML = selectedItem.textContent + ' <img src="{{global_asset('staff/assets/images/dropdown-arrow.svg')}}" alt="Icon">';
+                }
+            }
+        } else if (type === 'subject') {
+            const button = buttons[1];
+            if (value === 'all') {
+                button.innerHTML = 'Select Subject <img src="{{global_asset('staff/assets/images/dropdown-arrow.svg')}}" alt="Icon">';
+            } else {
+                const selectedItem = document.querySelector(`[onclick="applyFilter('subject', '${value}')"]`);
+                if (selectedItem) {
+                    button.innerHTML = selectedItem.textContent + ' <img src="{{global_asset('staff/assets/images/dropdown-arrow.svg')}}" alt="Icon">';
+                }
+            }
+        }
+    }
+
+
+  function fetchFilteredResults(pageUrl = null) {
+        const loader = '<div class="loading">Loading...</div>';
+        $('#studentTableContainer').html(loader);
+        
+        let url = pageUrl || "{{ route('staff.students.filter') }}";
+        let params = {
+            year_status: $('#yearStatusInput').val(),
+            subject: $('#subjectInput').val(),
+            filter: true
+        };
+
+        // Add page parameter if it's a pagination request
+        if (pageUrl) {
+            const urlParams = new URLSearchParams(new URL(pageUrl).search);
+            if (urlParams.has('page')) {
+                params.page = urlParams.get('page');
+            }
+        }
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: params,
+            success: function (response) {
+                if (response.status) {
+                    $('#studentTableContainer').html(response.html);
+                    $('#paginationContainer').html(response.paginationHtml || '');
+                    
+                    // Update results info
+                    if (response.from && response.to && response.total) {
+                        $('.pagination-info').html(
+                            `<p>Showing ${response.from} – ${response.to} of ${response.total} results</p>`
+                        );
+                    }
+                }
+            },
+            error: function (xhr) {
+                $('#studentTableContainer').html('<div class="error">Failed to load data. Please try again.</div>');
+                console.error('AJAX Error:', xhr.responseText);
+            }
+        });
+    }
+
+    $(document).on('click', '.pagination a', function (e) {
+        e.preventDefault();
+        let pageUrl = $(this).attr('href');
+        fetchFilteredResults(pageUrl);
+    });
+
+    $(document).on('change', '#perPageSelect', function (e) {
+        e.preventDefault();
+        fetchFilteredResults();
+    });
+
+    // Close dropdowns when clicking outside
+    $(document).on('click', function(event) {
+        if (!$(event.target).closest('.dropdown-week').length) {
+            $('.dropdown-menu-subject, .dropdown-menu-status').removeClass('show');
+        }
+    });
+
+    if (performance.navigation?.type === 1) {
+        // Clear any stored filter values
+        localStorage.removeItem('studentFilters');
+    }
+   
+</script>
+
+<script>
+    // Reset filters on full browser reload
+    // if (performance.navigation.type === 1) {
+    //     window.location.href = "{{ route('staff.students.index') }}";
+    // }
+</script>
+
+
+
+
+ @endpush
