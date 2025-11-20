@@ -10,6 +10,7 @@ use App\Models\Role;
 use App\Models\Staff\Designation;
 use App\Models\Upload;
 use App\Models\User;
+use App\Models\Leave;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\LiveChat\Entities\Message;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -109,6 +110,10 @@ class Staff extends BaseModel
         return $this->hasMany(SubjectAssignChildren::class, 'staff_id');
     }
 
+    public function leaves()
+    {
+        return $this->hasMany(Leave::class, 'teacher_id', 'id');
+    }
 
     public function subjectAssigns()
     {

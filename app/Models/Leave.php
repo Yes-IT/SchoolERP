@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\StudentInfo\Student;
+use App\Models\Staff\Staff;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -31,6 +32,11 @@ class Leave extends Model
     public function student()
     {
         return $this->belongsTo(Student::class, 'student_id', 'id');
+    }
+
+    public function teacher()
+    {
+        return $this->belongsTo(Staff::class, 'teacher_id', 'id');
     }
    
 
