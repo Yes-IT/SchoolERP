@@ -6,12 +6,12 @@
 
     <div class="dsbdy-filter-wrp">
         <select name="year" id="year">
-        <option value="2024-2025">Subject +</option>
+        <option value="2024-2025">Subject</option>
         <option value="2023-2024">Maths</option>
         <option value="2023-2024">English</option>
         </select>
         <select name="semester" id="semester">
-        <option value="first-semester">Room No.</option>
+        <option value="first-semester">Room No</option>
         <option value="second-semester">319</option>
         </select>
     </div>
@@ -68,7 +68,7 @@
                 <input type="checkbox" id="toggle" hidden>
                 <label for="toggle" class="select-label">
                     24 October
-                    <img src="./images/chevrondown.svg" alt="">
+                    <img src="{{ asset('staff') }}/assets/images/chevrondown.svg" alt="">
                 </label>
                 <ul class="options">
                     <li data-value="24">24 October</li>
@@ -84,7 +84,7 @@
                 <input type="checkbox" id="toggle-day" hidden>
                 <label for="toggle-day" class="select-label-day">
                     Day
-                    <img src="./images/chevrondowngrey.svg" alt="">
+                    <img src="{{ asset('staff') }}/assets/images/chevrondowngrey.svg" alt="">
                 </label>
                 <ul class="options-day">
                     <li>Monday</li>
@@ -98,8 +98,8 @@
                 </div>
 
                 <div>
-                <img src="./images/leftarrow.svg" class="arrow-attendance" alt="leftarrow" />
-                <img src="./images/rightarrow.svg" class="arrow-attendance" alt="leftarrow" />
+                <img src="{{ asset('staff') }}/assets/images/leftarrow.svg" class="arrow-attendance" alt="leftarrow" />
+                <img src="{{ asset('staff') }}/assets/images/rightarrow.svg" class="arrow-attendance" alt="leftarrow" />
                 </div>
 
                 <button class="viewall">View All</button>
@@ -210,7 +210,7 @@
             <div class="datepicker">
             <div class="datepicker__header">
                 <span>Oct 04- Oct 09 </span>
-                <img src="./images/down-arrow-5.svg" />
+                <img src="{{ asset('staff') }}/assets/images/down-arrow-5.svg" />
             </div>
             <div class="datepicker-body-wrp">
                 <div class="datepicker__body">
@@ -231,7 +231,7 @@
             <div class="studentBtns">
             <div class="dropdown-week">
                 <button class="cmn-btn print-btn" onclick="toggleDropdownWeek()">Week <img
-                    src="./images/greyarrow.svg" alt="Icon"></button>
+                    src="{{ asset('staff') }}/assets/images/greyarrow.svg" alt="Icon"></button>
                 <ul class="dropdown-menu-grade">
                 <li>Day</li>
                 <li class="active-week">Week</li>
@@ -239,8 +239,8 @@
                 </ul>
             </div>
 
-            <button><img src="./images/leftstudent.svg" /></button>
-            <button><img src="./images/rightstudent.svg" /></button>
+            <button><img src="{{ asset('staff') }}/assets/images/leftstudent.svg" /></button>
+            <button><img src="{{ asset('staff') }}/assets/images/rightstudent.svg" /></button>
 
             <button class="viewall">View All</button>
             </div>
@@ -305,21 +305,7 @@
                     <td>
 
                     </td>
-                    <!-- <td>
-                                        <strong>Subject Name</strong><br>
-                                        Teacher Name<br>
-                                        Room No. 12
-                                        </td>
-                                        <td>
-                                        <strong>Subject Name</strong><br>
-                                        Teacher Name<br>
-                                        Room No. 12
-                                        </td>
-                                        <td>
-                                        <strong>Subject Name</strong><br>
-                                        Teacher Name<br>
-                                        Room No. 12
-                                        </td> -->
+                    
                 </tr>
 
                 <!-- Monday -->
@@ -462,7 +448,7 @@
                 <div class="datepicker">
                     <div class="datepicker__header">
                         <span>Octuber 2025 </span>
-                        <img src="./images/down-arrow-5.svg" />
+                        <img src="{{ asset('staff') }}/assets/images/down-arrow-5.svg" />
                     </div>
                     <div class="datepicker-body-wrp">
                         <div class="datepicker__body">
@@ -482,7 +468,7 @@
 
                 <div class="studentBtns">
                     <div class="dropdown-week">
-                        <button class="cmn-btn print-btn" onclick="toggleDropdownWeek()">Month <img src="./images/greyarrow.svg"
+                        <button class="cmn-btn print-btn" onclick="toggleDropdownWeek()">Month <img src="{{ asset('staff') }}/assets/images/greyarrow.svg"
                             alt="Icon"></button>
                         <ul class="dropdown-menu-week">
                         <li>Day</li>
@@ -491,8 +477,8 @@
                         </ul>
                     </div>
 
-                    <button><img src="./images/leftstudent.svg" /></button>
-                    <button><img src="./images/rightstudent.svg" /></button>
+                    <button><img src="{{ asset('staff') }}/assets/images/leftstudent.svg" /></button>
+                    <button><img src="{{ asset('staff') }}/assets/images/rightstudent.svg" /></button>
                 </div>
             </div>
 
