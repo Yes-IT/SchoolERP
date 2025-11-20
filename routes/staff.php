@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Staff\AttendanceController;
 use App\Http\Controllers\Staff\DashboardController;
 use App\Http\Controllers\Staff\DepartmentController;
 use App\Http\Controllers\Staff\DesignationController;
@@ -52,6 +53,10 @@ Route::middleware([ 'web',])->group(function () {
 
                 
             Route::get('/staff/dashboard', [DashboardController::class, 'index'])->name('staff.dashboard')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+            
+            Route::get('/staff/attendance', [AttendanceController::class, 'index'])->name('staff.attendance.index')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+            Route::post('/staff/attendance/load', [AttendanceController::class, 'loadAttendance'])->name('staff.attendance.load');
+            Route::post('/staff/attendance/save', [AttendanceController::class, 'saveAttendance'])->name('staff.attendance.save');
 
 
         });

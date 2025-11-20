@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/regular.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
 
     <!-- slick slider -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
@@ -53,7 +54,7 @@
     <!-- Modal Popup -->
     <div id="customPopup" class="popup-overlay">
     <div class="popup-box">
-        <img src="./images/material-cancel.svg" class="cancelpopup" onclick="closeCustomPopup()" />
+        <img src="{{ asset('staff') }}/assets/images/material-cancel.svg" class="cancelpopup" onclick="closeCustomPopup()" />
         
         <h2>Selection Session</h2>
 
@@ -63,7 +64,7 @@
         <div class="studentBtns">
                     <div class="dropdown-week">
                     <button class="subjectbox-session" onclick="toggleDropdowndash()">2024-2025<img
-                        src="./images/dropdown-arrow.svg" alt="Icon"></button>
+                        src="{{ asset('staff') }}/assets/images/dropdown-arrow.svg" alt="Icon"></button>
                     <ul class="dropdown-menu-dash">
                         <li>2021-2022</li>
                         <li class="active-week">2022-2023</li>
@@ -79,7 +80,7 @@
         <label class="form-label" for="customYearStatus">Year Status</label>
         <div class="custom-dropdown custom-year-status" id="customYearStatus">
             <div class="dropdown-selected">Shana Alef</div>
-            <img src="./images/sessionarrow.svg" class="dropdown-arrow" />
+            <img src="{{ asset('staff') }}/assets/images/sessionarrow.svg" class="dropdown-arrow" />
             
         </div>
         </div>
@@ -90,7 +91,7 @@
         <div class="studentBtns">
                     <div class="dropdown-week">
                     <button class="subjectbox-session" onclick="toggleDropdownsem()">First Semester<img
-                        src="./images/dropdown-arrow.svg" alt="Icon"></button>
+                        src="{{ asset('staff') }}/assets/images/dropdown-arrow.svg" alt="Icon"></button>
                     <ul class="dropdown-menu-sem">
                         <li>First Semester</li>
                         <li class="active-week">Second Semester</li>
@@ -112,6 +113,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
 
     <script src="{{ global_asset('staff/assets/js/common.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
 
     @stack('script')
 </body>
