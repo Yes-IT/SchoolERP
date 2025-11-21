@@ -27,6 +27,8 @@
 
     <!-- custom -->
     <link rel="stylesheet" href="{{ asset('staff/assets/css/style.css') }}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css"/>
     
     @stack('styles')
 </head>
@@ -51,7 +53,6 @@
 
     <!-- Modal Popup -->
     <div id="customPopup" class="popup-overlay">
-<<<<<<< HEAD
     <div class="popup-box">
         <img src="{{ asset('staff') }}/assets/images/material-cancel.svg" class="cancelpopup" onclick="closeCustomPopup()" />
         
@@ -80,10 +81,6 @@
         <div class="custom-dropdown custom-year-status" id="customYearStatus">
             <div class="dropdown-selected">Shana Alef</div>
             <img src="{{ asset('staff') }}/assets/images/sessionarrow.svg" class="dropdown-arrow" />
-=======
-        <div class="popup-box">
-            <img src="./images/material-cancel.svg" class="cancelpopup" onclick="closeCustomPopup()" />
->>>>>>> d22054a38da4228a94858bec44d6ad5252515433
             
             <h2>Selection Session</h2>
 
@@ -92,7 +89,6 @@
                 <label class="form-label" for="customYear">Year</label>
                 <div class="studentBtns">
                     <div class="dropdown-week">
-<<<<<<< HEAD
                     <button class="subjectbox-session" onclick="toggleDropdownsem()">First Semester<img
                         src="{{ asset('staff') }}/assets/images/dropdown-arrow.svg" alt="Icon"></button>
                     <ul class="dropdown-menu-sem">
@@ -100,17 +96,6 @@
                         <li class="active-week">Second Semester</li>
                     
                     </ul>
-=======
-                        <button class="subjectbox-session" onclick="toggleDropdowndash()">
-                            2024-2025<img src="./images/dropdown-arrow.svg" alt="Icon">
-                        </button>
-                        <ul class="dropdown-menu-dash">
-                            <li>2021-2022</li>
-                            <li class="active-week">2022-2023</li>
-                            <li>2023-2024</li>
-                            <li>2024-2025</li>
-                        </ul>
->>>>>>> d22054a38da4228a94858bec44d6ad5252515433
                     </div>
                 </div>
             </div>
@@ -153,8 +138,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
 
     <script src="{{ global_asset('staff/assets/js/common.js') }}"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    @include('staff.partials.ajax-alert')
 
     @stack('script')
 </body>

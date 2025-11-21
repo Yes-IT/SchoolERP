@@ -52,31 +52,33 @@ Route::middleware([ 'web',])->group(function () {
                     Route::delete('/delete/{id}', 'delete')->name('delete')->middleware(['PermissionCheck:designation_delete', 'DemoCheck']);
                 });
                 
-            Route::get('/staff/dashboard', [DashboardController::class, 'index'])->name('staff.dashboard')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
-            
-            Route::get('/staff/attendance', [AttendanceController::class, 'index'])->name('staff.attendance.index')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
-            Route::post('/staff/attendance/load', [AttendanceController::class, 'loadAttendance'])->name('staff.attendance.load');
-            Route::post('/staff/attendance/save', [AttendanceController::class, 'saveAttendance'])->name('staff.attendance.save');
-
+                Route::get('/staff/dashboard', [DashboardController::class, 'index'])->name('staff.dashboard')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+                
+                Route::get('/staff/attendance', [AttendanceController::class, 'index'])->name('staff.attendance.index')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+                Route::post('/staff/attendance/load', [AttendanceController::class, 'loadAttendance'])->name('staff.attendance.load');
+                Route::post('/staff/attendance/save', [AttendanceController::class, 'saveAttendance'])->name('staff.attendance.save');
             });
 
-        });
+            Route::prefix('staff')->name('staff.')->middleware(['lang', 'CheckSubscription'])->group(function () {
 
-        Route::prefix('staff')->name('staff.')->middleware(['lang', 'CheckSubscription'])->group(function () {
+                Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('FeatureCheck:staff_manage');
 
-            Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('FeatureCheck:staff_manage');
+                // Profile Module
+                Route::prefix('profile')->name('profile.')->controller(ProfileController::class)->group(function () {
+                    Route::get('/', 'index')->name('index')->middleware('PermissionCheck:profile_read');
+                });
 
-            // Profile Module
-            Route::prefix('profile')->name('profile.')->controller(ProfileController::class)->group(function () {
-                Route::get('/', 'index')->name('index')->middleware('PermissionCheck:profile_read');
-            });
+                Route::prefix('assignment')->name('assignment.')->controller(AssignmentController::class)->group(function () {
+                    Route::get('/', 'index')->name('index')->middleware('PermissionCheck:assignment_read');
+                });
 
-            Route::prefix('assignment')->name('assignment.')->controller(AssignmentController::class)->group(function () {
-                Route::get('/', 'index')->name('index')->middleware('PermissionCheck:assignment_read');
-            });
-
-            Route::prefix('apply-leave')->name('apply-leave.')->controller(ApplyLeaveController::class)->group(function () {
-                Route::get('/', 'index')->name('index')->middleware('PermissionCheck:apply_leave_read');
+                Route::prefix('apply-leave')->name('apply-leave.')->controller(ApplyLeaveController::class)->group(function () {
+                    Route::get('/', 'index')->name('index')->middleware('PermissionCheck:apply_leave_read');
+                    Route::post('/', 'applyForLeave')->name('apply')->middleware('PermissionCheck:apply_leave_update');
+                    Route::get('/get-leave/{id}', 'showLeave')->name('get-leave')->middleware('PermissionCheck:apply_leave_read');
+                    Route::put('/update/{id}', 'updateLeave')->name('update')->middleware(['PermissionCheck:apply_leave_update']);
+                    Route::delete('/delete/{id}', 'deleteLeave')->name('delete')->middleware(['PermissionCheck:apply_leave_delete']);
+                });
             });
 
             Route::prefix('students')->name('students.')->controller(StudentController::class)->group(function () {
