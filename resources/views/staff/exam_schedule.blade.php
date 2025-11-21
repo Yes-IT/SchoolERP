@@ -1,5 +1,25 @@
 @extends('staff.master')
+<style>
+    .time-select-group {
+    display: flex;
+    gap: 5px;
+}
 
+.req-time {
+    width: 80px !important;
+}
+
+#room-loading {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.req-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+</style>
 @section('content')
     <div class="ds-breadcrumb">
         <h1>Exam Schedule</h1>
@@ -243,6 +263,10 @@
     <!-- popup request exam-->
         <div class="request-overlay" style="display: none;">
             <div class="request-modal">
+                <form id="exam-request-form">
+                    @csrf
+
+                    
                     <p class="request-heading">Request Modal <span><img src="{{asset('staff/assets/images/reqCross.svg')}}" class="requestClose" /></span></p>
 
                     <div class="req-type">
@@ -250,7 +274,7 @@
                         <p>
                             {{-- <input type="text" class="req-box" placeholder="Select Exam Type"/> --}}
 
-                            <select class="req-box exam-type-select">
+                            <select class="req-box exam-type-select"  name="exam_type_id" required>
                                 <option value="">Select Exam Type</option>
                                 @foreach($examTypes as $examType)
                                     <option value="{{ $examType->id }}">{{ $examType->name }}</option>
@@ -268,7 +292,7 @@
                             <p class="req-exam">Subject</p>
                             <p>
                                 {{-- <input type="text" class="req-box" placeholder="Select Subject"/> --}}
-                                <select class="req-box subject-select">
+                                <select class="req-box subject-select" name="subject_id" required>
                                     <option value="">Select Subject</option>
                                     @foreach($subjects as $subject)
                                         <option value="{{ $subject->id }}">{{ $subject->name }}</option>
@@ -283,7 +307,7 @@
                         <div class="req-type">
                             <p class="req-exam">Exam Date *</p>
                             <p>
-                                <input type="text" class="req-box" id="exam-date" placeholder="mm-dd-yyyy" />
+                                <input type="text" class="req-box" id="exam-date" name="exam_date" placeholder="mm-dd-yyyy"  required/>
                                 <span><img src="{{asset('staff/assets/images/reqCal.svg')}}" class="req-arrow"/></span>
                             </p>
                         </div>
@@ -294,8 +318,8 @@
                         <div class="req-type">
                             <p class="req-exam">Start Time *</p>
                             <div class="time-select-group">
-                                <select class="req-box req-time">
-                                <option>01</option>
+                                <select class="req-box req-time hour-dropdown start-hour"  name="start_hour" required>
+                                {{-- <option>01</option>
                                 <option>02</option>
                                 <option>03</option>
                                 <option>04</option>
@@ -306,27 +330,28 @@
                                 <option>09</option>
                                 <option>10</option>
                                 <option>11</option>
-                                <option>12</option>
+                                <option>12</option> --}}
                                 </select>
-                                <select class="req-box req-time">
-                                <option>00</option>
+                                <select class="req-box req-time minute-dropdown start-minute" name="start_minute" required>
+                                {{-- <option>00</option>
                                 <option>15</option>
                                 <option>30</option>
-                                <option>45</option>
+                                <option>45</option> --}}
                                 </select>
-                                <select class="req-box req-time">
-                                <option>AM</option>
-                                <option>PM</option>
+                                <select class="req-box req-time ampm-dropdown start-ampm" name="start_ampm" required>
+                                {{-- <option>AM</option>
+                                <option>PM</option> --}}
                                 </select>
                             </div>
+                          
                         </div>
 
                         <!-- END TIME -->
                         <div class="req-type">
                             <p class="req-exam">End Time *</p>
                             <div class="time-select-group">
-                                <select class="req-box req-time">
-                                <option>01</option>
+                                <select class="req-box req-time hour-dropdown end-hour" name="end_hour" required>
+                                {{-- <option>01</option>
                                 <option>02</option>
                                 <option>03</option>
                                 <option>04</option>
@@ -337,19 +362,21 @@
                                 <option>09</option>
                                 <option>10</option>
                                 <option>11</option>
-                                <option>12</option>
+                                <option>12</option> --}}
                                 </select>
-                                <select class="req-box req-time">
-                                <option>00</option>
+                                <select class="req-box req-time minute-dropdown end-minute" name="end_minute" required>
+                                {{-- <option>00</option>
                                 <option>15</option>
                                 <option>30</option>
-                                <option>45</option>
+                                <option>45</option> --}}
                                 </select>
-                                <select class="req-box req-time">
-                                <option>AM</option>
-                                <option>PM</option>
+                                <select class="req-box req-time ampm-dropdown end-ampm" name="end_ampm" required>
+                                {{-- <option>AM</option>
+                                <option>PM</option> --}}
                                 </select>
                             </div>
+
+                           
                         </div>
                     </div>
 
@@ -357,17 +384,21 @@
                         <p class="req-exam">Room *</p>
                         <p>
                             {{-- <input type="text" class="req-box" class="datepick" placeholder="Select Room"/> --}}
-                            <select class="req-box room-select" id="room-select">
-                                <option value="">Select Room</option>
-                                <!-- Rooms will be populated dynamically -->
+                            <select class="req-box room-select" id="room-select" name="room_id" required disabled>
+                                <option value="">Select Date and Time first</option>
+                                
                             </select>
                             <span>
                                 <img src="{{asset('staff/assets/images/dropdown-arrowpopup.svg')}}" class="req-arrow"/>
                             </span>
                         </p>
+                       <div id="room-loading" style="display: none;">Checking available rooms...</div>
+
                     </div>
 
-                    <button class="req-btn">Request</button>
+                    <button  type="submit" class="req-btn">Request</button>
+
+                </form>    
             </div>
         </div>
     <!-- popup request exam-->
@@ -379,9 +410,340 @@
         $("#exam-date").datepicker({
         dateFormat: "mm-dd-yy", // Matches your placeholder
         changeMonth: true,
-        changeYear: true
+        changeYear: true,
+        
         });
     });
 </script>
+<script>
+    // Populate hours 01–12
+   function populateHours(selector) {
+        let select = document.querySelector(selector);
+        select.innerHTML = "";
+        // Add empty option first
+        let emptyOpt = new Option("HH", "");
+        select.add(emptyOpt);
+        for (let i = 1; i <= 12; i++) {
+            let value = i.toString().padStart(2, "0");
+            let opt = new Option(value, value);
+            select.add(opt);
+        }
+    }
+
+    // Populate minutes 00–59
+   function populateMinutes(selector) {
+        let select = document.querySelector(selector);
+        select.innerHTML = "";
+        // Add empty option first
+        let emptyOpt = new Option("MM", "");
+        select.add(emptyOpt);
+        for (let i = 0; i < 60; i++) {
+            let value = i.toString().padStart(2, "0");
+            let opt = new Option(value, value);
+            select.add(opt);
+        }
+    }
+
+    // Populate AM/PM
+    function populateAmpm(selector) {
+        let select = document.querySelector(selector);
+        select.innerHTML = "";
+        // Add empty option first
+        let emptyOpt = new Option("AM/PM", "");
+        select.add(emptyOpt);
+        ["AM", "PM"].forEach(val => {
+            let opt = new Option(val, val);
+            select.add(opt);
+        });
+    }
+
+    // Call for all dropdowns
+    document.addEventListener("DOMContentLoaded", function () {
+        populateHours(".start-hour");
+        populateHours(".end-hour");
+
+        populateMinutes(".start-minute");
+        populateMinutes(".end-minute");
+
+        populateAmpm(".start-ampm");
+        populateAmpm(".end-ampm");
+    });
+</script>
+
+
+<script>
+    class ExamScheduler {
+        constructor() {
+            this.debounceTimer = null;
+            this.bindEvents();
+        }
+
+        bindEvents() {
+            // Check room availability when date or time changes
+            $('#exam-date, .start-hour, .start-minute, .start-ampm, .end-hour, .end-minute, .end-ampm').on('change', () => {
+                this.debouncedCheckRoomAvailability();
+            });
+
+            // Handle form submission
+            $('#exam-request-form').on('submit', (e) => {
+                e.preventDefault();
+                this.submitExamRequest();
+            });
+        }
+
+        // Debounce function to prevent multiple rapid API calls
+        debouncedCheckRoomAvailability() {
+            if (this.debounceTimer) {
+                clearTimeout(this.debounceTimer);
+            }
+            this.debounceTimer = setTimeout(() => {
+                this.checkRoomAvailability();
+            }, 500);
+        }
+
+        areTimeFieldsFilled() {
+            const startHour = $('.start-hour').val();
+            const startMinute = $('.start-minute').val();
+            const startAmPm = $('.start-ampm').val();
+            const endHour = $('.end-hour').val();
+            const endMinute = $('.end-minute').val();
+            const endAmPm = $('.end-ampm').val();
+
+            // All time fields must have non-empty values
+            return startHour && startMinute && startAmPm && endHour && endMinute && endAmPm;
+        }
+
+        getFormattedTime() {
+            const startTime = this.formatTime(
+                $('.start-hour').val(),
+                $('.start-minute').val(),
+                $('.start-ampm').val()
+            );
+            
+            const endTime = this.formatTime(
+                $('.end-hour').val(),
+                $('.end-minute').val(),
+                $('.end-ampm').val()
+            );
+
+            return { startTime, endTime };
+        }
+
+        formatTime(hour, minute, ampm) {
+            let hourInt = parseInt(hour);
+            if (ampm === 'PM' && hourInt !== 12) {
+                hourInt += 12;
+            } else if (ampm === 'AM' && hourInt === 12) {
+                hourInt = 0;
+            }
+            return `${String(hourInt).padStart(2, '0')}:${minute}:00`;
+        }
+
+        async checkRoomAvailability() {
+            const examDateInput = $('#exam-date').val();
+            const examDate = this.formatDateForBackend(examDateInput);
+            
+            // Only proceed if date is selected AND all time fields are filled
+            if (!examDate || !this.areTimeFieldsFilled()) {
+                $('#room-select').html('<option value="">Select Date and complete all Time fields</option>');
+                $('#room-select').prop('disabled', true);
+                return;
+            }
+
+            const { startTime, endTime } = this.getFormattedTime();
+
+            // Validate time logic
+            if (startTime >= endTime) {
+                $('#room-select').html('<option value="">End time must be after start time</option>');
+                $('#room-select').prop('disabled', true);
+                return;
+            }
+
+            // Show loading
+            $('#room-loading').show();
+            $('#room-select').prop('disabled', true);
+
+            try {
+                const response = await $.ajax({
+                    url: '{{route("staff.my-classes.available-rooms")}}',
+                    method: 'GET',
+                    data: {
+                        exam_date: examDate,
+                        start_time: startTime,
+                        end_time: endTime
+                    }
+                });
+
+                if (response.success) {
+                    this.populateRooms(response.rooms);
+                } else {
+                    this.showError('Failed to fetch available rooms');
+                    $('#room-select').html('<option value="">Error loading rooms</option>');
+                }
+            } catch (error) {
+                console.error('Error fetching rooms:', error);
+                this.showError('Error checking room availability');
+                $('#room-select').html('<option value="">Error loading rooms</option>');
+            } finally {
+                $('#room-loading').hide();
+            }
+        }
+
+        formatDateForBackend(dateString) {
+            if (!dateString) return '';
+            
+            // Split the date (assuming format: MM-DD-YYYY)
+            const parts = dateString.split('-');
+            if (parts.length === 3) {
+                const [month, day, year] = parts;
+                return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            }
+            
+            return dateString; // Return as-is if format doesn't match
+        }
+
+        populateRooms(rooms) {
+            const roomSelect = $('#room-select');
+            roomSelect.empty();
+
+            if (rooms.length === 0) {
+                roomSelect.append('<option value="">No rooms available for selected time</option>');
+                roomSelect.prop('disabled', true);
+            } else {
+                roomSelect.append('<option value="">Select a room</option>');
+                rooms.forEach(room => {
+                    roomSelect.append(
+                       $('<option>', {
+                            value: room.id,
+                            text: `Room ${room.room_no}`
+                        })
+                    );
+                });
+                roomSelect.prop('disabled', false);
+            }
+        }
+
+      async submitExamRequest() {
+
+
+        // Add this at the beginning of your submitExamRequest method
+        console.log('CSRF Token from meta:', $('meta[name="csrf-token"]').attr('content'));
+        console.log('CSRF Token from input:', $('input[name="_token"]').val());
+            // Collect data manually instead of using FormData
+            const data = {
+                exam_type_id: $('.exam-type-select').val(),
+                subject_id: $('.subject-select').val(),
+                class_id: $('.class-select').val(),
+                room_id: $('#room-select').val(),
+                exam_date: this.formatDateForBackend($('#exam-date').val()),
+                _token: $('meta[name="csrf-token"]').attr('content') || $('input[name="_token"]').val()
+            };
+
+            const { startTime, endTime } = this.getFormattedTime();
+            data.start_time = startTime;
+            data.end_time = endTime;
+
+            console.log('Manual form data:', data);
+           console.log('CSRF Token:', data._token); // Debug: check if token exists
+
+            // Basic validation
+            if (!this.validateForm(data)) {
+                return;
+            }
+
+            // Show loading state
+            $('.req-btn').prop('disabled', true).text('Submitting...');
+
+            try {
+                const response = await $.ajax({
+                    url: '{{route("staff.my-classes.store_exam_request")}}',
+                    method: 'POST',
+                    data: data,
+                    
+                });
+
+                if (response.success) {
+                    this.showSuccess(response.message);
+                    this.resetForm();
+                    $('.request-modal').hide();
+                } else {
+                    this.showError(response.message);
+                }
+            } catch (error) {
+                console.error('Error submitting request:', error);
+                const errorMessage = error.responseJSON?.message || 'Failed to submit exam request';
+                this.showError(errorMessage);
+            } finally {
+                $('.req-btn').prop('disabled', false).text('Request');
+            }
+        }
+
+        validateForm(data) {
+            if (!data.exam_type_id || !data.subject_id  || 
+                !data.exam_date || !data.room_id) {
+                this.showError('Please fill all required fields');
+                return false;
+            }
+
+            // Check if time fields are filled
+            if (!this.areTimeFieldsFilled()) {
+                this.showError('Please complete all time fields');
+                return false;
+            }
+
+            const { startTime, endTime } = this.getFormattedTime();
+            if (startTime >= endTime) {
+                this.showError('End time must be after start time');
+                return false;
+            }
+
+            return true;
+        }
+
+        showSuccess(message) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: message,
+                    timer: 3000
+                });
+            } else {
+                alert('Success: ' + message);
+            }
+        }
+
+        showError(message) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: message
+                });
+            } else {
+                alert('Error: ' + message);
+            }
+        }
+
+        resetForm() {
+            document.getElementById('exam-request-form').reset();
+            $('#room-select').html('<option value="">Select Date and Time first</option>');
+            $('#room-select').prop('disabled', true);
+        }
+    }
+
+    // Initialize when document is ready
+    $(document).ready(function() {
+        setTimeout(() => {
+            window.examScheduler = new ExamScheduler();
+        }, 100);
+        
+        $('.requestClose').on('click', function() {
+            $('.request-modal').hide();
+        });
+    });
+</script>
+
+
 
 @endpush

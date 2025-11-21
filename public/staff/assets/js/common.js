@@ -600,16 +600,16 @@ function toggleDropdownstatus() {
 
 
   /* daterangepicker */
-
-  // Open modal on 'Requested Examination' click
-document.querySelector('.examtype-text-btn span:nth-child(2)').addEventListener('click', function () {
-  // document.querySelector('.request-overlay').style.display = 'flex';
-});
-
-// OPEN MODAL only when clicking + Add Exam Request
-document.querySelector('.exm-req').addEventListener('click', function () {
-    document.querySelector('.request-overlay').style.display = 'flex';
-});
+  if(document.querySelector('.exam-last-div .exm-req')){
+    document.querySelector('.exam-last-div .exm-req').addEventListener('click', function () {
+      document.querySelector('.request-overlay').style.display = 'flex';
+    });
+  }
+if(document.querySelector('.request-close')){
+  document.querySelector('.request-close').addEventListener('click', function () {
+    document.querySelector('.request-overlay').style.display = 'none';
+  });
+}
 
 // Close modal on 'X' click
 document.querySelector('.requestClose').addEventListener('click', function () {
