@@ -4,6 +4,19 @@
     {{ @$data['title'] }}
 @endsection
 
+@push('styles')
+<style>
+    .error-input {
+        border: 1px solid red !important;
+    }
+    .error-message {
+        color: red;
+        font-size: 13px;
+        margin-top: 4px;
+    }
+</style>
+@endpush
+
 @section('content')
     
 <div class="ds-breadcrumb">
@@ -13,8 +26,6 @@
         <li>Apply Leaves</li>
     </ul>
 </div>
-
-@dump($data['leaves']->toArray())
 
 <div class="ds-pr-body">
     
@@ -33,100 +44,8 @@
             </div>
         </div>
 
-        <div class="ds-cmn-tble count-row w1200">
-            <table>
-                <thead>
-                    <tr>
-                        <th>S. No</th>
-                        <th>Apply Date</th>
-                        <th>From Date</th>
-                        <th>To Date</th>
-                        <th>Reason</th>
-                        <th>
-                            <div class="status-wrp">
-                                Status
-                                <div class="ibtn">
-                                    <button type="button" class="ibtn-icon">
-                                        <img src="{{ asset('staff/assets/images/i-icon.svg') }}" alt="Icon">
-                                    </button>
-                                    <div class="ibtn-info lg rt p15">
-                                        <button type="button" class="ibtn-close" style="filter: brightness(0);">
-                                            <img src="{{ asset('staff/assets/images/fa-times.svg') }}" alt="icon">
-                                        </button>
-                                        <h3 class="txt-primary mb-2">Note:</h3>
-                                        <p>Your leave will be reviewed by your Mechaneches.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>0</td>
-                        <td>04/02/2025</td>
-                        <td>04/02/2025</td>
-                        <td>04/02/2025</td>
-                        <td><div class="linecamped line-count-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</div></td>
-                        <td><p class="red-bg cmn-tbl-btn">Pending</p></td>
-                        <td>
-                            <div class="actions-wrp">
-                                <button type="button" data-bs-toggle="modal" data-bs-target="#editLeaveRequest">
-                                    <img src="./images/edit-icon-primary.svg" alt="Icon">
-                                </button>
-                                <button type="button" data-bs-toggle="modal" data-bs-target="#deleteLeaveRequest">
-                                    <img src="./images/bin-icon.svg" alt="Icon">
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>0</td>
-                        <td>04/02/2025</td>
-                        <td>04/02/2025</td>
-                        <td>04/02/2025</td>
-                        <td><div class="linecamped line-count-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</div></td>
-                        <td><p class="green-bg cmn-tbl-btn">Approved (04/01/2025)</p></td>
-                        <td>--</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="tablepagination">
-
-            <div class="tbl-pagination-inr">
-                <ul>
-                    <li><a href="#url"><img src="./images/arrow-left.svg" alt="Icon"></a></li>
-                    <li class="active"><a href="#url">1</a></li>
-                    <li><a href="#url">2</a></li>
-                    <li><a href="#url">3</a></li>
-                    <li><a href="#url"><img src="./images/arrow-right.svg" alt="Icon"></a></li>
-                </ul>
-            </div>
-
-            <div class="pages-select">
-                <form>
-                    <div class="formfield">
-                        <label>Per page</label>
-                        <select>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                        </select>
-                    </div>
-                </form>
-                <p>of 2 results</p>
-            </div>
-
+        <div id="leaveListContainer">
+            {{-- Load leave list here --}}
         </div>
 
     </div>
@@ -138,28 +57,34 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true"><img src="./images/cross-icon.svg" alt="Icon"></span>
+                <span aria-hidden="true">
+                    <img src="{{ asset('staff/assets/images/cross-icon.svg') }}" alt="Icon">
+                </span>
             </button>
 
             <div class="modal-body">
                 <div class="cmn-pop-inr-content-wrp">
                     <h2>Request Leave</h2>
                     <div class="request-leave-form-wrp">
-                        <form>
+                        <form id="requestLeaveForm">
+                            @csrf
                             <div class="request-leave-form">
                                 <div class="multi-input-grp">
                                     <div class="input-grp">
                                         <label>From Date *</label>
-                                        <input type="date" placeholder="DD-MM-YYYY">
+                                        <input type="date" name="from_date" placeholder="DD-MM-YYYY" required>
+                                        <div class="error-message" data-error="from_date"></div>
                                     </div>
                                     <div class="input-grp">
                                         <label>To Date *</label>
-                                        <input type="date" placeholder="DD-MM-YYYY">
+                                        <input type="date" name="to_date" placeholder="DD-MM-YYYY" required>
+                                        <div class="error-message" data-error="to_date"></div>
                                     </div>
                                 </div>
                                 <div class="input-grp">
                                     <label>Reason</label>
-                                    <textarea placeholder="Reason"></textarea>
+                                    <textarea name="reason" placeholder="Reason" required></textarea>
+                                    <div class="error-message" data-error="reason"></div>
                                 </div>
                                 <input type="submit" value="Submit" class="btn-sm">
                             </div>
@@ -177,28 +102,35 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true"><img src="./images/cross-icon.svg" alt="Icon"></span>
+                <span aria-hidden="true">
+                    <img src="{{ asset('staff/assets/images/cross-icon.svg') }}" alt="Icon">
+                </span>
             </button>
 
             <div class="modal-body">
                 <div class="cmn-pop-inr-content-wrp">
                     <h2>Edit Leave</h2>
                     <div class="request-leave-form-wrp">
-                        <form>
+                        <form id="editLeaveForm">
+                            @csrf
+                            <input type="hidden" id="edit-leave-id" name="leave_id">
                             <div class="request-leave-form">
                                 <div class="multi-input-grp">
                                     <div class="input-grp">
                                         <label>From Date *</label>
-                                        <input type="date" placeholder="DD-MM-YYYY">
+                                        <input type="date" name="from_date" placeholder="DD-MM-YYYY" required>
+                                        <div class="error-message" data-error="from_date"></div>
                                     </div>
                                     <div class="input-grp">
                                         <label>To Date *</label>
-                                        <input type="date" placeholder="DD-MM-YYYY">
+                                        <input type="date" name="to_date" placeholder="DD-MM-YYYY" required>
+                                        <div class="error-message" data-error="to_date"></div>
                                     </div>
                                 </div>
                                 <div class="input-grp">
                                     <label>Reason</label>
-                                    <textarea placeholder="Reason">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</textarea>
+                                    <textarea name="reason" placeholder="Reason" required></textarea>
+                                    <div class="error-message" data-error="reason"></div>
                                 </div>
                                 <input type="submit" value="Submit" class="btn-sm">
                             </div>
@@ -217,21 +149,27 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true"><img src="./images/cross-icon.svg" alt="Icon"></span>
+                <span aria-hidden="true">
+                    <img src="{{ asset('staff/assets/images/cross-icon.svg') }}" alt="Icon">
+                </span>
             </button>
 
             <div class="modal-body">
                 <div class="cmn-pop-inr-content-wrp">
                     <div class="modal-icon">
-                        <img src="./images/bin-primary.svg" alt="Bin Icon">
+                        <img src="{{ asset('staff/assets/images/bin-primary.svg') }}" alt="Bin Icon">
                     </div>
                     <div class="sec-head head-center">
                         <h2>Delete!</h2>
                         <p>Are you sure you want to delete this Leave Request?</p>
-                        <div class="btn-wrp">
-                            <button type="submit" class="cmn-btn">Delete</button>
-                            <button type="button" class="cmn-btn" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
-                        </div>
+                        <form id="deleteLeaveForm">
+                            @csrf
+                            <input type="hidden" id="delete-leave-id" name="leave_id">
+                            <div class="btn-wrp">
+                                <button type="submit" class="cmn-btn">Delete</button>
+                                <button type="button" class="cmn-btn" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -244,5 +182,200 @@
 @endsection
 
 @push('script')
-    
+<script>
+$(document).ready(function () {
+    const $leaveListContainer = $('#leaveListContainer');
+    const $perPageSelect = $('#perPageSelect');
+
+    let currentPageUrl = null;
+    let currentPerPage = $perPageSelect.val() || 10;
+
+    function refreshLeaveList(pageUrl = null, perPage = null) {
+        if (perPage) currentPerPage = perPage;
+        if (pageUrl) currentPageUrl = pageUrl;
+
+        const url = new URL(pageUrl || currentPageUrl || "{{ route('staff.apply-leave.index') }}", window.location.origin);
+        url.searchParams.set('per_page', currentPerPage);
+
+        $.get(url.toString())
+            .done(function (response) {
+                $leaveListContainer.html(response.html);
+            })
+            .fail(function () {
+                showError('Failed to load leave requests. Please try again.');
+            });
+    }
+
+    // Pagination & Per Page Change
+    $(document).on('change', '#perPageSelect', function () {
+        refreshLeaveList(null, $(this).val());
+    });
+
+    $(document).on('click', '.tablepagination a', function (e) {
+        e.preventDefault();
+        refreshLeaveList($(this).attr('href'));
+    });
+
+    function resetForm($form, resetValues = true) {
+        if (resetValues) {
+            $form[0].reset();
+        }
+        $form.find('.error-message').text('');
+        $form.find('.error-input').removeClass('error-input');
+    }
+
+    function showValidationErrors($form, errors) {
+        $.each(errors, function (field, messages) {
+            const $input = $form.find(`[name="${field}"]`);
+            $input.addClass('error-input');
+            $form.find(`[data-error="${field}"]`).text(messages[0]);
+        });
+    }
+
+    // Submit Leave Request
+    $('#requestLeaveForm').on('submit', function (e) {
+        e.preventDefault();
+        const $form = $(this);
+        const $btn = $form.find('input[type="submit"]');
+        const originalText = $btn.val();
+
+        resetForm($form, false);
+        $btn.prop('disabled', true).val('Submitting...');
+
+        $.ajax({
+            url: "{{ route('staff.apply-leave.apply') }}",
+            method: "POST",
+            data: $form.serialize(),
+            success: function ( response ) {
+                if (response.status) {
+                    $('#requestLeave').modal('hide');
+                    resetForm($form);
+                    showSuccess('Leave request submitted successfully.');
+                    refreshLeaveList();
+                }
+            },
+            error: function (xhr) {
+                if (xhr.status === 422) {
+                    showValidationErrors($form, xhr.responseJSON.errors);
+                } else {
+                    showError(xhr.responseJSON?.message || 'An error occurred. Please try again.');
+                }
+            },
+            complete: function () {
+                $btn.prop('disabled', false).val(originalText);
+            }
+        });
+    });
+
+    // Edit Leave Request
+    $(document).on('click', '.edit-btn', function () {
+        const leaveId = $(this).data('leave');
+        const $form = $('#editLeaveForm');
+        const $modal = $('#editLeaveRequest');
+
+        $('#edit-leave-id').val(leaveId);
+        resetForm($form, true);
+
+        $.get("{{ url('staff/apply-leave/get-leave') }}/" + leaveId)
+            .done(function (response) {
+                if (!response.status && response.message) {
+                    showError(response.message);
+                    return;
+                }
+
+                const leave = response.data || response;
+                $form.find('[name="from_date"]').val(leave.from_date);
+                $form.find('[name="to_date"]').val(leave.to_date);
+                $form.find('[name="reason"]').val(leave.reason);
+
+                $modal.modal('show');
+            })
+            .fail(function () {
+                showError('Failed to fetch leave details.');
+            });
+    });
+
+    $('#editLeaveForm').on('submit', function (e) {
+        e.preventDefault();
+        const $form = $(this);
+        const leaveId = $('#edit-leave-id').val();
+        if (!leaveId) return showError('Invalid leave request.');
+
+        const $btn = $form.find('input[type="submit"]');
+        const originalText = $btn.val();
+
+        resetForm($form, false);
+        $btn.prop('disabled', true).val('Saving...');
+
+        $.ajax({
+            url: "{{ url('staff/apply-leave/update') }}/" + leaveId,
+            method: "PUT",
+            data: $form.serialize() + "&_token={{ csrf_token() }}",
+            success: function (response) {
+                if (response.status) {
+                    $('#editLeaveRequest').modal('hide');
+                    resetForm($form, true);
+                    showSuccess('Leave request updated successfully.');
+                    refreshLeaveList();
+                }
+            },
+            error: function (xhr) {
+                if (xhr.status === 422) {
+                    showValidationErrors($form, xhr.responseJSON.errors);
+                } else {
+                    showError(xhr.responseJSON?.message || 'Update failed.');
+                }
+            },
+            complete: function () {
+                $btn.prop('disabled', false).val(originalText);
+            }
+        });
+    });
+
+    // Delete Leave Request
+    $(document).on('click', '.delete-btn', function () {
+        $('#delete-leave-id').val($(this).data('leave'));
+        $('#deleteLeaveRequest').modal('show');
+    });
+
+    $('#deleteLeaveForm').on('submit', function (e) {
+        e.preventDefault();
+        const leaveId = $('#delete-leave-id').val();
+        if (!leaveId) return showError('Invalid leave ID.');
+
+        const $btn = $(this).find('button[type="submit"]');
+        $btn.prop('disabled', true).text('Deleting...');
+
+        $.ajax({
+            url: "{{ url('staff/apply-leave/delete') }}/" + leaveId,
+            method: "DELETE",
+            data: {
+                _token: "{{ csrf_token() }}"
+            },
+            success: function (response) {
+                if (response.status) {
+                    $('#deleteLeaveRequest').modal('hide');
+                    showSuccess('Leave request deleted successfully.');
+                    refreshLeaveList();
+                } else {
+                    showError(response.message || 'Delete failed.');
+                }
+            },
+            error: function () {
+                showError('Error deleting leave request.');
+            },
+            complete: function () {
+                $btn.prop('disabled', false).text('Delete');
+            }
+        });
+    });
+
+    // Reset forms on modal close
+    $('#requestLeave, #editLeaveRequest').on('hidden.bs.modal', function () {
+        resetForm($(this).find('form'));
+    });
+
+    refreshLeaveList();
+});
+</script>
 @endpush
