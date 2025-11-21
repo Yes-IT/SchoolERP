@@ -85,8 +85,12 @@ Route::middleware([ 'web',])->group(function () {
 
             });
 
-            Route::prefix('exam-schedule')->name('exam-schedule.')->controller(ExamScheduleController::class)->group(function () {
-                Route::get('/', 'index')->name('index')->middleware('PermissionCheck:exam_schedule_read');
+            Route::prefix('my-classes')->name('my-classes.')->controller(ExamScheduleController::class)->group(function () {
+                Route::get('/exam-schedule', 'examSchedule')->name('exam-schedule')->middleware('PermissionCheck:exam_schedule_read');
+                Route::get('/available-rooms', 'getAvailableRooms')->name('available-rooms')->middleware('PermissionCheck:exam_schedule_read');
+                Route::post('/exam-request-store', 'store_exam_request')->name('store_exam_request')->middleware('PermissionCheck:exam_schedule_create');
+
+                Route::get('/class-schedule', 'classSchedule')->name('class-schedule')->middleware('PermissionCheck:exam_schedule_read');
             });
         });
     });

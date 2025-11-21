@@ -106,7 +106,7 @@ class ClassesRepository implements ClassesInterface
             $class->composite_class_2_weight   = $request->composite_class_2_weight;
             $class->save();
 
-            // Step 2: Create Schedule(s) for this class
+
             if ($request->has('schedules')) {
                 foreach ($request->schedules as $schedule) {
                     $start_time = Carbon::createFromFormat('h:i A', $schedule['start_time'])->format('H:i:s');
@@ -155,17 +155,15 @@ class ClassesRepository implements ClassesInterface
                 }
             }
 
-            //step 4:adding students in the class
              if ($request->has('student_ids') && !empty($request->student_ids)) {
-                // Validate that students exist
                 $existingStudents = Student::whereIn('id', $request->student_ids)->pluck('id')->toArray();
                 
                 if (count($existingStudents) > 0) {
                     $class->students()->attach($existingStudents);
-                    Log::info('Students attached to class:', [
-                        'class_id' => $class->id,
-                        'students' => $existingStudents
-                    ]);
+                    // Log::info('Students attached to class:', [
+                    //     'class_id' => $class->id,
+                    //     'students' => $existingStudents
+                    // ]);
                 } else {
                     Log::warning('No valid students found to attach', ['requested_ids' => $request->student_ids]);
                 }
@@ -204,7 +202,7 @@ class ClassesRepository implements ClassesInterface
 
     public function update($request, $id)
     {
-        Log::info('Update request received', $request->all());
+        // Log::info('Update request received', $request->all());
 
         try {
             $class             = $this->classes->findOrfail($id);
@@ -221,7 +219,6 @@ class ClassesRepository implements ClassesInterface
             $class->composite_class_2_weight = $request->composite_class_2_weight;
             $class->is_class_scheduling = $request->has('is_class_for_scheduling') ? 1 : 0;
 
-             // Save class specifications (only if not scheduling-only)
             if (!$class->is_class_scheduling)
             {
                 $subject = Subject::find($request->subject_id);
@@ -255,13 +252,11 @@ class ClassesRepository implements ClassesInterface
 
             $class->save();
 
-             // Handle schedules update
             if ($request->has('schedules')) {
                 $class->schedules()->delete();
                 
                 foreach ($request->schedules as $scheduleData) {
                     if (!empty($scheduleData['day']) && !empty($scheduleData['period'])) {
-                        // Convert time format from '09:00 AM' to '09:00:00'
                         if (!empty($scheduleData['start_time'])) {
                             $scheduleData['start_time'] = $this->convertTo24HourFormat($scheduleData['start_time']);
                         }
@@ -274,12 +269,9 @@ class ClassesRepository implements ClassesInterface
                 }
             }
 
-            
-            // Sync students (this will add new ones and remove deleted ones)
             if ($request->has('student_ids')) {
                 $class->students()->sync($request->student_ids);
             } else {
-                // If no students selected, remove all
                 $class->students()->detach();
             }
 
@@ -298,7 +290,6 @@ class ClassesRepository implements ClassesInterface
         try {
             return \Carbon\Carbon::createFromFormat('h:i A', $time12Hour)->format('H:i:s');
         } catch (\Exception $e) {
-            // If conversion fails, return the original time or handle the error
             Log::error('Time conversion error', [
                 'original_time' => $time12Hour,
                 'error' => $e->getMessage()
@@ -346,73 +337,66 @@ class ClassesRepository implements ClassesInterface
     }
 
 
-public function filter($requestData)
-{
-    Log::info('Filter request data:', $requestData);
+    public function filter($requestData)
+    {
+        Log::info('Filter request data:', $requestData);
 
-    $query = Classes::query()->with([
-        'subject',
-        'teacher', 
-        'session',
-        'yearStatus',
-        'semester'
-    ]);
+        $query = Classes::query()->with([
+            'subject',
+            'teacher', 
+            'session',
+            'yearStatus',
+            'semester'
+        ]);
 
-    // ============= SESSION FILTERS =============
-    if (!empty($requestData['session_id']) && 
-        $requestData['session_id'] !== "" && 
-        $requestData['session_id'] !== "School Year" &&
-        is_numeric($requestData['session_id'])) {
-        
-        $query->where('session_id', $requestData['session_id']);
-        Log::info('Applied session filter:', ['session_id' => $requestData['session_id']]);
+        if (!empty($requestData['session_id']) && 
+            $requestData['session_id'] !== "" && 
+            $requestData['session_id'] !== "School Year" &&
+            is_numeric($requestData['session_id'])) {
+            
+            $query->where('session_id', $requestData['session_id']);
+            // Log::info('Applied session filter:', ['session_id' => $requestData['session_id']]);
+        }
+
+        if (!empty($requestData['year_status_id']) && 
+            $requestData['year_status_id'] !== "" && 
+            $requestData['year_status_id'] !== "Year Status" &&
+            is_numeric($requestData['year_status_id'])) {
+            
+            $query->where('year_status_id', $requestData['year_status_id']);
+            // Log::info('Applied year status filter:', ['year_status_id' => $requestData['year_status_id']]);
+        }
+
+        if (!empty($requestData['semester_id']) && 
+            $requestData['semester_id'] !== "" && 
+            $requestData['semester_id'] !== "Semester" &&
+            is_numeric($requestData['semester_id'])) {
+            
+            $query->where('semester_id', $requestData['semester_id']);
+            // Log::info('Applied semester filter:', ['semester_id' => $requestData['semester_id']]);
+        }
+
+       
+        if (!empty($requestData['teacher_id']) && $requestData['teacher_id'] !== "all") {
+            $query->where('teacher_id', $requestData['teacher_id']);
+            Log::info('Applied teacher filter:', ['teacher_id' => $requestData['teacher_id']]);
+        } else {
+            Log::info('No teacher filter applied or showing all teachers');
+        }
+
+        $perPage = $requestData['per_page'] ?? 10;
+        $page = $requestData['page'] ?? 1;
+
+        $results = $query->paginate($perPage, ['*'], 'page', $page);
+         Log::info('Filter results:', [
+            'total' => $results->total(),
+            // 'count' => $results->count(),
+            'current_page' => $results->currentPage(),
+            'per_page' => $results->perPage()
+        ]);
+
+        return $results;
     }
-
-     if (!empty($requestData['year_status_id']) && 
-        $requestData['year_status_id'] !== "" && 
-        $requestData['year_status_id'] !== "Year Status" &&
-        is_numeric($requestData['year_status_id'])) {
-        
-        $query->where('year_status_id', $requestData['year_status_id']);
-        Log::info('Applied year status filter:', ['year_status_id' => $requestData['year_status_id']]);
-    }
-
-    if (!empty($requestData['semester_id']) && 
-        $requestData['semester_id'] !== "" && 
-        $requestData['semester_id'] !== "Semester" &&
-        is_numeric($requestData['semester_id'])) {
-        
-        $query->where('semester_id', $requestData['semester_id']);
-        Log::info('Applied semester filter:', ['semester_id' => $requestData['semester_id']]);
-    }
-
-    // ============= TEACHER FILTER =============
-if (!empty($requestData['teacher_id']) && $requestData['teacher_id'] !== "all") {
-        $query->where('teacher_id', $requestData['teacher_id']);
-        Log::info('Applied teacher filter:', ['teacher_id' => $requestData['teacher_id']]);
-    } else {
-        Log::info('No teacher filter applied or showing all teachers');
-     }
-
-    Log::info('SQL Query:', ['sql' => $query->toSql()]); // Debug the final SQL
-
-
-    // =============== PAGINATION ================
-    $perPage = $requestData['per_page'] ?? 10;
-    $page = $requestData['page'] ?? 1;
-
-    $results = $query->paginate($perPage, ['*'], 'page', $page);
-
-    
-    Log::info('Filter results:', [
-        'total' => $results->total(),
-        'count' => $results->count(),
-        'current_page' => $results->currentPage(),
-        'per_page' => $results->perPage()
-    ]);
-
-    return $results;
-}
 
 
 

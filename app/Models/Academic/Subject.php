@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Academic\SubjectAssignChildren;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Staff\Staff;
+
 
 class Subject extends BaseModel
 {
@@ -31,4 +33,19 @@ class Subject extends BaseModel
     {
         return $this->hasMany(Classes::class, 'subject_id', 'id');
     }
+
+    public function teachers()
+    {
+        return $this->hasManyThrough(
+            Staff::class,
+            Classes::class,
+            'subject_id',   // FK on classes table
+            'id',           // PK on teachers table
+            'id',           // PK on subjects table
+            'teacher_id'    // FK on classes table
+        )->where('role_id', 5);
+    }
+
+
+    
 }

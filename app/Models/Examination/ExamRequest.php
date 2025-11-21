@@ -9,14 +9,14 @@ use App\Models\Academic\Classes;
 use App\Models\Academic\ClassRoom;
 use App\Models\Staff\Staff;
 use App\Models\Academic\Subject;
-
+use App\Enums\ExamRequestStatus;
 
 
 class ExamRequest extends Model
 {
     use HasFactory,SoftDeletes;
 
-    protected $table = 'exam_request';
+    protected $table = 'exam_requests';
 
     protected $fillable = [
         'exam_type_id',
@@ -35,7 +35,7 @@ class ExamRequest extends Model
         'exam_date' => 'date',
         'start_time' => 'datetime:H:i:s',
         'end_time' => 'datetime:H:i:s',
-         'status' => \App\Enums\ExamRequestStatus::class,
+        'status' => ExamRequestStatus::class,
     ];
 
 

@@ -9,7 +9,7 @@
             <div class="ds-breadcrumb">
                 <h1>Exam Schedule</h1>
                 <ul>
-                    <li><a href="../dashboard.html">Dashboard</a> /</li>
+                    <li><a href="{{route('exam-schedule.index')}}">Dashboard</a> /</li>
                     <li><a href="dashboard.html">Exam Schedule</a> /</li>
                     <li>Exam Schedule</li>
                 

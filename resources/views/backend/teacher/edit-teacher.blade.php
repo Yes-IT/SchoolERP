@@ -145,36 +145,33 @@
                                               <label for="address">Address</label>
                                               <input id="address" name="address" type="text" value="{{ old('address', $teacher->current_address) }}" required>
                                             </div>
-                                           <div class="input-grp">
-                                              <label for="city">City</label>
-                                               <select id="city" name="city" required>
-                                                  <option value="" disabled {{ old('city', $teacher->city) ? '' : 'selected' }}>City Name</option>
-                                                  <option value="Mumbai" {{ old('city', $teacher->city) == 'Mumbai' ? 'selected' : '' }}>Mumbai</option>
-                                                  <option value="Delhi" {{ old('city', $teacher->city) == 'Delhi' ? 'selected' : '' }}>Delhi</option>
-                                                  <option value="Tel Aviv" {{ old('city', $teacher->city) == 'Tel Aviv' ? 'selected' : '' }}>Tel Aviv</option>
-                                                  <option value="Jerusalem" {{ old('city', $teacher->city) == 'Jerusalem' ? 'selected' : '' }}>Jerusalem</option>
-                                                  <option value="New York" {{ old('city', $teacher->city) == 'New York' ? 'selected' : '' }}>New York</option>
-                                                  <option value="Los Angeles" {{ old('city', $teacher->city) == 'Los Angeles' ? 'selected' : '' }}>Los Angeles</option>
-                                              </select>
-                                            </div>
                                            
-                                          </div>
-                                        
-                                          <div class="multi-input-grp grp-3">
-                                           
-                                        
                                             <div class="input-grp">
                                               <label for="zip_code">Zip Code</label>
                                               <input id="zip_code" name="zip_code" type="text" inputmode="numeric"value="{{ old('zip_code', $teacher->zip_code) }}" required>
                                             </div>
+
+                                          </div>
                                         
+                                          <div class="multi-input-grp grp-3">
+                                           
                                             <div class="input-grp">
                                               <label for="country">Country</label>
                                                <select id="country" name="country" required>
-                                                  <option value="" disabled {{ old('country', $teacher->country) ? '' : 'selected' }}>Country</option>
-                                                  <option value="India" {{ old('country', $teacher->country) == 'India' ? 'selected' : '' }}>India</option>
-                                                  <option value="Israel" {{ old('country', $teacher->country) == 'Israel' ? 'selected' : '' }}>Israel</option>
-                                                  <option value="USA" {{ old('country', $teacher->country) == 'USA' ? 'selected' : '' }}>USA</option>
+                                                  <option value="" disabled>Select Country</option>
+                                                    @foreach($countries as $country)
+                                                        <option value="{{ $country->country_id }}"
+                                                            {{ $teacher->country == $country->country_id ? 'selected' : '' }}>
+                                                            {{ $country->country_name }}
+                                                        </option>
+                                                    @endforeach
+                                              </select>
+                                            </div>
+
+                                            <div class="input-grp">
+                                              <label for="city">City</label>
+                                              <select id="city" name="city" required>
+                                                  <option value="" disabled>Select City</option>
                                               </select>
                                             </div>
                                           </div>
@@ -192,3 +189,40 @@
                     </div>
                 </div>
 @endsection
+@push('script')
+<script>
+  $(document).ready(function () {
+      let selectedCountry = "{{ $teacher->country }}";
+      let selectedCity = "{{ $teacher->city }}";
+
+      if (selectedCountry) {
+          loadCities(selectedCountry, selectedCity);
+      }
+
+      $('#country').on('change', function () {
+          loadCities($(this).val(), null);
+      });
+
+      function loadCities(countryId, selectedCityId) {
+
+          $.ajax({
+              url: "{{ route('teachers.get_cities', '') }}/" + countryId,
+              method: "GET",
+              success: function (response) {
+                  let $city = $('#city');
+                  $city.html('<option value="" disabled>Select City</option>');
+
+                  $.each(response, function (index, city) {
+                      let selected = (selectedCityId == city.id) ? 'selected' : '';
+                      $city.append(`<option value="${city.id}" ${selected}>${city.city}</option>`);
+                  });
+              },
+              error: function () {
+                  alert("Error loading cities");
+              }
+          });
+      }
+  });
+</script>
+
+@endpush

@@ -11,6 +11,8 @@ use App\Models\Staff\Designation;
 use App\Models\Upload;
 use App\Models\User;
 use App\Models\Leave;
+use App\Models\StudentClassMapping;
+use App\Models\Academic\{Classes, Section, Subject};
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\LiveChat\Entities\Message;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -126,4 +128,25 @@ class Staff extends BaseModel
             'subject_assign_id'              // Local key on the SubjectAssignChildren model
         );
     }
+
+    public function classes()
+    {
+        return $this->belongsToMany(
+            Classes::class,
+            'student_class_mapping',
+            'teacher_id',
+            'class_id'
+        )->withPivot('status');
+    }
+
+    public function subjects()
+    {
+        return $this->belongsToMany(
+            Subject::class,
+            'student_class_mapping',
+            'teacher_id',
+            'class_id'  
+        )->using(StudentClassMapping::class);
+    }
+
 }

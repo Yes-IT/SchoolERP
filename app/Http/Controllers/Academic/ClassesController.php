@@ -128,11 +128,11 @@ class ClassesController extends Controller
     public function store(ClassesStoreRequest $request)
     {
         try {
-            Log::info('Store method triggered', ['data' => $request->all()]);
+            // Log::info('Store method triggered', ['data' => $request->all()]);
 
             $result = $this->classes->store($request);
 
-            Log::info('Store method result', ['result' => $result]);
+            // Log::info('Store method result', ['result' => $result]);
 
             if ($result['status']) {
                 return redirect()->route('classes.index')->with('success', $result['message']);
@@ -184,11 +184,8 @@ class ClassesController extends Controller
         $students = Student::all();
 
         $allStudents = Student::all();
-        
-         // Get assigned student IDs
         $assignedStudentIds = $classes->students->pluck('id')->toArray();
         
-        // Filter available students (not already assigned to this class)
         $availableStudents = $allStudents->filter(function($student) use ($assignedStudentIds) {
             return !in_array($student->id, $assignedStudentIds);
         });
@@ -245,15 +242,13 @@ class ClassesController extends Controller
 
     public function filter(Request $request)
     {
-        Log::info('Filter request received in ClassController', $request->all());
+        // Log::info('Filter request received in ClassController', $request->all());
         
         try {
             $classes = $this->classes->filter($request->all()); 
 
-            Log::info('Filtered classes', ['classes' => $classes]);
-            Log::info('Filtered classes count', ['count' => $classes->count()]);
-
-
+            // Log::info('Filtered classes', ['classes' => $classes]);
+        
             $html = view('backend.academic.class.partials.class-rows', compact('classes'))->render();
             $pagination = view('backend.academic.class.partials.class-pagination', compact('classes'))->render();
 

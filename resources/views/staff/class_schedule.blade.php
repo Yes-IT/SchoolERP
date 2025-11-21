@@ -1,0 +1,670 @@
+@extends('staff.master')
+
+@section('content')
+ <div class="ds-breadcrumb">
+        <h1>My Classes</h1>
+        <ul>
+          <li><a href="dashboard.html">Dashboard</a> /</li>
+          <li>My Classes</li>
+        </ul>
+      </div>
+      <div class="ds-pr-body">
+
+        <div class="classes-schedule-container">
+          <div class="classes-schedule-filter">
+            <div class="datepicker">
+              <div class="datepicker__header">
+               
+                <span>Oct 04- Oct 09 </span>
+                <img src="{{asset('staff/assets')}}./images/down-arrow-5.svg" />
+              </div>
+              <div class="datepicker-body-wrp">
+                <div class="datepicker__body">
+                  Oct 04- Oct 09
+                </div>
+                <div class="datepicker__body">
+                  Oct 11- Oct 16
+                </div>
+                <div class="datepicker__body">
+                  Oct 18- Oct 23
+                </div>
+                <div class="datepicker__body">
+                  Oct 25- Oct 30
+                </div>
+
+              </div>
+            </div>
+
+            <div class="studentBtns">
+              <div class="dropdown-week">
+                <button class="cmn-btn print-btn" onclick="toggleDropdownWeek()">Week <img src="{{asset('staff/assets')}}./images/greyarrow.svg"
+                    alt="Icon"></button>
+                <ul class="dropdown-menu-week">
+                  <li>Day</li>
+                  <li class="active-week">Week</li>
+                  <li>Month</li>
+                </ul>
+              </div>
+
+              <button><img src="{{asset('staff/assets')}}./images/leftstudent.svg" /></button>
+              <button><img src="{{asset('staff/assets')}}./images/rightstudent.svg" /></button>
+            </div>
+          </div>
+
+          <div class="boxtbl-outer">
+            <div class="box-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Sun 04 Oct</th>
+                    <th>Mon 05 Oct</th>
+                    <th>Tue 06 Oct</th>
+                    <th>Wed 07 Oct</th>
+                    <th>Thur 08 Oct</th>
+                    <th>Fri 09 Oct</th>
+                    <th>Shabbos 10 Oct</th>
+                    <!-- <th>04:00 PM - 04:59 PM</th>
+                                          <th>05:00 PM - 05:59 PM</th>
+                                          <th>06:00 PM - 06:59 PM</th>
+                                          <th>07:00 PM - 07:59 PM</th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Friday -->
+                  <tr>
+                    <!-- <th>Friday</th> -->
+                    <td>
+                      <div class="item-blue">
+                        <p class="lorem-text">Lorem ipsum dolor sit amet, consectetur</p>
+                        <p class="lorem-grey">Room no. - 25</p>
+                        <p class="lorem-grey">10:00 - 12:00</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="item-green">
+                        <p class="lorem-text">Lorem ipsum dolor sit amet, consectetur</p>
+                        <p class="lorem-grey">Room no. - 25</p>
+                        <p class="lorem-grey">10:00 - 12:00</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="item-blue">
+                        <p class="lorem-text">Lorem ipsum dolor sit amet, consectetur</p>
+                        <p class="lorem-grey">Room no. - 25</p>
+                        <p class="lorem-grey">10:00 - 12:00</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="item-blue">
+                        <p class="lorem-text">Lorem ipsum dolor sit amet, consectetur</p>
+                        <p class="lorem-grey">Room no. - 25</p>
+                        <p class="lorem-grey">10:00 - 12:00</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="item-green">
+                        <p class="lorem-text">Lorem ipsum dolor sit amet, consectetur</p>
+                        <p class="lorem-grey">Room no. - 25</p>
+                        <p class="lorem-grey">10:00 - 12:00</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="item-pink">
+                        <p class="lorem-text">Lorem ipsum dolor sit amet, consectetur</p>
+                        <p class="lorem-grey">Room no. - 25</p>
+                        <p class="lorem-grey">10:00 - 12:00</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="item-black">
+                        <p>Not Scheduled</p>
+                      </div>
+                    </td>
+                    <!-- <td>
+                                            <strong>Subject Name</strong><br>
+                                            Teacher Name<br>
+                                            Room No. 12
+                                          </td>
+                                          <td>
+                                            <strong>Subject Name</strong><br>
+                                            Teacher Name<br>
+                                            Room No. 12
+                                          </td>
+                                          <td>
+                                            <strong>Subject Name</strong><br>
+                                            Teacher Name<br>
+                                            Room No. 12
+                                          </td> -->
+                  </tr>
+
+                  <!-- Monday -->
+                  <tr>
+                    <!-- <th>Monday</th> -->
+                    <td>
+                      <div class="item-grey">
+                        <p class="lorem-text">Lorem ipsum dolor sit amet, consectetur</p>
+                        <p class="lorem-grey">Room no. - 25</p>
+                        <p class="lorem-grey">10:00 - 12:00</p>
+                      </div>
+                    </td>
+                    <!-- repeat the same cell 11 more times -->
+                    <td>
+                      <div class="item-purple">
+                        <p class="lorem-text">Lorem ipsum dolor sit amet, consectetur</p>
+                        <p class="lorem-grey">Room no. - 25</p>
+                        <p class="lorem-grey">10:00 - 12:00</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="item-pink">
+                        <p class="lorem-text">Lorem ipsum dolor sit amet, consectetur</p>
+                        <p class="lorem-grey">Room no. - 25</p>
+                        <p class="lorem-grey">10:00 - 12:00</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="item-grey">
+                        <p class="lorem-text">Lorem ipsum dolor sit amet, consectetur</p>
+                        <p class="lorem-grey">Room no. - 25</p>
+                        <p class="lorem-grey">10:00 - 12:00</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="item-purple">
+                        <p class="lorem-text">Lorem ipsum dolor sit amet, consectetur</p>
+                        <p class="lorem-grey">Room no. - 25</p>
+                        <p class="lorem-grey">10:00 - 12:00</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="item-blue">
+                        <p class="lorem-text">Lorem ipsum dolor sit amet, consectetur</p>
+                        <p class="lorem-grey">Room no. - 25</p>
+                        <p class="lorem-grey">10:00 - 12:00</p>
+                      </div>
+                    </td>
+                    <td> </td>
+                    <!-- <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
+                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
+                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td> -->
+                  </tr>
+
+                  <!-- Tuesday -->
+                  <tr>
+                    <!-- <th>Tuesday</th> -->
+                    <td>
+                      <div class="item-blue">
+                        <p class="lorem-text">Lorem ipsum dolor sit amet, consectetur</p>
+                        <p class="lorem-grey">Room no. - 25</p>
+                        <p class="lorem-grey">10:00 - 12:00</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="item-pink">
+                        <p class="lorem-text">Lorem ipsum dolor sit amet, consectetur</p>
+                        <p class="lorem-grey">Room no. - 25</p>
+                        <p class="lorem-grey">10:00 - 12:00</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="item-red">
+                        <p class="exam-btn-red">Exam</p>
+                        <div class="red-text">
+                          <p>Subject- Lorem ipsum dolor sit amet, consectetur</p>
+                          <div>
+                            <p>Room no. - 25</p>
+                            <p>10:00 - 12:00</p>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="item-green">
+                        <p class="lorem-text">Lorem ipsum dolor sit amet, consectetur</p>
+                        <p class="lorem-grey">Room no. - 25</p>
+                        <p class="lorem-grey">10:00 - 12:00</p>
+                      </div>
+                    </td>
+                    <td> </td>
+                    <td>
+                      <div class="item-grey">
+                        <p class="lorem-text">Lorem ipsum dolor sit amet, consectetur</p>
+                        <p class="lorem-grey">Room no. - 25</p>
+                        <p class="lorem-grey">10:00 - 12:00</p>
+                      </div>
+                    </td>
+                    <td> </td>
+                    <!-- <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
+                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
+                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td> -->
+                  </tr>
+
+                  <!-- Wednesday -->
+                  <tr>
+                    <!-- <th>Wednesday</th> -->
+                    <td></td>
+                    <td>
+                      <div class="item-blue">
+                        <p class="lorem-text">Lorem ipsum dolor sit amet, consectetur</p>
+                        <p class="lorem-grey">Room no. - 25</p>
+                        <p class="lorem-grey">10:00 - 12:00</p>
+                      </div>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <!-- <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
+                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
+                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td> -->
+                  </tr>
+
+                  <!-- Thursday -->
+                  <tr>
+                    <!-- <th>Thursday</th> -->
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <!-- <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
+                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
+                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td> -->
+                  </tr>
+
+                  <!-- Friday (second row) -->
+                  <tr>
+                    <!-- <th>Friday</th> -->
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <!-- <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
+                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
+                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td> -->
+                  </tr>
+
+                  <!-- Shabbos -->
+                  <!-- <tr> -->
+                  <!-- <th>Shabbos</th> -->
+                  <!-- <td colspan="12" style="background: var(--secondary-clr);"></td> -->
+                  <!-- </tr> -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="ds-pr-body">
+
+        <div class="dsbdy-bottom w65">
+          <div class="calendar-container">
+            <div class="calendar-header">
+              <div>
+                <div class="dropdown header-select">
+                  <input type="checkbox" id="toggle" hidden>
+                 
+                  <p class="calender-open"><input type="text" value="January 25, 2025" id="datepicker" class="calenderDate"> <img class="calimage" src="{{asset('staff/assets/images/cal.svg')}}" />
+                  
+                  <ul class="options">
+                    <li data-value="24">24 October</li>
+                    <li data-value="25">25 October</li>
+                    <li data-value="26">26 October</li>
+                    <li data-value="27">27 October</li>
+                  </ul>
+                </div>
+
+              </div>
+              <div class="att-right-header">
+                <div class="dropdown-day header-select-day">
+                  <input type="checkbox" id="toggle-day" hidden>
+                  <label for="toggle-day" class="select-label-day">
+                    Date
+                    <img src="{{asset('staff/assets/images/chevrondowngrey.svg')}}" alt="">
+                  </label>
+                  <ul class="options-day">
+                    <li>Day</li>
+                    <li>Week</li>
+                    <li>Month</li>
+                    
+                  </ul>
+                </div>
+
+                <div>
+                  <img src="{{asset('staff/assets/images/leftarrow.svg')}}." class="arrow-attendance" alt="leftarrow" />
+                  <img src="{{asset('staff/assets/images/rightarrow.svg')}}" class="arrow-attendance" alt="leftarrow" />
+                </div>
+              </div>
+            </div>
+
+            <hr class="cander-hr" />
+
+            <div class="calendar-grid">
+              <!-- Time slots -->
+              <div class="time-row">
+                <div class="time-cell">8:00</div>
+                <div class="time-cell">9:00</div>
+                <div class="time-cell">10:00</div>
+                <div class="time-cell">11:00</div>
+                <div class="time-cell">12:00</div>
+                <div class="time-cell">13:00</div>
+                <div class="time-cell">14:00</div>
+                <div class="time-cell">15:00</div>
+                <div class="time-cell">16:00</div>
+                <div class="time-cell">17:00</div>
+              </div>
+
+              <!-- Events -->
+
+              <div class="events-blocks">
+
+                <div class="div1-blocks">
+                  <div class="block-yellow">
+                    <div class="block-title">Lorem ipsum dolor sit amet, consectetur</div>
+                    <div class="block-sub">Room no. - 25 <span>|</span> 10:00 - 12:00</div>
+                  </div>
+
+                  <div class="block-green">
+                    <div class="block-title">Lorem ipsum dolor sit </div>
+                    <div class="block-sub">Room no. - 25 <span>|</span> 10:00 - 12:00</div>
+                  </div>
+
+                  <div class="block-blue tooltip-wrapper">
+                    <div class="block-title">Lorem ipsum dolor sit amet, consectetur adipiscing elit, </div>
+                    <div class="block-sub">Room no. - 25 <span>|</span> 10:00 - 12:00</div>
+
+                    <div class="custom-tooltip">
+                      <div class="tooltip-content">
+                        Lorem ipsum dolor sit amet,<br>
+                        consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                        <div class="tooltip-sub">Room no. - 25 <span>|</span> 10:00 - 12:00</div>
+                      </div>
+                      <div class="tooltip-arrow"></div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div class="div2-blocks">
+
+                  <div class="block-pink">
+                    <div class="block-title">Lorem ipsum dolor sit amet</div>
+                    <div class="block-sub">Room no. - 25 <span>|</span> 10:00 - 12:00</div>
+                  </div>
+
+                  <div class="block-grey">
+                    <div class="block-title">Lorem ipsum dolor</div>
+                    <div class="block-sub">Room no. - 25 <span>|</span> 10:00 - 12:00</div>
+                  </div>
+
+                </div>
+
+                <div class="div3-blocks">
+
+                  <div class="block-green2">
+                    <div class="block-title">Lorem ipsum</div>
+                    <div class="block-sub">Room no. - 25 <span>|</span> 10:00 - 12:00</div>
+                  </div>
+
+                  <div class="block-blue2">
+                    <div class="block-title">Lorem ipsum dolor sit amet, consectetur</div>
+                    <div class="block-sub">Room no. - 25 <span>|</span> 10:00 - 12:00</div>
+                  </div>
+
+                </div>
+
+                <div class="div4-blocks">
+
+                  <div class="block-pink2">
+                    <div class="block-title">Lorem ipsum dolor sit amet, consectetua.</div>
+                    <div class="block-sub">Room no. - 25 <span>|</span> 10:00 - 12:00</div>
+                  </div>
+
+                  <div class="block-grey2">
+                    <div class="block-title">Lorem ipsum dolor sit amet</div>
+                    <div class="block-sub">Room no. - 25 <span>|</span> 10:00 - 12:00</div>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-pr-body">
+
+        <div class="classes-schedule-container">
+          <div class="classes-schedule-filter">
+            <div class="datepicker">
+              <div class="datepicker__header">
+                <!-- <img src="./images/calender-icon.svg" alt="Icon"> -->
+                <span>Octuber 2025 </span>
+                <img src="{{asset('staff/assets/images/down-arrow-5.svg')}}" />
+              </div>
+              <div class="datepicker-body-wrp">
+                <div class="datepicker__body">
+                  November 2025
+                </div>
+                <div class="datepicker__body">
+                  December 2025
+                </div>
+                <div class="datepicker__body">
+                  January 2026
+                </div>
+                <div class="datepicker__body">
+                  February 2026
+                </div>
+
+              </div>
+            </div>
+
+            <div class="studentBtns">
+              <div class="dropdown-week">
+                <button class="cmn-btn print-btn" onclick="toggleDropdownWeek()">Month <img src="{{asset('staff/assets/images/greyarrow.svg')}}"
+                    alt="Icon"></button>
+                <ul class="dropdown-menu-week">
+                  <li>Day</li>
+                  <li class="active-week">Week</li>
+                  <li>Month</li>
+                </ul>
+              </div>
+
+              <button><img src="{{asset('staff/assets/images/leftstudent.svg')}}" /></button>
+              <button><img src="{{asset('staff/assets/images/rightstudent.svg')}}" /></button>
+            </div>
+          </div>
+
+
+          <div class="calendar-wrapper">
+            <table class="calendar-table">
+              <thead>
+                <tr>
+                  <th>Mon</th>
+                  <th>Tue</th>
+                  <th>Wed</th>
+                  <th>Thu</th>
+                  <th>Fri</th>
+                  <th>Sat</th>
+                  <th>Sun</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Row 1 -->
+                <tr>
+                  <td class="empty">
+                    <div class="date-number">28</div>
+                  </td>
+                  <td class="empty">
+                    <div class="date-number">29</div>
+                  </td>
+                  <td class="empty">
+                    <div class="date-number">30</div>
+                  </td>
+                  <td class="empty">
+                    <div class="date-number">31</div>
+                  </td>
+                  <td class="contain-colors">
+                    <div class="event orange">Lorem ipsum dolor</div>
+                    <div class="event pink">Lorem ipsum dolor</div>
+                    <div class="event blue">Lorem ipsum dolor</div>
+                    <div class="date-number">1</div>
+                  </td>
+                  <td>
+                    <div class="date-number">2</div>
+                  </td>
+                  <td>
+                    <div class="date-number">3</div>
+                  </td>
+                </tr>
+                <!-- Row 2 -->
+                <tr>
+                  <td>
+                    <div class="date-number">4</div>
+                  </td>
+                  <td class="contain-colors">
+                    <div class="event cyan">Lorem ipsum dolor</div>
+                    <div class="event pink">Lorem ipsum dolor</div>
+                    <div class="date-number">5</div>
+                  </td>
+                  <td class="contain-colors">
+
+                    <div class="event orange">Lorem ipsum dolor</div>
+                    <div class="event green">Lorem ipsum dolor</div>
+                    <div class="date-number">6</div>
+                  </td>
+                  <td class="contain-colors">
+                    <div class="event orange">Lorem ipsum dolor</div>
+                    <div class="event pink">Lorem ipsum dolor</div>
+                    <div class="event blue">Lorem ipsum dolor</div>
+                    <div class="date-number">7</div>
+                  </td>
+                  <td>
+                    <div class="date-number">8</div>
+                  </td>
+                  <td>
+                    <div class="date-number">9</div>
+                  </td>
+                  <td>
+                    <div class="date-number">10</div>
+                  </td>
+                </tr>
+                <!-- Row 3 -->
+                <tr>
+                  <td class="contain-colors">
+                    <div class="event grey">Lorem ipsum dolor</div>
+                    <div class="event blue">Lorem ipsum dolor</div>
+                    <div class="date-number">11</div>
+                  </td>
+                  <td class="contain-colors">
+                    <div class="event orange">Lorem ipsum dolor</div>
+                    <div class="event pink">Lorem ipsum dolor</div>
+                    <div class="event blue">Lorem ipsum dolor</div>
+                    <div class="date-number">12</div>
+                  </td>
+                  <td>
+                    <div class="date-number">13</div>
+                  </td>
+                  <td class="contain-colors">
+                    <div class="event orange">Lorem ipsum dolor</div>
+                    <div class="event green">Lorem ipsum dolor</div>
+                    <div class="date-number">14</div>
+                  </td>
+                  <td class="contain-colors">
+                    <div class="event orange">Lorem ipsum dolor</div>
+                    <div class="event pink">Lorem ipsum dolor</div>
+                    <div class="event blue">Lorem ipsum dolor</div>
+                    <div class="date-number">15</div>
+                  </td>
+                  <td>
+                    <div class="date-number">16</div>
+                  </td>
+                  <td>
+                    <div class="date-number">17</div>
+                  </td>
+                </tr>
+                <!-- Row 4 -->
+                <tr>
+                  <td class="contain-colors">
+                    <div class="event orange">Lorem ipsum dolor</div>
+                    <div class="event pink">Lorem ipsum dolor</div>
+                    <div class="event blue">Lorem ipsum dolor</div>
+                    <div class="date-number">18</div>
+                  </td>
+                  <td class="contain-colors">
+                    <div class="event cyan">Lorem ipsum dolor</div>
+                    <div class="event pink">Lorem ipsum dolor</div>
+                    <div class="date-number">19</div>
+                  </td>
+                  <td class="contain-colors">
+                    <div class="event orange">Lorem ipsum dolor</div>
+                    <div class="event green">Lorem ipsum dolor</div>
+                    <div class="date-number">20</div>
+                  </td>
+                  <td class="contain-colors">
+                    <div class="event grey">Lorem ipsum dolor</div>
+                    <div class="event green">Lorem ipsum dolor</div>
+                    <div class="date-number">21</div>
+                  </td>
+                  <td class="contain-colors">
+                    <div class="event orange">Lorem ipsum dolor</div>
+                    <div class="event pink">Lorem ipsum dolor</div>
+                    <div class="event blue">Lorem ipsum dolor</div>
+                    <div class="date-number">22</div>
+                  </td>
+                  <td>
+                    <div class="date-number">23</div>
+                  </td>
+                  <td>
+                    <div class="date-number">24</div>
+                  </td>
+                </tr>
+                <!-- Row 5 -->
+                <tr>
+                  <td>
+                    <div class="date-number">25</div>
+                  </td>
+                  <td>
+                    <div class="date-number">26</div>
+                  </td>
+                  <td class="contain-colors">
+                    <div class="event orange">Lorem ipsum dolor</div>
+                    <div class="event pink">Lorem ipsum dolor</div>
+                    <div class="event blue">Lorem ipsum dolor</div>
+                    <div class="date-number">27</div>
+                  </td>
+                  <td>
+                    <div class="date-number">28</div>
+                  </td>
+                  <td>
+                    <div class="date-number">29</div>
+                  </td>
+                  <td>
+                    <div class="date-number">30</div>
+                  </td>
+                  <td>
+                    <div class="date-number">1</div>
+                  </td>
+                </tr>
+                <!-- Row 6 -->
+
+              </tbody>
+            </table>
+          </div>
+
+
+        </div>
+
+      </div>
+@endsection

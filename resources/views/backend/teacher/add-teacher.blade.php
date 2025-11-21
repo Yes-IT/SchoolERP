@@ -149,17 +149,11 @@
                                               <label for="address_line1">Address</label>
                                               <input id="address" name="address" type="text" placeholder="Address" required>
                                             </div>
-                                           <div class="input-grp">
-                                              <label for="city">City</label>
-                                              <select id="city" name="city" required>
-                                                <option value="" disabled selected>City Name</option>
-                                                <option value="Mumbai">Mumbai</option>
-                                                <option value="Delhi">Delhi</option>
-                                                <option value="Tel Aviv">Tel Aviv</option>
-                                                <option value="Jerusalem">Jerusalem</option>
-                                                <option value="New York">New York</option>
-                                                <option value="Los Angeles">Los Angeles</option>
-                                            </select>
+                                          
+
+                                            <div class="input-grp">
+                                              <label for="zip_code">Zip Code</label>
+                                              <input id="zip_code" name="zip_code" type="text" inputmode="numeric" placeholder="Zip Code" required>
                                             </div>
                                            
                                           </div>
@@ -167,18 +161,20 @@
                                           <div class="multi-input-grp grp-3">
                                            
                                             <div class="input-grp">
-                                              <label for="zip_code">Zip Code</label>
-                                              <input id="zip_code" name="zip_code" type="text" inputmode="numeric" placeholder="Zip Code" required>
-                                            </div>
-                                        
-                                            <div class="input-grp">
                                               <label for="nationality">Country</label>
                                               <select id="country" name="country" required>
-                                                  <option value="" disabled selected>Country</option>
-                                                  <option value="India">India</option>
-                                                  <option value="Israel">Israel</option>
-                                                  <option value="USA">USA</option>
+                                                     <option value="" disabled selected>Select Country</option>
+                                                      @foreach($countries as $country)
+                                                          <option value="{{ $country->country_id }}">{{ $country->country_name }}</option>
+                                                      @endforeach
                                               </select>
+                                            </div>
+
+                                            <div class="input-grp">
+                                              <label for="city">City</label>
+                                              <select id="city" name="city" required>
+                                                <option value="" disabled selected>Select City</option>
+                                               </select>
                                             </div>
                                           </div>
                                     </div>
@@ -193,3 +189,30 @@
                     </div>
                 
 @endsection
+
+@push('script')
+<script>
+    $('#country').on('change', function () {
+        let countryId = $(this).val();
+
+        if (!countryId) return;
+
+        $.ajax({
+            url: "{{ route('teachers.get_cities', '') }}/" + countryId,
+            method: "GET",
+            success: function (response) {
+                let $city = $('#city');
+                $city.html('<option value="" disabled selected>Select City</option>');
+
+                $.each(response, function (index, city) {
+                    $city.append(`<option value="${city.id}">${city.city}</option>`);
+                });
+            },
+            error: function () {
+                alert("Error loading cities");
+            }
+        });
+    });
+</script>
+
+@endpush

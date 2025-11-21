@@ -49,8 +49,8 @@ class TeacherStoreRequest extends FormRequest
             'position'              => 'required|string|max:255',
             
             'address'               => 'required|string|max:255',
-            'city'                  => 'required|string|max:255',
-            'country'               => 'required|string|max:255',
+            'city'                  => 'required',
+            'country'               => 'required',
             'zip_code'              => 'required|string|max:20',
         ];
     }

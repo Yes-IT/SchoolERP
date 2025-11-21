@@ -26,14 +26,27 @@
                     Students
                 </a>
             </li>
-            <li class="classes">
-                <a href="my-classes.html">
-                    <img src="{{ asset('staff') }}/assets/images/sidebar-icon-3.svg" alt="Sidebar Icon">
+           <li class="has-submenu active">
+                <a href="javascript:void(0)" class="submenu-toggle">
+                    <img src="{{asset('staff/assets/images/sidebar-icon-3.svg')}}" alt="Sidebar Icon">
                     <div class="myclasses">
-                    My Classes <img src="{{ asset('staff') }}/assets/images/dropdown-arrow.svg" alt="arrow-down" class="downArrow" />
+                        My Classes
+                        <img src="{{asset('staff/assets/images/dropdown-arrow.svg')}}" alt="arrow-down" class="downArrow" />
                     </div>
                 </a>
-            </li>
+                <ul class="submenu">
+                    <li>
+                        <a href="{{ route('staff.my-classes.class-schedule') }}">
+                        <img src="{{asset('staff/assets/images/dot.svg')}}" class="dot" /> Class Schedule
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="{{ route('staff.my-classes.exam-schedule') }}">
+                        <img src="{{asset('staff/assets/images/dot.svg')}}" class="dot" /> Exam Schedule
+                        </a>
+                    </li>
+                </ul>
+           </li>
             <li>
                 <a href="{{ route('staff.attendance.index') }}">
                     <img src="{{ asset('staff') }}/assets/images/sidebar-icon-4.svg" alt="Sidebar Icon">

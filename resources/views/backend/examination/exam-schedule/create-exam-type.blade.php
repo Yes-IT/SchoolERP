@@ -13,8 +13,8 @@
             <div class="ds-breadcrumb">
                 <h1>Create Exam Types</h1>
                 <ul>
-                    <li><a href="../dashboard.html">Dashboard</a> /</li>
-                    <li><a href="dashboard.html">Exam Schedule</a> /</li>
+                    <li><a href="{{route('exam-schedule.index')}}">Dashboard</a> /</li>
+                    <li><a href="{{route('exam-schedule.createExamScheduleType')}}">Exam Schedule</a> /</li>
                     <li>Exam Types</li>
                     
                 </ul>

@@ -22,6 +22,10 @@ class ExamSchedule extends Model
         'allocated_students',
     ];
 
+    protected $casts = [
+        'exam_date' => 'date',
+    ];
+
     // belongs to Exam Request
     public function examRequest()
     {

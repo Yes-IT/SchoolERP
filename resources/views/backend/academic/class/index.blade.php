@@ -47,6 +47,9 @@
                                         </select>
                                     </div>
                                 </div>
+
+                                <input type="hidden" id="teacher_id" name="teacher_id" value="all">
+
                             
                                 <!-- Search Button -->
                                 <button type="submit" class="btn-search">Search</button>
@@ -156,39 +159,38 @@
 <script>
 $(document).ready(function () {
 
-    function initializeTeacherDropdown()
-    {
-            $('.teacher-dropdown .dropdown-trigger').on('click', function() {
-                $(this).closest('.teacher-dropdown').toggleClass('active');
-                $('#teacher-search').focus();
-            });
+    function initializeTeacherDropdown() {
+        $('.dropdown-year .dropdown-trigger').on('click', function() {
+            $(this).closest('.dropdown-year').toggleClass('active');
+            $('#teacher-search').focus();
+        });
 
-            // Teacher search functionality
-            $('#teacher-search').on('input', function() {
-                const searchTerm = $(this).val().toLowerCase();
-                $('.teacher-dropdown .dropdown-option').each(function() {
-                    const text = $(this).text().toLowerCase();
-                    if (text.includes(searchTerm)) {
-                        $(this).show();
-                    } else {
-                        $(this).hide();
-                    }
-                });
-            });
-
-            // Close dropdown when clicking outside
-            $(document).on('click', function(e) {
-                if (!$(e.target).closest('.teacher-dropdown').length) {
-                    $('.teacher-dropdown').removeClass('active');
+        $('#teacher-search').on('input', function() {
+            const searchTerm = $(this).val().toLowerCase();
+            $('.dropdown-year .dropdown-option').each(function() {
+                const text = $(this).text().toLowerCase();
+                if (text.includes(searchTerm)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
                 }
             });
-        }
+        });
+
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.dropdown-year').length) {
+                $('.dropdown-year').removeClass('active');
+            }
+        });
+    }
 
     initializeTeacherDropdown();
 
     function getFilterValues() {
-        const selectedTeacher = $('.teacher-dropdown .dropdown-option.selected');
+        const selectedTeacher = $('.dropdown-year .dropdown-option.selected');
         const teacherId = selectedTeacher.length ? selectedTeacher.data('id') : 'all';
+        
+        console.log('Selected teacher ID:', teacherId); 
         
         const filters = {
             session_id: $("#session_id").val(),
@@ -207,7 +209,6 @@ $(document).ready(function () {
         let filters = getFilterValues();
         filters.page = page;
 
-        // Remove empty filters
         Object.keys(filters).forEach(key => {
             if (filters[key] === "" || 
                 filters[key] === null || 
@@ -231,6 +232,7 @@ $(document).ready(function () {
             success: function (response) {
                 $("#class-table-body").html(response.html);
                 $("#class-pagination").html(response.pagination);
+                initializeTeacherDropdown();
             },
             error: function (xhr, status, error) {
                 console.error('Error:', error);
@@ -239,44 +241,43 @@ $(document).ready(function () {
         });
     }
 
-    // Teacher Dropdown Click
-     $(document).on("click", ".teacher-dropdown .dropdown-option", function (e) {
+    $(document).on("click", ".dropdown-year .dropdown-option", function (e) {
         e.stopPropagation();
         
         const $this = $(this);
         const teacherId = $this.data('id');
         const teacherName = $this.text();
         
-        $(".teacher-dropdown .dropdown-option").removeClass("selected");
+        $(".dropdown-year .dropdown-option").removeClass("selected");
         $this.addClass("selected");
-        $(".teacher-dropdown .dropdown-label").text(teacherName);
-        $('.teacher-dropdown').removeClass('active');
+        $(".dropdown-year .dropdown-label").text(teacherName);
+        $('.dropdown-year').removeClass('active');
+        $("#teacher_id").val(teacherId);
         
         console.log('Teacher selected:', teacherName, 'ID:', teacherId);
-    });
-
-    // Per page change
-    $('#class-per-page').on('change', function () {
-        console.log('Per page changed to:', $(this).val());
+        
         filterClasses(1);
     });
 
-    // Pagination click
-   $(document).on("click", "#class-pagination a", function (e) {
-        e.preventDefault();
-        let page = $(this).attr('href').split('page=')[1];
-        console.log('Pagination clicked, page:', page);
-        filterClasses(page);
-    });
+    initializeTeacherDropdown();
 
-    // Form Search Submit (Session/Year Status/Semester)
     $("#class-filter-form").on("submit", function (e) {
         e.preventDefault();
-        console.log('Search button clicked');
+        // console.log('Search button clicked');
+        filterClasses(1);
+    });
+   
+    $('#class-per-page').on('change', function () {
+        // console.log('Per page changed to:', $(this).val());
         filterClasses(1);
     });
 
-  
+    $(document).on("click", "#class-pagination a", function (e) {
+        e.preventDefault();
+        let page = $(this).attr('href').split('page=')[1];
+        // console.log('Pagination clicked, page:', page);
+        filterClasses(page);
+    });
 
 });
 

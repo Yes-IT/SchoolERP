@@ -75,11 +75,18 @@ class Classes extends BaseModel
         return $this->belongsTo(Subject::class, 'subject_id', 'id');
     }
 
-    public function teacher()
+   
+    public function teachers()
     {
-        return $this->belongsTo(Staff::class, 'teacher_id')
-            ->where('role_id', 5); 
+        return $this->belongsToMany(
+            Staff::class,
+            'student_class_mapping',
+            'class_id',
+            'teacher_id'
+        )->withPivot('status')
+        ->where('role_id', 5);
     }
+
 
 
     // public function schoolYear()

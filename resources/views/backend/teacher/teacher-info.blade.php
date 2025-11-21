@@ -159,7 +159,7 @@
                                           </tr>
                                           <tr>
                                             <td class="td-lineremover" >City</td>
-                                            <td class="td-lineremover" >{{ $teacher->city ?? '-' }}</td>
+                                            <td class="td-lineremover" >{{ $cityName ?? '-' }}</td>
                                           </tr>
                                           <tr>
                                             <td class="td-lineremover" >Zip Code</td>
@@ -167,7 +167,7 @@
                                           </tr>
                                           <tr>
                                             <td class="td-lineremover" >Country</td>
-                                            <td class="td-lineremover" >{{ $teacher->country ?? '-' }} </td>
+                                            <td class="td-lineremover" >{{ $countryName ?? '-' }} </td>
                                           </tr>
                                          
                                         </tbody>

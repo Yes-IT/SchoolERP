@@ -180,6 +180,7 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::delete('/delete/{id}', 'delete')->name('teacher.delete')->middleware('PermissionCheck:teacher_read');
                     Route::post('/teachers/{teacher}/inactive', 'toggleInactive')->name('teachers.toggleInactive')->middleware('PermissionCheck:teacher_read');
                     Route::get('/teachers/filter', 'filter')->name('teachers.filter')->middleware('PermissionCheck:teacher_read');
+                    Route::get('/get-cities/{country_id}', 'getCities')->name('teachers.get_cities');
                 });
 
                 //room management routes

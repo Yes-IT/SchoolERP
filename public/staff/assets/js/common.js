@@ -603,11 +603,16 @@ function toggleDropdownstatus() {
 
   // Open modal on 'Requested Examination' click
 document.querySelector('.examtype-text-btn span:nth-child(2)').addEventListener('click', function () {
-  document.querySelector('.request-overlay').style.display = 'flex';
+  // document.querySelector('.request-overlay').style.display = 'flex';
+});
+
+// OPEN MODAL only when clicking + Add Exam Request
+document.querySelector('.exm-req').addEventListener('click', function () {
+    document.querySelector('.request-overlay').style.display = 'flex';
 });
 
 // Close modal on 'X' click
-document.querySelector('.request-close').addEventListener('click', function () {
+document.querySelector('.requestClose').addEventListener('click', function () {
   document.querySelector('.request-overlay').style.display = 'none';
 });
 

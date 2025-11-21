@@ -8,6 +8,7 @@ use App\Interfaces\Staff\TeacherInterface;
 use App\Http\Requests\Staff\Teacher\{TeacherStoreRequest,TeacherUpdateRequest};
 use App\Models\Staff\Staff;
 use Illuminate\Support\Facades\{Log,DB};
+use App\Models\Cities;
 
 
 class TeacherController extends Controller
@@ -35,7 +36,30 @@ class TeacherController extends Controller
             abort(404, 'Teacher not found');
         }
 
-        return view('backend.teacher.teacher-info', compact('teacher','classes'));
+        $countryName = DB::table('countries')
+                        ->where('country_id', $teacher->country)
+                        ->value('country_name');
+
+        // dd($countryName);
+
+        $cityName = DB::table('cities')
+                    ->where('id', $teacher->city)
+                    ->value('city');
+
+        // dd($cityName);
+
+        return view('backend.teacher.teacher-info', compact('teacher','classes','countryName','cityName'));
+    }
+
+    public function getCities($country_id)
+    {
+        $cities = DB::table('cities')
+            ->select('id', 'city')
+            ->where('country_id', $country_id)
+            ->orderBy('city')
+            ->get();
+
+        return response()->json($cities);
     }
 
     public function create(){
@@ -51,7 +75,10 @@ class TeacherController extends Controller
         $nextTeacherId = 'TCHR' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
         // Log::info('nextTeacherId', ['nextTeacherId' => $nextTeacherId]);
 
-        return view('backend.teacher.add-teacher', compact('data','nextTeacherId'));
+         $countries = DB::table('countries')->select('country_id', 'country_name')->get();
+       
+
+        return view('backend.teacher.add-teacher', compact('data','nextTeacherId','countries'));
     }
 
     public function store(TeacherStoreRequest $request){
@@ -71,9 +98,11 @@ class TeacherController extends Controller
             return redirect()->route('teacher.index')->with('danger', 'Teacher not found.');
         }
 
+         $countries = DB::table('countries')->select('country_id', 'country_name')->get();
+
         // Log::info('teacher', ['teacher' => $teacher]);
 
-        return view('backend.teacher.edit-teacher',compact('data','teacher'));
+        return view('backend.teacher.edit-teacher',compact('data','teacher','countries'));
     }
     
     public function update(TeacherUpdateRequest $request, $id)
