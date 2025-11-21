@@ -1,6 +1,6 @@
 <?php
  
-
+ 
 use App\Http\Controllers\Staff\AttendanceController;
 use App\Http\Controllers\Staff\DashboardController;
 use App\Http\Controllers\Staff\AssignmentController;
@@ -8,8 +8,8 @@ use App\Http\Controllers\Staff\ApplyLeaveController;
 use App\Http\Controllers\Staff\ProfileController;
 use App\Http\Controllers\Staff\DepartmentController;
 use App\Http\Controllers\Staff\DesignationController;
-use App\Http\Controllers\Staff\{StudentController,ExamScheduleController};   
-
+use App\Http\Controllers\Staff\{StudentController,ExamScheduleController};  
+ 
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -25,13 +25,13 @@ Route::middleware([ 'web',])->group(function () {
     Route::middleware(saasMiddleware()) // your custom SAAS middleware stack
         ->middleware('XssSanitizer')
         ->group(function () {
-
+ 
         // All staff management features (departments, designations, etc.)
         Route::middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage'])->group(function () {
-
+ 
             // Authenticated admin routes (your custom guard/middleware)
             Route::middleware(['auth.routes', 'AdminPanel'])->group(function () {
-
+ 
                 // Departments
                 Route::prefix('department')->name('department.')->controller(DepartmentController::class)->group(function () {
                     Route::get('/', 'index')->name('index')->middleware('PermissionCheck:department_read');
@@ -41,7 +41,7 @@ Route::middleware([ 'web',])->group(function () {
                     Route::put('/update/{id}', 'update')->name('update')->middleware(['PermissionCheck:department_update', 'DemoCheck']);
                     Route::delete('/delete/{id}', 'delete')->name('delete')->middleware(['PermissionCheck:department_delete', 'DemoCheck']);
                 });
-
+ 
                 // Designations
                 Route::prefix('designation')->name('designation.')->controller(DesignationController::class)->group(function () {
                     Route::get('/', 'index')->name('index')->middleware('PermissionCheck:designation_read');
@@ -51,47 +51,49 @@ Route::middleware([ 'web',])->group(function () {
                     Route::put('/update/{id}', 'update')->name('update')->middleware(['PermissionCheck:designation_update', 'DemoCheck']);
                     Route::delete('/delete/{id}', 'delete')->name('delete')->middleware(['PermissionCheck:designation_delete', 'DemoCheck']);
                 });
-                
-                Route::get('/staff/dashboard', [DashboardController::class, 'index'])->name('staff.dashboard')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
-                
-                Route::get('/staff/attendance', [AttendanceController::class, 'index'])->name('staff.attendance.index')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
-                Route::post('/staff/attendance/load', [AttendanceController::class, 'loadAttendance'])->name('staff.attendance.load');
-                Route::post('/staff/attendance/save', [AttendanceController::class, 'saveAttendance'])->name('staff.attendance.save');
+               
+            Route::get('/staff/dashboard', [DashboardController::class, 'index'])->name('staff.dashboard')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+           
+            Route::get('/staff/attendance', [AttendanceController::class, 'index'])->name('staff.attendance.index')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+            Route::post('/staff/attendance/load', [AttendanceController::class, 'loadAttendance'])->name('staff.attendance.load');
+            Route::post('/staff/attendance/save', [AttendanceController::class, 'saveAttendance'])->name('staff.attendance.save');
+ 
             });
-
-            Route::prefix('staff')->name('staff.')->middleware(['lang', 'CheckSubscription'])->group(function () {
-
-                Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('FeatureCheck:staff_manage');
-
-                // Profile Module
-                Route::prefix('profile')->name('profile.')->controller(ProfileController::class)->group(function () {
-                    Route::get('/', 'index')->name('index')->middleware('PermissionCheck:profile_read');
-                });
-
-                Route::prefix('assignment')->name('assignment.')->controller(AssignmentController::class)->group(function () {
-                    Route::get('/', 'index')->name('index')->middleware('PermissionCheck:assignment_read');
-                });
-
-                Route::prefix('apply-leave')->name('apply-leave.')->controller(ApplyLeaveController::class)->group(function () {
-                    Route::get('/', 'index')->name('index')->middleware('PermissionCheck:apply_leave_read');
-                    Route::post('/', 'applyForLeave')->name('apply')->middleware('PermissionCheck:apply_leave_update');
-                    Route::get('/get-leave/{id}', 'showLeave')->name('get-leave')->middleware('PermissionCheck:apply_leave_read');
-                    Route::put('/update/{id}', 'updateLeave')->name('update')->middleware(['PermissionCheck:apply_leave_update']);
-                    Route::delete('/delete/{id}', 'deleteLeave')->name('delete')->middleware(['PermissionCheck:apply_leave_delete']);
-                });
+ 
+        });
+ 
+        Route::prefix('staff')->name('staff.')->middleware(['lang', 'CheckSubscription'])->group(function () {
+ 
+            Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('FeatureCheck:staff_manage');
+ 
+            // Profile Module
+            Route::prefix('profile')->name('profile.')->controller(ProfileController::class)->group(function () {
+                Route::get('/', 'index')->name('index')->middleware('PermissionCheck:profile_read');
             });
-
+ 
+            Route::prefix('assignment')->name('assignment.')->controller(AssignmentController::class)->group(function () {
+                Route::get('/', 'index')->name('index')->middleware('PermissionCheck:assignment_read');
+            });
+ 
+            Route::prefix('apply-leave')->name('apply-leave.')->controller(ApplyLeaveController::class)->group(function () {
+                Route::get('/', 'index')->name('index')->middleware('PermissionCheck:apply_leave_read');
+                Route::post('/', 'applyForLeave')->name('apply')->middleware('PermissionCheck:apply_leave_update');
+                Route::get('/get-leave/{id}', 'showLeave')->name('get-leave')->middleware('PermissionCheck:apply_leave_read');
+                Route::put('/update/{id}', 'updateLeave')->name('update')->middleware(['PermissionCheck:apply_leave_update']);
+                Route::delete('/delete/{id}', 'deleteLeave')->name('delete')->middleware(['PermissionCheck:apply_leave_delete']);
+            });
+ 
             Route::prefix('students')->name('students.')->controller(StudentController::class)->group(function () {
                 Route::get('/', 'index')->name('index')->middleware('PermissionCheck:student_read');
                 Route::get('/filter',  'Filter')->name('filter')->middleware('PermissionCheck:student_filter');
-
+ 
             });
-
+ 
             Route::prefix('my-classes')->name('my-classes.')->controller(ExamScheduleController::class)->group(function () {
                 Route::get('/exam-schedule', 'examSchedule')->name('exam-schedule')->middleware('PermissionCheck:exam_schedule_read');
                 Route::get('/available-rooms', 'getAvailableRooms')->name('available-rooms')->middleware('PermissionCheck:exam_schedule_read');
                 Route::post('/exam-request-store', 'store_exam_request')->name('store_exam_request')->middleware('PermissionCheck:exam_schedule_create');
-
+ 
                 Route::get('/class-schedule', 'classSchedule')->name('class-schedule')->middleware('PermissionCheck:exam_schedule_read');
             });
         });
