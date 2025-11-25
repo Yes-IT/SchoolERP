@@ -74,6 +74,10 @@ Route::middleware([ 'web',])->group(function () {
             Route::prefix('assignment')->name('assignment.')->controller(AssignmentController::class)->group(function () {
                 Route::get('/', 'index')->name('index')->middleware('PermissionCheck:assignment_read');
             });
+
+            Route::prefix('communicate')->name('communicate.')->controller(AssignmentController::class)->group(function () {
+                Route::get('/', 'index')->name('index')->middleware('PermissionCheck:communicate_read');
+            });
  
             Route::prefix('apply-leave')->name('apply-leave.')->controller(ApplyLeaveController::class)->group(function () {
                 Route::get('/', 'index')->name('index')->middleware('PermissionCheck:apply_leave_read');
