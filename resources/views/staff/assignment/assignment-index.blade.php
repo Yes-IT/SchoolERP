@@ -51,22 +51,22 @@
                         <!-- Year/Month Picker Dropdown -->
                         <div class="dropdown subject-dropdown selectisub">
                             <button type="button" class="dropdown-toggle">
-                            <span class="label">Select Room No.</span>
-                            <img src="./images/down-arrow-5.svg" class="arrow-att"/>
+                                <span class="label">Select Room No.</span>
+                                <img src="./images/down-arrow-5.svg" class="arrow-att"/>
                             </button>
                             <div class="dropdown-menu">
-                            <label>
-                                <input type="checkbox" value="all" checked /> All Subjects
-                            </label>
-                            <label>
-                                <input type="checkbox" value="1" /> Lorem ipsum dolor sit amet
-                            </label>
-                            <label>
-                                <input type="checkbox" value="2" /> Lorem ipsum dolor sit amet
-                            </label>
-                            <label>
-                                <input type="checkbox" value="3" /> Lorem ipsum dolor sit amet
-                            </label>
+                                <label>
+                                    <input type="checkbox" value="all" checked /> All Subjects
+                                </label>
+                                <label>
+                                    <input type="checkbox" value="1" /> Lorem ipsum dolor sit amet
+                                </label>
+                                <label>
+                                    <input type="checkbox" value="2" /> Lorem ipsum dolor sit amet
+                                </label>
+                                <label>
+                                    <input type="checkbox" value="3" /> Lorem ipsum dolor sit amet
+                                </label>
                             </div>
                         </div>
 
