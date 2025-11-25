@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=0">
     <title>@yield('title', 'School Management System')</title>
-
+ <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- fabicon -->
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
 

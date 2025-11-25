@@ -22,7 +22,7 @@ class ExamRequest extends Model
         'exam_type_id',
         'subject_id',
         'room_id',    
-        'techer_id',
+        'teacher_id',
         'class_id',
         'exam_date',
         'start_time',
