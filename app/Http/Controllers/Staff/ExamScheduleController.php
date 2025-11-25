@@ -58,10 +58,10 @@ class ExamScheduleController extends Controller
     {
         try {
 
-            Log::info('Auth user:', [
-                'user_id' => Auth::id(),
-                'user' => Auth::user()
-            ]);
+            // Log::info('Auth user:', [
+            //     'user_id' => Auth::id(),
+            //     'user' => Auth::user()
+            // ]);
 
             $validated = $request->validate([
                 'exam_type_id' => 'required|exists:exam_types,id',
@@ -76,12 +76,11 @@ class ExamScheduleController extends Controller
             $user = Auth::user();
             $staffId = $user->staff->id;
 
-            Log::info('User and staff info:', [
-                'user_id' => $user->id,
-                'staff_id' => $staffId
-            ]);
+            // Log::info('User and staff info:', [
+            //     'user_id' => $user->id,
+            //     'staff_id' => $staffId
+            // ]);
 
-            // Double-check room availability before saving
             $availableRooms = $this->examRequestRepository->getAvailableRooms(
                 $validated['exam_date'],
                 $validated['start_time'],
@@ -97,7 +96,6 @@ class ExamScheduleController extends Controller
                 ], 422);
             }
 
-            // Calculate duration
             $start = Carbon::parse($validated['start_time']);
             $end = Carbon::parse($validated['end_time']);
             $duration = $start->diffInMinutes($end);
@@ -129,9 +127,8 @@ class ExamScheduleController extends Controller
     {
         try {
 
-          Log::info('getAvailableRooms request', ['request' => $request->all()]);
+            Log::info('getAvailableRooms request', ['request' => $request->all()]);
 
-            // STEP 1: Validate required parameters
             $request->validate([
                 'exam_date' => 'required|date',
                 'start_time' => 'required',
@@ -144,7 +141,6 @@ class ExamScheduleController extends Controller
                 'end_time' => $request->end_time
             ]);
 
-            // STEP 2: Fetch available rooms from repository
             $rooms = $this->examRequestRepository->getAvailableRooms(
                 $request->exam_date,
                 $request->start_time,
@@ -153,7 +149,6 @@ class ExamScheduleController extends Controller
 
             Log::info('Available rooms found:', ['count' => $rooms->count()]);
 
-            // STEP 3: Return available rooms
             return response()->json([
                 'success' => true,
                 'rooms' => $rooms
@@ -167,7 +162,6 @@ class ExamScheduleController extends Controller
                 'request' => $request->all()
             ]);
 
-            // STEP 4: Handle errors
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch available rooms'

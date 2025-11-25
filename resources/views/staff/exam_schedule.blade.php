@@ -416,7 +416,6 @@
     });
 </script>
 <script>
-    // Populate hours 01–12
    function populateHours(selector) {
         let select = document.querySelector(selector);
         select.innerHTML = "";
@@ -430,7 +429,6 @@
         }
     }
 
-    // Populate minutes 00–59
    function populateMinutes(selector) {
         let select = document.querySelector(selector);
         select.innerHTML = "";
@@ -453,7 +451,7 @@
         select.add(emptyOpt);
         ["AM", "PM"].forEach(val => {
             let opt = new Option(val, val);
-            select.add(opt);
+            select.add(opt);    
         });
     }
 
@@ -479,19 +477,16 @@
         }
 
         bindEvents() {
-            // Check room availability when date or time changes
             $('#exam-date, .start-hour, .start-minute, .start-ampm, .end-hour, .end-minute, .end-ampm').on('change', () => {
                 this.debouncedCheckRoomAvailability();
             });
 
-            // Handle form submission
             $('#exam-request-form').on('submit', (e) => {
                 e.preventDefault();
                 this.submitExamRequest();
             });
         }
 
-        // Debounce function to prevent multiple rapid API calls
         debouncedCheckRoomAvailability() {
             if (this.debounceTimer) {
                 clearTimeout(this.debounceTimer);
@@ -508,8 +503,6 @@
             const endHour = $('.end-hour').val();
             const endMinute = $('.end-minute').val();
             const endAmPm = $('.end-ampm').val();
-
-            // All time fields must have non-empty values
             return startHour && startMinute && startAmPm && endHour && endMinute && endAmPm;
         }
 
@@ -543,7 +536,6 @@
             const examDateInput = $('#exam-date').val();
             const examDate = this.formatDateForBackend(examDateInput);
             
-            // Only proceed if date is selected AND all time fields are filled
             if (!examDate || !this.areTimeFieldsFilled()) {
                 $('#room-select').html('<option value="">Select Date and complete all Time fields</option>');
                 $('#room-select').prop('disabled', true);
@@ -552,7 +544,6 @@
 
             const { startTime, endTime } = this.getFormattedTime();
 
-            // Validate time logic
             if (startTime >= endTime) {
                 $('#room-select').html('<option value="">End time must be after start time</option>');
                 $('#room-select').prop('disabled', true);
@@ -577,12 +568,12 @@
                 if (response.success) {
                     this.populateRooms(response.rooms);
                 } else {
-                    this.showError('Failed to fetch available rooms');
+                    showError('Failed to fetch available rooms');
                     $('#room-select').html('<option value="">Error loading rooms</option>');
                 }
             } catch (error) {
                 console.error('Error fetching rooms:', error);
-                this.showError('Error checking room availability');
+                showError('Error checking room availability');
                 $('#room-select').html('<option value="">Error loading rooms</option>');
             } finally {
                 $('#room-loading').hide();
@@ -591,15 +582,13 @@
 
         formatDateForBackend(dateString) {
             if (!dateString) return '';
-            
-            // Split the date (assuming format: MM-DD-YYYY)
             const parts = dateString.split('-');
             if (parts.length === 3) {
                 const [month, day, year] = parts;
                 return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
             }
             
-            return dateString; // Return as-is if format doesn't match
+            return dateString;
         }
 
         populateRooms(rooms) {
@@ -623,13 +612,16 @@
             }
         }
 
-      async submitExamRequest() {
+        closeModal() {
+            $('.request-modal').hide();
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open');
+            $('body').css('overflow', 'auto');
+            $('body').css('padding-right', '0');
+        }
 
-
-        // Add this at the beginning of your submitExamRequest method
-        console.log('CSRF Token from meta:', $('meta[name="csrf-token"]').attr('content'));
-        console.log('CSRF Token from input:', $('input[name="_token"]').val());
-            // Collect data manually instead of using FormData
+      async submitExamRequest()
+      {
             const data = {
                 exam_type_id: $('.exam-type-select').val(),
                 subject_id: $('.subject-select').val(),
@@ -643,15 +635,10 @@
             data.start_time = startTime;
             data.end_time = endTime;
 
-            console.log('Manual form data:', data);
-           console.log('CSRF Token:', data._token); // Debug: check if token exists
-
-            // Basic validation
             if (!this.validateForm(data)) {
                 return;
             }
 
-            // Show loading state
             $('.req-btn').prop('disabled', true).text('Submitting...');
 
             try {
@@ -662,68 +649,47 @@
                     
                 });
 
-                if (response.success) {
-                    this.showSuccess(response.message);
+                 if (response.success) {
+                    showSuccess(response.message);
                     this.resetForm();
-                    $('.request-modal').hide();
+                    this.closeModal();
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
                 } else {
-                    this.showError(response.message);
+                    showError(response.message);
                 }
             } catch (error) {
                 console.error('Error submitting request:', error);
                 const errorMessage = error.responseJSON?.message || 'Failed to submit exam request';
-                this.showError(errorMessage);
+                showError(errorMessage);
             } finally {
                 $('.req-btn').prop('disabled', false).text('Request');
             }
         }
 
-        validateForm(data) {
+        validateForm(data)
+        {
             if (!data.exam_type_id || !data.subject_id  || 
                 !data.exam_date || !data.room_id) {
-                this.showError('Please fill all required fields');
+                showError('Please fill all required fields');
                 return false;
             }
 
-            // Check if time fields are filled
             if (!this.areTimeFieldsFilled()) {
-                this.showError('Please complete all time fields');
+                showError('Please complete all time fields');
                 return false;
             }
 
             const { startTime, endTime } = this.getFormattedTime();
             if (startTime >= endTime) {
-                this.showError('End time must be after start time');
+                showError('End time must be after start time');
                 return false;
             }
 
             return true;
         }
-
-        showSuccess(message) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: message,
-                    timer: 3000
-                });
-            } else {
-                alert('Success: ' + message);
-            }
-        }
-
-        showError(message) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: message
-                });
-            } else {
-                alert('Error: ' + message);
-            }
-        }
+        
 
         resetForm() {
             document.getElementById('exam-request-form').reset();
@@ -732,7 +698,6 @@
         }
     }
 
-    // Initialize when document is ready
     $(document).ready(function() {
         setTimeout(() => {
             window.examScheduler = new ExamScheduler();

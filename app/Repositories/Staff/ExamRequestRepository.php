@@ -24,16 +24,24 @@ class ExamRequestRepository implements ExamRequestInterface
     public function getAvailableRooms($examDate, $startTime, $endTime)
     {
 
-        Log::info('Repository getAvailableRooms called:', [
-            'exam_date' => $examDate,
-            'start_time' => $startTime,
-            'end_time' => $endTime
-        ]);
+            Log::info('Repository getAvailableRooms called:', [
+                'exam_date' => $examDate,
+                'start_time' => $startTime,
+                'end_time' => $endTime
+            ]);
 
          try {
+
+                $allApprovedExams = DB::table('exam_requests')
+                                    ->where('exam_date', $examDate)
+                                    ->where('status', 'approved')
+                                    ->get(['id', 'room_id', 'start_time', 'end_time']);
+
+                Log::info('All approved exams for date:', $allApprovedExams->toArray());
+
                 $bookedRooms = DB::table('exam_requests')
                     ->where('exam_date', $examDate)
-                    ->where('status', 'approved')
+                    ->whereIn('status', ['approved', 'pending'])
                     ->where(function($query) use ($startTime, $endTime) {
                         $query->where(function($q) use ($startTime, $endTime) {
                             $q->where('start_time', '<=', $startTime)

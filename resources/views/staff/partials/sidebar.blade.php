@@ -21,7 +21,7 @@
                 </a>
             </li>
             <li>
-                <a href="profile.html">
+                <a href="{{route('staff.students.index')}}">
                     <img src="{{ asset('staff') }}/assets/images/sidebar-icon-2.svg" alt="Sidebar Icon">
                     Students
                 </a>
