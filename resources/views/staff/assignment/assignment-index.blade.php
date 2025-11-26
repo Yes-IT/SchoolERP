@@ -1,5 +1,27 @@
 @extends('staff.master')
 
+<style>
+    .popup-overlay-assignment {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-box-assignment {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+
+
+</style>
 @section('title')
     {{ @$data['title'] }}
 @endsection
@@ -30,7 +52,7 @@
                         <div class="dropdown subject-dropdown selectisub">
                             <button type="button" class="dropdown-toggle">
                                 <span class="label">Select Subject</span>
-                                <img src="./images/down-arrow-5.svg" class="arrow-att"/>
+                                <img src="{{asset('staff/assets/images/down-arrow-5.svg')}}" class="arrow-att"/>
                             </button>
                             <div class="dropdown-menu">
                             <label>
@@ -52,7 +74,7 @@
                         <div class="dropdown subject-dropdown selectisub">
                             <button type="button" class="dropdown-toggle">
                                 <span class="label">Select Room No.</span>
-                                <img src="./images/down-arrow-5.svg" class="arrow-att"/>
+                                <img src="{{asset('staff/assets/images/down-arrow-5.svg')}}" class="arrow-att"/>
                             </button>
                             <div class="dropdown-menu">
                                 <label>
@@ -85,692 +107,246 @@
             <div class="cmn-tab-head">
                 <ul>
                     <li class="tab-bg"></li>
-                    <li class="tab-switch active" data-tab="current-tab">Current Assignments</li>
+                    <li class="tab-switch " data-tab="current-tab">Current Assignments</li>
                     <li class="tab-switch" data-tab="closed-tab">Closed Assignments</li>
-                    <li class="tab-switch" data-tab="requested-tab">Requested Assignments</li>
+                    <li class="tab-switch active" data-tab="requested-tab">Requested Assignments</li>
                 </ul>
             </div>
-            <div class="assignments" onclick="openAssignmentPopup()">
+            <div class="assignments">
                 <p>+</p>
                 <p>Assignments</p>
             </div>
-        </div>
 
-        <div class="tab-content current-tab active">
-            <div class="ds-cmn-tble pending count-row">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>S. No</th>
-                            <th>Subject</th>
-                            <th>Assignment Title</th>
-                            <th>Assignment Description</th>
-                            <th>Attachment</th>
-                            <th>Assigned Date</th>
-                            <th>Due Date</th>
-                            <th>Grade</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            <div class="tab-content current-tab">
+                <div class="ds-cmn-tble pending count-row current-assignments">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>S. No</th>
+                                <th>Subject</th>
+                                <th>Assignment Title</th>
+                                <th>Assignment Description</th>
+                                <th>Attachment</th>
+                                <th>Assigned Date</th>
+                                <th>Due Date</th>
+                                <th>Grade</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{-- <tr>
+                                <td>1</td>
+                                <td>Lorem ipsum dolor sit amet </td>
+                                <td>Lorem ipsum dolor sit amet </td>
+                                <td>
+                                    <div class="toggle-text-wrapper">
+                                        <div class="toggle-text-content">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                        </div>
+                                        </div>
+                                        
+                                </td>
+                                <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="{{asset('staff/assets/images/eye-white.svg')}}" alt="Eye Icon"></button></td>
+                                <td>04/02/2025</td>
+                                <td>04/22/2025</td>
+                                <td>50</td>
+                                <td>
+                                    <div class="file-action">
+                                        <p><img src="{{asset('staff/assets/images/lines.svg')}}" /></p>
+                                        <p><img src="{{asset('staff/assets/images/pen.svg')}}" onclick="openEditPopup()"/></p>
+                                        <p class="delete-btn"><img src="{{asset('staff/assets/images/dust.svg')}}" /></p>
                                     </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/02/2025</td>
-                            <td>04/22/2025</td>
-                            <td>50</td>
-                            <td>
-                                <div class="file-action">
-                                    <p><img src="./images/lines.svg" /></p>
-                                    <p><img src="./images/pen.svg" onclick="openEditPopup()"/></p>
-                                    <p class="delete-btn"><img src="./images/dust.svg" /></p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <div class="file-action">
-                                    <p><img src="./images/lines.svg" /></p>
-                                    <p><img src="./images/pen.svg" /></p>
-                                    <p><img src="./images/dust.svg" /></p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <div class="file-action">
-                                    <p><img src="./images/lines.svg" /></p>
-                                    <p><img src="./images/pen.svg" /></p>
-                                    <p><img src="./images/dust.svg" /></p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <div class="file-action">
-                                    <p><img src="./images/lines.svg" /></p>
-                                    <p><img src="./images/pen.svg" /></p>
-                                    <p><img src="./images/dust.svg" /></p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <div class="file-action">
-                                    <p><img src="./images/lines.svg" /></p>
-                                    <p><img src="./images/pen.svg" /></p>
-                                    <p><img src="./images/dust.svg" /></p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <div class="file-action">
-                                    <p><img src="./images/lines.svg" /></p>
-                                    <p><img src="./images/pen.svg" /></p>
-                                    <p><img src="./images/dust.svg" /></p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <div class="file-action">
-                                    <p><img src="./images/lines.svg" /></p>
-                                    <p><img src="./images/pen.svg" /></p>
-                                    <p><img src="./images/dust.svg" /></p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <div class="file-action">
-                                    <p><img src="./images/lines.svg" /></p>
-                                    <p><img src="./images/pen.svg" /></p>
-                                    <p><img src="./images/dust.svg" /></p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <div class="file-action">
-                                    <p><img src="./images/lines.svg" /></p>
-                                    <p><img src="./images/pen.svg" /></p>
-                                    <p><img src="./images/dust.svg" /></p>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                                </td>
+                            </tr> --}}
+
+                            @forelse($data['current_assignments'] as $index => $assignment)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $assignment->subject->name ?? 'N/A' }}</td>
+                                    <td>{{ $assignment->title }}</td>
+                                    <td>
+                                        <div class="toggle-text-wrapper">
+                                            <div class="toggle-text-content">
+                                                {{ $assignment->description ?? 'No description' }}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if($assignment->media->count())
+                                            <button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal" data-assignment-id="{{ $assignment->id }}">
+                                                <img src="{{ asset('staff/assets/images/eye-white.svg') }}">
+                                            </button>
+                                        @else
+                                            <span>No files</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ $assignment->assigned_date->format('m/d/Y') }}</td>
+                                    <td>{{ $assignment->due_date->format('m/d/Y') }}</td>
+                                    <td>{{ $assignment->grade }}</td>
+                                    <td>
+                                        <div class="file-action">
+                                            {{-- <p><img src="{{asset('staff/assets/images/lines.svg')}}" /></p> --}}
+                                            <p>
+                                                <a href="{{ route('staff.assignment.evaluateAssignment', $assignment->id) }}">
+                                                    <img src="{{ asset('staff/assets/images/lines.svg') }}" />
+                                                </a>
+                                            </p>
+                                            <p><img src="{{asset('staff/assets/images/pen.svg')}}" onclick="openEditPopup()"/></p>
+                                            {{-- <p class="delete-btn"><img src="{{asset('staff/assets/images/dust.svg')}}" /></p> --}}
+                                             <button type="button" data-bs-target="#deleteAssignmentModal" data-bs-toggle="modal" class="delete-exam-btn deleteAssignmentBtn">
+                                                    <img src="{{ global_asset('staff/assets/images/dust.svg') }}" alt="Icon">
+                                                </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="10" class="text-center">No active assignments</td>
+                                </tr>
+                            @endforelse
+
+                        
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 
-        <div class="tab-content requested-tab">
-            <div class="ds-cmn-tble completed count-row">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>S. No</th>
-                            <th>Subject</th>
-                            <th>Assignment Title</th>
-                            <th>Assignment Description</th>
-                            <th>Attachment</th>
-                            <th>Assigned Date</th>
-                            <th>Due Date</th>
-                            <th>Grade</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            <div class="tab-content requested-tab">
+                <div class="ds-cmn-tble completed count-row requested-assignments" >
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>S. No</th>
+                                <th>Subject</th>
+                                <th>Assignment Title</th>
+                                <th>Assignment Description</th>
+                                <th>Attachment</th>
+                                <th>Assigned Date</th>
+                                <th>Due Date</th>
+                                <th>Grade</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{-- <tr>
+                                <td>1</td>
+                                <td>Lorem ipsum dolor sit amet </td>
+                                <td>Lorem ipsum dolor sit amet </td>
+                                <td>
+                                    <div class="toggle-text-wrapper">
+                                        <div class="toggle-text-content">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                        </div>
+                                        </div>
+                                        
+                                </td>
+                                <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="{{asset('staff/assets/images/eye-white.svg')}}" alt="Eye Icon"></button></td>
+                                <td>04/02/2025</td>
+                                <td>04/22/2025</td>
+                                <td>50</td>
+                                <td>
+                                    <div class="file-action">
+                                        <p><img src="{{asset('staff/assets/')}}./images/lines.svg" /></p>
+                                        <p><img src="{{asset('staff/assets/')}}./images/pen.svg" onclick="openEditPopup()"/></p>
+                                        <p><img src="{{asset('staff/assets/')}}./images/dust.svg" /></p>
                                     </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/02/2025</td>
-                            <td>04/22/2025</td>
-                            <td>50</td>
-                            <td>
-                                <div class="file-action">
-                                    <p><img src="./images/lines.svg" /></p>
-                                    <p><img src="./images/pen.svg" onclick="openEditPopup()"/></p>
-                                    <p><img src="./images/dust.svg" /></p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <div class="file-action">
-                                    <p><img src="./images/lines.svg" /></p>
-                                    <p><img src="./images/pen.svg" /></p>
-                                    <p><img src="./images/dust.svg" /></p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <div class="file-action">
-                                    <p><img src="./images/lines.svg" /></p>
-                                    <p><img src="./images/pen.svg" /></p>
-                                    <p><img src="./images/dust.svg" /></p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <div class="file-action">
-                                    <p><img src="./images/lines.svg" /></p>
-                                    <p><img src="./images/pen.svg" /></p>
-                                    <p><img src="./images/dust.svg" /></p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <div class="file-action">
-                                    <p><img src="./images/lines.svg" /></p>
-                                    <p><img src="./images/pen.svg" /></p>
-                                    <p><img src="./images/dust.svg" /></p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <div class="file-action">
-                                    <p><img src="./images/lines.svg" /></p>
-                                    <p><img src="./images/pen.svg" /></p>
-                                    <p><img src="./images/dust.svg" /></p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <div class="file-action">
-                                    <p><img src="./images/lines.svg" /></p>
-                                    <p><img src="./images/pen.svg" /></p>
-                                    <p><img src="./images/dust.svg" /></p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <div class="file-action">
-                                    <p><img src="./images/lines.svg" /></p>
-                                    <p><img src="./images/pen.svg" /></p>
-                                    <p><img src="./images/dust.svg" /></p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <div class="file-action">
-                                    <p><img src="./images/lines.svg" /></p>
-                                    <p><img src="./images/pen.svg" /></p>
-                                    <p><img src="./images/dust.svg" /></p>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                                </td>
+                            </tr> --}}
+
+
+                            @forelse($data['requested_assignments'] as $index => $assignment)
+                            @php
+                                $assignment_status= $assignment->status === 0 ? 'Pending' : '';
+                            @endphp
+
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $assignment->subject->name ?? 'N/A' }}</td>
+                                    <td>{{ $assignment->title }}</td>
+                                    <td>
+                                        <div class="toggle-text-wrapper">
+                                            <div class="toggle-text-content">
+                                                {{ $assignment->description ?? 'No description' }}
+                                            </div>
+                                        </div>
+                                    </td>~
+                                    <td>
+                                        @if($assignment->media->count() > 0)
+                                            <button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal" data-assignment-id="{{ $assignment->id }}">
+                                                <img src="{{ asset('staff/assets/images/eye-white.svg') }}" alt="Eye Icon">
+                                            </button>
+                                        @else
+                                            <span class="no-attachment">No files</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ $assignment->assigned_date->format('m/d/Y') }}</td>
+                                    <td>{{ $assignment->due_date->format('m/d/Y') }}</td>
+                                    <td>{{ $assignment->grade }}</td>
+                                    <td>
+                                        <p class="statusBtn">{{ $assignment_status }}</p>
+                                    </td>
+                                
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="10" class="text-center">No requested assignments pending approval</td>
+                                </tr>
+                            @endforelse
+                        
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 
-        <div class="tab-content closed-tab">
-            <div class="ds-cmn-tble closed count-row">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>S. No</th>
-                            <th>Subject</th>
-                            <th>Assignment Title</th>
-                            <th>Assignment Description</th>
-                            <th>Attachment</th>
-                            <th>Assigned Date</th>
-                            <th>Due Date</th>
-                            <th>Grade</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/02/2025</td>
-                            <td>04/22/2025</td>
-                            <td>50</td>
-                            <td>
-                                <p class="statusBtn">Pending</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <p class="statusBtn">Pending</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <p class="statusBtn">Pending</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <p class="statusBtn">Pending</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <p class="statusBtn">Pending</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <p class="statusBtn">Pending</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <p class="statusBtn">Pending</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <p class="statusBtn">Pending</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>Lorem ipsum dolor sit amet </td>
-                            <td>
-                                <div class="toggle-text-wrapper">
-                                    <div class="toggle-text-content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    </div>
-                                    
-                            </td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="./images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>04/15/2025</td>
-                            <td>04/15/2025</td>
-                            <td>50</td>
-                            <td>
-                                <p class="statusBtn">Pending</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="tab-content closed-tab" >
+                <div class="ds-cmn-tble closed count-row closed-assignments" >
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>S. No</th>
+                                <th>Subject</th>
+                                <th>Assignment Title</th>
+                                <th>Assignment Description</th>
+                                <th>Attachment</th>
+                                <th>Assigned Date</th>
+                                <th>Due Date</th>
+                                <th>Grade</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{-- <tr>
+                                <td>1</td>
+                                <td>Lorem ipsum dolor sit amet </td>
+                                <td>Lorem ipsum dolor sit amet </td>
+                                <td>
+                                    <div class="toggle-text-wrapper">
+                                        <div class="toggle-text-content">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                        </div>
+                                        </div>
+                                        
+                                </td>
+                                <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="{{asset('staff/assets/images/eye-white.svg')}}" alt="Eye Icon"></button></td>
+                                <td>04/02/2025</td>
+                                <td>04/22/2025</td>
+                                <td>50</td>
+                                <td>
+                                    <p class="statusBtn">Pending</p>
+                                </td>
+                            </tr> --}}
+
+                            @forelse($data['closed_assignments'] as $index => $assignment)
+                            
+                            @empty
+                                <tr><td colspan="10">No closed assignments</td></tr>
+                            @endforelse
+
+                            
+                            
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -784,7 +360,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true"><img src="./images/cross-icon.svg" alt="Icon"></span>
+                <span aria-hidden="true"><img src="{{asset('staff/assets/images/cross-icon.svg')}}" alt="Icon"></span>
             </button>
 
             <div class="modal-body">
@@ -802,11 +378,11 @@
                     <div class="cmn-pop-inr-content-wrp">
                         <div class="cmn-tab-content new-upload">
                             <form>
-                                <div class="file-upload-lg">
-                                    <input type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.mp4,.mov,.doc,.docx,.xls,.xlsx">
+                                <div class="file-upload-lg" id="dropZone">
+                                    <input type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.mp4,.mov,.doc,.docx,.xls,.xlsx"  id="uploadFile">
                                     <div class="file-upld-lg-design">
                                         <div class="fupld-lg-icon">
-                                            <img src="./images/upload-file-icon.svg" alt="Icon">
+                                            <img src="{{asset('staff/assets/images/upload-file-icon.svg')}}" alt="Icon">
                                         </div>
                                         <p class="drag-p">Click to browse or </p><p>drag and drop your files</p>
                                     </div>
@@ -815,11 +391,11 @@
                                     <p>Supports .pdf, .jpg, .jpeg, .png, .webp, .mp4, .mov, URL, .doc, .docx, .xls, .xlsx files.</p>
                                     <div class="ibtn">
                                         <button type="button" class="ibtn-icon">
-                                            <img src="./images/i-icon.svg" alt="Icon">
+                                            <img src="{{asset('staff/assets/images/i-icon.svg')}}" alt="Icon">
                                         </button>
                                         <div class="ibtn-info">
                                             <button type="button" class="ibtn-close">
-                                                <img src="./images/fa-times.svg" alt="icon">
+                                                <img src="{{asset('staff/assets/images/fa-times.svg')}}" alt="icon">
                                             </button>
                                             <h3>Upload Guidelines</h3>
                                             <ul>
@@ -829,7 +405,9 @@
                                             </ul>
                                         </div>
                                     </div>
-                                    
+
+                                   <input type="hidden" id="uploadAssignmentId">
+
                                 </div>
                             </form>
                         </div>
@@ -868,7 +446,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true"><img src="./images/cross-icon.svg" alt="Icon"></span>
+                <span aria-hidden="true"><img src="{{asset('staff/assets/images/cross-icon.svg')}}" alt="Icon"></span>
             </button>
 
             <div class="modal-body">
@@ -884,7 +462,7 @@
                                     <input type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.mp4,.mov,.doc,.docx,.xls,.xlsx">
                                     <div class="file-upld-lg-design">
                                         <div class="fupld-lg-icon">
-                                            <img src="./images/upload-file-icon.svg" alt="Icon">
+                                            <img src="{{asset('staff/assets/images/upload-file-icon.svg')}}" alt="Icon">
                                         </div>
                                         <p>Click to browse or drag and drop your files</p>
                                     </div>
@@ -893,11 +471,11 @@
                                     <p>Supports .pdf, .jpg, .jpeg, .png, .webp, .mp4, .mov, URL, .doc, .docx, .xls, .xlsx files.</p>
                                     <div class="ibtn">
                                         <button type="button" class="ibtn-icon">
-                                            <img src="./images/i-icon.svg" alt="Icon">
+                                            <img src="{{asset('staff/assets/images/i-icon.svg')}}" alt="Icon">
                                         </button>
                                         <div class="ibtn-info">
                                             <button type="button" class="ibtn-close">
-                                                <img src="./images/fa-times.svg" alt="icon">
+                                                <img src="{{asset('staff/assets/images/fa-times.svg')}}" alt="icon">
                                             </button>
                                             <h3>Upload Guidelines</h3>
                                             <ul>
@@ -916,34 +494,34 @@
                             <div class="upload-list">
                                 <ul class="uploads">
                                     <li class="upload-item">
-                                        <span class="icon pdf-icon"><img src="./images/pdf-icon.svg" alt="icon"></span>
+                                        <span class="icon pdf-icon"><img src="{{asset('staff/assets/images/pdf-icon.svg')}}" alt="icon"></span>
                                         <div class="details">
                                             <span class="filename">Sheet-01.pdf</span>
                                             <span class="timestamp">2m ago</span>
                                         </div>
                                         <span class="size">604KB</span>
-                                        <button class="remove-btn"><img src="./images/cross-circle.svg" alt="Icon"></button>
+                                        <button class="remove-btn"><img src="{{asset('staff/assets/images/cross-circle.svg')}}" alt="Icon"></button>
                                     </li>
                                     <li class="upload-item">
-                                        <span class="icon folder-icon"><img src="./images/folder-icon.svg" alt="Icon"></span>
+                                        <span class="icon folder-icon"><img src="{{asset('staff/assets/images/folder-icon.svg')}}" alt="Icon"></span>
                                         <div class="details">
                                             <span class="filename">Stock Photos</span>
                                             <span class="timestamp">3m ago</span>
                                         </div>
                                         <span class="size">2.20GB</span>
-                                        <button class="remove-btn"><img src="./images/cross-circle.svg" alt="Icon"></button>
+                                        <button class="remove-btn"><img src="{{asset('staff/assets/images/cross-circle.svg')}}" alt="Icon"></button>
                                     </li>
                                     <li class="upload-item">
-                                        <span class="icon video-icon"><img src="./images/video-reel-icon.svg" alt="Icon"></span>
+                                        <span class="icon video-icon"><img src="{{asset('staff/assets/images/video-reel-icon.svg')}}" alt="Icon"></span>
                                         <div class="details">
                                             <span class="filename">Assignment.mp4</span>
                                             <span class="timestamp">5m ago</span>
                                         </div>
                                         <span class="size">1.46MB</span>
-                                        <button class="remove-btn"><img src="./images/cross-circle.svg" alt="Icon"></button>
+                                        <button class="remove-btn"><img src="{{asset('staff/assets/images/cross-circle.svg')}}" alt="Icon"></button>
                                     </li>
                                     <li class="upload-item error">
-                                        <span class="icon doc-icon"><img src="./images/document-icon.svg" alt="Icon"></span>
+                                        <span class="icon doc-icon"><img src="{{asset('staff/assets/images/document-icon.svg')}}" alt="Icon"></span>
                                         <div class="details">
                                             <span class="filename">Strategy-Pitch-Final.docx</span>
                                             <span class="timestamp">10m ago</span>
@@ -952,23 +530,23 @@
                                             <button class="retry-btn">⟳</button>
                                             <span class="error-text">Error</span>
                                         </div>
-                                        <button class="remove-btn"><img src="./images/cross-circle.svg" alt="Icon"></button>
+                                        <button class="remove-btn"><img src="{{asset('staff/assets/images/cross-circle.svg')}}" alt="Icon"></button>
                                     </li>
                                     <li class="upload-item">
-                                        <span class="icon image-icon"><img src="./images/gallery-icon.svg" alt="Icon"></span>
+                                        <span class="icon image-icon"><img src="{{asset('staff/assets/images/gallery-icon.svg')}}" alt="Icon"></span>
                                         <div class="details">
                                             <span class="filename">man-holding-mobile-phone-while.jpg</span>
                                             <span class="timestamp">10m ago</span>
                                         </div>
                                         <span class="size">929KB</span>
-                                        <button class="remove-btn"><img src="./images/cross-circle.svg" alt="Icon"></button>
+                                        <button class="remove-btn"><img src="{{asset('staff/assets/images/cross-circle.svg')}}" alt="Icon"></button>
                                     </li>
                                 </ul>
                                 <div class="btn-wrp justify-content-end">
                                     <button class="btn-sm cmn-btn"  data-bs-dismiss="modal" aria-label="Close">Cancel</button>
                                     <button class="btn-sm cmn-btn">Save Changes</button>
                                 </div>
-                                <div class="last-updated"><img src="./images/check-circle.svg" alt="Icon"> Last updated: 3 mins ago</div>
+                                <div class="last-updated"><img src="{{asset('staff/assets/images/check-circle.svg')}}" alt="Icon"> Last updated: 3 mins ago</div>
                             </div>
                         </div>
 
@@ -986,7 +564,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true"><img src="./images/cross-icon.svg" alt="Icon"></span>
+                <span aria-hidden="true"><img src="{{asset('staff/assets/images/cross-icon.svg')}}" alt="Icon"></span>
             </button>
 
             <div class="modal-body">
@@ -1004,7 +582,7 @@
                                     <p>File Format: PDF File</p>
                                 </div>
                                 <div class="btn-wrp">
-                                    <a href="./images/document-icon.svg" download="./images/download-icon.svg" class="cmn-btn">Download</a>
+                                    <a href="{{asset('staff/assets/images/document-icon.svg')}}" download="{{asset('staff/assets/images/download-icon.svg')}}" class="cmn-btn">Download</a>
                                 </div>
                             </div>
                             <div class="attached-doc-card">
@@ -1014,7 +592,7 @@
                                     <p>File Format: PDF File</p>
                                 </div>
                                 <div class="btn-wrp">
-                                    <a href="./images/document-icon.svg" download="./images/download-icon.svg" class="cmn-btn">Download</a>
+                                    <a href="{{asset('staff/assets/images/document-icon.svg')}}" download="{{asset('staff/assets/images/download-icon.svg')}}" class="cmn-btn">Download</a>
                                 </div>
                             </div>
                         </div>
@@ -1027,56 +605,79 @@
 </div>
 <!-- End Of viewAttachedDocs Modal -->
 
-<!-- Assignement Popup-->
+<!-- add Assignement Popup-->
 <div id="assignmentPopup" class="popup-overlay-assignment">
-    <div class="popup-box-assignment">
-       
-        <h2 class="add-heading">Add Assignments</h2>
-        
-        <div class="desc-rows">
-             <img src="./images/reqCross.svg" class="close-btn-assignment" onclick="closePopup()">
-        <div class="assign-align">
-        <div class="assign-column">
-            <p class="assign-heading">Subject</p>
-            <input type="text" placeholder="Select Subject" />
-            <img src="./images/greyarrow.svg" />
-        </div>
-
-        <div class="assign-columndate">
-            <p class="assign-heading">Date</p>
-            <input type="text" placeholder="mm-dd-yyyy" />
-            <img src="./images/calender_s.svg" />
-        </div>
-        </div>
-
-        <div class="assign-align">
-        <div class="assign-column">
-            <p class="assign-heading">Assignment Title</p>
-            <input type="text" placeholder="Title" />
-        </div>
-
-        <div class="assign-columndate">
-            <p class="assign-heading">Grade</p>
-            <input type="text" placeholder="30" />
-        </div>
-        </div>
-
-        <div class="assign-column">
-            <p class="assign-heading">Attachment</p>
-           
-            <div class="attachment"> <img src="./images/calender_s.svg" class="specialimg"/> Drag and drop a file here or click</div>
-        </div>
-
-        <div class="assign-desc">
-            <p class="assign-heading">Description</p>
-           
-            <textarea class="desc-column" placeholder="Submit homework before last date." ></textarea>
+    <form id="assignmentForm" enctype="multipart/form-data">
+       @csrf
+        <div class="popup-box-assignment">
+            <h2 class="add-heading">Add Assignment</h2>
             
-        </div>
-        </div>
+            <div class="desc-rows">
+                <img src="{{asset('staff/assets/images/reqCross.svg')}}" class="close-btn-assignment" >
+                <div class="assign-align">
 
-        <button class="req-btn">Send Request</button>
-    </div>
+                    <div class="assign-column">
+                        <p class="assign-heading">Subject</p>
+                        {{-- <input type="text" placeholder="Select Subject" /> --}}
+                        <select name="subject_id" required>
+                            <option value="">Select Subject</option>
+                            @foreach($data['subjects'] as $subject)
+                                <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                            @endforeach
+                       </select>
+                        <img src="{{asset('staff/assets/images/greyarrow.svg')}}" />
+                    </div>
+
+                    <div class="assign-column">
+                        <p class="assign-heading">Class</p>
+                        {{-- <input type="text" placeholder="Select Subject" /> --}}
+                        <select name="class_id" required>
+                            <option value="">Select Class</option>
+                            {{-- @foreach($data['subjects'] as $subject)
+                                <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                            @endforeach --}}
+                       </select>
+                        <img src="{{asset('staff/assets/images/greyarrow.svg')}}" />
+                    </div>
+                   
+                </div>
+
+                <div class="assign-align">
+                    <div class="assign-column">
+                        <p class="assign-heading">Assignment Title</p>
+                        <input type="text" name="title" placeholder="Title"  required />
+                    </div>
+
+                    <div class="assign-columndate">
+                        <p class="assign-heading">Grade</p>
+                        <input type="number"  name="grade" placeholder="30"  min="0" max="100" required />
+                    </div>
+                </div>
+
+                <div class="assign-column">
+                    <p class="assign-heading">Attachment</p> 
+                    <div class="attachment">
+                        {{-- <img src="{{asset('staff/assets/images/calender_s.svg')}}" class="specialimg"/> Drag and drop a file here or click --}}
+                       <input type="file" name="file[]" multiple style="margin-top: 10px;">
+                    </div>
+
+                     <div class="assign-columndate">
+                        <p class="assign-heading"> Due Date</p>
+                        <input type="date" name="due_date" class="assign-date" required>
+                        <img src="{{asset('staff/assets/images/calender_s.svg')}}" />
+                    </div>
+                </div>
+
+                <div class="assign-desc">
+                    <p class="assign-heading">Description</p> 
+                    <textarea class="desc-column" name="description" placeholder="Submit homework before last date" ></textarea>  
+                </div>
+          </div>
+
+            <button type="submit" class="req-btn">Send Request</button>
+        </div>
+    </form>
+
 </div>
 
 <!-- Edit Popup-->
@@ -1086,18 +687,18 @@
         <h2 class="add-heading-edit">Edit Assignment</h2>
         
         <div class="desc-rows-edit">
-             <img src="./images/reqCross.svg" class="close-btn-edit" onclick="closeEditPopup()">
+             <img src="{{asset('staff/assets/images/reqCross.svg')}}" class="close-btn-edit" onclick="closeEditPopup()">
         <div class="assign-align-edit">
         <div class="assign-column-edit">
             <p class="assign-heading-edit">Subject</p>
             <input type="text" placeholder="Select Subject" />
-            <img src="./images/greyarrow.svg" />
+            <img src="{{asset('staff/assets/images/greyarrow.svg')}}" />
         </div>
 
         <div class="assign-columndate-edit">
             <p class="assign-heading-edit">Date</p>
             <input type="text" placeholder="05/10/2025" />
-            <img src="./images/calender_s.svg" />
+            <img src="{{asset('staff/assets/images/calender_s.svg')}}" />
         </div>
         </div>
 
@@ -1115,8 +716,12 @@
 
         <div class="assign-column-edit">
             <p class="assign-heading-edit">Attachment</p>
-           
-            <div class="attachment-edit"> <img src="./images/upload.svg" class="specialimg"/> Drag and drop a file here or click</div>
+            {{-- <div class="attachment-edit">
+                <img src="{{asset('staff/assets/images/upload.svg')}}" class="specialimg"/> Drag and drop a file here or click
+            </div> --}}
+            <div class="attachment">
+                <input type="file" name="file[]" multiple>
+            </div>
         </div>
 
         <div class="assign-desc-edit">
@@ -1130,10 +735,254 @@
         <button class="req-btn-edit">Save</button>
     </div>
 </div>
-<!-- delete popup-->
+<!-- Edit popup-->
+
+
+ <!-- Delete Room Modal Begin -->
+            <div class="modal fade cmn-popwrp popwrp w400" id="deleteAssignmentModal" tabindex="-1" role="dialog" aria-labelledby="deleteAssignmentModal" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">
+                                <img src="{{ global_asset('backend/assets/images/cross-icon.svg') }}" alt="Icon">
+                            </span>
+                        </button>
+
+                        <div class="modal-body">
+                            <div class="cmn-pop-inr-content-wrp">
+                                <div class="modal-icon">
+                                    <img src="{{ global_asset('backend/assets/images/bin-primary.svg') }}" alt="Bin Icon">
+                                </div>
+                                <div class="sec-head head-center">
+                                    <h2>Delete!</h2>
+                                    <p>Are you sure you want to delete exam type?</p>
+                                    <form method="post" >
+                                        @csrf
+                                        @method('DELETE')
+                                        <div class="btn-wrp">
+                                            <button type="submit" class="cmn-btn">Delete</button>
+                                            <button type="button" class="cmn-btn" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            <!-- End Of Delete Room Modal -->
 
 @endsection
 
 @push('script')
+<script> 
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const openBtn = document.querySelector('.assignments');
+        const popup = document.getElementById('assignmentPopup');
+        const closeBtn = document.querySelector('.close-btn-assignment');
+        const popupBox = document.querySelector('.popup-box-assignment');
+
+        openBtn.addEventListener('click', function () {
+            popup.style.display = 'flex';
+        });
+
+        closeBtn.addEventListener('click', function () {
+            popup.style.display = 'none';
+        });
+
+        window.addEventListener('click', function (e) {
+            if (e.target === popup) {
+                popup.style.display = 'none';
+            }
+        });
+
+    });
+
+</script>
+
+<script>
+   $("#assignmentForm").on("submit", function (e) {
+    e.preventDefault();
+
+    let formData = new FormData(this);
+    console.log(formData);
+
+    $.ajax({
+        url: "{{ route('staff.assignment.store_assignment') }}",
+        type: "POST",
+        data: formData,
+        processData: false,   
+        contentType: false,   
+        headers: {
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        success: function (response) {
+            if (response.success) {
+                showSuccess(response.message);
+                $("#assignmentPopup").hide();
+                $("#assignmentForm")[0].reset();
+                location.reload();
+
+            } else {
+               showError(response.message);
+            }
+        },
+        error: function (xhr) {
+            if (xhr.status === 422) {
+                let errors = xhr.responseJSON.errors;
+                let errorMessage = "Please fix the following errors:\n";
+                for (let field in errors) {
+                    errorMessage += "- " + errors[field][0] + "\n";
+                }
+                showError(errorMessage);
+            } else {
+                showError("Error: Unable to submit assignment.");
+            }
+        }
+    });
+   });
+</script>
+
+   
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Remove active class from all tab headers
+            document.querySelectorAll('.tab-switch').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show the selected tab
+            const selectedTab = document.querySelector(`.${tabName}`);
+            if (selectedTab) {
+                selectedTab.style.display = 'block';
+                
+                // Also ensure the inner table container is visible
+                const tableContainer = selectedTab.querySelector('[class*="-assignments"]');
+                if (tableContainer) {
+                    tableContainer.style.display = 'block';
+                }
+            }
+            
+            // Activate the tab header
+            const tabHeader = document.querySelector(`[data-tab="${tabName}"]`);
+            if (tabHeader) {
+                tabHeader.classList.add('active');
+            }
+        }
+
+        document.querySelectorAll('.tab-switch').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabName = this.getAttribute('data-tab');
+                showTab(tabName);
+            });
+        });
+
+        // showTab('requested-tab');
+        showTab('current-tab');
+    });
+</script>
+
+<script>
+$(document).ready(function () {
+
+    $(document).on("click", ".view-attachment-btn", function () {
+        let assignmentId = $(this).data("assignment-id");
+        // console.log('assignment id',assignmentId);
+        $("#uploadAssignmentId").val(assignmentId);
+
+        $baseurl = "{{ route('staff.assignment.getAssignementMedia', ':id') }}",
+
+        $.ajax({
+            url: baseurl.replace(':id', assignmentId),
+            type: "GET",
+            success: function (data) {
+                // console.log(' get data',data);
+                let html = "";
+                $.each(data, function (i, file) {
+                    html += `
+                        <li class="assignment-column">
+                            <p>Assignment No: ${file.assignment_id}</p>
+                            <p>Title: ${file.title}</p>
+                            <p>Grade: ${file.grade}</p>
+                            <p>File: ${file.file_name}</p>
+                            <p>File Format: ${file.media_type.toUpperCase()}</p>
+                            
+                        </li>
+                    `;
+                });
+                $(".uploads").html(html);
+            }
+        });
+    });
+
     
+    $("#uploadFile").on("change", function () {
+        let file = this.files[0];
+        uploadAssignmentFile(file);
+    });
+
+    let dropZone = $("#dropZone");
+    dropZone.on("dragover dragenter", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.addClass("drag-active");
+    });
+
+    dropZone.on("dragleave dragend drop", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.removeClass("drag-active");
+    });
+
+   
+    dropZone.on("drop", function (e) {
+        let files = e.originalEvent.dataTransfer.files;
+        if (files.length > 0) {
+            uploadAssignmentFile(files[0]);
+        }
+    });
+
+    function uploadAssignmentFile(file) {
+        let assignmentId = $("#uploadAssignmentId").val();
+        // console.log('assignment id for upload',assignmentId);
+        let formData = new FormData();
+
+        formData.append("file", file);
+        formData.append("assignment_id", assignmentId);
+        formData.append("_token", "{{ csrf_token() }}");
+
+        $.ajax({
+            url: "{{ route('staff.assignment.uploadAssignmentMedia') }}",
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                if (!response.status) {
+                    showError(response.message);
+                    return;
+                }
+
+                showSuccess(response.message);
+
+                $(".view-attachment-btn[data-assignment-id='" + assignmentId + "']").click();
+            }
+        });
+    }
+
+});
+</script>
+
+
+ 
+
 @endpush

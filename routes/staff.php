@@ -73,6 +73,11 @@ Route::middleware([ 'web',])->group(function () {
  
             Route::prefix('assignment')->name('assignment.')->controller(AssignmentController::class)->group(function () {
                 Route::get('/', 'index')->name('index')->middleware('PermissionCheck:assignment_read');
+                Route::post('/store_assignment',  'store_assignment')->name('store_assignment')->middleware('PermissionCheck:assignment_create');
+                Route::post('/upload-assignment-media',  'uploadAssignmentMedia')->name('uploadAssignmentMedia');
+                Route::get('/get-assignment-media/{id}',  'getAssignementMedia')->name('getAssignementMedia');
+                Route::get('/assignment-evaluation/{id}',  'assignmentEvaluation')->name('evaluateAssignment')->middleware('PermissionCheck:assignment_read');
+                Route::post('/evaluate-assignment-save/{id}',  'saveAssignmentEvaluation')->name('evaluateAssignmentSave')->middleware('PermissionCheck:assignment_update');
             });
 
             Route::prefix('communicate')->name('communicate.')->controller(AssignmentController::class)->group(function () {

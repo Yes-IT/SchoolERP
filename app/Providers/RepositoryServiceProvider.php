@@ -140,6 +140,8 @@ use App\Interfaces\Staff\StudentInterface;
 use App\Repositories\Staff\StudentRepository;
 use App\Interfaces\Staff\ExamRequestInterface;
 use App\Repositories\Staff\ExamRequestRepository;
+use App\Repositories\Staff\AssignmentRepository as StaffAssignmentRepository;
+use App\Interfaces\Staff\AssignmentInterface as StaffAssignmentInterface;
 
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -195,6 +197,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(TeacherInterface::class,                  TeacherRepository::class);
         $this->app->bind(StudentInterface::class,                  StudentRepository::class);
         $this->app->bind(ExamRequestInterface::class,              ExamRequestRepository::class);
+        $this->app->bind(StaffAssignmentInterface::class,          StaffAssignmentRepository::class);
 
         
         // Examination
