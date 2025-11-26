@@ -32,12 +32,19 @@ class Assignment extends Model
         
     ];
 
+    protected $casts = [
+        'due_date' => 'datetime',
+        'assigned_date' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     public function subject() {
         return $this->belongsTo(Subject::class);
     }
 
     public function class() {
-        return $this->belongsTo(Classes::class);
+        return $this->belongsTo(Classes::class, 'class_id');
     }
 
     public function creator() {

@@ -93,7 +93,7 @@
                 </a>
             </li>
             <li>
-                <a href="my-attendance.html">
+                <a href="{{ route('staff.assignment.index') }}">
                     <img src="{{ asset('staff') }}/assets/images/sidebar-icon-5.svg" alt="Sidebar Icon">
                     Assignments
                 </a>

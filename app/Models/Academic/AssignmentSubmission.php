@@ -27,6 +27,8 @@ class AssignmentSubmission extends Model
         'evaluated_at',
     ];
 
+    protected $dates = ['submitted_at', 'evaluated_at'];
+
     
         public function student()
     {
