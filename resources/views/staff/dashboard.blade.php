@@ -21,19 +21,19 @@
         <div class="dsbdy-cmn-card w55">
             <div class="dsbdy-student-card">
               <p class="students-dash-text">Students</p>
-              <p class="students-54-text">54</p>
+              <p class="students-54-text">{{ $totalStudent }}</p>
             </div>
         </div>
 
         <div class="attendance-card">
         <div class="attendance-header">
-            <a href="#" class="view-report">View Reports</a>
+            <a href="{{ route('staff.report.attendance.index') }}" class="view-report">View Reports</a>
             <h2>Student Attendance Today</h2>
         </div>
         <div class="bar-row">
             <div class="bar-label"><span>7 Present</span><span>12.96%</span></div>
             <div class="progress-bar">
-            <div class="bar-fill" style="width: 12.96%;"></div>
+            <div class="bar-fill" style="width: 10%;"></div>
             </div>
         </div>
 

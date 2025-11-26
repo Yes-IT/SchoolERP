@@ -95,6 +95,37 @@
 
 </div>
 
+
+<div class="modal fade cmn-popwrp pop600" id="addCommentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">
+                    <img src="{{ asset('staff') }}/assets/images/cross-icon.svg" alt="Icon">
+                </span>
+            </button>
+
+            <div class="modal-body">
+                <div class="cmn-pop-inr-content-wrp">
+                    <h2>Add Comment</h2>
+                    <div class="request-leave-form-wrp">
+                        <form>
+                            <div class="request-leave-form">
+                                <div class="input-grp">
+                                    <textarea id="commentTextarea" placeholder="Write your comment..."></textarea>
+                                </div>
+                                <input type="submit" value="Save" class="btn-sm" id="saveCommentBtn">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
 <!-- End Of Dashboard Body -->
 
 @endsection
@@ -261,6 +292,55 @@
 
     });
 
+
+    let currentStudentId = null;
+    let isSavingComment = false;   // ← This flag stops double execution
+
+    $(document).on('click', '.comment-pencil', function() {
+        currentStudentId = $(this).data('student');
+        $('#commentTextarea').val($(this).data('comment') || '');
+    });
+
+    // Keep your form submit handler exactly as you want
+    $('#addCommentModal form').on('submit', function(e) {
+        e.preventDefault();     
+        $('#saveCommentBtn').click();   // ← You wanted this line – it stays!
+    });
+
+    // Main save handler – with protection against double call
+    $(document).on('click', '#saveCommentBtn', function() {
+        if (isSavingComment) return;        // ← Blocks double execution
+        isSavingComment = true;
+
+        const comment = $('#commentTextarea').val().trim();
+        const classId = $('#current_class_id').val();
+        const date    = $('#current_date_formatted').val();
+
+        $.ajax({
+            url: '{{ route("staff.report.attendance.save-comment") }}',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                class_id: classId,
+                student_id: currentStudentId,
+                date: date,
+                comment: comment
+            },
+            success: function() {
+                alert('Comment saved!');
+                $('#addCommentModal').modal('hide');
+                loadAttendance();
+            },
+            error: function() {
+                alert('Failed to save comment.');
+            },
+            complete: function() {
+                isSavingComment = false;    // ← Re-allow next save
+            }
+        });
+    });
+
 </script>
+
 
 @endpush

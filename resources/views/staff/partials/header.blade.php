@@ -1,7 +1,7 @@
 <div class="dashboard-body-head">
 <div class="dsbdy-head-right">
 
-    <button class="open-modal-btn session-btn" onclick="openCustomPopup()">Selection Session</button>
+    <button class="open-modal-btn session-btn" onclick="openSessionModal()">Selection Semester</button>
 
     <button class="tgl-flscrn" aria-label="Toggle fullscreen">
     <img src="{{ asset('staff') }}/assets/images/fullscreen-toggler-icon.svg" alt="Icon">

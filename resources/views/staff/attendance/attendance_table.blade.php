@@ -4,9 +4,9 @@
 @endphp
 
 <table>
-
     <input type="hidden" id="current_class_id" value="{{ $classId }}">
-    <input type="hidden" id="current_date" value="{{ $formattedDate }}">
+    <input type="hidden" id="current_subject_id" value="{{ $subjectId }}">
+    <input type="hidden" id="current_date_formatted" value="{{ $date }}">
 
     <thead>
         <tr>
@@ -14,6 +14,7 @@
             <th>Student ID</th>
             <th>Student Name</th>
             <th>Attendance</th>
+            <th>Comment</th>
             <th>Approved Leaves</th>
         </tr>
     </thead>
@@ -21,15 +22,17 @@
         @forelse($students as $index => $student)
             @php
                 $sid = $student->id;
-                $att = $attendanceRecords->get($sid);
-                $leave = $leaves->get($sid);
+                $record = $attendanceRecords->get($sid); // ← This is your array now
 
+                // Safely extract attendance and comment
+                $attendanceStatus = $record['attendance'] ?? null;
+                $comment = $record['comment'] ?? '';
+
+                $leave = $leaves->get($sid);
                 $isApprovedLeave = $leave && $leave->is_approved == 1;
                 $isRejectedLeave = $leave && $leave->is_approved == 2;
-
-                // Only approved leave = fully disabled
-                // Rejected leave = locked (cannot click, but looks normal)
             @endphp
+
             <tr data-student="{{ $sid }}" class="attendance-row">
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ $student->student_id }}</td>
@@ -37,22 +40,40 @@
 
                 <td class="att-label"
                     style="{{ $isRejectedLeave ? 'pointer-events: none; opacity: 0.8;' : '' }}
-                        {{ $isApprovedLeave ? 'opacity: 0.5;' : '' }}">
+                           {{ $isApprovedLeave ? 'opacity: 0.5;' : '' }}">
 
-                    <label><input type="radio" class="attendance-radio" name="attendance[{{ $sid }}]" value="1"
-                        data-student="{{ $sid }}"
-                        {{ $att == 1 ? 'checked' : '' }}
-                        {{ $isApprovedLeave ? 'disabled' : '' }}> Present</label>
+                    <label>
+                        <input type="radio" class="attendance-radio" name="attendance[{{ $sid }}]" value="1"
+                               data-student="{{ $sid }}"
+                               {{ $attendanceStatus == 1 ? 'checked' : '' }}
+                               {{ $isApprovedLeave ? 'disabled' : '' }}> Present
+                    </label>
 
-                    <label><input type="radio" class="attendance-radio" name="attendance[{{ $sid }}]" value="3"
-                        data-student="{{ $sid }}"
-                        {{ $att == 3 ? 'checked' : '' }}
-                        {{ $isApprovedLeave ? 'disabled' : '' }}> Absent</label>
+                    <label>
+                        <input type="radio" class="attendance-radio" name="attendance[{{ $sid }}]" value="3"
+                               data-student="{{ $sid }}"
+                               {{ $attendanceStatus == 3 ? 'checked' : '' }}
+                               {{ $isApprovedLeave ? 'disabled' : '' }}> Absent
+                    </label>
 
-                    <label><input type="radio" class="attendance-radio" name="attendance[{{ $sid }}]" value="2"
-                        data-student="{{ $sid }}"
-                        {{ $att == 2 ? 'checked' : '' }}
-                        {{ $isApprovedLeave ? 'disabled' : '' }}> Late</label>
+                    <label>
+                        <input type="radio" class="attendance-radio" name="attendance[{{ $sid }}]" value="2"
+                               data-student="{{ $sid }}"
+                               {{ $attendanceStatus == 2 ? 'checked' : '' }}
+                               {{ $isApprovedLeave ? 'disabled' : '' }}> Late
+                    </label>
+                </td>
+
+                <td class="comment-cell">
+                    @if(!$isApprovedLeave)
+                        <img src="{{ asset('staff') }}/assets/images/newpencil.svg"
+                             class="pencil comment-pencil"
+                             data-student="{{ $sid }}"
+                             data-comment="{{ $comment }}"
+                             data-bs-toggle="modal"
+                             data-bs-target="#addCommentModal"
+                             style="cursor:pointer;">
+                    @endif
                 </td>
 
                 <!-- Leave Column -->
@@ -69,10 +90,9 @@
                         --
                     @endif
                 </td>
-
             </tr>
         @empty
-            <tr><td colspan="5" class="text-center">No students found.</td></tr>
+            <tr><td colspan="6" class="text-center">No students found.</td></tr>
         @endforelse
     </tbody>
 </table>
@@ -80,6 +100,3 @@
 <div class="text-center mt-4">
     <button type="button" class="submit-btn" id="submitAttendanceBtn">Submit</button>
 </div>
-
-
-

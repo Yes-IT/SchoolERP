@@ -15,6 +15,7 @@ class Grade extends Model
         'classes_id',
         'student_id',
         'semester_id',
+        'session_id',
         'school_years_id',
         'average',
         'personal_absences',

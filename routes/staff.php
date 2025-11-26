@@ -1,6 +1,7 @@
 <?php
  
- 
+ use App\Http\Controllers\Staff\AttendanceReportController;
+use App\Http\Controllers\Staff\CommunicateController;
 use App\Http\Controllers\Staff\AttendanceController;
 use App\Http\Controllers\Staff\DashboardController;
 use App\Http\Controllers\Staff\AssignmentController;
@@ -10,6 +11,12 @@ use App\Http\Controllers\Staff\DepartmentController;
 use App\Http\Controllers\Staff\DesignationController;
 use App\Http\Controllers\Staff\{StudentController,ExamScheduleController};  
  
+use App\Http\Controllers\Staff\GradeController;
+use App\Http\Controllers\Staff\StaffSessionController;
+use App\Models\Academic\Semester;
+use App\Models\Academic\YearStatus;
+use App\Models\Session;
+
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -75,9 +82,6 @@ Route::middleware([ 'web',])->group(function () {
                 Route::get('/', 'index')->name('index')->middleware('PermissionCheck:assignment_read');
             });
 
-            Route::prefix('communicate')->name('communicate.')->controller(AssignmentController::class)->group(function () {
-                Route::get('/', 'index')->name('index')->middleware('PermissionCheck:communicate_read');
-            });
  
             Route::prefix('apply-leave')->name('apply-leave.')->controller(ApplyLeaveController::class)->group(function () {
                 Route::get('/', 'index')->name('index')->middleware('PermissionCheck:apply_leave_read');
@@ -101,5 +105,55 @@ Route::middleware([ 'web',])->group(function () {
                 Route::get('/class-schedule', 'classSchedule')->name('class-schedule')->middleware('PermissionCheck:exam_schedule_read');
             });
         });
+
+            
+        Route::get('/staff/attendance', [AttendanceController::class, 'index'])->name('staff.attendance.index')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+        Route::post('/staff/attendance/load', [AttendanceController::class, 'loadAttendance'])->name('staff.attendance.load');
+        Route::post('/staff/attendance/save', [AttendanceController::class, 'saveAttendance'])->name('staff.attendance.save');
+
+
+        Route::get('/staff/report/attendance', [AttendanceReportController::class, 'index'])->name('staff.report.attendance.index')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+        Route::post('/staff/report/attendance/search', [AttendanceReportController::class, 'search'])->name('staff.report.attendance.search');
+        Route::post('/staff/report/attendance/save-comment', [AttendanceController::class, 'saveComment'])->name('staff.report.attendance.save-comment');
+
+        Route::get('/staff/grade/index', [GradeController::class, 'index'])->name('staff.grade.index')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+        Route::post('/staff/grade/assign-grades/filter', [GradeController::class, 'filterAssignGrades'])->name('staff.grade.assign-grades.filter');
+        Route::post('/staff/grade/save-marks', [GradeController::class, 'saveMarks'])->name('staff.grade.save-marks');
+
+
+        Route::get('/staff/communicate/index', [CommunicateController::class, 'index'])->name('staff.communicate.index')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+        Route::get('/staff/communicate/message/add', [CommunicateController::class, 'addMessage'])->name('staff.communicate.message.add')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+        Route::post('/staff/communicate/messages/store', [CommunicateController::class, 'store'])->name('staff.communicate.messages.store');
+
+
+        // For Global Session
+        Route::get('/staff/session-data', function () {
+            return response()->json([
+                'years'     => Session::where('status', 1)
+                                ->orderByDesc('end_date')
+                                ->get(['id', 'name']),
+
+                'semesters' => Semester::where('status', 1)
+                                ->orderBy('id')
+                                ->get(['id', 'name']),
+
+                'statuses'  => YearStatus::select('id', 'name')
+                                ->get(),
+
+                'defaults'  => [
+                    'session_id'       => currentSession()->session_id,
+                    'session_name'     => currentSession()->session_name,
+                    'semester_id'      => currentSession()->semester_id,
+                    'semester_name'    => currentSession()->semester_name,
+                    'year_status_id'   => currentSession()->year_status_id,
+                    'year_status_name' => currentSession()->year_status_name,
+                ]
+            ]);
+        })->name('staff.session.data');
+
+        // 2. Auto-save selected session (called on every change)
+        Route::post('/staff/set-session', [StaffSessionController::class, 'set'])->name('staff.set-session');
+        
+
     });
 });

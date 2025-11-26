@@ -22,7 +22,7 @@ class StudentClassMapping extends Model
 
     public function class()
     {
-        return $this->belongsTo(Classes::class, 'class_id', 'id'); 
+        return $this->belongsTo(Classes::class, 'class_id'); 
     }
 
     public function teacher()
@@ -34,4 +34,5 @@ class StudentClassMapping extends Model
     {
         return $this->belongsTo(Student::class, 'student_id', 'id');
     }
+    
 }

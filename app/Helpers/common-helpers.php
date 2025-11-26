@@ -1,10 +1,13 @@
 <?php
 
+use App\Models\Academic\Semester;
 use App\Models\Academic\SubjectAssignChildren;
+use App\Models\Academic\YearStatus;
 use App\Models\Currency;
 use App\Models\Examination\ExaminationSettings;
 use App\Models\Examination\MarksGrade;
 use App\Models\Language;
+use App\Models\Session as ModelsSession;
 use App\Models\Setting;
 use App\Models\StudentInfo\SessionClassStudent;
 use App\Models\Subscription;
@@ -857,3 +860,29 @@ if (!function_exists('humanReadableDate')) {
         return $formattedDate;
     }
 };
+
+
+function currentSession()
+{
+    // 1. Try to get from Laravel session (fast & no DB hit)
+    $session = session('staff_active_session');
+
+    if ($session) {
+        return (object) $session;
+    }
+
+    // 2. Fallback → latest active values (your "desc for default" rule)
+    $default = [
+        'session_id'      => ModelsSession::where('status', 1)->orderByDesc('end_date')->value('id'),
+        'session_name'    => ModelsSession::where('status', 1)->orderByDesc('end_date')->value('name'),
+        'semester_id'     => Semester::where('status', 1)->orderByDesc('id')->value('id'),
+        'semester_name'   => Semester::where('status', 1)->orderByDesc('id')->value('name'),
+        'year_status_id'  => YearStatus::where('name', 'Shana Alef')->value('id') ?? YearStatus::first()->id,
+        'year_status_name'=> YearStatus::where('name', 'Shana Alef')->value('name') ?? YearStatus::first()->name,
+    ];
+
+    // Cache the default for this request so multiple calls don't hit DB again
+    session(['staff_active_session' => $default]);
+
+    return (object) $default;
+}

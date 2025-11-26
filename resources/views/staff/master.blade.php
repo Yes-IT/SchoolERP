@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="{{ asset('staff/assets/css/style.css') }}">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
     
     @stack('styles')
 </head>
@@ -51,83 +52,79 @@
         </div>
     </div>
 
-    <!-- Modal Popup -->
-    <div id="customPopup" class="popup-overlay">
-    <div class="popup-box">
-        <img src="{{ asset('staff') }}/assets/images/material-cancel.svg" class="cancelpopup" onclick="closeCustomPopup()" />
-        
-        <h2>Selection Session</h2>
+    <!-- Session Selection Modal (Your Exact Design) -->
+    <div id="sessionModal" class="popup-overlay" style="display:none;">
+        <div class="popup-box">
+            <img src="{{ asset('staff') }}/assets/images/material-cancel.svg" class="cancelpopup" onclick="closeSessionModal()">
 
-        <!-- Year Dropdown -->
-        <div class="form-row">
-        <label class="form-label" for="customYear">Year</label>
-        <div class="studentBtns">
-                    <div class="dropdown-week">
-                    <button class="subjectbox-session" onclick="toggleDropdowndash()">2024-2025<img
-                        src="{{ asset('staff') }}/assets/images/dropdown-arrow.svg" alt="Icon"></button>
-                    <ul class="dropdown-menu-dash">
-                        <li>2021-2022</li>
-                        <li class="active-week">2022-2023</li>
-                        <li>2023-2024</li>
-                        <li>2024-2025</li>
-                    </ul>
-                    </div>
-                </div>
-        </div>
-
-        <!-- Year Status Dropdown -->
-        <div class="form-row">
-        <label class="form-label" for="customYearStatus">Year Status</label>
-        <div class="custom-dropdown custom-year-status" id="customYearStatus">
-            <div class="dropdown-selected">Shana Alef</div>
-            <img src="{{ asset('staff') }}/assets/images/sessionarrow.svg" class="dropdown-arrow" />
-            
-            <h2>Selection Session</h2>
+            <h2>Selection Semester</h2>
 
             <!-- Year Dropdown -->
             <div class="form-row">
-                <label class="form-label" for="customYear">Year</label>
+                <label class="form-label">Year</label>
                 <div class="studentBtns">
                     <div class="dropdown-week">
-                    <button class="subjectbox-session" onclick="toggleDropdownsem()">First Semester<img
-                        src="{{ asset('staff') }}/assets/images/dropdown-arrow.svg" alt="Icon"></button>
-                    <ul class="dropdown-menu-sem">
-                        <li>First Semester</li>
-                        <li class="active-week">Second Semester</li>
-                    
-                    </ul>
+                        <button type="button" class="subjectbox-session" id="yearBtn">
+                            {{ currentSession()->session_name ?? '2024-2025' }}
+                            <img src="{{ asset('staff') }}/assets/images/sessionarrow.svg" alt="Icon">
+                        </button>
+                        <ul class="dropdown-menu-dash" id="yearList">
+                            @foreach(\App\Models\Session::where('status', 1)->orderByDesc('end_date')->get() as $s)
+                                <li data-id="{{ $s->id }}" 
+                                    class="{{ currentSession()->session_id == $s->id ? 'active-week' : '' }}">
+                                    {{ $s->name }}
+                                </li>
+                            @endforeach
+                        </ul>
                     </div>
                 </div>
             </div>
 
             <!-- Year Status Dropdown -->
             <div class="form-row">
-                <label class="form-label" for="customYearStatus">Year Status</label>
-                <div class="custom-dropdown custom-year-status" id="customYearStatus">
-                    <div class="dropdown-selected">Shana Alef</div>
-                    <img src="./images/sessionarrow.svg" class="dropdown-arrow" />
+                <label class="form-label">Year Status</label>
+                <div class="studentBtns">
+                    <div class="dropdown-week">
+                        <button type="button" class="subjectbox-session" id="statusBtn">
+                            {{ currentSession()->year_status_name ?? 'Shana Alef' }}
+                            <img src="{{ asset('staff') }}/assets/images/sessionarrow.svg" alt="Icon">
+                        </button>
+                        <ul class="dropdown-menu-dash" id="statusList">
+                            @foreach(\App\Models\Academic\YearStatus::all() as $ys)
+                                <li data-id="{{ $ys->id }}" 
+                                    class="{{ currentSession()->year_status_id == $ys->id ? 'active-week' : '' }}">
+                                    {{ $ys->name }}
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
                 </div>
             </div>
 
             <!-- Semester Dropdown -->
             <div class="form-row">
-                <label class="form-label" for="customSemester">Semester</label>
+                <label class="form-label">Semester</label>
                 <div class="studentBtns">
                     <div class="dropdown-week">
-                        <button class="subjectbox-session" onclick="toggleDropdownsem()">
-                            First Semester
-                            <img src="./images/dropdown-arrow.svg" alt="Icon">
+                        <button type="button" class="subjectbox-session" id="semesterBtn">
+                            {{ currentSession()->semester_name ?? 'First Semester' }}
+                            <img src="{{ asset('staff') }}/assets/images/sessionarrow.svg" alt="Icon">
                         </button>
-                        <ul class="dropdown-menu-sem">
-                            <li>First Semester</li>
-                            <li class="active-week">Second Semester</li>
+                        <ul class="dropdown-menu-dash" id="semesterList">
+                            @foreach(\App\Models\Academic\Semester::where('status', 1)->orderBy('id')->get() as $sem)
+                                <li data-id="{{ $sem->id }}" 
+                                    class="{{ currentSession()->semester_id == $sem->id ? 'active-week' : '' }}">
+                                    {{ $sem->name }}
+                                </li>
+                            @endforeach
                         </ul>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
-    <!-- End Of Dashboard -->
+    <!-- End Modal -->
 
     <!-- Jquery-->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -140,9 +137,86 @@
     <script src="{{ global_asset('staff/assets/js/common.js') }}"></script>
     <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
 
     @include('staff.partials.ajax-alert')
 
     @stack('script')
+
+    <!-- Session Modal Logic -->
+    <script>
+        function closeSessionModal() {
+            document.getElementById("sessionModal").style.display = "none";
+        }
+
+        function openSessionModal() {
+            document.getElementById("sessionModal").style.display = "flex";
+        }
+
+        // Auto-save when any option is selected
+        function saveSession() {
+            const yearId     = document.querySelector('#yearList .active-week')?.dataset.id;
+            const statusId   = document.querySelector('#statusList .active-week')?.dataset.id;
+            const semesterId = document.querySelector('#semesterList .active-week')?.dataset.id;
+
+            fetch('{{ route("staff.set-session") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    session_id: yearId,
+                    semester_id: semesterId,
+                    year_status_id: statusId
+                })
+            });
+        }
+
+        // Open/close dropdowns
+        document.querySelectorAll('.subjectbox-session').forEach(btn => {
+            btn.onclick = function(e) {
+                e.stopPropagation();
+                const menu = this.nextElementSibling;
+                document.querySelectorAll('.dropdown-menu-dash').forEach(m => m.style.display = 'none');
+                menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+            };
+        });
+
+        // Click on any list item
+        document.querySelectorAll('.dropdown-menu-dash li').forEach(li => {
+            li.onclick = function() {
+                const menu = this.parentElement;
+                const btn = menu.previousElementSibling;
+
+                // Update button text
+                btn.innerHTML = this.textContent + ' <img src="{{ asset('staff') }}/assets/images/dropdown-arrow.svg" alt="Icon">';
+
+                // Set active
+                menu.querySelectorAll('li').forEach(l => l.classList.remove('active-week'));
+                this.classList.add('active-week');
+
+                // Close & save
+                menu.style.display = 'none';
+                saveSession();
+            };
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.dropdown-week')) {
+                document.querySelectorAll('.dropdown-menu-dash').forEach(m => m.style.display = 'none');
+            }
+        });
+
+        // Show modal only if no session is set
+        document.addEventListener('DOMContentLoaded', () => {
+            @if(! session()->has('staff_active_session'))
+                document.getElementById('sessionModal').style.display = 'flex';
+            @endif
+        });
+    </script>
+
+
 </body>
 </html>
