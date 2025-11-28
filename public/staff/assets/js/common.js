@@ -147,33 +147,75 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Toggle text (“Read more”)
         function initToggleText() {
-            $('.toggle-text-content').each(function() {
-                const $c = $(this), full = $c.text().trim();
-                $c.css({ width: '100%', height: '', overflow: '' }).removeClass('expanded');
-                const lh = parseFloat($c.css('line-height')), maxH = lh * 2;
-                let lo = 0, hi = full.length, best = 0;
-                while (lo <= hi) {
-                const mid = Math.floor((lo + hi)/2);
-                $c.html(escapeHTML(full.slice(0, mid/2.5)) + '… <a href="#" class="read-more">Read more <i class="fa-solid fa-arrow-right" style="transform:rotate(-45deg)"></i></a>');
-                if ($c[0].offsetHeight <= maxH) { best = mid; lo = mid +1; }
-                else { hi = mid -1; }
-                }
-                $c.html(escapeHTML(full.slice(0, best)) + '… <a href="#" class="read-more">Read more <i class="fa-solid fa-arrow-right" style="transform:rotate(-45deg)"></i></a>')
-                .css({ height: maxH + 'px', overflow: 'hidden' });
-            });
-            $('.toggle-text-wrapper').off('click.readmore').on('click.readmore', '.read-more', function(e) {
-                e.preventDefault();
-                const $c = $(this).closest('.toggle-text-wrapper').find('.toggle-text-content');
-                const full = $c.data('full') || ($c.data('full', $c.text()), $c.data('full'));
-                const expanded = $c.toggleClass('expanded').hasClass('expanded');
-                if (expanded) {
-                $c.html(escapeHTML(full) + ' <a href="#" class="read-more expanded">Show less <i class="fa-solid fa-arrow-right"></i></a>')
-                    .css({ height: 'auto', overflow: '' });
+            $(".toggle-text-content").each(function () {
+                const $c = $(this);
+                const full = $c.text().trim();
+    
+                // store original text immediately
+                $c.data("full", full);
+    
+                // ensure block layout and constrain width to parent's inner width for accurate measurement
+                const parentInnerWidth =
+                $c.parent().innerWidth() || $c.width() || $c.css("width");
+                if (typeof parentInnerWidth === "number") {
+                $c.css({display: "block", width: parentInnerWidth + "px"});
                 } else {
-                initToggleText(); // re-run to recalculate
+                $c.css({display: "block", width: "100%"});
                 }
+                $c.removeClass("expanded").css({height: "", overflow: "hidden"});
+                let lh = parseFloat($c.css("line-height"));
+                if (!lh || isNaN(lh)) {
+                const fs = parseFloat($c.css("font-size")) || 16;
+                lh = fs * 1.2;
+                }
+                const maxH = Math.round(lh * 2);
+                let lo = 0,
+                hi = full.length,
+                best = 0;
+                while (lo <= hi) {
+                const mid = Math.floor((lo + hi) / 2);
+                $c.html(
+                    escapeHTML(full.slice(0, mid)) +
+                    '… <button type="button"  data-bs-target="#readMore" data-bs-toggle="modal" class="read-more" >Read more <i class="fa-solid fa-arrow-right" style="transform:rotate(-45deg)"></i></button>'
+                );
+                // force browser to layout then test height
+                if ($c[0].offsetHeight <= maxH) {
+                    best = mid;
+                    lo = mid + 1;
+                } else {
+                    hi = mid - 1;
+                }
+                }
+    
+                // ensure we leave a little room so the "… Read more" fits on the second line
+                const finalSlice = Math.max(0, best - 8);
+                $c.html(
+                escapeHTML(full.slice(0, finalSlice)) +
+                    '… <button type="button"  data-bs-target="#readMore" data-bs-toggle="modal" class="read-more" >Read more <i class="fa-solid fa-arrow-right" style="transform:rotate(-45deg)"></i></button>'
+                ).css({height: maxH + "px", overflow: "hidden"});
             });
-        }
+    
+            // click handler
+                // $(".toggle-text-wrapper").off("click.readmore").on("click.readmore", ".read-more", function (e) {
+                //     e.preventDefault();
+                //     const $c = $(this)
+                //         .closest(".toggle-text-wrapper")
+                //         .find(".toggle-text-content");
+                //     const full = $c.data("full") || "";
+                //     const expanded = $c.toggleClass("expanded").hasClass("expanded");
+        
+                //     if (expanded) {
+                //         // show full text and keep a Show less link
+                //         $c.html(
+                //         escapeHTML(full) +
+                //             ' <a href="#" class="read-more expanded">Show less <i class="fa-solid fa-arrow-right"></i></a>'
+                //         ).css({height: "auto", overflow: ""});
+                //     } else {
+                //         // reinitialize truncation for the collapsed state
+                //         initToggleText();
+                //     }
+                // });
+            }
         
         function initTabs() {
             $('.tab-wrapper').each(function() {
@@ -425,6 +467,115 @@ document.addEventListener('DOMContentLoaded', function () {
     // Document End
 });
 
+// SS261125 Begin
+
+// SS271125 Begin
+jQuery(function ($) {
+    $("#datepick").datepicker({
+        dateFormat: "dd/mm/yy",        // display format
+        altField: "#single_iso",      // fill hidden field
+        altFormat: "yy-mm-dd",        // ISO: 2025-12-31
+        changeMonth: true,
+        changeYear: true,
+        showAnim: "fadeIn",
+        firstDay: 1,                  // week starts Monday (0 = Sunday)
+        beforeShow: function(input, inst){
+        }
+      });
+})
+
+// End Of SS271125
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.cmn-dropdn').forEach(drop => {
+        const trigger = drop.querySelector('.dropdown-trigger') || drop;
+        const menu = drop.querySelector('.dropdown-menu');
+        if (!menu) return;
+        trigger.addEventListener('click', e => {
+            e.stopPropagation();
+            drop.classList.toggle('open');
+        });
+    });
+    document.addEventListener('click', () =>
+        document.querySelectorAll('.cmn-dropdn.open').forEach(d => d.classList.remove('open'))
+    );
+
+    (function(){
+        const shell = document.querySelector('.editor-shell');
+        const editor = shell.querySelector('#editor');
+    
+        // Focus clickable contenteditable on load for demo parity with screenshot
+        editor.focus();
+    
+        // Button wiring using execCommand for broad compatibility (simple replica)
+        shell.querySelectorAll('.rte-btn').forEach(btn=>{
+          btn.addEventListener('click', (ev)=>{
+            ev.preventDefault();
+            const cmd = btn.getAttribute('data-cmd');
+    
+            if(cmd === 'createLink'){
+              const url = prompt('Enter URL','https://');
+              if(url){
+                document.execCommand('createLink', false, url);
+              }
+              return;
+            }
+    
+            if(cmd === 'insertImage'){
+              const url = prompt('Enter image URL','https://');
+              if(url){
+                document.execCommand('insertImage', false, url);
+              }
+              return;
+            }
+    
+            // toggle state commands (bold/italic/underline)
+            const toggleCommands = ['bold','italic','underline'];
+            if(toggleCommands.includes(cmd)){
+              document.execCommand(cmd,false,null);
+              // reflect pressed state (simple)
+              const pressed = document.queryCommandState(cmd);
+              btn.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+              return;
+            }
+    
+            // lists, alignment, undo/redo
+            const simpleCommands = ['insertUnorderedList','insertOrderedList','justifyLeft','justifyCenter','justifyRight','undo','redo'];
+            if(simpleCommands.includes(cmd)){
+              document.execCommand(cmd,false,null);
+              return;
+            }
+    
+            // fallback
+            document.execCommand(cmd,false,null);
+          });
+        });
+    
+        // update toggle states when selection changes (so bold/italic reflect active state)
+        document.addEventListener('selectionchange', ()=>{
+          const b = document.queryCommandState('bold');
+          const i = document.queryCommandState('italic');
+          const u = document.queryCommandState('underline');
+          shell.querySelectorAll('[data-cmd]').forEach(btn=>{
+            const c = btn.getAttribute('data-cmd');
+            if(c==='bold') btn.setAttribute('aria-pressed', b ? 'true':'false');
+            if(c==='italic') btn.setAttribute('aria-pressed', i ? 'true':'false');
+            if(c==='underline') btn.setAttribute('aria-pressed', u ? 'true':'false');
+          });
+        });
+    
+        // Basic keyboard shortcuts for convenience (Ctrl+B/I/U)
+        editor.addEventListener('keydown', (e)=>{
+          if((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'i' || e.key === 'u')){
+            e.preventDefault();
+            const map = {b:'bold', i:'italic', u:'underline'};
+            document.execCommand(map[e.key], false, null);
+          }
+        });
+      })();
+}); 
+
+// End Of SS261125
 
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("login-form");
@@ -502,7 +653,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-     function toggleDropdownYear() {
+    function toggleDropdownYear() {
     const dropdown = document.querySelector('.dropdown-menu-year');
     dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
   }
@@ -516,7 +667,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-       function toggleDropdownsem() {
+    function toggleDropdownsem() {
     const dropdown = document.querySelector('.dropdown-menu-sem');
     dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
   }
@@ -600,11 +751,18 @@ function toggleDropdownstatus() {
 
 
   /* daterangepicker */
-  if(document.querySelector('.exam-last-div .exm-req')){
+
+  // Open modal on 'Requested Examination' click
+// document.querySelector('.addExamRequest').addEventListener('click', function () {
+//   document.querySelector('.request-overlay').style.display = 'flex';
+// });
+
+if(document.querySelector('.exam-last-div .exm-req')){
     document.querySelector('.exam-last-div .exm-req').addEventListener('click', function () {
       document.querySelector('.request-overlay').style.display = 'flex';
     });
-  }
+}
+
 if(document.querySelector('.request-close')){
   document.querySelector('.request-close').addEventListener('click', function () {
     document.querySelector('.request-overlay').style.display = 'none';

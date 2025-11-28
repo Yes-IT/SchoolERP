@@ -76,11 +76,22 @@ class AssignmentRepository implements AssignmentInterface
 
     public function update($id, array $data)
     {
+
         $assignment = Assignment::find($id);
-        if ($assignment) {
-            $assignment->update($data);
-            return $assignment;
-        }
+            if ($assignment) {
+                Log::info('Updating assignment:', [
+                    'id' => $id,
+                    'data' => $data,
+                    'current_data' => $assignment->toArray()
+                ]);
+                
+                $assignment->update($data);
+                
+                Log::info('Assignment updated successfully:', $assignment->toArray());
+                return $assignment;
+            }
+        
+        Log::warning('Assignment not found for update:', ['id' => $id]);
         return null;
     }
 

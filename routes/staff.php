@@ -85,6 +85,8 @@ Route::middleware([ 'web',])->group(function () {
                 Route::get('/get-assignment-media/{id}',  'getAssignementMedia')->name('getAssignementMedia');
                 Route::get('/assignment-evaluation/{id}',  'assignmentEvaluation')->name('evaluateAssignment')->middleware('PermissionCheck:assignment_read');
                 Route::post('/evaluate-assignment-save/{id}',  'saveAssignmentEvaluation')->name('evaluateAssignmentSave')->middleware('PermissionCheck:assignment_update');
+                Route::get('/edit-assignment/{id}',  'editAssignment')->name('editAssignment')->middleware('PermissionCheck:assignment_update');
+                Route::post('/update-assignment',  'updateAssignment')->name('updateAssignment')->middleware('PermissionCheck:assignment_update');
             });
 
  

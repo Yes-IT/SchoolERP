@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Staff;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Academic\{Subject,Classes,AssignmentSubmission};
-
+// use Illuminate\Support\Validator;
 use App\Interfaces\Staff\AssignmentInterface;
-use Illuminate\Support\Facades\{Auth,Log,DB};
+use Illuminate\Support\Facades\{Auth,Log,DB,Validator};
 use Exception;
 
 
@@ -26,6 +26,11 @@ class AssignmentController extends Controller
 
             $teacherId = Auth::user()->staff->id;
             // Log::info("Teacher Staff ID: " . $teacherId);
+            $subjects = $this->getTeacherSubjects($teacherId);
+            // Log::info('Subjects: ', ['subjects' => $subjects]);
+
+            $classes = $this->getTeacherClasses($teacherId);
+            Log::info('Classes: ', ['classes' => $classes]);
 
             $current = $this->assignmentRepo->getByStatus($teacherId, 1);
             $closed = $this->assignmentRepo->getByStatus($teacherId, 2);
@@ -37,7 +42,8 @@ class AssignmentController extends Controller
 
             $data = [
                 'title' => 'My Assignment',
-                'subjects' => $this->getTeacherSubjects($teacherId),
+                'subjects' => $subjects,
+                'classes' => $classes,
                 'current_assignments' => $current,
                 'closed_assignments' => $closed,
                 'requested_assignments' => $requested,
@@ -53,14 +59,26 @@ class AssignmentController extends Controller
 
     public function store_assignment(Request $request)
     {
+        Log::info('store assignment Request: ', ['request' => $request->all()]);
+
+         // Convert mm-dd-yyyy → yyyy-mm-dd
+        if ($request->due_date) {
+            $request->merge([
+                'due_date' => date('Y-m-d', strtotime($request->due_date))
+            ]);
+        }
+
+        Log::info('due date', ['due_date' => $request->due_date]);
         $validated = $request->validate([
             'subject_id' => 'required|exists:subjects,id',
+            'class_id' => 'required|exists:classes,id',
             'title' => 'required|string|max:100',
             'grade' => 'required|numeric|min:0|max:100',
             'due_date' => 'required|date|after:today',
             'description' => 'nullable|string',
             'file.*' => 'nullable|file|max:2048',
         ]);
+
 
         try {
             $user = Auth::user();
@@ -98,11 +116,23 @@ class AssignmentController extends Controller
         }
     }
 
+    // private function getTeacherSubjects($teacherId)
+    // {
+    //     return Subject::whereHas('teachers', function($query) use ($teacherId) {
+    //         $query->where('staff.id', $teacherId);
+    //     })->get();
+    // }
+
     private function getTeacherSubjects($teacherId)
     {
-        return Subject::whereHas('teachers', function($query) use ($teacherId) {
-            $query->where('staff.user_id', $teacherId);
+        // Log::info('Getting subjects for teacher:', ['teacherId' => $teacherId]);
+
+        $subjects = Subject::whereHas('classes.teachers', function($query) use ($teacherId) {
+            $query->where('teacher_id', $teacherId);
         })->get();
+        
+        // Log::info('Subjects query result:', ['count' => $subjects->count()]);
+        return $subjects;
     }
 
  
@@ -141,10 +171,10 @@ class AssignmentController extends Controller
     {
         try{
              $assignment = $this->assignmentRepo->find($id);
-             Log::info('Assignment for evaluation: ',['assignment' => $assignment]);
+            //  Log::info('Assignment for evaluation: ',['assignment' => $assignment]);
 
             $submissions = $this->assignmentRepo->getSubmissionsForEvaluation($id);
-            Log::info('Submissions for evaluation: ',['submissions' => $submissions]);               
+            // Log::info('Submissions for evaluation: ',['submissions' => $submissions]);               
 
              return view('staff.assignment.assignment-evaluation',compact('assignment','submissions'));
         }catch(Exception $e){
@@ -167,7 +197,7 @@ class AssignmentController extends Controller
         ]);
         
         try {
-            Log::info('store evaluation Request: ', ['request' => $request->all()]);
+            // Log::info('store evaluation Request: ', ['request' => $request->all()]);
 
             $this->assignmentRepo->saveEvaluation($id, $request);
 
@@ -178,6 +208,111 @@ class AssignmentController extends Controller
             return back()->with('error', 'Something went wrong');
         }
     }
+
+    public function editAssignment($id)
+    {
+        try {
+            $teacherId = Auth::user()->staff->id;
+            $assignment = $this->assignmentRepo->find($id);
+            // Log::info('Assignment found:', ['assignment' => $assignment]);
+
+            if (!$assignment) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Assignment not found'
+                ], 404);
+            }
+
+            $subjects = $this->getTeacherSubjects($teacherId);
+            $classes = $this->getTeacherClasses($teacherId);
+
+            // Log::info('Subjects count:', ['count' => $subjects->count()]);
+            // Log::info('Classes count:', ['count' => $classes->count()]);
+            // Log::info('Subjects:', ['subjects' => $subjects->pluck('name', 'id')]);
+            // Log::info('Classes:', ['classes' => $classes->pluck('name', 'id')]);
+
+            // Log::info("Assignment ID: {$assignment->id}, Subject: " . ($assignment->subject->name ?? 'NULL') . ", Status: {$assignment->status}");
+
+            return response()->json([
+                'status' => true,
+                'data' => $assignment,
+                'subjects' => $subjects,
+                'classes' => $classes,
+                'media' => $assignment->media
+            ]);
+
+        } catch (\Exception $e) {
+            // Log::info('edit ')
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function getTeacherClasses($teacherId)
+    {
+        // Log::info('Getting classes for teacher:', ['teacherId' => $teacherId]);
+
+        return Classes::whereHas('teachers', function ($q) use ($teacherId) {
+            $q->where('teacher_id', $teacherId);
+        })->get();
+    }
+
+
+    public function updateAssignment(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:assignments,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'class_id' => 'required|exists:classes,id',
+            'title' => 'required|string|max:255',
+            'grade' => 'required|numeric|min:0|max:100',
+            'description' => 'nullable|string',
+            'due_date' => 'required|date' 
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            
+            $updated = $this->assignmentRepo->update($request->id, [
+                'subject_id' => $request->subject_id,
+                'class_id' => $request->class_id,
+                'title' => $request->title,
+                'grade' => $request->grade,
+                'description' => $request->description,
+                'due_date' => $request->due_date
+            ]);
+
+            if ($updated) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Assignment updated successfully'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Assignment not found'
+                ], 404);
+            }
+
+        } catch (\Exception $e) {
+           Log::error('Update assignment error: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
 
    
 

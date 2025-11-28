@@ -1,7 +1,7 @@
 @extends('staff.master')
 
 <style>
-    .popup-overlay-assignment {
+    /* .popup-overlay-assignment {
     display: none;
     position: fixed;
     top: 0;
@@ -17,6 +17,48 @@
     background: #fff;
     padding: 20px;
     border-radius: 10px;
+} */
+
+/* Remove editor shadow */
+.ck-editor__main {
+    border-top: none !important;
+}
+
+.ck-editor__editable {
+    min-height: 320px !important;
+    border: 1px solid #660000 !important; 
+    border-radius: 5px !important;
+    padding: 14px !important;
+}
+
+/* Toolbar styling */
+.ck-toolbar {
+    border: 1px solid #660000 !important;
+    border-bottom: none !important;
+    border-radius: 8px 8px 0 0 !important;
+    padding: 8px !important;
+}
+
+.ck-toolbar .ck-button {
+    background: none !important;
+    border-radius: 4px !important;
+    padding: 4px !important;
+    width: 32px !important;
+    height: 32px !important;
+}
+
+.ck-toolbar .ck-button:hover {
+    background: #f4f4f4 !important;
+}
+
+
+.ck-toolbar .ck-dropdown {
+    margin-right: 6px;
+}
+
+
+.ck.ck-editor__editable:not(.ck-editor__nested-editable):focus {
+    box-shadow: none !important;
 }
 
 
@@ -46,35 +88,14 @@
         <div class="atndnc-filter">
             <form>
                 <div class="atndnc-filter-form">
-
-                    <div class="atndnc-filter-options">
+                    <div class="atndnc-filter-options flex-row">
+                        <!-- Subject Multi‑Select Dropdown -->
 
                         <div class="dropdown subject-dropdown selectisub">
                             <button type="button" class="dropdown-toggle">
                                 <span class="label">Select Subject</span>
-                                <img src="{{asset('staff/assets/images/down-arrow-5.svg')}}" class="arrow-att"/>
-                            </button>
-                            <div class="dropdown-menu">
-                            <label>
-                                <input type="checkbox" value="all" checked /> All Subjects
-                            </label>
-                            <label>
-                                <input type="checkbox" value="1" /> Lorem ipsum dolor sit amet
-                            </label>
-                            <label>
-                                <input type="checkbox" value="2" /> Lorem ipsum dolor sit amet
-                            </label>
-                            <label>
-                                <input type="checkbox" value="3" /> Lorem ipsum dolor sit amet
-                            </label>
-                            </div>
-                        </div>
-                    
-                        <!-- Year/Month Picker Dropdown -->
-                        <div class="dropdown subject-dropdown selectisub">
-                            <button type="button" class="dropdown-toggle">
-                                <span class="label">Select Room No.</span>
-                                <img src="{{asset('staff/assets/images/down-arrow-5.svg')}}" class="arrow-att"/>
+                                <img src="{{asset('staff/assets/images/down-arrow-5.svg')}}" class="arrow-att" />
+
                             </button>
                             <div class="dropdown-menu">
                                 <label>
@@ -92,8 +113,30 @@
                             </div>
                         </div>
 
+                        <!-- Year/Month Picker Dropdown -->
+                        <div class="dropdown subject-dropdown selectisub">
+                            <button type="button" class="dropdown-toggle">
+                                <span class="label">Select Room No.</span>
+                                <img src="{{asset('staff/assets/images/down-arrow-5.svg')}}" class="arrow-att" />
+
+                            </button>
+                            <div class="dropdown-menu">
+                                <label>
+                                    <input type="checkbox" value="all" checked /> All Subjects
+                                </label>
+                                <label>
+                                    <input type="checkbox" value="1" /> Lorem ipsum dolor sit amet
+                                </label>
+                                <label>
+                                    <input type="checkbox" value="2" /> Lorem ipsum dolor sit amet
+                                </label>
+                                <label>
+                                    <input type="checkbox" value="3" /> Lorem ipsum dolor sit amet
+                                </label>
+                            </div>
+                        </div>
                     </div>
-                
+
                     <!-- Search Button -->
                     <button type="submit" class="btn-search">Search</button>
                 </div>
@@ -112,7 +155,12 @@
                     <li class="tab-switch active" data-tab="requested-tab">Requested Assignments</li>
                 </ul>
             </div>
-            <div class="assignments">
+            {{-- <div class="assignments">
+                <p>+</p>
+                <p>Assignments</p>
+            </div> --}}
+
+            <div class="assignments" onclick="openAssignmentPopup()">
                 <p>+</p>
                 <p>Assignments</p>
             </div>
@@ -191,11 +239,16 @@
                                                     <img src="{{ asset('staff/assets/images/lines.svg') }}" />
                                                 </a>
                                             </p>
-                                            <p><img src="{{asset('staff/assets/images/pen.svg')}}" onclick="openEditPopup()"/></p>
+                                            <p>
+                                                <img src="{{asset('staff/assets/images/pen.svg')}}" 
+                                                   class="edit-icon" data-id="{{ $assignment->id }}" />
+                                            </p>
+                                            
+
                                             {{-- <p class="delete-btn"><img src="{{asset('staff/assets/images/dust.svg')}}" /></p> --}}
-                                             <button type="button" data-bs-target="#deleteAssignmentModal" data-bs-toggle="modal" class="delete-exam-btn deleteAssignmentBtn">
+                                            <button type="button" data-bs-target="#deleteAssignmentModal" data-bs-toggle="modal" class="delete-exam-btn deleteAssignmentBtn">
                                                     <img src="{{ global_asset('staff/assets/images/dust.svg') }}" alt="Icon">
-                                                </button>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -421,6 +474,9 @@
                                     <p>Grade: 50</p>
                                     <p>Title: Lorem Ipsum</p>
                                     <p>File Format: PDF File</p>
+                                     <div class="btn-wrp">
+                                        <a href="./images/A.svg" download="./images/A.svg" class="cmn-btn btn-sm ms-auto">Download</a>
+                                    </div>
                                     </li> 
                                     <li  class="assignment-column">
                                     <p>Assignment No.- 24</p>
@@ -606,7 +662,7 @@
 <!-- End Of viewAttachedDocs Modal -->
 
 <!-- add Assignement Popup-->
-<div id="assignmentPopup" class="popup-overlay-assignment">
+{{-- <div id="assignmentPopup" class="popup-overlay-assignment">
     <form id="assignmentForm" enctype="multipart/form-data">
        @csrf
         <div class="popup-box-assignment">
@@ -618,7 +674,7 @@
 
                     <div class="assign-column">
                         <p class="assign-heading">Subject</p>
-                        {{-- <input type="text" placeholder="Select Subject" /> --}}
+                        
                         <select name="subject_id" required>
                             <option value="">Select Subject</option>
                             @foreach($data['subjects'] as $subject)
@@ -630,12 +686,9 @@
 
                     <div class="assign-column">
                         <p class="assign-heading">Class</p>
-                        {{-- <input type="text" placeholder="Select Subject" /> --}}
+                       
                         <select name="class_id" required>
                             <option value="">Select Class</option>
-                            {{-- @foreach($data['subjects'] as $subject)
-                                <option value="{{ $subject->id }}">{{ $subject->name }}</option>
-                            @endforeach --}}
                        </select>
                         <img src="{{asset('staff/assets/images/greyarrow.svg')}}" />
                     </div>
@@ -657,7 +710,6 @@
                 <div class="assign-column">
                     <p class="assign-heading">Attachment</p> 
                     <div class="attachment">
-                        {{-- <img src="{{asset('staff/assets/images/calender_s.svg')}}" class="specialimg"/> Drag and drop a file here or click --}}
                        <input type="file" name="file[]" multiple style="margin-top: 10px;">
                     </div>
 
@@ -678,61 +730,158 @@
         </div>
     </form>
 
-</div>
+</div> --}}
+
+
+    <div id="assignmentPopup" class="popup-overlay-assignment">    
+        <div class="assignPopup-inr-wrp">
+            <img src="{{asset('staff/assets/images/reqCross.svg')}}" class="close-btn-assignment" onclick="closePopup()">
+          <form id="assignmentForm" enctype="multipart/form-data">
+           @csrf
+                <div class="popup-box-assignment">
+
+                    <h2 class="add-heading">Add Assignments</h2>
+
+                    <div class="desc-rows">
+                        <div class="assign-align">
+                            <div class="assign-column">
+                                <p class="assign-heading">Subject</p>
+                                {{-- <input type="text" placeholder="Select Subject" /> --}}
+                                <select name="subject_id" required>
+                                    <option value="">Select Subject</option>
+                                    @foreach($data['subjects'] as $subject)
+                                        <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                                    @endforeach
+                                </select>
+                                <img src="{{asset('staff/assets/images/greyarrow.svg')}}" />
+                            </div>
+
+                            <div class="assign-column">
+                                <p class="assign-heading">Class</p>
+                                <select name="class_id" required>
+                                    <option value="">Select Class</option>
+                                    @foreach ($data['classes'] as $class)
+                                        <option value="{{ $class->id }}">{{ $class->name }}</option>) 
+                                    @endforeach
+                                </select>
+                                <img src="{{asset('staff/assets/images/greyarrow.svg')}}" />
+                        </div>
+                        
+                        </div>
+
+                        <div class="assign-align">
+                            <div class="assign-column">
+                                <p class="assign-heading">Assignment Title</p>
+                                <input type="text" name="title" placeholder="Title" />
+                            </div>
+
+                            <div class="assign-columndate">
+                                <p class="assign-heading">Grade</p>
+                                <input type="text" name="grade" placeholder="30"  min="0" max="100" required />
+                            </div>
+                        </div>
+
+                        <div class="assign-align">
+                            <div class="assign-column">
+                                <p class="assign-heading">Attachment</p>
+                                <div class="attachment file-upload">
+                                    <img src="{{asset('staff/assets/images/calender_s.svg')}}" class="specialimg" /> Drag and drop
+                                    <input type="file" name="file[]" multiple >
+                                </div>
+
+                            </div>
+                            <div class="assign-columndate">
+                                {{-- <p class="assign-heading">Due Date</p> --}}
+                                <p class="req-exam">Due Date</p>
+
+                                <input type="text"  id="datepick" class="req-box" name="due_date" placeholder="mm-dd-yyyy" required/>
+                                <img src="{{asset('staff/assets/images/calender_s.svg')}}" />
+                            </div>
+                        </div>
+
+                        <div class="assign-desc">
+                            <p class="assign-heading">Description</p>
+                            <textarea id="assignment_description"  class="desc-column" name="description" placeholder="Submit homework before last date."></textarea>
+
+                        </div>
+                    </div>
+
+                    <button class="req-btn">Send Request</button>
+                </div>
+          </form>    
+        </div>
+    </div>
+
+
+<!-- end Assignement Popup-->
+
 
 <!-- Edit Popup-->
 <div id="EditPopup" class="popup-overlay-edit">
     <div class="popup-box-edit">
-       
         <h2 class="add-heading-edit">Edit Assignment</h2>
         
         <div class="desc-rows-edit">
              <img src="{{asset('staff/assets/images/reqCross.svg')}}" class="close-btn-edit" onclick="closeEditPopup()">
-        <div class="assign-align-edit">
-        <div class="assign-column-edit">
-            <p class="assign-heading-edit">Subject</p>
-            <input type="text" placeholder="Select Subject" />
-            <img src="{{asset('staff/assets/images/greyarrow.svg')}}" />
-        </div>
 
-        <div class="assign-columndate-edit">
-            <p class="assign-heading-edit">Date</p>
-            <input type="text" placeholder="05/10/2025" />
-            <img src="{{asset('staff/assets/images/calender_s.svg')}}" />
-        </div>
-        </div>
+               <!-- Add hidden field for assignment ID -->
+            <input type="hidden" id="edit_assignment_id" name="id">
 
-        <div class="assign-align-edit">
-        <div class="assign-column-edit">
-            <p class="assign-heading-edit">Assignment Title</p>
-            <input type="text" placeholder="Title" value="Lorem ipsum dolor sit amet, consectetur adipiscing elit" />
-        </div>
+            <div class="assign-align-edit">
+                <div class="assign-column-edit">
+                    <p class="assign-heading-edit">Subject</p>
+                    {{-- <input type="text" placeholder="Select Subject" /> --}}
+                    <select name="subject_id" id="edit_subject" required></select>
+                    <img src="{{asset('staff/assets/images/greyarrow.svg')}}" />
+                </div>
 
-        <div class="assign-columndate-edit">
-            <p class="assign-heading-edit">Grade</p>
-            <input type="text" placeholder="30" />
-        </div>
-        </div>
+                <div class="assign-column">
+                        <p class="assign-heading">Class</p>
+                        {{-- <input type="text" placeholder="Select Subject" /> --}}
+                        <select name="class_id" id="edit_class"></select>
+                        <img src="{{asset('staff/assets/images/greyarrow.svg')}}" />
+                </div>
 
-        <div class="assign-column-edit">
-            <p class="assign-heading-edit">Attachment</p>
-            {{-- <div class="attachment-edit">
-                <img src="{{asset('staff/assets/images/upload.svg')}}" class="specialimg"/> Drag and drop a file here or click
-            </div> --}}
-            <div class="attachment">
-                <input type="file" name="file[]" multiple>
+                <div class="assign-columndate-edit">
+                    <p class="assign-heading-edit">Due Date</p>
+                    <input type="date" id="edit_date" name="due_date" class="assign-date" required>
+                    <img src="{{asset('staff/assets/images/calender_s.svg')}}" />
+                </div>
+            </div>
+
+            <div class="assign-align-edit">
+                <div class="assign-column-edit">
+                    <p class="assign-heading-edit">Assignment Title</p>
+                    <input type="text"  id="edit_title" name="title" placeholder="Title" value="Lorem ipsum dolor sit amet, consectetur adipiscing elit" />
+                </div>
+
+                <div class="assign-columndate-edit">
+                    <p class="assign-heading-edit">Grade</p>
+                    <input type="number" id="edit_grade" name="grade" placeholder="30"  min="0" max="100" required />
+                </div>
+            </div>
+
+            <div class="assign-column-edit">
+                <p class="assign-heading-edit">Attachment</p>
+                <div id="existing-attachments" class="existing-attachments">
+                    <p>Current Attachments:</p>
+                    <div id="attachments-list"></div>
+                </div>
+    
+                <div class="attachment-edit">
+                    {{-- <img src="{{asset('staff/assets/images/upload.svg')}}" class="specialimg"/> Drag and drop a file here or click --}}
+                    <input type="file" name="file[]" multiple style="margin-top: 10px;">
+                </div>  
+            </div>
+
+            <div class="assign-desc-edit">
+                <p class="assign-heading-edit">Description</p>
+                <textarea id="edit_description" class="desc-column-edit" name="description" placeholder="Submit homework before last date." ></textarea>
+                
             </div>
         </div>
 
-        <div class="assign-desc-edit">
-            <p class="assign-heading-edit">Description</p>
-           
-            <textarea class="desc-column-edit" placeholder="Submit homework before last date." ></textarea>
-            
-        </div>
-        </div>
-
-        <button class="req-btn-edit">Save</button>
+        <button type="submit" class="req-btn-edit">Save</button>
     </div>
 </div>
 <!-- Edit popup-->
@@ -771,11 +920,47 @@
                     </div>
                 </div>
             </div>
-            <!-- End Of Delete Room Modal -->
+<!-- End Of Delete Room Modal -->
+
+<!-- Read More Modal Begin -->
+
+        <div class="modal fade cmn-popwrp" id="readMore" tabindex="-1" role="dialog"
+                aria-labelledby="readMore" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"><img src="{{asset('staff/assets/images/cross-icon.svg')}}" alt="Icon"></span>
+                    </button>
+
+                    <div class="modal-body">
+                        <div class="cmn-pop-content-wrapper">
+                            <div class="cmn-pop-head">
+                                <h2>Assignment Description</h2>
+                            </div>
+
+                            <div class="cmn-pop-inr-content-wrp">
+                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+<!-- End Of Read More Modal -->
 
 @endsection
 
 @push('script')
+<script>
+    // Initialize CKEditor for description
+    ClassicEditor
+        .create(document.querySelector('#assignment_description'))
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+
 <script> 
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -806,46 +991,48 @@
    $("#assignmentForm").on("submit", function (e) {
     e.preventDefault();
 
-    let formData = new FormData(this);
-    console.log(formData);
+        let formData = new FormData(this);
+        // console.log(formData);
+        let editorData = document.querySelector('.ck-editor__editable').innerHTML;
+        formData.set('description', editorData);
 
-    $.ajax({
-        url: "{{ route('staff.assignment.store_assignment') }}",
-        type: "POST",
-        data: formData,
-        processData: false,   
-        contentType: false,   
-        headers: {
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-        },
-        success: function (response) {
-            if (response.success) {
-                showSuccess(response.message);
-                $("#assignmentPopup").hide();
-                $("#assignmentForm")[0].reset();
-                location.reload();
+        console.log(editorData);
 
-            } else {
-               showError(response.message);
-            }
-        },
-        error: function (xhr) {
-            if (xhr.status === 422) {
-                let errors = xhr.responseJSON.errors;
-                let errorMessage = "Please fix the following errors:\n";
-                for (let field in errors) {
-                    errorMessage += "- " + errors[field][0] + "\n";
+        $.ajax({
+            url: "{{ route('staff.assignment.store_assignment') }}",
+            type: "POST",
+            data: formData,
+            processData: false,   
+            contentType: false,   
+            headers: {
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            },
+            success: function (response) {
+                if (response.success) {
+                    showSuccess(response.message);
+                    $("#assignmentPopup").hide();
+                    $("#assignmentForm")[0].reset();
+                    location.reload();
+
+                } else {
+                showError(response.message);
                 }
-                showError(errorMessage);
-            } else {
-                showError("Error: Unable to submit assignment.");
+            },
+            error: function (xhr) {
+                if (xhr.status === 422) {
+                    let errors = xhr.responseJSON.errors;
+                    let errorMessage = "Please fix the following errors:\n";
+                    for (let field in errors) {
+                        errorMessage += "- " + errors[field][0] + "\n";
+                    }
+                    showError(errorMessage);
+                } else {
+                    showError("Error: Unable to submit assignment.");
+                }
             }
-        }
-    });
+        });
    });
 </script>
-
-   
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -979,9 +1166,160 @@ $(document).ready(function () {
         });
     }
 
+   
+
 });
 </script>
 
+
+
+
+<script>
+
+    function openEditPopup(id)
+    {
+        console.log('Opening edit popup for assignment:', id); // Debug log
+        console.log('EditPopup element:', $('#EditPopup'));
+        
+        $.ajax({
+            url: "{{ route('staff.assignment.editAssignment', '') }}/" + id,
+            type: "GET",
+            success: function(response) {
+                console.log('AJAX success, response:', response);
+                
+                if (response.status) {
+                    let assignment = response.data;
+                    // console.log('Assignment data:', assignment);
+                    $('#edit_assignment_id').val(assignment.id);
+
+                    $('#edit_subject').empty().append('<option value="">Select Subject</option>');
+                    response.subjects.forEach(function(subject) {
+                        $('#edit_subject').append(
+                            `<option value="${subject.id}">${subject.name}</option>`
+                        );
+                    });
+
+                    $('#edit_class').empty().append('<option value="">Select Class</option>');
+                    response.classes.forEach(function(cls) {
+                        $('#edit_class').append(
+                            `<option value="${cls.id}">${cls.name}</option>`
+                        );
+                    });
+
+                    // Set current values
+                    $('#edit_subject').val(assignment.subject_id);
+                    $('#edit_class').val(assignment.class_id);
+                    $('#edit_title').val(assignment.title);
+                    $('#edit_grade').val(assignment.grade);
+                    $('#edit_description').val(assignment.description);
+
+                    if (assignment.due_date) {
+                        let dueDate = assignment.due_date;
+                        console.log('Due date raw:', dueDate);
+                        
+                        if (dueDate.includes('T')) {
+                            dueDate = dueDate.split('T')[0];
+                        }
+                        // console.log('Due date formatted:', dueDate);
+                        $('#edit_date').val(dueDate);
+                    }
+
+                    displayExistingAttachments(response.media || []);
+
+                    $('#EditPopup').show();
+                } else {
+                    alert("Error: " + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', error);
+                alert("Something went wrong!");
+            }
+        });
+    }
+
+    // Function to display existing attachments
+    function displayExistingAttachments(media) {
+        const attachmentsList = $('#attachments-list');
+        attachmentsList.empty();
+        
+        if (media.length === 0) {
+            attachmentsList.html('<p>No attachments</p>');
+            return;
+        }
+        
+        media.forEach(function(file) {
+            const fileItem = `
+                <div class="attachment-item" style="display: flex; justify-content: space-between; align-items: center; margin: 5px 0; padding: 5px; border: 1px solid #ddd;">
+                    <span>${file.file_name || 'File'}</span>
+                
+                </div>
+            `;
+            attachmentsList.append(fileItem);
+        });
+        
+    
+    }
+
+    function closeEditPopup() {
+        $('#EditPopup').hide();
+    }
+
+    $(document).ready(function () {
+        // Edit icon click handler
+        $(document).on('click', '.edit-icon', function() {
+            var id = $(this).data('id');
+            console.log('Edit icon clicked, id:', id);
+            openEditPopup(id);
+        });
+        
+        
+       // Save button handler
+       $('.req-btn-edit').click(function() {
+        let formData = {
+            _token: "{{ csrf_token() }}",
+            id: $('#edit_assignment_id').val(),
+            subject_id: $('#edit_subject').val(),
+            class_id: $('#edit_class').val(),
+            title: $('#edit_title').val(),
+            grade: $('#edit_grade').val(),
+            due_date: $('#edit_date').val(), // Make sure this matches backend
+            description: $('#edit_description').val()
+        };
+
+        console.log('Sending update data:', formData);
+
+        $.ajax({
+            url: "{{ route('staff.assignment.updateAssignment') }}",
+            type: "POST",
+            data: formData,
+            success: function(response){
+                console.log('Update response:', response);
+                if(response.status){
+                    alert("Assignment updated successfully!");
+                    $('#EditPopup').hide();
+                    location.reload();
+                } else {
+                    if (response.errors) {
+                        // Display validation errors
+                        let errorMessages = [];
+                        for (let field in response.errors) {
+                            errorMessages.push(response.errors[field][0]);
+                        }
+                        alert("Validation errors:\n" + errorMessages.join('\n'));
+                    } else {
+                        alert("Error: " + response.message);
+                    }
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Update Error:', error);
+                alert("Something went wrong while updating!");
+            }
+        });
+    });
+});
+</script>
 
  
 
