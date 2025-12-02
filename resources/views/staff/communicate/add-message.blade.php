@@ -33,12 +33,11 @@
                     <div class="assign-columndate">
                         <p class="assign-heading">Notice Date <span class="text-danger">*</span></p>
                         <input type="date" id="date" name="date" required>
-                        <img src="{{ asset('staff/assets/images/calender_s.svg') }}" style="position:absolute; right:10px; top:40px; pointer-events:none;">
                     </div>
 
                     <div class="assign-columndate">
                         <p class="assign-heading">Attachment (Optional)</p>
-                        <div class="attachment">
+                        <div class="attachment file-upload">
                             <input type="file" id="document" name="document" accept=".pdf,.doc,.docx,.jpg,.png">
                             <span>Drag and drop a file here or click</span>
                         </div>

@@ -18,10 +18,33 @@ use Illuminate\Support\Facades\Auth;
 class CommunicateController extends Controller
 {
 
-    public function index(){
+    public function index()
+    {
+        $teacherId = Auth::id();
 
-        return view('staff.communicate.index');
+        // 1. Messages created by this teacher
+        $myMessages = NoticeBoard::where('teacher_id', $teacherId)
+            ->with('attachmentFile') // eager load attachment
+            ->latest('date')
+            ->get();
 
+        // 2. Global notices (no specific recipient)
+        $globalNotices = NoticeBoard::whereNull('year_status_id')
+            ->whereNull('semester_id')
+            ->whereNull('class_id')
+            ->whereNull('section_id')
+            ->whereNull('student_id')
+            ->whereNull('teacher_id')
+            ->with('attachmentFile')
+            ->latest('date')
+            ->get();
+
+        // Combine both (teacher's + global), remove duplicates if any
+        $notices = $myMessages->merge($globalNotices)
+            ->sortByDesc('date')
+            ->values();
+
+        return view('staff.communicate.index', compact('notices'));
     }
 
 
@@ -50,7 +73,6 @@ class CommunicateController extends Controller
             $filename = time() . '_' . $file->getClientOriginalName();
             $path     = $file->storeAs('noticeboard_attachments', $filename, 'public');
 
-            // Manual creation – bypasses mass assignment completely
             $upload           = new Upload();
             $upload->path     = $path;
             $upload->created_at = now();
