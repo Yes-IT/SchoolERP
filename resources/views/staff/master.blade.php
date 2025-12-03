@@ -142,6 +142,8 @@
     <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     @include('staff.partials.ajax-alert')
 
@@ -156,8 +158,7 @@
         function openSessionModal() {
             document.getElementById("sessionModal").style.display = "flex";
         }
-
-        // Auto-save when any option is selected
+        
         function saveSession() {
             const yearId     = document.querySelector('#yearList .active-week')?.dataset.id;
             const statusId   = document.querySelector('#statusList .active-week')?.dataset.id;
@@ -174,8 +175,25 @@
                     semester_id: semesterId,
                     year_status_id: statusId
                 })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    toastr.success("Your current session has been updated successfully.");
+                    
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    toastr.error(data.message || "Failed to update session.");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                toastr.error("Something went wrong! Please try again.");
             });
         }
+
 
         // Open/close dropdowns
         document.querySelectorAll('.subjectbox-session').forEach(btn => {

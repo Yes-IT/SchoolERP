@@ -142,6 +142,9 @@ Route::middleware([ 'web',])->group(function () {
         Route::get('/staff/communicate/index', [CommunicateController::class, 'index'])->name('staff.communicate.index')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
         Route::get('/staff/communicate/message/add', [CommunicateController::class, 'addMessage'])->name('staff.communicate.message.add')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
         Route::post('/staff/communicate/messages/store', [CommunicateController::class, 'store'])->name('staff.communicate.messages.store');
+        Route::get('/staff/communicate/message/edit/{id}', [CommunicateController::class, 'editMessage'])->name('staff.communicate.message.edit')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+        Route::put('/staff/communicate/messages/update/{id}', [CommunicateController::class, 'update'])->name('staff.communicate.messages.update')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+        Route::delete('/staff/communicate/messages/delete/{id}', [CommunicateController::class, 'destroy'])->name('staff.communicate.messages.destroy')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
 
 
         // For Global Session
