@@ -30,7 +30,7 @@ class AssignmentController extends Controller
             // Log::info('Subjects: ', ['subjects' => $subjects]);
 
             $classes = $this->getTeacherClasses($teacherId);
-            Log::info('Classes: ', ['classes' => $classes]);
+            // Log::info('Classes: ', ['classes' => $classes]);
 
             $current = $this->assignmentRepo->getByStatus($teacherId, 1);
             $closed = $this->assignmentRepo->getByStatus($teacherId, 2);
@@ -59,26 +59,25 @@ class AssignmentController extends Controller
 
     public function store_assignment(Request $request)
     {
-        Log::info('store assignment Request: ', ['request' => $request->all()]);
+        // Log::info('store assignment Request: ', ['request' => $request->all()]);
 
-         // Convert mm-dd-yyyy → yyyy-mm-dd
         if ($request->due_date) {
-            $request->merge([
-                'due_date' => date('Y-m-d', strtotime($request->due_date))
-            ]);
+        $parts = explode('/', $request->due_date); 
+            if (count($parts) === 3) {
+                $formattedDate = $parts[2] . '-' . $parts[1] . '-' . $parts[0];
+                $request->merge(['due_date' => $formattedDate]);
+            }
         }
 
-        Log::info('due date', ['due_date' => $request->due_date]);
         $validated = $request->validate([
             'subject_id' => 'required|exists:subjects,id',
             'class_id' => 'required|exists:classes,id',
             'title' => 'required|string|max:100',
             'grade' => 'required|numeric|min:0|max:100',
-            'due_date' => 'required|date|after:today',
-            'description' => 'nullable|string',
+            'due_date' => 'required|date|after_or_equal:today',
+            'description' => 'nullable|string|max:5000',
             'file.*' => 'nullable|file|max:2048',
         ]);
-
 
         try {
             $user = Auth::user();
@@ -87,12 +86,12 @@ class AssignmentController extends Controller
             $assignmentData = [
                 'subject_id'    => $validated['subject_id'],
                 'student_id'    => null,
-                'class_id'      => $user->class_id,
+                'class_id'      => $validated['class_id'],
                 'title'         => $validated['title'],
                 'grade'         => $validated['grade'],
                 'due_date'      => $validated['due_date'],
                 'assigned_date' => now(),
-                'description'   => $validated['description'],
+                'description'   => strip_tags($validated['description']),
                 'status'        => 0,// 0=requested
                 'created_by'    => $teacherId,
             ];
@@ -214,7 +213,7 @@ class AssignmentController extends Controller
         try {
             $teacherId = Auth::user()->staff->id;
             $assignment = $this->assignmentRepo->find($id);
-            // Log::info('Assignment found:', ['assignment' => $assignment]);
+            Log::info('Assignment found:', ['assignment' => $assignment]);
 
             if (!$assignment) {
                 return response()->json([
@@ -311,6 +310,29 @@ class AssignmentController extends Controller
             ], 500);
         }
     }
+
+
+    public function deleteAssignment($id)
+    {
+        try {
+            $assignment = $this->assignmentRepo->find($id);
+            $title = $assignment->title;
+
+            $assignment->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => "You have deleted the '{$title}' Assignment successfully"
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Delete assignment error: ' . $e->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong!'
+            ], 500);
+        }
+    }
+
 
 
 

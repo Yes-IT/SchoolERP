@@ -182,30 +182,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- <tr>
-                                <td>1</td>
-                                <td>Lorem ipsum dolor sit amet </td>
-                                <td>Lorem ipsum dolor sit amet </td>
-                                <td>
-                                    <div class="toggle-text-wrapper">
-                                        <div class="toggle-text-content">
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                        </div>
-                                        </div>
-                                        
-                                </td>
-                                <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="{{asset('staff/assets/images/eye-white.svg')}}" alt="Eye Icon"></button></td>
-                                <td>04/02/2025</td>
-                                <td>04/22/2025</td>
-                                <td>50</td>
-                                <td>
-                                    <div class="file-action">
-                                        <p><img src="{{asset('staff/assets/images/lines.svg')}}" /></p>
-                                        <p><img src="{{asset('staff/assets/images/pen.svg')}}" onclick="openEditPopup()"/></p>
-                                        <p class="delete-btn"><img src="{{asset('staff/assets/images/dust.svg')}}" /></p>
-                                    </div>
-                                </td>
-                            </tr> --}}
 
                             @forelse($data['current_assignments'] as $index => $assignment)
                                 <tr>
@@ -233,7 +209,6 @@
                                     <td>{{ $assignment->grade }}</td>
                                     <td>
                                         <div class="file-action">
-                                            {{-- <p><img src="{{asset('staff/assets/images/lines.svg')}}" /></p> --}}
                                             <p>
                                                 <a href="{{ route('staff.assignment.evaluateAssignment', $assignment->id) }}">
                                                     <img src="{{ asset('staff/assets/images/lines.svg') }}" />
@@ -244,9 +219,9 @@
                                                    class="edit-icon" data-id="{{ $assignment->id }}" />
                                             </p>
                                             
-
-                                            {{-- <p class="delete-btn"><img src="{{asset('staff/assets/images/dust.svg')}}" /></p> --}}
-                                            <button type="button" data-bs-target="#deleteAssignmentModal" data-bs-toggle="modal" class="delete-exam-btn deleteAssignmentBtn">
+                                            <button type="button" data-bs-target="#deleteAssignmentModal" data-bs-toggle="modal"
+                                                class="delete-exam-btn deleteAssignmentBtn"
+                                                data-id="{{ $assignment->id }}">
                                                     <img src="{{ global_asset('staff/assets/images/dust.svg') }}" alt="Icon">
                                             </button>
                                         </div>
@@ -281,32 +256,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- <tr>
-                                <td>1</td>
-                                <td>Lorem ipsum dolor sit amet </td>
-                                <td>Lorem ipsum dolor sit amet </td>
-                                <td>
-                                    <div class="toggle-text-wrapper">
-                                        <div class="toggle-text-content">
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                        </div>
-                                        </div>
-                                        
-                                </td>
-                                <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="{{asset('staff/assets/images/eye-white.svg')}}" alt="Eye Icon"></button></td>
-                                <td>04/02/2025</td>
-                                <td>04/22/2025</td>
-                                <td>50</td>
-                                <td>
-                                    <div class="file-action">
-                                        <p><img src="{{asset('staff/assets/')}}./images/lines.svg" /></p>
-                                        <p><img src="{{asset('staff/assets/')}}./images/pen.svg" onclick="openEditPopup()"/></p>
-                                        <p><img src="{{asset('staff/assets/')}}./images/dust.svg" /></p>
-                                    </div>
-                                </td>
-                            </tr> --}}
-
-
+                           
                             @forelse($data['requested_assignments'] as $index => $assignment)
                             @php
                                 $assignment_status= $assignment->status === 0 ? 'Pending' : '';
@@ -317,12 +267,15 @@
                                     <td>{{ $assignment->subject->name ?? 'N/A' }}</td>
                                     <td>{{ $assignment->title }}</td>
                                     <td>
-                                        <div class="toggle-text-wrapper">
+                                        <div class="toggle-text-wrapper"
+                                            data-description="{{ $assignment->description ?? 'No description' }}"
+                                            data-title="{{ $assignment->title }}" >
                                             <div class="toggle-text-content">
                                                 {{ $assignment->description ?? 'No description' }}
                                             </div>
                                         </div>
-                                    </td>~
+                                    </td>
+
                                     <td>
                                         @if($assignment->media->count() > 0)
                                             <button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal" data-assignment-id="{{ $assignment->id }}">
@@ -368,35 +321,58 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- <tr>
-                                <td>1</td>
-                                <td>Lorem ipsum dolor sit amet </td>
-                                <td>Lorem ipsum dolor sit amet </td>
-                                <td>
-                                    <div class="toggle-text-wrapper">
-                                        <div class="toggle-text-content">
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                        </div>
-                                        </div>
-                                        
-                                </td>
-                                <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="{{asset('staff/assets/images/eye-white.svg')}}" alt="Eye Icon"></button></td>
-                                <td>04/02/2025</td>
-                                <td>04/22/2025</td>
-                                <td>50</td>
-                                <td>
-                                    <p class="statusBtn">Pending</p>
-                                </td>
-                            </tr> --}}
-
+                        
+                        
                             @forelse($data['closed_assignments'] as $index => $assignment)
-                            
+
+                            @php
+                                $assignment_status= $assignment->status === 2 ? 'Closed' : '';
+                            @endphp
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $assignment->subject->name ?? 'N/A' }}</td>
+                                    <td>{{ $assignment->title }}</td>
+
+                                    <!-- Description -->
+                                    {{-- <td>{{ Str::limit($assignment->description, 50) }}</td> --}}
+                                    <td>
+                                        <div class="toggle-text-wrapper"
+                                            data-description="{{ $assignment->description ?? 'No description' }}"
+                                            data-title="{{ $assignment->title }}" >
+                                            <div class="toggle-text-content">
+                                                {{ $assignment->description ?? 'No description' }}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if($assignment->media->count() > 0)
+                                            <button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal" data-assignment-id="{{ $assignment->id }}">
+                                                <img src="{{ asset('staff/assets/images/eye-white.svg') }}" alt="Eye Icon">
+                                            </button>
+                                        @else
+                                            <span class="no-attachment">No files</span>
+                                        @endif
+                                    </td>
+
+                                    <td>{{ $assignment->assigned_date->format('m/d/Y') }}</td>
+                                    <td>{{ $assignment->due_date->format('m/d/Y') }}</td>
+                                    <td>{{ $assignment->grade }}</td>
+                                    
+
+                                    <!-- Status -->
+                                    <td>
+                                        <span class="status-badge closed" style="background-color: #f36969">{{ $assignment_status }}</span>
+                                    </td>
+                                </tr>
+
                             @empty
-                                <tr><td colspan="10">No closed assignments</td></tr>
+                                <tr>
+                                    <td colspan="10" class="text-center">No closed assignments</td>
+                                </tr>
                             @endforelse
 
-                            
-                            
+
+
                         </tbody>
                     </table>
                 </div>
@@ -761,7 +737,7 @@
                                 <select name="class_id" required>
                                     <option value="">Select Class</option>
                                     @foreach ($data['classes'] as $class)
-                                        <option value="{{ $class->id }}">{{ $class->name }}</option>) 
+                                        <option value="{{ $class->id }}">{{ $class->name }}</option>
                                     @endforeach
                                 </select>
                                 <img src="{{asset('staff/assets/images/greyarrow.svg')}}" />
@@ -785,7 +761,7 @@
                             <div class="assign-column">
                                 <p class="assign-heading">Attachment</p>
                                 <div class="attachment file-upload">
-                                    <img src="{{asset('staff/assets/images/calender_s.svg')}}" class="specialimg" /> Drag and drop
+                                    <img src="{{asset('staff/assets/images/calender_s.svg')}}" class="specialimg" /> Drag and drop a file here or click
                                     <input type="file" name="file[]" multiple >
                                 </div>
 
@@ -868,9 +844,9 @@
                     <div id="attachments-list"></div>
                 </div>
     
-                <div class="attachment-edit">
-                    {{-- <img src="{{asset('staff/assets/images/upload.svg')}}" class="specialimg"/> Drag and drop a file here or click --}}
-                    <input type="file" name="file[]" multiple style="margin-top: 10px;">
+                <div class="attachment-edit file-upload">
+                    <img src="{{asset('staff/assets/images/upload.svg')}}" class="specialimg"/> Drag and drop a file here or click
+                    <input type="file" name="file[]" multiple >
                 </div>  
             </div>
 
@@ -905,7 +881,7 @@
                                 <div class="sec-head head-center">
                                     <h2>Delete!</h2>
                                     <p>Are you sure you want to delete exam type?</p>
-                                    <form method="post" >
+                                    <form id="deleteAssignmentForm" method="post" >
                                         @csrf
                                         @method('DELETE')
                                         <div class="btn-wrp">
@@ -920,6 +896,7 @@
                     </div>
                 </div>
             </div>
+
 <!-- End Of Delete Room Modal -->
 
 <!-- Read More Modal Begin -->
@@ -935,11 +912,11 @@
                     <div class="modal-body">
                         <div class="cmn-pop-content-wrapper">
                             <div class="cmn-pop-head">
-                                <h2>Assignment Description</h2>
+                                <h2 id="assignmentModalTitle">Assignment Description</h2>
                             </div>
 
                             <div class="cmn-pop-inr-content-wrp">
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                                <p id="assignmentModalDescription">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
                             </div>
                         </div>
                     </div>
@@ -988,6 +965,7 @@
 </script>
 
 <script>
+ // for add assignment
    $("#assignmentForm").on("submit", function (e) {
     e.preventDefault();
 
@@ -996,7 +974,7 @@
         let editorData = document.querySelector('.ck-editor__editable').innerHTML;
         formData.set('description', editorData);
 
-        console.log(editorData);
+        // console.log(editorData);
 
         $.ajax({
             url: "{{ route('staff.assignment.store_assignment') }}",
@@ -1019,7 +997,10 @@
                 }
             },
             error: function (xhr) {
+
                 if (xhr.status === 422) {
+                     console.log("422 ERROR:", xhr.responseJSON);
+                    
                     let errors = xhr.responseJSON.errors;
                     let errorMessage = "Please fix the following errors:\n";
                     for (let field in errors) {
@@ -1035,31 +1016,86 @@
 </script>
 
 <script>
+$(document).ready(function() {
+    //for read more
+    $(document).on('click', '.read-more', function() {
+        const $wrapper = $(this).closest('.toggle-text-wrapper');
+        const description = $wrapper.data('description');
+        const title = $wrapper.data('title');
+    
+        $('#assignmentModalTitle').text(title);
+        $('#assignmentModalDescription').text(description);
+    });
+
+   // for delete assignment 
+    $(document).on("click", ".deleteAssignmentBtn", function () {
+        let id = $(this).data("id");
+        let url = "{{ route('staff.assignment.destroyAssignment', ':id') }}";
+        url = url.replace(':id', id);
+
+        $("#deleteAssignmentForm").attr("action", url);
+    });
+
+
+   $(document).on("submit", "#deleteAssignmentForm", function (e) {
+        e.preventDefault();
+
+        let url = $(this).attr("action");
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                _method: "DELETE" 
+            },
+            success: function (response) {
+                if (response.status) {
+                    showSuccess(response.message);
+                    $('#deleteAssignmentModal').modal('hide');
+
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1200);
+                } else {
+                    showError(response.message);
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr);
+                showError("Something went wrong!");
+            }
+        });
+   });
+
+    
+});
+
+</script>
+
+<script>
+    //for switch tab
     document.addEventListener('DOMContentLoaded', function() {
         function showTab(tabName) {
-            // Hide all tabs
+
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.style.display = 'none';
             });
             
-            // Remove active class from all tab headers
             document.querySelectorAll('.tab-switch').forEach(tab => {
                 tab.classList.remove('active');
             });
             
-            // Show the selected tab
             const selectedTab = document.querySelector(`.${tabName}`);
             if (selectedTab) {
                 selectedTab.style.display = 'block';
-                
-                // Also ensure the inner table container is visible
+            
                 const tableContainer = selectedTab.querySelector('[class*="-assignments"]');
                 if (tableContainer) {
                     tableContainer.style.display = 'block';
                 }
             }
             
-            // Activate the tab header
             const tabHeader = document.querySelector(`[data-tab="${tabName}"]`);
             if (tabHeader) {
                 tabHeader.classList.add('active');
@@ -1073,12 +1109,12 @@
             });
         });
 
-        // showTab('requested-tab');
         showTab('current-tab');
     });
 </script>
 
 <script>
+ // for upload assignment   
 $(document).ready(function () {
 
     $(document).on("click", ".view-attachment-btn", function () {
@@ -1165,21 +1201,15 @@ $(document).ready(function () {
             }
         });
     }
-
-   
-
 });
 </script>
 
-
-
-
 <script>
-
+    // for edit assignment
     function openEditPopup(id)
     {
-        console.log('Opening edit popup for assignment:', id); // Debug log
-        console.log('EditPopup element:', $('#EditPopup'));
+        // console.log('Opening edit popup for assignment:', id);
+        // console.log('EditPopup element:', $('#EditPopup'));
         
         $.ajax({
             url: "{{ route('staff.assignment.editAssignment', '') }}/" + id,
@@ -1266,10 +1296,9 @@ $(document).ready(function () {
     }
 
     $(document).ready(function () {
-        // Edit icon click handler
         $(document).on('click', '.edit-icon', function() {
             var id = $(this).data('id');
-            console.log('Edit icon clicked, id:', id);
+            // console.log('Edit icon clicked, id:', id);
             openEditPopup(id);
         });
         
@@ -1277,26 +1306,27 @@ $(document).ready(function () {
        // Save button handler
        $('.req-btn-edit').click(function() {
         let formData = {
+
             _token: "{{ csrf_token() }}",
             id: $('#edit_assignment_id').val(),
             subject_id: $('#edit_subject').val(),
             class_id: $('#edit_class').val(),
             title: $('#edit_title').val(),
             grade: $('#edit_grade').val(),
-            due_date: $('#edit_date').val(), // Make sure this matches backend
+            due_date: $('#edit_date').val(),
             description: $('#edit_description').val()
         };
 
-        console.log('Sending update data:', formData);
+        // console.log('Sending update data:', formData);
 
         $.ajax({
             url: "{{ route('staff.assignment.updateAssignment') }}",
             type: "POST",
             data: formData,
             success: function(response){
-                console.log('Update response:', response);
+                // console.log('Update response:', response);
                 if(response.status){
-                    alert("Assignment updated successfully!");
+                    showSuccess(response.message);
                     $('#EditPopup').hide();
                     location.reload();
                 } else {
@@ -1308,13 +1338,13 @@ $(document).ready(function () {
                         }
                         alert("Validation errors:\n" + errorMessages.join('\n'));
                     } else {
-                        alert("Error: " + response.message);
+                        showError(response.message);
                     }
                 }
             },
             error: function(xhr, status, error) {
                 console.error('Update Error:', error);
-                alert("Something went wrong while updating!");
+                showError("Something went wrong!");
             }
         });
     });

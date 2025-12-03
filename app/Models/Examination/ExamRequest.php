@@ -64,9 +64,6 @@ class ExamRequest extends Model
         // dd($this->teacher);
     }
 
-    
-
-    //  Accessor for Full Name (Optional: can also put inside Staff model)
     public function getTeacherNameAttribute()
     {
         return $this->teacher ? $this->teacher->first_name . ' ' . $this->teacher->last_name : null;

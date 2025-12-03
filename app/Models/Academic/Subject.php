@@ -34,17 +34,35 @@ class Subject extends BaseModel
         return $this->hasMany(Classes::class, 'subject_id', 'id');
     }
 
+    // public function teachers()
+    // {
+    //     return $this->hasManyThrough(
+    //         Staff::class,
+    //         Classes::class,
+    //         'subject_id',   // FK on classes table
+    //         'id',           // PK on teachers table
+    //         'id',           // PK on subjects table
+    //         'teacher_id'    // FK on classes table
+    //     )->where('role_id', 5);
+    // }
+
     public function teachers()
     {
         return $this->hasManyThrough(
             Staff::class,
             Classes::class,
-            'subject_id',   // FK on classes table
-            'id',           // PK on teachers table
-            'id',           // PK on subjects table
-            'teacher_id'    // FK on classes table
-        )->where('role_id', 5);
+            'subject_id',    // FK in classes
+            'id',            // PK in staff
+            'id',            // PK in subject
+            'teacher_id'     // FK in classes
+        );
     }
+
+
+
+
+
+
 
 
     

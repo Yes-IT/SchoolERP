@@ -26,19 +26,17 @@ class ExamSchedule extends Model
         'exam_date' => 'date',
     ];
 
-    // belongs to Exam Request
     public function examRequest()
     {
         return $this->belongsTo(ExamRequest::class);
     }
 
-    // belongs to Room
     public function room()
     {
         return $this->belongsTo(ClassRoom::class,'room_id');
     }
 
-    // each schedule may have availability slots
+    
     public function availabilities()
     {
         return $this->hasMany(RoomAvailability::class);

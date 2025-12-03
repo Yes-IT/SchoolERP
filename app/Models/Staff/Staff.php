@@ -16,6 +16,7 @@ use App\Models\Academic\{Classes, Section, Subject};
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\LiveChat\Entities\Message;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Staff extends BaseModel
 {
     use HasFactory,SoftDeletes;
@@ -129,24 +130,42 @@ class Staff extends BaseModel
         );
     }
 
+    // public function classes()
+    // {
+    //     return $this->belongsToMany(
+    //         Classes::class,
+    //         'student_class_mapping',
+    //         'teacher_id',
+    //         'class_id'
+    //     )->withPivot('status');
+    // }
+
+    // public function subjects()
+    // {
+    //     return $this->belongsToMany(
+    //         Subject::class,
+    //         'student_class_mapping',
+    //         'teacher_id',
+    //         'class_id'  
+    //     )->using(StudentClassMapping::class);
+    // }
+
+
     public function classes()
     {
-        return $this->belongsToMany(
-            Classes::class,
-            'student_class_mapping',
-            'teacher_id',
-            'class_id'
-        )->withPivot('status');
+        return $this->hasMany(Classes::class, 'teacher_id', 'id');
     }
 
     public function subjects()
     {
-        return $this->belongsToMany(
+        return $this->hasManyThrough(
             Subject::class,
-            'student_class_mapping',
-            'teacher_id',
-            'class_id'  
-        )->using(StudentClassMapping::class);
+            Classes::class,
+            'teacher_id',   // FK on classes table
+            'id',           // PK on subject table
+            'id',           // PK on staff table
+            'subject_id'    // FK on classes table
+        );
     }
 
 }

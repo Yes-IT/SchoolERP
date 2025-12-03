@@ -5,6 +5,7 @@ namespace App\Models\Academic;
 use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Examination\ExamSchedule;
 
 class ClassRoom extends BaseModel
 {
@@ -25,4 +26,10 @@ class ClassRoom extends BaseModel
     {
         return $this->hasMany(ClassSchedule::class, 'room_id');
     }
+
+    public function examSchedules()
+    {
+        return $this->hasMany(ExamSchedule::class, 'room_id');
+    }
+
 }

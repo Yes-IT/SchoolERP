@@ -464,6 +464,8 @@ document.addEventListener('DOMContentLoaded', function () {
         $('input[name="dates"]').daterangepicker();
     }
 
+    
+
     // Document End
 });
 
@@ -753,21 +755,9 @@ function toggleDropdownstatus() {
   /* daterangepicker */
 
   // Open modal on 'Requested Examination' click
-// document.querySelector('.addExamRequest').addEventListener('click', function () {
-//   document.querySelector('.request-overlay').style.display = 'flex';
-// });
-
-if(document.querySelector('.exam-last-div .exm-req')){
-    document.querySelector('.exam-last-div .exm-req').addEventListener('click', function () {
-      document.querySelector('.request-overlay').style.display = 'flex';
-    });
-}
-
-if(document.querySelector('.request-close')){
-  document.querySelector('.request-close').addEventListener('click', function () {
-    document.querySelector('.request-overlay').style.display = 'none';
-  });
-}
+document.querySelector('.addExamRequest').addEventListener('click', function () {
+  document.querySelector('.request-overlay').style.display = 'flex';
+});
 
 // Close modal on 'X' click
 document.querySelector('.requestClose').addEventListener('click', function () {

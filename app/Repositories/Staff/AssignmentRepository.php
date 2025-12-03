@@ -62,9 +62,9 @@ class AssignmentRepository implements AssignmentInterface
 
         // Log::info("Repo Result Count: " . $assignments->count());
 
-        foreach ($assignments as $assignment) {
-            Log::info("Assignment ID: {$assignment->id}, Subject: " . ($assignment->subject->name ?? 'NULL') . ", Status: {$assignment->status}");
-        }
+        // foreach ($assignments as $assignment) {
+        //     Log::info("Assignment ID: {$assignment->id}, Subject: " . ($assignment->subject->name ?? 'NULL') . ", Status: {$assignment->status}");
+        // }
 
         return $assignments;
     }
@@ -79,15 +79,15 @@ class AssignmentRepository implements AssignmentInterface
 
         $assignment = Assignment::find($id);
             if ($assignment) {
-                Log::info('Updating assignment:', [
-                    'id' => $id,
-                    'data' => $data,
-                    'current_data' => $assignment->toArray()
-                ]);
+                // Log::info('Updating assignment:', [
+                //     'id' => $id,
+                //     'data' => $data,
+                //     'current_data' => $assignment->toArray()
+                // ]);
                 
                 $assignment->update($data);
                 
-                Log::info('Assignment updated successfully:', $assignment->toArray());
+                // Log::info('Assignment updated successfully:', $assignment->toArray());
                 return $assignment;
             }
         
@@ -215,6 +215,32 @@ class AssignmentRepository implements AssignmentInterface
                 $submission->save();
             }
         }
+
+
+
+        // for closed assignment 
+        $assignment = Assignment::find($assignmentId);
+
+        if ($assignment) {
+
+            $dueDatePassed = now()->greaterThan($assignment->due_date);
+
+            $hasEvaluations = AssignmentSubmission::where('assignment_id', $assignmentId)
+                                ->whereNotNull('evaluated_at')
+                                ->exists();
+
+            $lateExists = AssignmentSubmission::where('assignment_id', $assignmentId)
+                            ->whereNotNull('submitted_at')
+                            ->where('submitted_at', '>', $assignment->due_date)
+                            ->exists();
+
+            if ($assignment->status == 1 && $dueDatePassed && $hasEvaluations && !$lateExists) {
+
+                $assignment->status = 2; // CLOSED assignment
+                $assignment->save();
+            }
+        }
+
 
         return true;
     }

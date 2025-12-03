@@ -96,35 +96,31 @@ class ExamScheduleController extends Controller
     public function checkAvailablity($id)
     {
         $examRequest = ExamRequest::with(['examType', 'class', 'room', 'teacher'])
-            ->findOrFail($id);
+                       ->findOrFail($id);
         // dd($examRequest);   
         
-        // Find available rooms for this date/time
        $availableRooms = ClassRoom::whereDoesntHave('examSchedules', function($q) use ($examRequest) {
-        $q->where('exam_date', $examRequest->exam_date)
-          ->where(function($q2) use ($examRequest) {
-              $q2->whereBetween('start_time', [$examRequest->start_time, $examRequest->end_time])
-                 ->orWhereBetween('end_time', [$examRequest->start_time, $examRequest->end_time])
-                 ->orWhere(function($q3) use ($examRequest) {
-                     $q3->where('start_time', '<=', $examRequest->start_time)
-                        ->where('end_time', '>=', $examRequest->end_time);
-                 });
-          });
-        })->get();
+                        $q->where('exam_date', $examRequest->exam_date)
+                        ->where(function($q2) use ($examRequest) {
+                            $q2->whereBetween('start_time', [$examRequest->start_time, $examRequest->end_time])
+                                ->orWhereBetween('end_time', [$examRequest->start_time, $examRequest->end_time])
+                                ->orWhere(function($q3) use ($examRequest) {
+                                    $q3->where('start_time', '<=', $examRequest->start_time)
+                                        ->where('end_time', '>=', $examRequest->end_time);
+                                });
+                        });
+                        })->get();
 
-         // Generate available time slots (you can modify this logic)
-          $availableSlots = $this->generateAvailableSlots($examRequest->exam_date);
+        $availableSlots = $this->generateAvailableSlots($examRequest->exam_date);
 
         return view('backend.examination.exam-schedule.check-availablity', compact('examRequest','availableRooms','availableSlots'));
     }
 
     private function generateAvailableSlots($examDate)
     {
-        // This is a simplified example - you should implement your actual slot generation logic
         $slots = [];
         $startDate = Carbon::parse($examDate);
         
-        // Generate sample slots for the next 3 days
         for ($i = 0; $i < 3; $i++) {
             $date = $startDate->copy()->addDays($i);
             $slots[] = [
@@ -166,7 +162,6 @@ public function assignExam(Request $request, $id)
         $startTime = $request->start_time;
         $endTime = $request->end_time;
 
-        // Validate total allocated students match class requirements
         $totalAllocated = collect($request->rooms)->sum('allocated_students');
         $requiredStudents = $examRequest->class->student_count ?? $totalAllocated;
 
@@ -174,17 +169,14 @@ public function assignExam(Request $request, $id)
             return back()->with('error', "Total allocated students ($totalAllocated) is less than required ($requiredStudents).");
         }
 
-        // Check all rooms availability before creating any schedules
         foreach ($request->rooms as $roomData) {
             $roomId = $roomData['room_id'];
             $room = ClassRoom::find($roomId);
 
-            // Check room capacity
             if ($roomData['allocated_students'] > $room->capacity) {
                 return back()->with('error', "Room {$room->room_no} capacity exceeded. Max: {$room->capacity}");
             }
 
-            // Check if room is available
             $isAvailable = !ExamSchedule::where('room_id', $roomId)
                 ->where('exam_date', $examDate)
                 ->where(function($q) use ($startTime, $endTime) {
@@ -201,7 +193,6 @@ public function assignExam(Request $request, $id)
             }
         }
 
-        // Create exam schedules for all rooms
         foreach ($request->rooms as $roomData) {
             $roomId = $roomData['room_id'];
             $allocated = $roomData['allocated_students'];
@@ -213,10 +204,9 @@ public function assignExam(Request $request, $id)
                 'start_time' => $startTime,
                 'end_time' => $endTime,
                 'allocated_students' => $allocated,
-                'status' => 'scheduled' // Add status if your table has it
+                'status' => 'scheduled' 
             ]);
 
-            // Update room availability if you're using that table
             if (class_exists('RoomAvailability')) {
                 RoomAvailability::updateOrCreate(
                     [
@@ -234,7 +224,6 @@ public function assignExam(Request $request, $id)
             }
         }
 
-        // Update exam request status
         $examRequest->update([
             'status' => \App\Enums\ExamRequestStatus::APPROVED,
             // 'scheduled_at' => now()

@@ -7418,6 +7418,8 @@ left: 1102px; */
     -webkit-box-pack: justify;
     -ms-flex-pack: justify;
     justify-content: space-between;
+    /* flex-wrap: wrap;
+    gap: 12px; */
 }
 .exam-last-div {
     display: -webkit-box;
@@ -8280,30 +8282,6 @@ html .ui-button.ui-state-disabled:active {
     letter-spacing: 0%;
     color: #000606;
 }
-
-
-.assign-column select {
-    width: 400px;
-    height: 48px;
-    -webkit-box-pack: justify;
-    -ms-flex-pack: justify;
-    justify-content: space-between;
-    opacity: 1;
-    border-radius: 8px;
-    padding-right: 12px;
-    padding-left: 12px;
-    border-width: 1px;
-    border: 1px solid #6A6A6A;
-    background: #FFFFFF;
-    font-family: Urbanist;
-    font-weight: 400;
-    font-style: Regular;
-    font-size: 14px;
-    line-height: 20px;
-    letter-spacing: 0%;
-    color: #000606;
-}
-
 .assign-column img {
     position: absolute;
     width: 20px;
@@ -9166,5 +9144,51 @@ svg {
 .checkbox-wrp label input[type="checkbox"]{
     accent-color: rgba(26, 147, 46, 1);
 }
+/* .ui-datepicker select.ui-datepicker-month, .ui-datepicker select.ui-datepicker-year{
+    height: auto;
+    cursor: pointer;
+}
+.ui-widget-header .ui-icon{
+    background-image: url(./images/leftarrow.svg);
+    background-position: center;
+    cursor: pointer;
+}
+.ui-datepicker .ui-datepicker-prev span, .ui-datepicker .ui-datepicker-next span{
+    margin-top: 0;
+}
+.ui-datepicker .ui-datepicker-next span{
+    background-image: url(./images/rightarrow.svg);
+}
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus, .ui-button:hover, .ui-button:focus {
+    border: 0;
+    background: #fff;
+    font-weight: normal;
+    color: #000;
+} */
 
 /* End Of SS271125 */
+
+/* SS011225 Begin */
+
+/* .exm-type-dropdown select{
+    font-size: 24px;
+    width: auto;
+    background-image: url(./images/dropdown-arrowpopup.svg);
+    background-position: right 12px center;
+    background-size: 16px;
+    background-repeat: no-repeat;
+    padding-right: 30px;
+    cursor: pointer;
+}
+.exm-type-dropdown{
+    width: auto;
+    display: inline-block;
+}
+.ds-pr-body:has(.tab-switch.chng-fltr.active) .dn-for-non-active{
+    display: none;
+}
+.ds-pr-body:has(.tab-switch.chng-fltr) .dn-for-non-active{
+    display: block;
+} */
+
+/* End Of SS011225 */

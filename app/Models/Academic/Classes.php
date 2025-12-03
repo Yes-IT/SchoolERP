@@ -76,6 +76,19 @@ class Classes extends BaseModel
     }
 
    
+    // public function teachers()
+    // {
+    //     return $this->belongsToMany(
+    //         Staff::class,
+    //         'student_class_mapping',
+    //         'class_id',
+    //         'teacher_id'
+    //     )->withPivot('status')
+    //     ->where('role_id', 5);
+    // }
+
+
+  // In Classes model
     public function teachers()
     {
         return $this->belongsToMany(
@@ -83,10 +96,8 @@ class Classes extends BaseModel
             'student_class_mapping',
             'class_id',
             'teacher_id'
-        )->withPivot('status')
-        ->where('role_id', 5);
+        )->withPivot('status');
     }
-
 
 
     // public function schoolYear()

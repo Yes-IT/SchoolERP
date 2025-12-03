@@ -29,15 +29,15 @@
         </ul>
     </div>
     <div class="ds-pr-body">
-        <div class="atndnc-filter-wrp w-100">
+        <div class="atndnc-filter-wrp w-100 dn-for-non-active">
             <div class="sec-head">
                 <h2>Filters</h2>
             </div>
             <div class="atndnc-filter">
                 <form>
                     <div class="atndnc-filter-form">
-                        <div class="atndnc-filter-options">
-                            <!-- Subject Multi‑Select Dropdown -->
+                        <div class="atndnc-filter-options flex-row">
+                           
                             <div class="dropdown subject-dropdown selectisub">
                                 <button type="button" class="dropdown-toggle">
                                 <span class="label">Select Year</span>
@@ -81,7 +81,7 @@
                                 </div>
                             </div>
                         
-                            <!-- Year/Month Picker Dropdown -->
+                           
                             <div class="dropdown subject-dropdown selectisub">
                                 <button type="button" class="dropdown-toggle">
                                 <span class="label">Select Semester</span>
@@ -105,40 +105,265 @@
                             </div>
                         </div>
                     
-                        <!-- Search Button -->
+                        
                         <button type="submit" class="btn-search">Search</button>
                     </div>
                 </form>
             </div> 
         </div>
-        <div class="ds-cmn-table-wrp table-width">
+        <div class="ds-cmn-table-wrp table-width tab-wrapper">
+
+               <div class="exam-type-div">
+
+
+                    <div class="cmn-tab-head">
+                        <ul>
+                            <li class="tab-bg"></li>
+                            <li class="tab-switch active" data-tab="current-tab">Upcoming Examination</li>
+                            <li class="tab-switch chng-fltr" data-tab="closed-tab">Requested Examination</li>
+                        </ul>
+                    </div>
+                    <div class="exam-last-div">
+                        <p class="exm-req addExamRequest">+ Add Exam Request</p>
+                        <div class="dropdown-container-sub dn-for-non-active">
+                            <p class="allsub" id="dropdownToggle">
+                                All Subjects
+                                <span><img src="./images/arrow-white-up.svg" id="dropdownArrow-sub" /></span>
+                            </p>
+                            <ul class="dropdown-menu-sub" id="dropdownMenu-sub">
+                                <li>All Subjects</li>
+                                <li>My Subjects</li>
+                            </ul>
+                         </div>
+                        <p class="download-list">Download List</p>
+                    </div>
+                </div>
+
+                <div class="input-grp exm-type-dropdown dn-for-non-active">
+                    <select>
+                        <option value="select">Exam Type</option>
+                        <option value="all">All Subjects</option>
+                        <option value="my-subjects">My Subjects</option>
+                    </select>
+                </div>
+                <button class="exam-btn">Exam Type <img src="{{asset('staff/assets/images/uparrow.svg')}}" class="examarrow" /></button>
+
+                 <div id="upcomingContainer">
+                    <table  class="ds-cmn-tble">
+                        <thead>
+                            <tr>
+                                <th>S. No</th>
+                                <th>Subject</th>
+                                <th>Date</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Duration</th>
+                                <th>Room No.</th>
+                                <th>Marks(Max..)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+
+                            @forelse($upcomingExams as $index => $exam)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $exam->subject->name ?? 'N/A' }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($exam->exam_date)->format('d/m/Y') }}</td>
+                                    <td>{{ $exam->start_time }}</td>
+                                    <td>{{ $exam->end_time }}</td>
+                                    <td>{{ $exam->duration }} mins</td>
+                                    <td>{{ $exam->room->room_no ?? '-' }}</td>
+                                    <td>{{ $exam->marks ?? '100' }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="8" style="text-align:center;">No upcoming exams.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+
+                  <button class="exam-btn">Exam Type <img src="{{asset('staff/assets/images/uparrow.svg')}}" class="examarrow" /></button>
+                 </div>
+
+
+                
+                <div id="requestedContainer" >
+                    <table  class="ds-cmn-tble">
+                        <thead>
+                            <tr>
+                                <th>S. No</th>
+                                <th>Exam Type</th>
+                                <th>Subject</th>
+                                <th> Date</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Room No.</th>
+                                <th>Duration</th>
+                                <th>Marks(Max..)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                          
+                            
+                            @forelse($requestedExams as $index => $exam)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $exam->examType->name ?? 'N/A' }}</td>
+                                    <td>{{ $exam->subject->name ?? 'N/A' }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($exam->exam_date)->format('m/d/Y') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($exam->start_time)->format('H:i') }} </td>
+                                    <td>{{ \Carbon\Carbon::parse($exam->end_time)->format('H:i') }}</td>
+                                    <td>{{ $exam->room->room_no ?? '-' }}</td>
+                                    <td>{{ $exam->duration }} mins</td>
+                                    <td>{{ $exam->marks ?? '100' }}</td>
+                                    <td>
+                                        @if($exam->status == 'pending')
+                                            <span style="color:orange;">Pending</span>
+                                        @elseif($exam->status == 'approved')
+                                            <span style="color:green;">Approved</span>
+                                        @elseif($exam->status == 'rejected')
+                                            <span style="color:red;">Rejected</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" style="text-align:center;">No requested exams.</td>
+                                </tr>
+                            @endforelse
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>   
+        </div>
+    </div>   
+
+    {{-- <div class="ds-pr-body">
+
+        <div class="atndnc-filter-wrp w-100 dn-for-non-active">
+            <div class="sec-head">
+                <h2>Filters</h2>
+            </div>
+            <div class="atndnc-filter">
+                <form>
+                    <div class="atndnc-filter-form">
+                        <div class="atndnc-filter-options flex-row">
+                            <!-- Subject Multi‑Select Dropdown -->
+                            <div class="dropdown subject-dropdown selectisub">
+                                <button type="button" class="dropdown-toggle">
+                                    <span class="label">Select Year</span>
+                                    <img src="./images/down-arrow-5.svg" class="arrow-att" />
+                                </button>
+                                <div class="dropdown-menu">
+                                    <label>
+                                        <input type="checkbox" value="all" checked /> All Subjects
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" value="1" /> Lorem ipsum dolor sit amet
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" value="2" /> Lorem ipsum dolor sit amet
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" value="3" /> Lorem ipsum dolor sit amet
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="dropdown subject-dropdown selectisub">
+                                <button type="button" class="dropdown-toggle">
+                                    <span class="label">Select Year Status</span>
+                                    <img src="./images/down-arrow-5.svg" class="arrow-att" />
+
+                                </button>
+                                <div class="dropdown-menu">
+                                    <label>
+                                        <input type="checkbox" value="all" checked /> All Subjects
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" value="1" /> Lorem ipsum dolor sit amet
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" value="2" /> Lorem ipsum dolor sit amet
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" value="3" /> Lorem ipsum dolor sit amet
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Year/Month Picker Dropdown -->
+                            <div class="dropdown subject-dropdown selectisub">
+                                <button type="button" class="dropdown-toggle">
+                                    <span class="label">Select Semester</span>
+                                    <img src="./images/down-arrow-5.svg" class="arrow-att" />
+
+                                </button>
+                                <div class="dropdown-menu">
+                                    <label>
+                                        <input type="checkbox" value="all" checked /> All Subjects
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" value="1" /> Lorem ipsum dolor sit amet
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" value="2" /> Lorem ipsum dolor sit amet
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" value="3" /> Lorem ipsum dolor sit amet
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Search Button -->
+                        <button type="submit" class="btn-search">Search</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="ds-cmn-table-wrp table-width tab-wrapper">
 
             <div class="exam-type-div">
-                <div class="examtype-text-btn">
-                    <span class="upcoming">Upcoming Examination</span> 
-                    <span class="requested">Requested Examination</span>
-                   
+                <!-- <div class="examtype-text-btn"><span class="upcoming">Upcoming Examination</span> <span class="requested">Requested Examination</span></div> -->
+                <div class="cmn-tab-head">
+                    <ul>
+                        <li class="tab-bg"></li>
+                        <li class="tab-switch active" data-tab="current-tab">Upcoming Examination</li>
+                        <li class="tab-switch chng-fltr" data-tab="closed-tab">Requested Examination</li>
+                    </ul>
                 </div>
-                    <div class="exam-last-div">
-                        <p class="exm-req">+ Add Exam Request</p>
-                        <div class="dropdown-container-sub">
+                <div class="exam-last-div">
+                    <p class="exm-req addExamRequest">+ Add Exam Request</p>
+                    <div class="dropdown-container-sub dn-for-non-active">
                         <p class="allsub" id="dropdownToggle">
                             All Subjects
-                            <span><img src="{{asset('staff/assets/images/arrow-white-up.svg')}}" id="dropdownArrow-sub" /></span>
+                            <span><img src="./images/arrow-white-up.svg" id="dropdownArrow-sub" /></span>
                         </p>
                         <ul class="dropdown-menu-sub" id="dropdownMenu-sub">
                             <li>All Subjects</li>
                             <li>My Subjects</li>
                         </ul>
-                        </div>
-                        <p class="download-list">Download List</p>
                     </div>
-                </div>
-                <button class="exam-btn">Exam Type <img src="{{asset('staff/assets/images/uparrow.svg')}}" class="examarrow" /></button>
 
-                <!-- <div class="submit-align"> -->
-                <table>
-                    <thead>
+                    <p class="download-list">Download List</p>
+                </div>
+            </div>
+            <div class="input-grp exm-type-dropdown dn-for-non-active">
+                <select>
+                    <option value="select">Exam Type</option>
+                    <option value="all">All Subjects</option>
+                    <option value="my-subjects">My Subjects</option>
+                </select>
+            </div>
+
+            <!-- <div class="submit-align"> -->
+            <table class="ds-cmn-tble">
+                <thead>
                     <tr>
                         <th>S. No</th>
                         <th>Subject</th>
@@ -149,116 +374,233 @@
                         <th>Room No.</th>
                         <th>Marks(Max..)</th>
                     </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Lorem ipsum dolor sit amet</td>
-                            <td>04/02/2025</td>
-                            <td>09:30:30</td>
-                            <td>10:30:30</td>
-                            <td>90</td>
-                            <td>12</td>
-                            <td>100</td>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Lorem ipsum dolor sit amet</td>
+                        <td>04/02/2025</td>
+                        <td>09:30:30</td>
+                        <td>10:30:30</td>
+                        <td>90</td>
+                        <td>12</td>
+                        <td>100</td>
 
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Lorem ipsum dolor sit amet, conse</td>
-                            <td>04/02/2025</td>
-                            <td>09:30:30</td>
-                            <td>10:30:30</td>
-                            <td>90</td>
-                            <td>11</td>
-                            <td>100</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Lorem ipsum dolor sit amet, conse</td>
+                        <td>04/02/2025</td>
+                        <td>09:30:30</td>
+                        <td>10:30:30</td>
+                        <td>90</td>
+                        <td>11</td>
+                        <td>100</td>
 
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Lorem ipsum dolor sit amet</td>
-                            <td>04/02/2025</td>
-                            <td>09:30:30</td>
-                            <td>10:30:30</td>
-                            <td>90</td>
-                            <td>11</td>
-                            <td>100</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Lorem ipsum dolor sit amet</td>
+                        <td>04/02/2025</td>
+                        <td>09:30:30</td>
+                        <td>10:30:30</td>
+                        <td>90</td>
+                        <td>11</td>
+                        <td>100</td>
 
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>Lorem ipsum dolor sit amet, conse</td>
-                            <td>04/02/2025</td>
-                            <td>09:30:30</td>
-                            <td>10:30:30</td>
-                            <td>90</td>
-                            <td>11</td>
-                            <td>100</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Lorem ipsum dolor sit amet, conse</td>
+                        <td>04/02/2025</td>
+                        <td>09:30:30</td>
+                        <td>10:30:30</td>
+                        <td>90</td>
+                        <td>11</td>
+                        <td>100</td>
 
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td>Lorem ipsum dolor sit amet</td>
-                            <td>04/02/2025</td>
-                            <td>09:30:30</td>
-                            <td>10:30:30</td>
-                            <td>90</td>
-                            <td>11</td>
-                            <td>100</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Lorem ipsum dolor sit amet</td>
+                        <td>04/02/2025</td>
+                        <td>09:30:30</td>
+                        <td>10:30:30</td>
+                        <td>90</td>
+                        <td>11</td>
+                        <td>100</td>
 
-                        </tr>
-                        <tr>
-                            <td>6</td>
-                            <td>Lorem ipsum dolor sit amet, conse</td>
-                            <td>04/02/2025</td>
-                            <td>09:30:30</td>
-                            <td>10:30:30</td>
-                            <td>90</td>
-                            <td>11</td>
-                            <td>100</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Lorem ipsum dolor sit amet, conse</td>
+                        <td>04/02/2025</td>
+                        <td>09:30:30</td>
+                        <td>10:30:30</td>
+                        <td>90</td>
+                        <td>11</td>
+                        <td>100</td>
 
-                        </tr>
-                        <tr>
-                            <td>7</td>
-                            <td>Lorem ipsum dolor sit amet</td>
-                            <td>04/02/2025</td>
-                            <td>09:30:30</td>
-                            <td>10:30:30</td>
-                            <td>90</td>
-                            <td>11</td>
-                            <td>100</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>Lorem ipsum dolor sit amet</td>
+                        <td>04/02/2025</td>
+                        <td>09:30:30</td>
+                        <td>10:30:30</td>
+                        <td>90</td>
+                        <td>11</td>
+                        <td>100</td>
 
-                        </tr>
-                        <tr>
-                            <td>8</td>
-                            <td>Lorem ipsum dolor sit amet, conse</td>
-                            <td>04/02/2025</td>
-                            <td>09:30:30</td>
-                            <td>10:30:30</td>
-                            <td>90</td>
-                            <td>11</td>
-                            <td>100</td>
-                            
-                        </tr>
-                        <tr>
-                            <td>9</td>
-                            <td>Lorem ipsum dolor sit amet</td>
-                            <td>04/02/2025</td>
-                            <td>09:30:30</td>
-                            <td>10:30:30</td>
-                            <td>90</td>
-                            <td>11</td>
-                            <td>100</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>Lorem ipsum dolor sit amet, conse</td>
+                        <td>04/02/2025</td>
+                        <td>09:30:30</td>
+                        <td>10:30:30</td>
+                        <td>90</td>
+                        <td>11</td>
+                        <td>100</td>
 
-                        </tr>
-                    </tbody>
-                </table>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>Lorem ipsum dolor sit amet</td>
+                        <td>04/02/2025</td>
+                        <td>09:30:30</td>
+                        <td>10:30:30</td>
+                        <td>90</td>
+                        <td>11</td>
+                        <td>100</td>
 
-                <button class="exam-btn">Exam Type <img src="{{asset('staff/assets/images/uparrow.svg')}}" class="examarrow" /></button>
-                <!-- </div> -->
-            </div>   
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="ds-cmn-tble">
+                <thead>
+                    <tr>
+                        <th>S. No 2</th>
+                        <th>Subject</th>
+                        <th>Date</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Duration</th>
+                        <th>Room No.</th>
+                        <th>Marks(Max..)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Lorem ipsum dolor sit amet</td>
+                        <td>04/02/2025</td>
+                        <td>09:30:30</td>
+                        <td>10:30:30</td>
+                        <td>90</td>
+                        <td>12</td>
+                        <td>100</td>
+
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Lorem ipsum dolor sit amet, conse</td>
+                        <td>04/02/2025</td>
+                        <td>09:30:30</td>
+                        <td>10:30:30</td>
+                        <td>90</td>
+                        <td>11</td>
+                        <td>100</td>
+
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Lorem ipsum dolor sit amet</td>
+                        <td>04/02/2025</td>
+                        <td>09:30:30</td>
+                        <td>10:30:30</td>
+                        <td>90</td>
+                        <td>11</td>
+                        <td>100</td>
+
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Lorem ipsum dolor sit amet, conse</td>
+                        <td>04/02/2025</td>
+                        <td>09:30:30</td>
+                        <td>10:30:30</td>
+                        <td>90</td>
+                        <td>11</td>
+                        <td>100</td>
+
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Lorem ipsum dolor sit amet</td>
+                        <td>04/02/2025</td>
+                        <td>09:30:30</td>
+                        <td>10:30:30</td>
+                        <td>90</td>
+                        <td>11</td>
+                        <td>100</td>
+
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Lorem ipsum dolor sit amet, conse</td>
+                        <td>04/02/2025</td>
+                        <td>09:30:30</td>
+                        <td>10:30:30</td>
+                        <td>90</td>
+                        <td>11</td>
+                        <td>100</td>
+
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>Lorem ipsum dolor sit amet</td>
+                        <td>04/02/2025</td>
+                        <td>09:30:30</td>
+                        <td>10:30:30</td>
+                        <td>90</td>
+                        <td>11</td>
+                        <td>100</td>
+
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>Lorem ipsum dolor sit amet, conse</td>
+                        <td>04/02/2025</td>
+                        <td>09:30:30</td>
+                        <td>10:30:30</td>
+                        <td>90</td>
+                        <td>11</td>
+                        <td>100</td>
+
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>Lorem ipsum dolor sit amet</td>
+                        <td>04/02/2025</td>
+                        <td>09:30:30</td>
+                        <td>10:30:30</td>
+                        <td>90</td>
+                        <td>11</td>
+                        <td>100</td>
+
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- <button class="exam-btn">Exam Type <img src="./images/uparrow.svg" class="examarrow" /></button> -->
+            <!-- </div> -->
         </div>
-    </div>   
-    
+
+
+    </div>
+     --}}
     
     <!-- popup request exam-->
         <div class="request-overlay" style="display: none;">
@@ -267,7 +609,7 @@
                     @csrf
 
                     
-                    <p class="request-heading">Request Modal <span><img src="{{asset('staff/assets/images/reqCross.svg')}}" class="requestClose" /></span></p>
+                    <p class="request-heading">Request Exam <span><img src="{{asset('staff/assets/images/reqCross.svg')}}" class="requestClose" /></span></p>
 
                     <div class="req-type">
                         <p class="req-exam">Exam Type</p>
@@ -414,6 +756,31 @@
         
         });
     });
+</script>
+<script>
+
+//    document.addEventListener('DOMContentLoaded', function () {
+//        document.querySelector('.upcoming').classList.add('active');
+
+//         document.querySelector('.upcoming').addEventListener('click', function () {
+//             document.querySelector('.upcoming').classList.add('active');
+//             document.querySelector('.requested').classList.remove('active');
+
+//             document.getElementById('upcomingContainer').style.display = 'block';
+//             document.getElementById('requestedContainer').style.display = 'none';
+//         });
+
+//         document.querySelector('.requested').addEventListener('click', function () {
+//             document.querySelector('.requested').classList.add('active');
+//             document.querySelector('.upcoming').classList.remove('active');
+
+//             document.getElementById('upcomingContainer').style.display = 'none';
+//             document.getElementById('requestedContainer').style.display = 'block';
+//         });
+
+//     });
+
+
 </script>
 <script>
    function populateHours(selector) {

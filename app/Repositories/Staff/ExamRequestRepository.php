@@ -37,7 +37,7 @@ class ExamRequestRepository implements ExamRequestInterface
                                     ->where('status', 'approved')
                                     ->get(['id', 'room_id', 'start_time', 'end_time']);
 
-                Log::info('All approved exams for date:', $allApprovedExams->toArray());
+                // Log::info('All approved exams for date:', $allApprovedExams->toArray());
 
                 $bookedRooms = DB::table('exam_requests')
                     ->where('exam_date', $examDate)
@@ -56,13 +56,13 @@ class ExamRequestRepository implements ExamRequestInterface
                     })
                     ->pluck('room_id');
 
-                Log::info('Booked rooms found:', ['booked_rooms' => $bookedRooms->toArray()]);
+                // Log::info('Booked rooms found:', ['booked_rooms' => $bookedRooms->toArray()]);
 
                 $availableRooms = ClassRoom::where('status', 1)
                     ->whereNotIn('id', $bookedRooms)
                     ->get(['id', 'room_no', 'capacity']);
 
-                Log::info('Available rooms query result:', ['count' => $availableRooms->count()]);
+                // Log::info('Available rooms query result:', ['count' => $availableRooms->count()]);
 
                 return $availableRooms;
 
@@ -74,5 +74,22 @@ class ExamRequestRepository implements ExamRequestInterface
                 ]);
                 throw $e;
             }
+    }
+
+    public function getUpcomingExams($teacherId)
+    {
+        return $this->model->where('status', 'approved')
+            ->where('teacher_id', $teacherId)
+            ->where('exam_date', '>=', date('Y-m-d'))
+            ->orderBy('exam_date', 'asc')
+            ->get();
+    }
+
+    public function getRequestedExams($teacherId)
+    {
+        return $this->model->whereIn('status', ['pending','rejected','updated'])
+            ->where('teacher_id', $teacherId)
+            ->orderBy('created_at', 'desc')
+            ->get();
     }
 }

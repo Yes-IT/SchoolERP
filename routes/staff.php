@@ -78,6 +78,7 @@ Route::middleware([ 'web',])->group(function () {
                 Route::get('/', 'index')->name('index')->middleware('PermissionCheck:profile_read');
             });
  
+            // Assignment Module
             Route::prefix('assignment')->name('assignment.')->controller(AssignmentController::class)->group(function () {
                 Route::get('/', 'index')->name('index')->middleware('PermissionCheck:assignment_read');
                 Route::post('/store_assignment',  'store_assignment')->name('store_assignment')->middleware('PermissionCheck:assignment_create');
@@ -87,6 +88,9 @@ Route::middleware([ 'web',])->group(function () {
                 Route::post('/evaluate-assignment-save/{id}',  'saveAssignmentEvaluation')->name('evaluateAssignmentSave')->middleware('PermissionCheck:assignment_update');
                 Route::get('/edit-assignment/{id}',  'editAssignment')->name('editAssignment')->middleware('PermissionCheck:assignment_update');
                 Route::post('/update-assignment',  'updateAssignment')->name('updateAssignment')->middleware('PermissionCheck:assignment_update');
+                Route::delete('/delete-assignment/{id}',  'deleteAssignment')->name('destroyAssignment')->middleware('PermissionCheck:assignment_delete');
+    
+
             });
 
  
@@ -104,6 +108,7 @@ Route::middleware([ 'web',])->group(function () {
  
             });
  
+            // Class & Exam Schedule
             Route::prefix('my-classes')->name('my-classes.')->controller(ExamScheduleController::class)->group(function () {
                 Route::get('/exam-schedule', 'examSchedule')->name('exam-schedule')->middleware('PermissionCheck:exam_schedule_read');
                 Route::get('/available-rooms', 'getAvailableRooms')->name('available-rooms')->middleware('PermissionCheck:exam_schedule_read');
