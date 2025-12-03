@@ -14,14 +14,38 @@ use App\Models\Upload;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class CommunicateController extends Controller
 {
 
-    public function index(){
+    public function index()
+    {
+        $teacherId = Auth::id();
 
-        return view('staff.communicate.index');
+        // 1. Messages created by this teacher
+        $myMessages = NoticeBoard::where('teacher_id', $teacherId)
+            ->with('attachmentFile') // eager load attachment
+            ->latest('date')
+            ->get();
 
+        // 2. Global notices (no specific recipient)
+        $globalNotices = NoticeBoard::whereNull('year_status_id')
+            ->whereNull('semester_id')
+            ->whereNull('class_id')
+            ->whereNull('section_id')
+            ->whereNull('student_id')
+            ->whereNull('teacher_id')
+            ->with('attachmentFile')
+            ->latest('date')
+            ->get();
+
+        // Combine both (teacher's + global), remove duplicates if any
+        $notices = $myMessages->merge($globalNotices)
+            ->sortByDesc('date')
+            ->values();
+
+        return view('staff.communicate.index', compact('notices'));
     }
 
 
@@ -50,7 +74,6 @@ class CommunicateController extends Controller
             $filename = time() . '_' . $file->getClientOriginalName();
             $path     = $file->storeAs('noticeboard_attachments', $filename, 'public');
 
-            // Manual creation – bypasses mass assignment completely
             $upload           = new Upload();
             $upload->path     = $path;
             $upload->created_at = now();
@@ -85,6 +108,91 @@ class CommunicateController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Message published successfully!'
+        ]);
+    }
+
+
+
+    public function editMessage($id)
+    {
+        $notice = NoticeBoard::where('id', $id)
+            ->where('teacher_id', Auth::id())
+            ->with('attachmentFile')
+            ->firstOrFail();
+
+        return view('staff.communicate.edit-message', compact('notice'));
+    }
+
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'title'    => 'required|string|max:255',
+            'date'     => 'required|date',
+            'message'  => 'required|string',
+            'document' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240'
+        ]);
+
+        $notice = NoticeBoard::where('id', $id)
+                    ->where('teacher_id', Auth::id())
+                    ->firstOrFail();
+
+        $notice->title       = $request->title;
+        $notice->date        = $request->date;
+        $notice->publish_date = $request->date;
+        $notice->description = $request->message;
+
+        // THIS IS THE ONLY CHANGE NEEDED — EXACTLY LIKE YOUR STORE METHOD
+        if ($request->hasFile('document')) {
+            // Delete old file exactly like you would want
+            if ($notice->attachment) {
+                $old = Upload::find($notice->attachment);
+                if ($old) {
+                    Storage::disk('public')->delete($old->path);
+                    $old->delete();
+                }
+            }
+
+            // Reuse YOUR perfect upload pattern
+            $file     = $request->file('document');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path     = $file->storeAs('noticeboard_attachments', $filename, 'public');
+
+            $upload       = new Upload();
+            $upload->path = $path;
+            $upload->save();
+
+            $notice->attachment = $upload->id;
+        }
+
+        $notice->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Message updated successfully!'
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        $notice = NoticeBoard::where('id', $id)
+                    ->where('teacher_id', Auth::id())
+                    ->firstOrFail();
+
+        // Delete attachment file if exists
+        if ($notice->attachment) {
+            $upload = Upload::find($notice->attachment);
+            if ($upload) {
+                Storage::disk('public')->delete($upload->path);
+                $upload->delete();
+            }
+        }
+
+        $notice->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Message deleted successfully!'
         ]);
     }
 

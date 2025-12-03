@@ -9,7 +9,7 @@ use App\Http\Controllers\Staff\ApplyLeaveController;
 use App\Http\Controllers\Staff\ProfileController;
 use App\Http\Controllers\Staff\DepartmentController;
 use App\Http\Controllers\Staff\DesignationController;
-use App\Http\Controllers\Staff\{StudentController,ExamScheduleController};  
+use App\Http\Controllers\Staff\{StudentController,ExamScheduleController, GradeReportController};  
  
 use App\Http\Controllers\Staff\GradeController;
 use App\Http\Controllers\Staff\StaffSessionController;
@@ -128,6 +128,17 @@ Route::middleware([ 'web',])->group(function () {
         Route::post('/staff/report/attendance/search', [AttendanceReportController::class, 'search'])->name('staff.report.attendance.search');
         Route::post('/staff/report/attendance/save-comment', [AttendanceController::class, 'saveComment'])->name('staff.report.attendance.save-comment');
 
+
+        Route::get('/staff/report/grade/all-grade-report', [GradeReportController::class, 'allGrade'])->name('staff.report.grade.all-grade')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+        Route::post('/staff/report/grade/all-grade-report/search', [GradeReportController::class, 'allGradeSearch'])->name('staff.report.grade.all-grade.search')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+       
+        Route::get('/staff/report/grade/failing-grade-report', [GradeReportController::class, 'failingGrade'])->name('staff.report.grade.failing-grade')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+        Route::post('/staff/report/grade/failing-grade-report/search', [GradeReportController::class, 'failingGradeSearch'])->name('staff.report.grade.failing-grade.search')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+        
+        Route::get('/staff/report/grade/missing-grade-report', [GradeReportController::class, 'missingGrade'])->name('staff.report.grade.missing-grade')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+        Route::post('/staff/report/grade/missing-grade-report/search', [GradeReportController::class, 'missingGradeSearch'])->name('staff.report.grade.missing-grade.search')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+
+
         Route::get('/staff/grade/index', [GradeController::class, 'index'])->name('staff.grade.index')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
         Route::post('/staff/grade/assign-grades/filter', [GradeController::class, 'filterAssignGrades'])->name('staff.grade.assign-grades.filter');
         Route::post('/staff/grade/save-marks', [GradeController::class, 'saveMarks'])->name('staff.grade.save-marks');
@@ -136,6 +147,9 @@ Route::middleware([ 'web',])->group(function () {
         Route::get('/staff/communicate/index', [CommunicateController::class, 'index'])->name('staff.communicate.index')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
         Route::get('/staff/communicate/message/add', [CommunicateController::class, 'addMessage'])->name('staff.communicate.message.add')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
         Route::post('/staff/communicate/messages/store', [CommunicateController::class, 'store'])->name('staff.communicate.messages.store');
+        Route::get('/staff/communicate/message/edit/{id}', [CommunicateController::class, 'editMessage'])->name('staff.communicate.message.edit')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+        Route::put('/staff/communicate/messages/update/{id}', [CommunicateController::class, 'update'])->name('staff.communicate.messages.update')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+        Route::delete('/staff/communicate/messages/delete/{id}', [CommunicateController::class, 'destroy'])->name('staff.communicate.messages.destroy')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
 
 
         // For Global Session

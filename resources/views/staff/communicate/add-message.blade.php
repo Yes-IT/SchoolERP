@@ -2,6 +2,13 @@
 
 @section('content')
 
+@push('styles')
+    <!-- Optional: CKEditor 5 default styles (you can customize later) -->
+    <style>
+        .ck-editor__editable { min-height: 300px; }
+    </style>
+@endpush
+
 <div class="ds-breadcrumb">
     <h1>Compose New Message</h1>
     <ul>
@@ -33,12 +40,11 @@
                     <div class="assign-columndate">
                         <p class="assign-heading">Notice Date <span class="text-danger">*</span></p>
                         <input type="date" id="date" name="date" required>
-                        <img src="{{ asset('staff/assets/images/calender_s.svg') }}" style="position:absolute; right:10px; top:40px; pointer-events:none;">
                     </div>
 
                     <div class="assign-columndate">
                         <p class="assign-heading">Attachment (Optional)</p>
-                        <div class="attachment">
+                        <div class="attachment file-upload">
                             <input type="file" id="document" name="document" accept=".pdf,.doc,.docx,.jpg,.png">
                             <span>Drag and drop a file here or click</span>
                         </div>
@@ -47,6 +53,7 @@
 
                 <div class="assign-desc">
                     <p class="assign-heading">Message <span class="text-danger">*</span></p>
+                    <!-- CKEditor will replace this textarea -->
                     <textarea class="desc-column" id="message" name="message"></textarea>
                 </div>
             </div>
@@ -58,29 +65,46 @@
 
 @endsection
 
-
 @push('script')
 
 <script>
+
+    let editor; 
+
     $(document).ready(function() {
-        // Initialize Summernote
-        $('#message').summernote({
-            placeholder: 'Write your message here...',
-            height: 300,
-            focus: true
-        });
+
+        // Initialize CKEditor 5 Classic
+        ClassicEditor
+            .create(document.querySelector('#message'), {
+                placeholder: 'Write your message here...',
+                // You can add toolbar items, plugins, etc. here
+                toolbar: [
+                    'heading', '|',
+                    'bold', 'italic', 'underline', 'strikethrough', '|',
+                    'link', 'bulletedList', 'numberedList', '|',
+                    'outdent', 'indent', '|',
+                    'blockQuote', 'insertTable', '|',
+                    'undo', 'redo'
+                ],
+                
+            })
+            .then(newEditor => {
+                editor = newEditor;
+            })
+            .catch(error => {
+                console.error('CKEditor 5 error:', error);
+            });
 
         // Handle form submission via AJAX
         $('#composeMessageForm').on('submit', function(e) {
             e.preventDefault();
 
-            // Sync Summernote content to textarea
-            $('#message').summernote('code', $('#message').summernote('code'));
+            // Important: Update the textarea with CKEditor content before sending
+            if (editor) {
+                $('#message').val(editor.getData());
+            }
 
             let formData = new FormData(this);
-
-            // Optional: Append summernote content explicitly if needed
-            formData.append('message', $('#message').summernote('code'));
 
             $.ajax({
                 url: '{{ route("staff.communicate.messages.store") }}',
@@ -100,7 +124,7 @@
 
                     // Reset form
                     $('#composeMessageForm')[0].reset();
-                    $('#message').summernote('reset');
+                    if (editor) editor.setData('');   // Clear CKEditor
 
                     setTimeout(() => $('#responseAlert').slideUp(), 5000);
                 },
@@ -121,5 +145,7 @@
             });
         });
     });
+
 </script>
+
 @endpush
