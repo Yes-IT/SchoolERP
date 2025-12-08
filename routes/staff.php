@@ -139,10 +139,11 @@ Route::middleware([ 'web',])->group(function () {
         Route::post('/staff/report/grade/missing-grade-report/search', [GradeReportController::class, 'missingGradeSearch'])->name('staff.report.grade.missing-grade.search')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
 
 
-        Route::get('/staff/grade/index', [GradeController::class, 'index'])->name('staff.grade.index')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
-        Route::post('/staff/grade/assign-grades/filter', [GradeController::class, 'filterAssignGrades'])->name('staff.grade.assign-grades.filter');
-        Route::post('/staff/grade/save-marks', [GradeController::class, 'saveMarks'])->name('staff.grade.save-marks');
+         Route::get('/staff/grade/index', [GradeController::class, 'index'])->name('staff.grade.index')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
+        Route::match(['post', 'get'], 'staff/grade/assign-grades/filter', [GradeController::class, 'filterAssignGrades'])->name('staff.grade.assign-grades.filter');
 
+        Route::post('/staff/grade/save-marks', [GradeController::class, 'saveMarks'])->name('staff.grade.save-marks');
+        Route::post('/staff/grade/save-marks-batch', [GradeController::class, 'saveMarksBatch'])->name('staff.grade.save-marks-batch');
 
         Route::get('/staff/communicate/index', [CommunicateController::class, 'index'])->name('staff.communicate.index')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);
         Route::get('/staff/communicate/message/add', [CommunicateController::class, 'addMessage'])->name('staff.communicate.message.add')->middleware(['lang', 'CheckSubscription', 'FeatureCheck:staff_manage']);

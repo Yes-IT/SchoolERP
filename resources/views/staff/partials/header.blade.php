@@ -21,7 +21,7 @@
 
     <div class="pr-ctrl-menu">
         <ul>
-        <li><a href="profile.html">My Profile</a></li>
+        <li><a href="{{ route('staff.profile.index') }}">My Profile</a></li>
         <li><a href="set-password.html">Change Password</a></li>
         </ul>
     </div>

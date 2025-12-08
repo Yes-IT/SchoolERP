@@ -17,17 +17,24 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-
-class AttendanceReportController extends Controller{
-
+class AttendanceReportController extends Controller
+{
     public function index()
     {
-
         $teacherId = Auth::id();
-        $assignedClassIds = StudentClassMapping::where('teacher_id', $teacherId)->distinct()->pluck('class_id');
 
-        $classes = Classes::whereIn('id', $assignedClassIds)->get();
-        $subjects = Subject::get();
+        $assignedClassIds = StudentClassMapping::where('teacher_id', $teacherId)
+            ->distinct()
+            ->pluck('class_id');
+
+        $classes = Classes::whereIn('id', $assignedClassIds)
+            ->with('subject') 
+            ->get();
+
+        $subjectIds = $classes->pluck('subject_id')->unique();
+
+        $subjects = Subject::whereIn('id', $subjectIds)->get();
+
         $years = Session::orderByDesc('id')->get();
         $yearStatuses = YearStatus::orderByDesc('id')->get();
         $semesters = Semester::orderByDesc('id')->get();
@@ -41,7 +48,6 @@ class AttendanceReportController extends Controller{
         ));
     }
 
-    
     public function search(Request $request)
     {
         $tab      = $request->input('tab', 'month');
@@ -113,25 +119,86 @@ class AttendanceReportController extends Controller{
         }
 
         if ($tab === 'semester') {
-
             $summary = [];
+
+            // Get subject information for late counting rules
+            $subjects = Subject::whereIn('id', $classIds)->get();
+            
+            // Get classes with their subjects
+            $classesWithSubjects = Classes::whereIn('id', $classIds)
+                ->with('subject')
+                ->get()
+                ->keyBy('id');
 
             foreach ($students as $student) {
                 $studentId = $student->id;
+                $lateCounts = []; // Track late counts per class/subject
+                $absencesFromLate = []; // Track absences from excessive lates per class/subject
 
-                // 1. Excused (approved leaves)
-                $excusedCount = isset($leaveDays[$studentId]) ? count($leaveDays[$studentId]) : 0;
+                // Initialize late counts for each class
+                foreach ($classIds as $classId) {
+                    $lateCounts[$classId] = 0;
+                    $absencesFromLate[$classId] = 0;
+                }
 
-                // 2. Late count – now correctly checks for value 2
-                $lateCount = 0;
+                // 1. Process attendance records for late counting and absences
+                $absentCount = 0;
                 for ($day = 1; $day <= $maxDay; $day++) {
                     $key = "{$studentId}-{$day}";
-                    if (isset($attendanceRecords[$key]) && $attendanceRecords[$key] == 2) {
-                        $lateCount++;
+                    $attendance = $attendanceRecords[$key] ?? null;
+                    
+                    // Check if this day has attendance for any of the selected classes
+                    $hasAttendanceForDay = false;
+                    $lateForDay = 0;
+
+                    foreach ($classIds as $classId) {
+                        $attendanceKey = "{$studentId}-{$day}-{$classId}";
+                        $specificAttendance = $attendanceRecords[$attendanceKey] ?? null;
+                        
+                        if ($specificAttendance !== null) {
+                            $hasAttendanceForDay = true;
+                            
+                            // Count direct absences (attendance = 3)
+                            if ($specificAttendance == 3) {
+                                $absentCount++;
+                            }
+                            
+                            // Count lates (attendance = 2)
+                            if ($specificAttendance == 2) {
+                                $lateCounts[$classId]++;
+                                $lateForDay++;
+                            }
+                        }
+                    }
+
+                    // If no attendance record for the day and not on leave, count as not counted
+                    if (!$hasAttendanceForDay && !isset($leaveDays[$studentId][$day])) {
+                        // You might want to count this as absent or handle differently
+                        // For now, we'll just track it as not counted
                     }
                 }
 
-                // 3. Not Counted = no attendance record AND not on leave
+                // 2. Calculate absences from excessive lates per subject/class
+                foreach ($classIds as $classId) {
+                    $subject = $classesWithSubjects[$classId]->subject ?? null;
+                    if ($subject && isset($lateCounts[$classId])) {
+                        $numberLatenessesEqualAbsence = (int) $subject->number_latenesses_equal_absence;
+                        
+                        if ($numberLatenessesEqualAbsence > 0) {
+                            $absencesFromLates = floor($lateCounts[$classId] / $numberLatenessesEqualAbsence);
+                            $absencesFromLate[$classId] = $absencesFromLates;
+                            $absentCount += $absencesFromLates;
+                        }
+                    }
+                }
+
+                // 3. Excused (approved leaves)
+                $excusedCount = isset($leaveDays[$studentId]) ? count($leaveDays[$studentId]) : 0;
+
+                // 4. Total late count (across all classes)
+                $totalLateCount = array_sum($lateCounts);
+
+                // 5. Not Counted = no attendance record AND not on leave
                 $notCounted = 0;
                 for ($day = 1; $day <= $maxDay; $day++) {
                     $key = "{$studentId}-{$day}";
@@ -143,32 +210,42 @@ class AttendanceReportController extends Controller{
                     }
                 }
 
+                // 6. Calculate percentages and points (assuming points are absences for now)
+                $totalPossibleDays = $maxDay;
+                $totalAbsences = $absentCount; // Direct absences + absences from lates
+                $attendancePercentage = $totalPossibleDays > 0 ? 
+                    round((($totalPossibleDays - $totalAbsences) / $totalPossibleDays) * 100, 2) : 0;
+
                 $summary[] = [
-                    'student'     => $student,
-                    'excused'     => $excusedCount,
-                    'late'        => $lateCount,
-                    'not_counted' => $notCounted,
+                    'student'                 => $student,
+                    'excused'                 => $excusedCount,
+                    'late'                    => $totalLateCount,
+                    'absences_direct'         => $absentCount - array_sum($absencesFromLate), // Only direct absences
+                    'absences_from_late'      => array_sum($absencesFromLate), // Absences from excessive lates
+                    'total_absences'          => $totalAbsences,
+                    'not_counted'             => $notCounted,
+                    'attendance_percentage'   => $attendancePercentage,
+                    'points'                  => $totalAbsences, // Points as absences for now
+                    'late_details'            => $lateCounts, // Per class late counts
+                    'absences_from_late_details' => $absencesFromLate, // Per class late-based absences
                 ];
             }
 
-            $html = view('staff.report.attendance.partials.semester-total', ['summary' => $summary])->render();
+            $html = view('staff.report.attendance.partials.semester-total', [
+                'summary' => $summary,
+                'maxDay' => $maxDay
+            ])->render();
 
-        }else{
-
-            // Render Blade view
+        } else {
+            // Render Blade view for month-wise
             $html = view('staff.report.attendance.partials.month-wise-table', [
                 'students'          => $students,
                 'maxDay'            => $maxDay,
                 'attendanceRecords' => $attendanceRecords,
                 'leaveDays'         => $leaveDays,
             ])->render();
-
         }
         
-
         return response()->json(['html' => $html]);
     }
-
-
-
 }

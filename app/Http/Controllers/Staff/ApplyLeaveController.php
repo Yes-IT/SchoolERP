@@ -64,6 +64,9 @@ class ApplyLeaveController extends Controller
         $leave->from_date = $validated['from_date'];
         $leave->to_date = $validated['to_date'];
         $leave->reason = $validated['reason'];
+        $leave->session_id  = currentSession()->session_id;
+        $leave->semester_id = currentSession()->semester_id;
+        $leave->year_status_id  = currentSession()->year_status_id;
         $leave->apply_date = now();
         $leave->is_approved = 0;
         $leave->save();

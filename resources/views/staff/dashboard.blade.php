@@ -26,38 +26,52 @@
         </div>
 
         <div class="attendance-card">
-        <div class="attendance-header">
-            <a href="{{ route('staff.report.attendance.index') }}" class="view-report">View Reports</a>
-            <h2>Student Attendance Today</h2>
-        </div>
-        <div class="bar-row">
-            <div class="bar-label"><span>7 Present</span><span>12.96%</span></div>
-            <div class="progress-bar">
-            <div class="bar-fill" style="width: 10%;"></div>
-            </div>
-        </div>
 
-        <div class="bar-row">
-            <div class="bar-label"><span>2 Absent</span><span>3.70%</span></div>
-            <div class="progress-bar">
-            <div class="bar-fill" style="width: 12.96%;"></div>
+            <div class="attendance-header">
+                <a href="{{ route('staff.report.attendance.index') }}" class="view-report">View Reports</a>
+                <h2>Student Attendance Today</h2>
             </div>
-        </div>
 
-        <div class="bar-row">
-            <div class="bar-label"><span>0 Late</span><span>12.96%</span></div>
-            <div class="progress-bar">
-            <div class="bar-fill" style="width: 12.96%;"></div>
+            <div class="bar-row">
+                <div class="bar-label">
+                    <span>{{ $todayAttendance['present'] }} Present</span>
+                    <span>{{ $todayAttendance['present_percent'] }}%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="bar-fill present" style="width: {{ $todayAttendance['present_percent'] }}%;"></div>
+                </div>
             </div>
-        </div>
 
-        <div class="bar-row">
-            <div class="bar-label"><span>2 Approved Leaves</span><span>1.70%</span></div>
-            <div class="progress-bar">
-            <div class="bar-fill" style="width: 12.96%;"></div>
+            <div class="bar-row">
+                <div class="bar-label">
+                    <span>{{ $todayAttendance['absent'] }} Absent</span>
+                    <span>{{ $todayAttendance['absent_percent'] }}%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="bar-fill absent" style="width: {{ $todayAttendance['absent_percent'] }}%;"></div>
+                </div>
             </div>
-        </div>
-        <!-- </div> -->
+
+            <div class="bar-row">
+                <div class="bar-label">
+                    <span>{{ $todayAttendance['late'] }} Late</span>
+                    <span>{{ $todayAttendance['late_percent'] }}%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="bar-fill late" style="width: {{ $todayAttendance['late_percent'] }}%;"></div>
+                </div>
+            </div>
+
+            <div class="bar-row">
+                <div class="bar-label">
+                    <span>{{ $todayAttendance['leave'] }} Approved Leaves</span>
+                    <span>{{ $todayAttendance['leave_percent'] }}%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="bar-fill leave" style="width: {{ $todayAttendance['leave_percent'] }}%;"></div>
+                </div>
+            </div>
+            
         </div>
 
         <div class="dsbdy-bottom w65">

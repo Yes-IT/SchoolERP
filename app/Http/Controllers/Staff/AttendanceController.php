@@ -20,6 +20,8 @@ class AttendanceController extends Controller
     {
         $teacherId = Auth::id();
 
+        $data['title'] = 'Attendance';
+
         // Get classes assigned to this teacher
         $assignedClassIds = StudentClassMapping::where('teacher_id', $teacherId)
             ->distinct()
@@ -28,7 +30,7 @@ class AttendanceController extends Controller
         $classes = Classes::whereIn('id', $assignedClassIds)->get();
         $subjects = Subject::orderBy('name')->get();
 
-        return view('staff.attendance.index', compact('classes', 'subjects'));
+        return view('staff.attendance.index', compact('classes', 'subjects', 'data'));
     }
 
 
@@ -157,8 +159,11 @@ class AttendanceController extends Controller
             $dataToSave[] = [
                 'classes_id'   => $classId,
                 'student_id'   => $studentId,
+                'session_id'   => currentSession()->session_id,
+                'year_status_id'   => currentSession()->year_status_id,
+                'semester_id'   => currentSession()->semester_id,
                 'date'         => $date,
-                'attendance'   => $status, // 1, 2, or 3
+                'attendance'   => $status,
                 'created_at'   => now(),
                 'updated_at'   => now(),
             ];

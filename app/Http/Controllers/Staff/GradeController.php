@@ -57,7 +57,7 @@ class GradeController extends Controller{
         $sessionId  = $request->year_id;
         $semesterId = $request->semester_id;
         $classId    = $request->class_id;
-        $perPage    = in_array($request->per_page, [10,25,50,100]) ? $request->per_page : 20;
+        $perPage    = $request->per_page;
 
         $paginator = StudentClassMapping::with('student')
             ->where('teacher_id', $teacherId)
@@ -136,21 +136,69 @@ class GradeController extends Controller{
             'message' => 'Marks saved successfully'
         ]);
     }
+    
 
-    // Optional helper
+    public function saveMarksBatch(Request $request)
+    {
+        $request->validate([
+            'marks' => 'required|array',
+            'marks.*.student_id' => 'required|exists:students,id',
+            'marks.*.marks_achieved' => 'required|numeric|min:0|max:100',
+            'year_id' => 'required',
+            'year_status_id' => 'required',
+            'semester_id' => 'required',
+            'class_id' => 'required',
+        ]);
+
+        $savedGrades = [];
+
+        foreach ($request->marks as $mark) {
+            $data = [
+                'student_id'     => $mark['student_id'],
+                'session_id'     => $request->year_id,
+                'semester_id'    => $request->semester_id,
+                'classes_id'     => $request->class_id,
+                'percentage'     => $mark['marks_achieved'],
+                'updated_by'     => Auth::id(),
+                'updated_at'     => now(),
+            ];
+
+            Grade::updateOrCreate(
+                [
+                    'student_id'  => $mark['student_id'],
+                    'session_id'  => $request->year_id,
+                    'semester_id' => $request->semester_id,
+                    'classes_id'  => $request->class_id,
+                ],
+                $data
+            );
+
+            $savedGrades[$mark['student_id']] = $this->calculateGrade($mark['marks_achieved']);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Marks saved successfully',
+            'grades' => $savedGrades
+        ]);
+    }
+    
+    
     private function calculateGrade($marks)
     {
         if ($marks === null) {
             return '-';
         }
 
-        $gradeMap = GradeMap::where('grade_input', '<=', $marks)
-            ->orderByDesc('grade_input')
-            ->first();
+        $marks = (int) round($marks);
 
-        return $gradeMap ? $gradeMap->grade : 'F';
+        // Cast grade_input to integer in the query to fix string comparison issues
+        $gradeMap = GradeMap::whereRaw('CAST(grade_input AS UNSIGNED) <= ?', [$marks])
+                            ->orderByDesc(DB::raw('CAST(grade_input AS UNSIGNED)'))
+                            ->first();
+
+        return $gradeMap?->grade ?? 'F';
     }
-
 
 
 }

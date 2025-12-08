@@ -49,7 +49,6 @@ class GradeReportController extends Controller{
     {
         $request->validate([
             'year_id'        => 'required|exists:sessions,id',
-            'semester_id'    => 'required|exists:semesters,id',
             'class_id'       => 'required|exists:classes,id',
             'year_status_id' => 'nullable|exists:year_status,id',
             'subject_id'     => 'nullable|exists:subjects,id',
@@ -61,7 +60,27 @@ class GradeReportController extends Controller{
         $yearStatusId  = $request->year_status_id;
         $teacherId = Auth::id();
 
-        // Step 1: Get active students in this class (status = 1)
+        // Check if "Full Year" option is selected
+        if ($semesterId === 'all') {
+            // Handle Full Year logic - Return full_year_grade_list view
+            return $this->handleFullYearGrades($yearId, $classId, $yearStatusId, $teacherId);
+        } else {
+            // Original logic for regular semester selection
+            return $this->handleSemesterGrades($yearId, $semesterId, $classId, $yearStatusId, $teacherId);
+        }
+
+    }
+
+    private function handleFullYearGrades($yearId, $classId, $yearStatusId, $teacherId)
+    {
+       
+        return view('staff.report.grade.partials.full_year_grade_list')->render();
+    }
+
+
+    private function handleSemesterGrades($yearId, $semesterId, $classId, $yearStatusId, $teacherId)
+    {
+        
         $mappings = DB::table('student_class_mapping')
             ->where('class_id', $classId)
             ->where('status', 1)
@@ -132,7 +151,7 @@ class GradeReportController extends Controller{
 
     public function failingGrade()
     {
-        $years        = Session::orderByDesc('id')->get();         // Session = academic year
+        $years        = Session::orderByDesc('id')->get();
         $yearStatuses = YearStatus::orderByDesc('id')->get();
         $semesters    = Semester::orderByDesc('id')->get();
 
@@ -218,18 +237,23 @@ class GradeReportController extends Controller{
 
     }
 
+    
     public function missingGradeSearch(Request $request)
     {
         $request->validate([
             'year_id'        => 'required|exists:sessions,id',
             'year_status_id' => 'nullable|exists:year_status,id',
             'semester_id'    => 'required|exists:semesters,id',
+            'page'           => 'nullable|integer|min:1',
+            'per_page'       => 'nullable|integer|in:1,2,3,4', // Match options in pagination blade
         ]);
 
         $teacherId     = Auth::id();
         $yearId        = $request->year_id;
         $semesterId    = $request->semester_id;
         $yearStatusId  = $request->year_status_id;
+        $page          = $request->input('page', 1);
+        $perPage       = $request->input('per_page', 1); // Default to 1, as per your pagination blade options
 
         // 1. Get all active class-subject combinations this teacher is assigned to
         $assignedMappings = StudentClassMapping::where('teacher_id', $teacherId)
@@ -239,7 +263,13 @@ class GradeReportController extends Controller{
             ->get();
 
         if ($assignedMappings->isEmpty()) {
-            return view('staff.report.grade.partials.missing_grade_list', ['missing' => collect()])->render();
+            $missing = collect();
+            $paginator = new \Illuminate\Pagination\LengthAwarePaginator($missing, 0, $perPage, $page);
+            return view('staff.report.grade.partials.missing_grade_list', [
+                'missing' => $missing,
+                'paginator' => $paginator,
+                'routeName' => 'staff.report.grade.missing-grade.search',
+            ])->render();
         }
 
         $classIds    = $assignedMappings->pluck('class_id')->unique();
@@ -258,16 +288,20 @@ class GradeReportController extends Controller{
             ->when($yearStatusId, function ($q) use ($yearStatusId) {
                 return $q->where('year_status_id', $yearStatusId);
             })
-            ->pluck('student_id', 'classes_id'); // Key: class_id => student_id (means grade exists)
+            ->get()
+            ->groupBy('classes_id')
+            ->map(function ($group) {
+                return $group->pluck('student_id')->toArray();
+            });
 
-        // 4. Build expected combinations: every student should have a grade in each class they are enrolled in
+        // 4. Build expected missing combinations
         $expected = [];
         foreach ($assignedMappings as $map) {
-            $classId    = $map->class_id;
-            $studentId  = $map->student_id;
+            $classId   = $map->class_id;
+            $studentId = $map->student_id;
 
-            // Only if this student belongs to this class actively
-            if (!isset($existingGrades[$classId]) || !in_array($studentId, (array)$existingGrades[$classId])) {
+            $gradedStudents = $existingGrades->get($classId, []);
+            if (!in_array($studentId, $gradedStudents)) {
                 $expected[] = [
                     'student_id' => $studentId,
                     'class_id'   => $classId,
@@ -276,14 +310,21 @@ class GradeReportController extends Controller{
         }
 
         if (empty($expected)) {
-            return view('staff.report.grade.partials.missing_grade_list', ['missing' => collect()])->render();
+            $missing = collect();
+            $paginator = new \Illuminate\Pagination\LengthAwarePaginator($missing, 0, $perPage, $page);
+            return view('staff.report.grade.partials.missing_grade_list', [
+                'missing' => $missing,
+                'paginator' => $paginator,
+                'routeName' => 'staff.report.grade.missing-grade.search',
+            ])->render();
         }
 
-        // 5. Load class details (with subject) for display
-        $classes = Classes::with('subject')->whereIn('id', collect($expected)->pluck('class_id'))->get()->keyBy('id');
+        // 5. Load class details (with subject) once
+        $classIdsNeeded = collect($expected)->pluck('class_id')->unique();
+        $classes = Classes::with('subject')->whereIn('id', $classIdsNeeded)->get()->keyBy('id');
 
-        // 6. Build final missing list
-        $missing = collect($expected)->map(function ($item) use ($students, $classes) {
+        // 6. Build the missing collection
+        $missingCollection = collect($expected)->map(function ($item) use ($students, $classes) {
             $student = $students->get($item['student_id']);
             $class   = $classes->get($item['class_id']);
 
@@ -295,10 +336,27 @@ class GradeReportController extends Controller{
                 'subject_name' => $class->subject?->name ?? 'Unknown Subject',
                 'full_name'    => ($class->name ?? 'Unknown') . ' - ' . ($class->subject?->name ?? 'Unknown'),
             ];
-        })->filter()->sortBy('full_name')->values();
+        })->filter()->sortBy('full_name');
 
-        return view('staff.report.grade.partials.missing_grade_list', compact('missing'))->render();
+        // 7. Paginate the collection
+        $total = $missingCollection->count();
+        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+            $missingCollection->forPage($page, $perPage),
+            $total,
+            $perPage,
+            $page,
+            ['path' => route('staff.report.grade.missing-grade.search')]
+        );
+
+        // 8. Render the partial view
+        return view('staff.report.grade.partials.missing_grade_list', [
+            'missing' => $missingCollection->forPage($page, $perPage)->values(),
+            'paginator' => $paginator,
+            'routeName' => 'staff.report.grade.missing-grade.search',
+        ])->render();
     }
+
+    
 
 
 }

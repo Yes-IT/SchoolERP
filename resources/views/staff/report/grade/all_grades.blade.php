@@ -33,84 +33,91 @@
                 <div class="atndnc-filter-form">
                     <div class="atndnc-filter-options">
 
-                        <!-- Year -->
-                        <div class="dropdown year-dropdown selectisub">
-                            <button type="button" class="dropdown-toggle">
-                                <span class="label">Select Year</span>
-                                <img src="{{ asset('staff/assets/images/down-arrow-5.svg') }}" class="arrow-att" />
-                            </button>
-                            <div class="dropdown-menu">
-                                @foreach($years as $year)
-                                    <label class="dropdown-item" data-id="{{ $year->id }}">
-                                        {{ $year->name ?? $year->year }}
-                                    </label>
-                                @endforeach
+                        <div class="header-filter">
+                            <!-- Year -->
+                            <div class="dropdown year-dropdown selectisub">
+                                <button type="button" class="dropdown-toggle">
+                                    <span class="label">Select Year</span>
+                                    <img src="{{ asset('staff/assets/images/down-arrow-5.svg') }}" class="arrow-att" />
+                                </button>
+                                <div class="dropdown-menu">
+                                    @foreach($years as $year)
+                                        <label class="dropdown-item" data-id="{{ $year->id }}">
+                                            {{ $year->name ?? $year->year }}
+                                        </label>
+                                    @endforeach
+                                </div>
+                                <input type="hidden" name="year_id" id="year_id" value="">
                             </div>
-                            <input type="hidden" name="year_id" id="year_id" value="">
+
+                            <!-- Year Status -->
+                            <div class="dropdown year-status-dropdown selectisub">
+                                <button type="button" class="dropdown-toggle">
+                                    <span class="label">Select Year Status</span>
+                                    <img src="{{ asset('staff/assets/images/down-arrow-5.svg') }}" class="arrow-att" />
+                                </button>
+                                <div class="dropdown-menu">
+                                    @foreach($yearStatuses as $status)
+                                        <label class="dropdown-item" data-id="{{ $status->id }}">
+                                            {{ $status->name }}
+                                        </label>
+                                    @endforeach
+                                </div>
+                                <input type="hidden" name="year_status_id" id="year_status_id" value="">
+                            </div>
+
+                            <!-- Semester -->
+                            <div class="dropdown semester-dropdown selectisub">
+                                <button type="button" class="dropdown-toggle">
+                                    <span class="label">Select Semester</span>
+                                    <img src="{{ asset('staff/assets/images/down-arrow-5.svg') }}" class="arrow-att" />
+                                </button>
+                                <div class="dropdown-menu">
+                                    @foreach($semesters as $semester)
+                                        <label class="dropdown-item" data-id="{{ $semester->id }}">
+                                            {{ $semester->name }}
+                                        </label>
+                                    @endforeach
+                                        <label class="dropdown-item" data-id="all">
+                                        Full Year
+                                        </label>
+                                </div>
+                                <input type="hidden" name="semester_id" id="semester_id" value="">
+                            </div>
                         </div>
 
-                        <!-- Year Status -->
-                        <div class="dropdown year-status-dropdown selectisub">
-                            <button type="button" class="dropdown-toggle">
-                                <span class="label">Select Year Status</span>
-                                <img src="{{ asset('staff/assets/images/down-arrow-5.svg') }}" class="arrow-att" />
-                            </button>
-                            <div class="dropdown-menu">
-                                @foreach($yearStatuses as $status)
-                                    <label class="dropdown-item" data-id="{{ $status->id }}">
-                                        {{ $status->name }}
-                                    </label>
-                                @endforeach
+                        <div class="header-filter">
+                            <!-- Subject -->
+                            <div class="dropdown subject-dropdown selectisub">
+                                <button type="button" class="dropdown-toggle">
+                                    <span class="label">Select Subject</span>
+                                    <img src="{{ asset('staff/assets/images/down-arrow-5.svg') }}" class="arrow-att" />
+                                </button>
+                                <div class="dropdown-menu">
+                                    @foreach($subjects as $subject)
+                                        <label class="dropdown-item" data-id="{{ $subject->id }}">
+                                            {{ $subject->name }}
+                                        </label>
+                                    @endforeach
+                                </div>
+                                <input type="hidden" name="subject_id" id="subject_id" value="">
                             </div>
-                            <input type="hidden" name="year_status_id" id="year_status_id" value="">
-                        </div>
 
-                        <!-- Semester -->
-                        <div class="dropdown semester-dropdown selectisub">
-                            <button type="button" class="dropdown-toggle">
-                                <span class="label">Select Semester</span>
-                                <img src="{{ asset('staff/assets/images/down-arrow-5.svg') }}" class="arrow-att" />
-                            </button>
-                            <div class="dropdown-menu">
-                                @foreach($semesters as $semester)
-                                    <label class="dropdown-item" data-id="{{ $semester->id }}">
-                                        {{ $semester->name }}
-                                    </label>
-                                @endforeach
+                            <!-- Class -->
+                            <div class="dropdown class-dropdown selectisub">
+                                <button type="button" class="dropdown-toggle">
+                                    <span class="label">Select Class</span>
+                                    <img src="{{ asset('staff/assets/images/down-arrow-5.svg') }}" class="arrow-att" />
+                                </button>
+                                <div class="dropdown-menu">
+                                    @foreach($classes as $class)
+                                        <label class="dropdown-item" data-id="{{ $class->id }}">
+                                            {{ $class->name }}
+                                        </label>
+                                    @endforeach
+                                </div>
+                                <input type="hidden" name="class_id" id="class_id" value="">
                             </div>
-                            <input type="hidden" name="semester_id" id="semester_id" value="">
-                        </div>
-
-                        <!-- Subject -->
-                        <div class="dropdown subject-dropdown selectisub">
-                            <button type="button" class="dropdown-toggle">
-                                <span class="label">Select Subject</span>
-                                <img src="{{ asset('staff/assets/images/down-arrow-5.svg') }}" class="arrow-att" />
-                            </button>
-                            <div class="dropdown-menu">
-                                @foreach($subjects as $subject)
-                                    <label class="dropdown-item" data-id="{{ $subject->id }}">
-                                        {{ $subject->name }}
-                                    </label>
-                                @endforeach
-                            </div>
-                            <input type="hidden" name="subject_id" id="subject_id" value="">
-                        </div>
-
-                        <!-- Class -->
-                        <div class="dropdown class-dropdown selectisub">
-                            <button type="button" class="dropdown-toggle">
-                                <span class="label">Select Class</span>
-                                <img src="{{ asset('staff/assets/images/down-arrow-5.svg') }}" class="arrow-att" />
-                            </button>
-                            <div class="dropdown-menu">
-                                @foreach($classes as $class)
-                                    <label class="dropdown-item" data-id="{{ $class->id }}">
-                                        {{ $class->name }}
-                                    </label>
-                                @endforeach
-                            </div>
-                            <input type="hidden" name="class_id" id="class_id" value="">
                         </div>
 
                     </div>
