@@ -34,6 +34,8 @@
                 <div class="atndnc-filter-form">
                     <div class="atndnc-filter-options">
 
+                    <div class="header-filter">
+                        
                         <!-- Year -->
                         <div class="dropdown year-dropdown selectisub">
                             <button type="button" class="dropdown-toggle">
@@ -81,6 +83,8 @@
                             </div>
                             <input type="hidden" name="semester_id" id="semester_id" value="">
                         </div>
+
+                    </div>
 
                     </div>
                     <button type="submit" id="btnSearch" class="btn-search">Search</button>

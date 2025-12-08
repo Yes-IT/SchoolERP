@@ -1,7 +1,11 @@
 @extends('staff.master')
 
-@section('content')
+@section('title')
+    {{ @$data['title'] }}
+@endsection
 
+
+@section('content')
 
 <!-- Dashboard Body Begin -->
 
@@ -10,11 +14,10 @@
     <div class="ds-breadcrumb">
         <h1>Attendance</h1>
         <ul>
-            <li><a href="dashboard.html">Dashboard</a> /</li>
+            <li><a href="{{ route('staff.dashboard') }}">Dashboard</a> /</li>
             <li>Attendance </li>
         </ul>
     </div>
-
 
     <div class="ds-pr-body">
 
@@ -27,49 +30,54 @@
                 <form id="attendanceFilterForm">
                     @csrf
                     <div class="atndnc-filter-form">
+
                         <div class="atndnc-filter-options">
 
-                            <!-- Class Dropdown -->
-                            <div class="dropdown subject-dropdown selectisub">
-                                <button type="button" class="dropdown-toggle">
-                                    <span class="label">Select Class</span>
-                                    <img src="{{ asset('staff') }}/assets/images/down-arrow-5.svg" class="arrow-att"/>
-                                </button>
-                                <div class="dropdown-menu">
-                                    @forelse($classes as $class)
-                                        <label class="dropdown-item" data-id="{{ $class->id }}">
-                                            {{ $class->name }}
-                                        </label>
-                                    @empty
-                                        <label class="dropdown-item">No classes available</label>
-                                    @endforelse
+                            <div class="header-filter">
+                                
+                                <!-- Class Dropdown -->
+                                <div class="dropdown subject-dropdown selectisub">
+                                    <button type="button" class="dropdown-toggle">
+                                        <span class="label">Select Class</span>
+                                        <img src="{{ asset('staff') }}/assets/images/down-arrow-5.svg" class="arrow-att"/>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        @forelse($classes as $class)
+                                            <label class="dropdown-item" data-id="{{ $class->id }}">
+                                                {{ $class->name }}
+                                            </label>
+                                        @empty
+                                            <label class="dropdown-item">No classes available</label>
+                                        @endforelse
+                                    </div>
+                                    <input type="hidden" name="class_id" id="class_id" value="">
                                 </div>
-                                <input type="hidden" name="class_id" id="class_id" value="">
-                            </div>
 
-                            <!-- Subject Dropdown -->
-                            <div class="dropdown subject-dropdown selectisub">
-                                <button type="button" class="dropdown-toggle">
-                                    <span class="label">Select Subject</span>
-                                    <img src="{{ asset('staff') }}/assets/images/down-arrow-5.svg" class="arrow-att"/>
-                                </button>
-                                <div class="dropdown-menu">
-                                    @forelse($subjects as $subject)
-                                        <label class="dropdown-item" data-id="{{ $subject->id }}">
-                                            {{ $subject->name }}
-                                        </label>
-                                    @empty
-                                        <label class="dropdown-item">No subjects available</label>
-                                    @endforelse
+                                <!-- Subject Dropdown -->
+                                <div class="dropdown subject-dropdown selectisub">
+                                    <button type="button" class="dropdown-toggle">
+                                        <span class="label">Select Subject</span>
+                                        <img src="{{ asset('staff') }}/assets/images/down-arrow-5.svg" class="arrow-att"/>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        @forelse($subjects as $subject)
+                                            <label class="dropdown-item" data-id="{{ $subject->id }}">
+                                                {{ $subject->name }}
+                                            </label>
+                                        @empty
+                                            <label class="dropdown-item">No subjects available</label>
+                                        @endforelse
+                                    </div>
+                                    <input type="hidden" name="subject_id" id="subject_id" value="">
                                 </div>
-                                <input type="hidden" name="subject_id" id="subject_id" value="">
+                            
+                                <!-- Year/Month Picker Dropdown -->
+                                <p class="calender-open">
+                                    <input type="text" id="datepicker" name="attendance_date" class="calenderDate" value="{{ \Carbon\Carbon::now()->format('F d, Y') }}" style="width: 200px !important">
+                                    <img class="calimage" src="{{ asset('staff') }}/assets/images/cal.svg" />
+                                </p>
+
                             </div>
-                        
-                            <!-- Year/Month Picker Dropdown -->
-                            <p class="calender-open">
-                                <input type="text" id="datepicker" name="attendance_date" class="calenderDate" value="{{ \Carbon\Carbon::now()->format('F d, Y') }}" style="width: 200px !important">
-                                <img class="calimage" src="{{ asset('staff') }}/assets/images/cal.svg" />
-                            </p>
                                                       
                             </div>
                         </div>
@@ -244,12 +252,12 @@
             const selectedDate = $('#datepicker').val();
 
             if (!classId || !selectedDate) {
-                alert('Please select class and date.');
+                showWarning('Please select class and date.');
                 return;
             }
 
             if (clickedStudents.size === 0) {
-                alert('No changes made. Nothing to submit.');
+                showWarning('No changes made. Nothing to submit.');
                 return;
             }
 
@@ -277,12 +285,12 @@
                     attendance: attendanceData
                 },
                 success: function() {
-                    alert('Attendance saved successfully!');
+                    showSuccess('Attendance saved successfully!');
                     clickedStudents.clear();
                     loadAttendance();
                 },
                 error: function(xhr) {
-                    alert('Error: ' + (xhr.responseJSON?.message || 'Failed to save'));
+                    showError('Error: ' + (xhr.responseJSON?.message || 'Failed to save'));
                 },
                 complete: function() {
                     $('#submitAttendanceBtn').prop('disabled', false).text('Submit');
@@ -327,12 +335,14 @@
                 comment: comment
             },
             success: function() {
-                alert('Comment saved!');
+                showSuccess('Comment saved!');
                 $('#addCommentModal').modal('hide');
-                loadAttendance();
+                setTimeout(function() {
+                    location.reload();
+                }, 3000);
             },
             error: function() {
-                alert('Failed to save comment.');
+                showError('Failed to save comment');
             },
             complete: function() {
                 isSavingComment = false;    // ← Re-allow next save

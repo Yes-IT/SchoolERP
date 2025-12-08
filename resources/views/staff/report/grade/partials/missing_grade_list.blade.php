@@ -39,7 +39,10 @@
     </div>
 </div>
 
-<!-- Pagination (will be replaced by AJAX response if needed) -->
-<div class="tablepagination" style="display:none;">
-    <!-- Your pagination here -->
+
+ <div class="tablepagination" id="paginationContainer">
+    @include('backend.partials.pagination', [
+                'paginator' => $paginator,
+                'routeName' => $routeName
+            ])
 </div>

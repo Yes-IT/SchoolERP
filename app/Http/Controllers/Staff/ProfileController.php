@@ -29,4 +29,5 @@ class ProfileController extends Controller
 
         return view('staff.profile.profile-index', compact('data'));
     }
+
 }

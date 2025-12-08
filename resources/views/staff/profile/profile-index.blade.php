@@ -19,7 +19,7 @@
 
         <div class="dspr-profile-cd-upr">
             <div class="dspr-profile-cd-img">
-                <img src="{{ asset($data['staff']->upload?->path ?? 'images/default.png') }}" alt="Profile Image">
+                <img src="{{ asset($data['staff']->upload->path ?? 'staff/assets/images/user-round.svg') }}" alt="Profile Image">
             </div>
             <div class="dspr-profile-cd-info">
                 <h2>{{ $data['staff']->first_name }} {{ $data['staff']->last_name }}</h2>
@@ -46,8 +46,20 @@
                         <td>Year Status</td>
                         <td>
                             <div>
-                                <p class="tickpara"><img src="./images/true.svg" class="tick" /> Shana Alef </p>
-                                <p><img src="./images/blanktick.svg" class="tick" /> Shana Bais  </p>
+                                @php
+                                    $status = currentSession()->year_status_name ?? ''; 
+                                @endphp
+
+                                <p class="tickpara">
+                                    <img src="{{ asset('staff/assets/images/' . ($status === 'Shana Alef' ? 'true.svg' : 'blanktick.svg')) }}" class="" />
+                                    Shana Alef
+                                </p>
+
+                                <p class="tickpara">
+                                    <img src="{{ asset('staff/assets/images/' . ($status === 'Shana Beis' ? 'true.svg' : 'blanktick.svg')) }}" class="" />
+                                    Shana Beis
+                                </p>
+
                             </div>
                         </td>
                     </tr>

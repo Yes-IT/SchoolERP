@@ -10,17 +10,21 @@
     </ul>
 </div>
 
+
 <div class="ds-pr-body">
 
     <div class="atndnc-filter-wrp w-100">
-        <div class="sec-head"><h2>Select Criteria</h2></div>
-            <div class="atndnc-filter">
-                <form id="attendanceFilterForm" method="GET">
-                    
+        <div class="sec-head">
+            <h2>Select Criteria</h2>
+        </div>
+        <div class="atndnc-filter">
+            <form id="attendanceFilterForm" method="GET">
+                <div class="atndnc-filter-form">
                     <div class="atndnc-filter-options">
+                        <!-- Subject Multi‑Select Dropdown -->
 
-                        <!-- Row 1 -->
                         <div class="header-filter">
+                            
                             <!-- Year (Radio) -->
                             <div class="dropdown year-dropdown selectisub">
                                 <button type="button" class="dropdown-toggle" aria-expanded="false">
@@ -71,11 +75,10 @@
                                     @endforeach
                                 </div>
                             </div>
-
                         </div>
 
-                        <!-- Row 2 -->
-                        <div class="d-flex gap-3 mt-3">
+                        <div>
+
                             <!-- Subject (Radio) -->
                             <div class="dropdown subject-dropdown selectisub">
                                 <button type="button" class="dropdown-toggle" aria-expanded="false">
@@ -111,19 +114,20 @@
                             </div>
 
                         </div>
-
                     </div>
 
+                    <!-- Search Button -->
                     <button type="submit" class="btn-search mt-3">Search</button>
-                </form>
-            </div>
+
+                </div>
+            </form>
         </div>
     </div>
 
-        <!-- Tabs & Month Selector -->
     <div class="ds-cmn-table-wrp tab-wrapper">
 
         <div class="ds-content-head">
+
             <div class="cmn-tab-head">
                 <ul>
                     <li class="tab-bg"></li>
@@ -152,9 +156,9 @@
                     @endforeach
                 </div>
             </div>
+
         </div>
 
-        <!-- Result Container -->
         <div id="attendanceResult">
             <p class="mt-3">Loading attendance data...</p>
         </div>
@@ -162,6 +166,7 @@
     </div>
 
 </div>
+
 
 @endsection
 

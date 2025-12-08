@@ -35,52 +35,54 @@
                 <div class="atndnc-filter-form">
                     <div class="atndnc-filter-options">
 
-                        <!-- Year -->
-                        <div class="dropdown year-dropdown selectisub">
-                            <button type="button" class="dropdown-toggle">
-                                <span class="label">Select Year</span>
-                                <img src="{{ asset('staff/assets/images/down-arrow-5.svg') }}" class="arrow-att" />
-                            </button>
-                            <div class="dropdown-menu">
-                                @foreach($years as $year)
-                                    <label class="dropdown-item" data-id="{{ $year->id }}">
-                                        {{ $year->name ?? $year->year }}
-                                    </label>
-                                @endforeach
+                        <div class="header-filter">
+                            <!-- Year -->
+                            <div class="dropdown year-dropdown selectisub">
+                                <button type="button" class="dropdown-toggle">
+                                    <span class="label">Select Year</span>
+                                    <img src="{{ asset('staff/assets/images/down-arrow-5.svg') }}" class="arrow-att" />
+                                </button>
+                                <div class="dropdown-menu">
+                                    @foreach($years as $year)
+                                        <label class="dropdown-item" data-id="{{ $year->id }}">
+                                            {{ $year->name ?? $year->year }}
+                                        </label>
+                                    @endforeach
+                                </div>
+                                <input type="hidden" name="year_id" id="year_id" value="">
                             </div>
-                            <input type="hidden" name="year_id" id="year_id" value="">
-                        </div>
 
-                        <!-- Year Status -->
-                        <div class="dropdown year-status-dropdown selectisub">
-                            <button type="button" class="dropdown-toggle">
-                                <span class="label">Select Year Status</span>
-                                <img src="{{ asset('staff/assets/images/down-arrow-5.svg') }}" class="arrow-att" />
-                            </button>
-                            <div class="dropdown-menu">
-                                @foreach($yearStatuses as $status)
-                                    <label class="dropdown-item" data-id="{{ $status->id }}">
-                                        {{ $status->name }}
-                                    </label>
-                                @endforeach
+                            <!-- Year Status -->
+                            <div class="dropdown year-status-dropdown selectisub">
+                                <button type="button" class="dropdown-toggle">
+                                    <span class="label">Select Year Status</span>
+                                    <img src="{{ asset('staff/assets/images/down-arrow-5.svg') }}" class="arrow-att" />
+                                </button>
+                                <div class="dropdown-menu">
+                                    @foreach($yearStatuses as $status)
+                                        <label class="dropdown-item" data-id="{{ $status->id }}">
+                                            {{ $status->name }}
+                                        </label>
+                                    @endforeach
+                                </div>
+                                <input type="hidden" name="year_status_id" id="year_status_id" value="">
                             </div>
-                            <input type="hidden" name="year_status_id" id="year_status_id" value="">
-                        </div>
 
-                        <!-- Semester -->
-                        <div class="dropdown semester-dropdown selectisub">
-                            <button type="button" class="dropdown-toggle">
-                                <span class="label">Select Semester</span>
-                                <img src="{{ asset('staff/assets/images/down-arrow-5.svg') }}" class="arrow-att" />
-                            </button>
-                            <div class="dropdown-menu">
-                                @foreach($semesters as $semester)
-                                    <label class="dropdown-item" data-id="{{ $semester->id }}">
-                                        {{ $semester->name }}
-                                    </label>
-                                @endforeach
+                            <!-- Semester -->
+                            <div class="dropdown semester-dropdown selectisub">
+                                <button type="button" class="dropdown-toggle">
+                                    <span class="label">Select Semester</span>
+                                    <img src="{{ asset('staff/assets/images/down-arrow-5.svg') }}" class="arrow-att" />
+                                </button>
+                                <div class="dropdown-menu">
+                                    @foreach($semesters as $semester)
+                                        <label class="dropdown-item" data-id="{{ $semester->id }}">
+                                            {{ $semester->name }}
+                                        </label>
+                                    @endforeach
+                                </div>
+                                <input type="hidden" name="semester_id" id="semester_id" value="">
                             </div>
-                            <input type="hidden" name="semester_id" id="semester_id" value="">
                         </div>
 
                     </div>
@@ -94,6 +96,7 @@
     <div class="ds-cmn-table-wrp tab-wrapper" id="missing_grade_result">
         
     </div>
+
 </div>
 
 @endsection
@@ -101,9 +104,7 @@
 @push('script')
 
 <script>
-
 $(function () {
-    
     // === Top Menu Dropdown (Working) ===
     $('#gradeMenuBtn').on('click', function (e) {
         e.stopPropagation();
@@ -116,7 +117,7 @@ $(function () {
         }
     });
 
-    // === Single-Select Dropdown Logic (Same as All Grades & Failing Grades) ===
+    // === Single-Select Dropdown Logic ===
     $(document).on('click', '.dropdown-item', function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -157,7 +158,7 @@ $(function () {
     }
 
     // === AJAX: Fetch Missing Grades ===
-    function fetchMissingGrades() {
+    function fetchMissingGrades(page = 1, perPage = 1) {
         const year_id        = $('#year_id').val();
         const year_status_id = $('#year_status_id').val();
         const semester_id    = $('#semester_id').val();
@@ -167,6 +168,8 @@ $(function () {
             return;
         }
 
+        $("#btnSearch").text("Loading...").prop('disabled', true);
+
         $.ajax({
             url: "{{ route('staff.report.grade.missing-grade.search') }}",
             method: "POST",
@@ -174,12 +177,20 @@ $(function () {
                 _token: '{{ csrf_token() }}',
                 year_id: year_id,
                 year_status_id: year_status_id,
-                semester_id: semester_id
+                semester_id: semester_id,
+                page: page,
+                per_page: perPage
             },
             success: function (response) {
                 $("#btnSearch").text("Search").prop('disabled', false);
                 $("#missing_grade_result").html(response);
+                bindPaginationLinks(); // Bind click handlers to new pagination links
+                bindPerPageChange(); // Bind change handler to per_page select
                 showSuccess('Missing grades loaded successfully.');
+                // Scroll to results
+                $('html, body').animate({
+                    scrollTop: $("#missing_grade_result").offset().top - 100
+                }, 500);
             },
             error: function (xhr) {
                 $("#btnSearch").text("Search").prop('disabled', false);
@@ -189,19 +200,40 @@ $(function () {
         });
     }
 
+    // === Bind Pagination Link Clicks ===
+    function bindPaginationLinks() {
+        $('.tbl-pagination-inr a').off('click').on('click', function (e) {
+            e.preventDefault();
+            const url = $(this).attr('href');
+            const pageMatch = url.match(/page=(\d+)/);
+            const page = pageMatch ? pageMatch[1] : 1;
+            const perPageMatch = url.match(/per_page=(\d+)/);
+            const perPage = perPageMatch ? perPageMatch[1] : $('#perPageSelect').val() || 1;
+            fetchMissingGrades(page, perPage);
+        });
+    }
+
+    // === Bind Per Page Select Change ===
+    function bindPerPageChange() {
+        $('#perPageSelect').off('change').on('change', function () {
+            const perPage = $(this).val();
+            fetchMissingGrades(1, perPage); // Reset to page 1 on per_page change
+        });
+    }
+
     // === On Load ===
     $(document).ready(function () {
         setDefaultSelections();
-        fetchMissingGrades(); // Auto load
+        fetchMissingGrades(1, 1); // Start with page 1, per_page 1
     });
 
     // === Search Button ===
     $('#missingGradeSearchForm').on('submit', function (e) {
         e.preventDefault();
-        fetchMissingGrades();
+        const perPage = $('#perPageSelect').val() || 1;
+        fetchMissingGrades(1, perPage); // Reset to page 1
     });
-
 });
-
 </script>
+
 @endpush
