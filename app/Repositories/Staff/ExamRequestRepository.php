@@ -24,11 +24,11 @@ class ExamRequestRepository implements ExamRequestInterface
     public function getAvailableRooms($examDate, $startTime, $endTime)
     {
 
-            Log::info('Repository getAvailableRooms called:', [
-                'exam_date' => $examDate,
-                'start_time' => $startTime,
-                'end_time' => $endTime
-            ]);
+            // Log::info('Repository getAvailableRooms called:', [
+            //     'exam_date' => $examDate,
+            //     'start_time' => $startTime,
+            //     'end_time' => $endTime
+            // ]);
 
          try {
 

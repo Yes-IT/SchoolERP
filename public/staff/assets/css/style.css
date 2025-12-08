@@ -7418,15 +7418,15 @@ left: 1102px; */
     -webkit-box-pack: justify;
     -ms-flex-pack: justify;
     justify-content: space-between;
-    /* flex-wrap: wrap;
-    gap: 12px; */
+    flex-wrap: wrap;
+    gap: 12px;
 }
 .exam-last-div {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
     gap: 20px;
-    margin-left: 20px;
+    /* margin-left: 20px; */
 }
 
 /* month calender*/
@@ -9144,7 +9144,7 @@ svg {
 .checkbox-wrp label input[type="checkbox"]{
     accent-color: rgba(26, 147, 46, 1);
 }
-/* .ui-datepicker select.ui-datepicker-month, .ui-datepicker select.ui-datepicker-year{
+.ui-datepicker select.ui-datepicker-month, .ui-datepicker select.ui-datepicker-year{
     height: auto;
     cursor: pointer;
 }
@@ -9164,13 +9164,13 @@ svg {
     background: #fff;
     font-weight: normal;
     color: #000;
-} */
+}
 
 /* End Of SS271125 */
 
 /* SS011225 Begin */
 
-/* .exm-type-dropdown select{
+.exm-type-dropdown select{
     font-size: 24px;
     width: auto;
     background-image: url(./images/dropdown-arrowpopup.svg);
@@ -9189,6 +9189,6 @@ svg {
 }
 .ds-pr-body:has(.tab-switch.chng-fltr) .dn-for-non-active{
     display: block;
-} */
+}
 
 /* End Of SS011225 */

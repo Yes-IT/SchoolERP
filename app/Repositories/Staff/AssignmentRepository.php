@@ -3,7 +3,8 @@ namespace App\Repositories\Staff;
 
 use App\Interfaces\Staff\AssignmentInterface;
 use App\Models\Academic\{Assignment,AssignmentMedia,AssignmentSubmission};
-use Illuminate\Support\Facades\{DB,Log};
+use App\Models\StudentClassMapping;
+use Illuminate\Support\Facades\{DB,Log,Storage};
 use Exception;
 
 
@@ -14,10 +15,9 @@ class AssignmentRepository implements AssignmentInterface
         DB::beginTransaction();
         
         try {
-            // Create assignment
+           
             $assignment = Assignment::create($data);
 
-            // Handle file uploads
             if (!empty($files)) {
                 foreach ($files as $file) {
                     $path = $file->store('staff/uploads/assignments/images', 'public');
@@ -91,7 +91,7 @@ class AssignmentRepository implements AssignmentInterface
                 return $assignment;
             }
         
-        Log::warning('Assignment not found for update:', ['id' => $id]);
+        // Log::warning('Assignment not found for update:', ['id' => $id]);
         return null;
     }
 
@@ -187,62 +187,163 @@ class AssignmentRepository implements AssignmentInterface
 
 
 
+    // public function getSubmissionsForEvaluation($assignmentId)
+    // {
+    //     return AssignmentSubmission::with('student')
+    //             ->where('assignment_id', $assignmentId)
+    //             ->whereNull('deleted_at')
+    //             ->get();
+    // }
+
+
     public function getSubmissionsForEvaluation($assignmentId)
     {
-        return AssignmentSubmission::with('student')
-                ->where('assignment_id', $assignmentId)
-                ->whereNull('deleted_at')
-                ->get();
+        $teacherId = auth()->user()->staff->id;
+        
+        // Get the assignment first to get the class_id
+        $assignment = Assignment::findOrFail($assignmentId);
+
+        // Get student IDs from teacher's class mapping
+        $studentIds = StudentClassMapping::where('class_id', $assignment->class_id)
+            ->where('teacher_id', $teacherId)
+            ->pluck('student_id')
+            ->toArray();
+
+        // Fetch submissions only for these students who have uploaded a file
+        return AssignmentSubmission::with(['student' => function($query) {
+                $query->select('id', 'first_name', 'last_name');
+            }])
+            ->where('assignment_id', $assignmentId)
+            ->whereIn('student_id', $studentIds)
+            ->whereNotNull('submitted_at')
+            ->whereNotNull('file_path') 
+            ->where('file_path', '!=', '') 
+            ->where('status', '>=', 1)
+            ->whereNull('deleted_at')
+            ->get();
     }
+
+    // public function saveEvaluation($assignmentId, $request)
+    // {
+    //     $grades = $request->grades ?? [];
+    //     $notes  = $request->notes ?? [];
+
+    //     $teacherId = auth()->user()->staff->id;  
+
+    //     foreach ($grades as $submissionId => $grade) {
+
+    //         $submission = AssignmentSubmission::find($submissionId);
+
+    //         if ($submission) {
+    //             $submission->grade        = $grade;
+    //             $submission->note         = $notes[$submissionId] ?? null;
+    //             $submission->evaluated_by = $teacherId;
+    //             $submission->evaluated_at = now();
+    //             $submission->status       = 2; // evaluated
+    //             $submission->save();
+    //         }
+    //     }
+
+
+
+    //     // for closed assignment 
+    //     $assignment = Assignment::find($assignmentId);
+
+    //     if ($assignment) {
+
+    //         $dueDatePassed = now()->greaterThan($assignment->due_date);
+
+    //         $hasEvaluations = AssignmentSubmission::where('assignment_id', $assignmentId)
+    //                             ->whereNotNull('evaluated_at')
+    //                             ->exists();
+
+    //         $lateExists = AssignmentSubmission::where('assignment_id', $assignmentId)
+    //                         ->whereNotNull('submitted_at')
+    //                         ->where('submitted_at', '>', $assignment->due_date)
+    //                         ->exists();
+
+    //         if ($assignment->status == 1 && $dueDatePassed && $hasEvaluations && !$lateExists) {
+
+    //             $assignment->status = 2; // CLOSED assignment
+    //             $assignment->save();
+    //         }
+    //     }
+
+
+    //     return true;
+    // }
 
     public function saveEvaluation($assignmentId, $request)
     {
         $grades = $request->grades ?? [];
-        $notes  = $request->notes ?? [];
+        $notes = $request->notes ?? [];
 
-        $teacherId = auth()->user()->staff->id;  // evaluator/teacher
-
-        foreach ($grades as $submissionId => $grade) {
-
-            $submission = AssignmentSubmission::find($submissionId);
-
-            if ($submission) {
-                $submission->grade        = $grade;
-                $submission->note         = $notes[$submissionId] ?? null;
-                $submission->evaluated_by = $teacherId;
-                $submission->evaluated_at = now();
-                $submission->status       = 2; // evaluated
-                $submission->save();
-            }
+        $teacherId = auth()->user()->staff->id;
+        
+        $assignment = Assignment::find($assignmentId);
+        
+        if (!$assignment) {
+            throw new Exception("Assignment not found");
         }
 
+        DB::beginTransaction();
+        
+        try {
+            foreach ($grades as $submissionId => $grade) {
+                $submission = AssignmentSubmission::find($submissionId);
 
+                if ($submission) {
+                    $percentage = 0;
+                    if ($assignment->grade > 0) {
+                        $percentage = ($grade / $assignment->grade) * 100;
+                    }
+                    
+                    $submission->grade = $grade;
+                    $submission->percentage = $percentage; 
+                    $submission->note = $notes[$submissionId] ?? null;
+                    $submission->evaluated_by = $teacherId;
+                    $submission->evaluated_at = now();
+                    $submission->status = 2; // evaluated
+                    $submission->save();
+                    
+                    Log::info('Assignment evaluated', [
+                        'submission_id' => $submissionId,
+                        'marks' => $grade,
+                        'percentage' => $percentage,
+                        'teacher_id' => $teacherId
+                    ]);
+                }
+            }
 
-        // for closed assignment 
-        $assignment = Assignment::find($assignmentId);
+           
+            $totalSubmissions = AssignmentSubmission::where('assignment_id', $assignmentId)
+                ->whereNotNull('submitted_at')
+                ->count();
+                
+            $evaluatedSubmissions = AssignmentSubmission::where('assignment_id', $assignmentId)
+                ->whereNotNull('evaluated_at')
+                ->count();
 
-        if ($assignment) {
-
+            // Update assignment status
             $dueDatePassed = now()->greaterThan($assignment->due_date);
+            
+            if ($assignment->status == 1 && $dueDatePassed) {
+                // Check if all submissions are evaluated
+                if ($totalSubmissions > 0 && $evaluatedSubmissions >= $totalSubmissions) {
+                    $assignment->status = 2; // CLOSED - all evaluated
+                } 
 
-            $hasEvaluations = AssignmentSubmission::where('assignment_id', $assignmentId)
-                                ->whereNotNull('evaluated_at')
-                                ->exists();
-
-            $lateExists = AssignmentSubmission::where('assignment_id', $assignmentId)
-                            ->whereNotNull('submitted_at')
-                            ->where('submitted_at', '>', $assignment->due_date)
-                            ->exists();
-
-            if ($assignment->status == 1 && $dueDatePassed && $hasEvaluations && !$lateExists) {
-
-                $assignment->status = 2; // CLOSED assignment
                 $assignment->save();
             }
+
+            DB::commit();
+            return true;
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Evaluation save error: ' . $e->getMessage());
+            throw $e;
         }
-
-
-        return true;
     }
 
 

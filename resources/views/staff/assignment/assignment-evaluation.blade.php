@@ -51,7 +51,9 @@
                                     <th>Student Name</th>
                                     <th>Submitted on</th>
                                     <th>Submitted Document</th>
-                                    <th>Weightage (%)</th>
+                                    <th>Weightage (out of {{ $assignment->grade }}) </th>
+                                    <th>Percentage (%)</th>
+                                    
                                 </tr>
                             </thead>
                             <tbody>
@@ -66,35 +68,57 @@
                                 <tr class="note-row">
                                     <td colspan="5"><textarea placeholder="Note"></textarea></td>
                                 </tr> --}}
-                                    
-                                @foreach ($submissions as $index => $submission)
-                                    <tr>
-                                        <td>{{ $index + 1 }}</td>
+                                @if($submissions && $submissions->count() > 0)       
+                                    @foreach ($submissions as $index => $submission)
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
 
-                                        <td>{{ $submission->student->first_name }} {{ $submission->student->last_name }}</td>
+                                            <td>{{ $submission->student->first_name }} {{ $submission->student->last_name }}</td>
 
-                                        <td>{{ $submission->submitted_at ? $submission->submitted_at->format('m/d/Y') : '-' }}</td>
+                                            <td>{{ $submission->submitted_at ? $submission->submitted_at->format('m/d/Y') : '-' }}</td>
 
-                                        <td>
-                                            @if ($submission->file_path)
-                                                <a href="{{ asset('uploads/assignments/' . $submission->file_path) }}" target="_blank" class="view-btn">View</a>
-                                            @else
-                                                No File
-                                            @endif
-                                        </td>
+                                            <td>
+                                                @if ($submission->file_path)
+                                                    <a href="{{ asset('uploads/assignments/' . $submission->file_path) }}" target="_blank" class="view-btn">View</a>
+                                                @else
+                                                    No File
+                                                @endif
+                                            </td>
 
-                                        <td>
-                                            <input type="number" name="grades[{{ $submission->id }}]" class="weight-input" min="0" max="100" placeholder="Marks" value="{{ $submission->grade }}">
-                                        </td>
-                                    </tr>
+                                            <td>
+                                                {{-- <input type="number" name="grades[{{ $submission->id }}]" class="weight-input" min="0" max="100" placeholder="Marks" value="{{ $submission->grade }}"> --}}
 
-                                    <tr class="note-row">
-                                        <td colspan="5">
-                                            <textarea name="notes[{{ $submission->id }}]" placeholder="Note">{{ $submission->note }}</textarea>
-                                        </td>
-                                    </tr>
-                                @endforeach
+                                                <input type="number" 
+                                                    name="grades[{{ $submission->id }}]" 
+                                                    class="marks-input" 
+                                                    min="0" 
+                                                    max="{{ $assignment->grade }}" 
+                                                    step="0.01"
+                                                    placeholder="Marks"
+                                                    value="{{ $submission->grade }}"
+                                                    data-assignment-grade="{{ $assignment->grade }}"
+                                                    oninput="calculatePercentage(this)">
+                                            </td>
+                                            <td class="percentage-cell">
+                                                <span id="percentage-{{ $submission->id }}">
+                                                    @if($submission->grade)
+                                                        {{ number_format(($submission->grade / $assignment->grade) * 100, 2) }}%
+                                                    @else
+                                                        0%
+                                                    @endif
+                                                </span>
+                                            </td>
+                                        </tr>
 
+                                        <tr class="note-row">
+                                            <td colspan="5">
+                                                <textarea name="notes[{{ $submission->id }}]" placeholder="Enter evaluation notes">{{ $submission->note }}</textarea>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @else
+                                    <p>No students to evaluate for this assignment.</p>
+                                @endif
 
                 
                             </tbody>
@@ -116,3 +140,61 @@
 
 </div>
 @endsection
+
+@push('script')
+<script>
+function calculatePercentage(input) {
+    const submissionId = input.name.match(/\[(\d+)\]/)[1];
+    const marks = parseFloat(input.value) || 0;
+    const totalMarks = parseFloat(input.dataset.assignmentGrade);
+    
+    if (totalMarks > 0) {
+        const percentage = (marks / totalMarks) * 100;
+        document.getElementById(`percentage-${submissionId}`).textContent = percentage.toFixed(2) + '%';
+    }
+}
+
+// Calculate percentages on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const marksInputs = document.querySelectorAll('.marks-input');
+    marksInputs.forEach(input => {
+        calculatePercentage(input);
+    });
+});
+
+// Form validation
+document.getElementById('evaluationForm').addEventListener('submit', function(e) {
+    const marksInputs = document.querySelectorAll('.marks-input');
+    let isValid = true;
+    
+    marksInputs.forEach(input => {
+        const marks = parseFloat(input.value);
+        const maxMarks = parseFloat(input.max);
+        
+        if (isNaN(marks)) {
+            alert(`Please enter valid marks for ${input.name}`);
+            input.focus();
+            isValid = false;
+            return;
+        }
+        
+        if (marks > maxMarks) {
+            alert(`Marks cannot exceed ${maxMarks} for ${input.name}`);
+            input.focus();
+            isValid = false;
+        }
+        
+        if (marks < 0) {
+            alert(`Marks cannot be less than 0 for ${input.name}`);
+            input.focus();
+            isValid = false;
+        }
+    });
+    
+    if (!isValid) {
+        e.preventDefault();
+    }
+});
+</script>
+    
+@endpush

@@ -20,6 +20,7 @@ class AssignmentSubmission extends Model
         'evaluated_by',
         'subject_id',
         'grade',
+        'percentage',
         'note',
         'file_path',
         'status',
@@ -29,6 +30,9 @@ class AssignmentSubmission extends Model
 
     protected $dates = ['submitted_at', 'evaluated_at'];
 
+    protected $casts = [
+        'percentage' => 'decimal:2'
+    ];
     
         public function student()
     {
