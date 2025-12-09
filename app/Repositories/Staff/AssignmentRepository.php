@@ -62,10 +62,6 @@ class AssignmentRepository implements AssignmentInterface
 
         // Log::info("Repo Result Count: " . $assignments->count());
 
-        // foreach ($assignments as $assignment) {
-        //     Log::info("Assignment ID: {$assignment->id}, Subject: " . ($assignment->subject->name ?? 'NULL') . ", Status: {$assignment->status}");
-        // }
-
         return $assignments;
     }
 

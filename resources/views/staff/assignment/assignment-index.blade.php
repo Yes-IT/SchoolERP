@@ -74,7 +74,7 @@
 <div class="ds-breadcrumb">
     <h1>Assignments</h1>
     <ul>
-        <li><a href="dashboard.html">Dashboard</a> /</li>
+        <li><a href="{{ route('staff.dashboard') }}">Dashboard</a> /</li>
         <li>Assignments</li>
     </ul>
 </div>
@@ -86,7 +86,7 @@
             <h2>Select Criteria</h2>
         </div>
         <div class="atndnc-filter">
-            <form>
+            <form id="filterForm" method="GET">
                 <div class="atndnc-filter-form">
                     <div class="atndnc-filter-options flex-row">
                         <!-- Subject Multi‑Select Dropdown -->
@@ -102,13 +102,15 @@
                                     <input type="checkbox" value="all" checked /> All Subjects
                                 </label>
                                 <label>
-                                    <input type="checkbox" value="1" /> Lorem ipsum dolor sit amet
+                                    {{-- <input type="checkbox" value="1" /> Lorem ipsum dolor sit amet --}}
+                                    <input type="checkbox" name="subjects[]" value="1" />
+
                                 </label>
                                 <label>
-                                    <input type="checkbox" value="2" /> Lorem ipsum dolor sit amet
+                                    {{-- <input type="checkbox" value="2" /> Lorem ipsum dolor sit amet --}}
                                 </label>
                                 <label>
-                                    <input type="checkbox" value="3" /> Lorem ipsum dolor sit amet
+                                    {{-- <input type="checkbox" value="3" /> Lorem ipsum dolor sit amet --}}
                                 </label>
                             </div>
                         </div>
@@ -122,16 +124,18 @@
                             </button>
                             <div class="dropdown-menu">
                                 <label>
-                                    <input type="checkbox" value="all" checked /> All Subjects
+                                    <input type="checkbox" value="all" checked /> All Rooms
                                 </label>
                                 <label>
-                                    <input type="checkbox" value="1" /> Lorem ipsum dolor sit amet
+                                    {{-- <input type="checkbox" value="1" /> Lorem ipsum dolor sit amet --}}
+                                    <input type="checkbox" name="rooms[]" value="101" />
+
                                 </label>
                                 <label>
-                                    <input type="checkbox" value="2" /> Lorem ipsum dolor sit amet
+                                    {{-- <input type="checkbox" value="2" /> Lorem ipsum dolor sit amet --}}
                                 </label>
                                 <label>
-                                    <input type="checkbox" value="3" /> Lorem ipsum dolor sit amet
+                                    {{-- <input type="checkbox" value="3" /> Lorem ipsum dolor sit amet --}}
                                 </label>
                             </div>
                         </div>
@@ -406,9 +410,10 @@
 
                     <div class="cmn-pop-inr-content-wrp">
                         <div class="cmn-tab-content new-upload">
-                            <form>
+                            <form  enctype="multipart/form-data">
+                                @csrf
                                 <div class="file-upload-lg" id="dropZone">
-                                    <input type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.mp4,.mov,.doc,.docx,.xls,.xlsx"  id="uploadFile">
+                                    <input type="file" id="uploadFile"  name="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.mp4,.mov,.doc,.docx,.xls,.xlsx"  >
                                     <div class="file-upld-lg-design">
                                         <div class="fupld-lg-icon">
                                             <img src="{{asset('staff/assets/images/upload-file-icon.svg')}}" alt="Icon">
@@ -1122,7 +1127,8 @@ $(document).ready(function () {
         // console.log('assignment id',assignmentId);
         $("#uploadAssignmentId").val(assignmentId);
 
-        $baseurl = "{{ route('staff.assignment.getAssignementMedia', ':id') }}",
+       let baseurl = "{{ route('staff.assignment.getAssignementMedia', ':id') }}";
+
 
         $.ajax({
             url: baseurl.replace(':id', assignmentId),

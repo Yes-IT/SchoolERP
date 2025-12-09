@@ -213,7 +213,7 @@ class AssignmentController extends Controller
         try {
             $teacherId = Auth::user()->staff->id;
             $assignment = $this->assignmentRepo->find($id);
-            Log::info('Assignment found:', ['assignment' => $assignment]);
+            // Log::info('Assignment found:', ['assignment' => $assignment]);
 
             if (!$assignment) {
                 return response()->json([

@@ -176,9 +176,15 @@ class Student extends BaseModel
         return $this->hasMany(\App\Models\FormChecklist::class, 'student_id');
     }
 
+    // public function classes()
+    // {
+    //     return $this->belongsToMany(Classes::class, 'student_class_mapping', 'student_id', 'class_id');
+    // }
+
     public function classes()
     {
-        return $this->belongsToMany(Classes::class, 'student_class_mapping', 'student_id', 'class_id');
+        return $this->belongsToMany(Classes::class, 'student_class_mapping', 'student_id', 'class_id')
+            ->withPivot('teacher_id');
     }
 
     public function getParentFullNameAttribute()

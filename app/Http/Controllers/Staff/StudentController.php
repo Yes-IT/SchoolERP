@@ -29,7 +29,7 @@ class StudentController extends Controller
                 $students = $this->students->filter($request);
             } else {
                 $students = $this->students->all();
-               Log::info('All students', ['students' => $students]);
+            //    Log::info('All students', ['students' => $students]);
             }
 
             return view('staff.students', compact('yearstatuses', 'subjects','students'));
@@ -40,39 +40,39 @@ class StudentController extends Controller
     }
 
     public function Filter(Request $request)
-{
-    try {
-        $students = $this->students->filter($request);
+    {
+        try {
+            $students = $this->students->filter($request);
 
-        $html = view('staff.partials.student_list', compact('students'))->render();
-        
-        $paginationHtml = '';
-        if ($students->hasPages()) {
-            $paginationHtml = view('backend.partials.pagination', [
-                'paginator' => $students, 
-                'routeName' => 'staff.students.index',
-                'queryParams' => $request->except('page')
-            ])->render();
+            $html = view('staff.partials.student_list', compact('students'))->render();
+            
+            $paginationHtml = '';
+            if ($students->hasPages()) {
+                $paginationHtml = view('backend.partials.pagination', [
+                    'paginator' => $students, 
+                    'routeName' => 'staff.students.index',
+                    'queryParams' => $request->except('page')
+                ])->render();
+            }
+
+            return response()->json([
+                'status' => true,
+                'html' => $html,
+                'paginationHtml' => $paginationHtml,
+                'total' => $students->total(),
+                'from' => $students->firstItem(),
+                'to' => $students->lastItem()
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Error loading data'
+            ], 500);
         }
-
-        return response()->json([
-            'status' => true,
-            'html' => $html,
-            'paginationHtml' => $paginationHtml,
-            'total' => $students->total(),
-            'from' => $students->firstItem(),
-            'to' => $students->lastItem()
-        ]);
-
-    } catch (\Exception $e) {
-        Log::error($e->getMessage());
-
-        return response()->json([
-            'status' => false,
-            'message' => 'Error loading data'
-        ], 500);
     }
-}
 
 
 }
