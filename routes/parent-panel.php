@@ -13,7 +13,12 @@ use App\Http\Controllers\ParentPanel\AttendanceController;
 use App\Http\Controllers\ParentPanel\ExamRoutineController;
 use App\Http\Controllers\ParentPanel\SubjectListController;
 use App\Http\Controllers\ParentPanel\ClassRoutineController;
+
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+use App\Http\Controllers\ParentPanel\AssignmentController;
+use App\Http\Controllers\ParentPanel\GradesController;
+use App\Http\Controllers\ParentPanel\TranscriptController;
+use App\Http\Controllers\ParentPanel\ExtendedLeavesController;
 // use Modules\VehicleTracker\Http\Controllers\ParentPanelTransportController;
 // use Modules\VehicleTracker\Http\Controllers\StudentPanelTransportController;
 
@@ -26,7 +31,9 @@ Route::middleware(saasMiddleware())->group(function () {
 
                     Route::controller(DashboardController::class)->prefix('parent-panel-dashboard')->group(function () {
                         Route::get('/', 'index')->name('parent-panel-dashboard.index');
+                        Route::get('/dashboard-upload', 'indexupload')->name('parent-panel-dashboard.indexupload');
                         Route::post('/search', 'search')->name('parent-panel-student.search');
+                        Route::post('/selectStudent', 'selectStudent')->name('parent-panel-student.selectStudent');
                         Route::post('search-parent-menu-data', 'searchParentMenuData')->name('search-parent-menu-data');
                     });
 
@@ -38,7 +45,9 @@ Route::middleware(saasMiddleware())->group(function () {
                         Route::get('/password/update',      'passwordUpdate')->name('parent-panel.password-update');
                         Route::put('/password/update/store', 'passwordUpdateStore')->name('parent-panel.password-update-store')->middleware('DemoCheck');
                     });
-
+                    Route::controller(AssignmentController::class)->prefix('parent-panel-assignment')->group(function () {
+                        Route::get('/', 'index')->name('parent-panel-assignment.index');
+                    });
                     Route::group(['middleware' => ['FeatureCheck:academic']], function () {
                         Route::controller(SubjectListController::class)->prefix('parent-panel-subject-list')->group(function () {
                             Route::get('/', 'index')->name('parent-panel-subject-list.index');
@@ -51,6 +60,18 @@ Route::middleware(saasMiddleware())->group(function () {
                             Route::get('/', 'index')->name('parent-panel-class-routine.index');
                             Route::post('/search', 'search')->name('parent-panel-class-routine.search');
                             Route::get('/pdf-generate/{student}', 'generatePDF')->name('parent-panel-class-routine.pdf-generate');
+                        });
+                        Route::controller(AssignmentController::class)->prefix('parent-panel-assignment')->group(function () {
+                            Route::get('/', 'index')->name('parent-panel-assignment.index');
+                        });
+                        Route::controller(ExtendedLeavesController::class)->prefix('parent-panel-extendedLeaves')->group(function () {
+                            Route::get('/', 'index')->name('parent-panel-extendedLeaves.index');
+                        });
+                        Route::controller(GradesController::class)->prefix('parent-panel-grades')->group(function () {
+                            Route::get('/', 'index')->name('parent-panel-grades.index');
+                        });
+                        Route::controller(TranscriptController::class)->prefix('parent-panel-transcript')->group(function () {
+                            Route::get('/', 'index')->name('parent-panel-transcript.index');
                         });
                         Route::controller(ExamRoutineController::class)->prefix('parent-panel-exam-routine')->group(function () {
                             Route::get('/', 'index')->name('parent-panel-exam-routine.index');
@@ -91,7 +112,6 @@ Route::middleware(saasMiddleware())->group(function () {
                             Route::get('/', 'index')->name('parent-panel-homeworks.index');
                             Route::any('/search', 'search')->name('parent-panel-homeworks.search');
                         });
-
                     });
 
                     Route::controller(DashboardController::class)->group(function () {
@@ -106,6 +126,10 @@ Route::middleware(saasMiddleware())->group(function () {
                         Route::get('parent/panel/issue-books', 'indexParent')->name('parent-panel-issue-books.index');
                     });
 
+
+
+
+
                     // Route::controller(ParentPanelTransportController::class)->prefix('parent-panel-transport')->group(function () {
                     //     Route::get('/schdule', 'schdule')->name('parent-panel-transport.schdule');
                     //     Route::get('/report', 'report')->name('parent-panel-transport.report');
@@ -118,5 +142,3 @@ Route::middleware(saasMiddleware())->group(function () {
         });
     });
 });
-
-

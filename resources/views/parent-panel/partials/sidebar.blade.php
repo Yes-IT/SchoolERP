@@ -1,146 +1,105 @@
-<aside class="sidebar" id="sidebar">
-
-    <x-sidebar-header />
-
-    <div class="sidebar-menu srollbar">
-        <div class="sidebar-menu-section">
-
-
-            <!-- parent menu list start  -->
-            <ul class="sidebar-dropdown-menu">
-                <li class="sidebar-menu-item {{ set_menu(['parent-panel-dashboard*']) }}">
-                    <a href="{{ route('parent-panel-dashboard.index') }}" class="parent-item-content">
-                        {{-- <img src="{{ asset('backend') }}/assets/images/icons/notification-status.svg" alt="Dashboard" /> --}}
-                        <i class="las la-desktop"></i>
-                        <span class="on-half-expanded">{{ ___('common.dashboard') }}</span>
-                    </a>
-                </li>
-                @if (hasFeature('academic'))
-                    <li class="sidebar-menu-item {{ set_menu(['parent-panel-subject-list*']) }}">
-                        <a href="{{ route('parent-panel-subject-list.index') }}" class="parent-item-content">
-                            {{-- <img src="{{ asset('backend') }}/assets/images/icons/notification-status.svg" alt="subject-list" /> --}}
-                            <i class="las la-book"></i>
-                            <span class="on-half-expanded">{{ ___('settings.subject_list') }}</span>
-                        </a>
-                    </li>
-                @endif
-                @if (hasFeature('routine'))
-                    <li class="sidebar-menu-item {{ set_menu(['parent-panel-class-routine*']) }}">
-                        <a href="{{ route('parent-panel-class-routine.index') }}" class="parent-item-content">
-                            {{-- <img src="{{ asset('backend') }}/assets/images/icons/notification-status.svg" alt="class-routine" /> --}}
-                            <i class="las la-award"></i>
-                            <span class="on-half-expanded">{{ ___('settings.class_routine') }}</span>
-                        </a>
-                    </li>
-                @endif
-                @if (hasFeature('fees'))
-                    <li class="sidebar-menu-item {{ set_menu(['parent-panel-fees*']) }}">
-                        <a href="{{ route('parent-panel-fees.index') }}" class="parent-item-content">
-                            <i class="las la-award"></i>
-                            <span class="on-half-expanded">{{ ___('settings.fees') }}</span>
-                        </a>
-                    </li>
-                @endif
-
-                @if (hasModule('VehicleTracker'))
-                <li class="sidebar-menu-item {{ set_menu(['parent-panel-transport/*']) }}">
-                    <a class="parent-item-content has-arrow">
-                        <i class="las la-bus"></i>
-                        <span class="on-half-expanded">{{ ___('student.Transport') }} @if(env('APP_DEMO')) <span class="badge badge-danger">Pro</span>@endif</span>
-                    </a>
-                    <ul class="child-menu-list">
-                        <li class="sidebar-menu-item {{ set_menu(['parent-panel-transport.schdule']) }}">
-                            <a href="{{ route('parent-panel-transport.schdule') }}">{{ ___('settings.Schdule') }}</a>
-                        </li>
-                        <li class="sidebar-menu-item {{ set_menu(['parent-panel-transport/report*']) }}">
-                            <a
-                                href="{{ route('parent-panel-transport.report') }}">{{ ___('settings.Report') }}</a>
-                        </li>
-                        <li class="sidebar-menu-item {{ set_menu(['parent-panel-transport.livetrack']) }}">
-                            <a href="{{ route('parent-panel-transport.livetrack') }}">{{ ___('settings.Live Track') }}</a>
-                        </li>
-                    </ul>
-                </li>
-                @endif
-
-                @if (hasFeature('routine'))
-                    <li class="sidebar-menu-item {{ set_menu(['parent-panel-exam-routine*']) }}">
-                        <a href="{{ route('parent-panel-exam-routine.index') }}" class="parent-item-content">
-                            {{-- <img src="{{ asset('backend') }}/assets/images/icons/notification-status.svg" alt="exam-routine" /> --}}
-                            <i class="las la-book-reader"></i>
-                            <span class="on-half-expanded">{{ ___('settings.exam_routine') }}</span>
-                        </a>
-                    </li>
-                @endif
-                @if (hasFeature('report'))
-                    <li class="sidebar-menu-item {{ set_menu(['parent-panel-marksheet*']) }}">
-                        <a href="{{ route('parent-panel-marksheet.index') }}" class="parent-item-content">
-                            {{-- <img src="{{ asset('backend') }}/assets/images/icons/notification-status.svg" alt="marksheet" /> --}}
-                            <i class="las la-graduation-cap"></i>
-                            <span class="on-half-expanded">{{ ___('settings.marksheet') }}</span>
-                        </a>
-                    </li>
-                @endif
-                @if (hasFeature('attendance'))
-                    <li class="sidebar-menu-item {{ set_menu(['parent-panel-attendance*']) }}">
-                        <a href="{{ route('parent-panel-attendance.index') }}" class="parent-item-content">
-                            <i class="las la-graduation-cap"></i>
-                            <span class="on-half-expanded">{{ ___('settings.Attendance') }}</span>
-                        </a>
-                    </li>
-                @endif
-                @if (hasFeature('attendance'))
-                    <li class="sidebar-menu-item {{ set_menu(['parent-panel-notice*']) }}">
-                        <a href="{{ route('parent-panel-notices.index') }}" class="parent-item-content">
-                            <i class="las la-graduation-cap"></i>
-                            <span class="on-half-expanded">{{ ___('settings.notices') }}</span>
-                        </a>
-                    </li>
-                @endif
-                <!-- Library start -->
-                @if (hasFeature('attendance'))
-                    <li
-                        class="sidebar-menu-item {{ set_menu(['parent-panel-book.index', 'parent-panel-issue-books.index']) }}">
-                        <a class="parent-item-content has-arrow">
-                            <i class="las la-swatchbook"></i>
-                            <span class="on-half-expanded">{{ ___('settings.Library') }}</span>
-                        </a>
-                        <ul class="child-menu-list">
-                            <li class="sidebar-menu-item {{ set_menu(['parent-panel-book.index']) }}">
-                                <a href="{{ route('parent-panel-book.index') }}">{{ ___('settings.Book') }}</a>
-                            </li>
-                            <li class="sidebar-menu-item {{ set_menu(['parent-panel-issue-books.index']) }}">
-                                <a
-                                    href="{{ route('parent-panel-issue-books.index') }}">{{ ___('settings.issue_book') }}</a>
-                            </li>
-                        </ul>
-                    </li>
-                @endif
-                <!-- Library end -->
-                @if (hasFeature('attendance'))
-                    <li class="sidebar-menu-item {{ set_menu(['parent-panel-homework*']) }}">
-                        <a href="{{ route('parent-panel-homeworks.index') }}" class="parent-item-content">
-                            <i class="las la-book-reader"></i>
-                            <span class="on-half-expanded">{{ ___('online-examination.homeworks') }}</span>
-                        </a>
-                    </li>
-                @endif
-
-                @if (hasModule('LiveChat'))
-                    <li class="sidebar-menu-item {{ set_menu(['guardian/live-chat*']) }}">
-                        <a href="{{ route('guardian.live_chat') }}" class="parent-item-content">
-                            <i class="lab la-facebook-messenger"></i>
-                            <span class="on-half-expanded">{{ ___('settings.Live Chat') }}</span>
-                        </a>
-                    </li>
-                @endif
-                @if (hasModule('Forums'))
-                    @include('forums::menus.parents_forum_menu')
-                @endif
-
-
-
-            </ul>
-        </div>
+<div class="sidebar">
+    <div class="sidebar-head">
+        <a href="{{ route('parent-panel-dashboard.index') }}" class="logo">
+            <img src="{{ global_asset('parent') }}/images/logo.png" alt="Logo">
+        </a>
+        <button class="sidebar-toggler"><i class="fa-solid fa-chevron-left"></i></button>
     </div>
-</aside>
+
+    <div class="sidebar-body">
+        <ul>
+            <li class="{{ Route::is('parent-panel-dashboard') ? 'active' : '' }}">
+                <a href="{{ route('parent-panel-dashboard.index') }}">
+                    <img src="{{ global_asset('parent') }}/images/sidebar-icon-1.svg" alt="">
+                    Dashboard
+                </a>
+            </li>
+
+            <li class="{{ Route::is('parent-panel.profile*') ? 'active' : '' }}">
+                <a href="{{ route('parent-panel.profile') }}">
+                    <img src="{{ global_asset('parent') }}/images/sidebar-icon-2.svg" alt="">
+                    My Profile
+                </a>
+            </li>
+
+            <li class="{{ Route::is('parent-panel-class-routine*') ? 'active' : '' }}">
+                <a href="{{ route('parent-panel-class-routine.index') }}">
+                    <img src="{{ global_asset('parent') }}/images/sidebar-icon-3.svg" alt="">
+                    Classes
+                </a>
+            </li>
+
+            <li class="{{ Route::is('parent-panel-assignment*') ? 'active' : '' }}">
+                <a href="{{ route('parent-panel-assignment.index') }}">
+                    <img src="{{ global_asset('parent') }}/images/sidebar-icon-4.svg" alt="">
+                    Assignments
+                </a>
+            </li>
+
+            <li class="{{ Route::is('parent-panel-attendance*') ? 'active' : '' }}">
+                <a href="{{ route('parent-panel-attendance.index') }}">
+                    <img src="{{ global_asset('parent') }}/images/sidebar-icon-5.svg" alt="">
+                    Attendance
+                </a>
+            </li>
+
+            <li class="{{ Route::is('parent-panel-grades*') ? 'active' : '' }}">
+                <a href="{{ route('parent-panel-grades.index') }}">
+                    <img src="{{ global_asset('parent') }}/images/sidebar-icon-6.svg" alt="">
+                    Grades
+                </a>
+            </li>
+
+            <li class="{{ Route::is('parent-panel-fees*') ? 'active' : '' }}">
+                <a href="{{ route('parent-panel-fees.index') }}">
+                    <img src="{{ global_asset('parent') }}/images/sidebar-icon-7.svg" alt="">
+                    Tuition Fees
+                </a>
+            </li>
+
+            <li class="{{ Route::is('parent-panel-transcript*') ? 'active' : '' }}">
+                <a href="{{ route('parent-panel-transcript.index') }}">
+                    <img src="{{ global_asset('parent') }}/images/sidebar-icon-8.svg" alt="">
+                    Request Transcript
+                </a>
+            </li>
+
+            <li class="{{ Route::is('parent-panel-extendedLeaves*') ? 'active' : '' }}">
+                <a href="{{ route('parent-panel-extendedLeaves.index') }}">
+                    <img src="{{ global_asset('parent') }}/images/sidebar-icon-9.svg" alt="">
+                    Extended Leaves
+                </a>
+            </li>
+
+            <li class="{{ Route::is('parent-panel-notices*') ? 'active' : '' }}">
+                <a href="{{ route('parent-panel-notices.index') }}">
+                    <img src="{{ global_asset('parent') }}/images/sidebar-icon-10.svg" alt="">
+                    Notice Board
+                </a>
+            </li>
+
+            {{-- <li>
+                <form action="/logout" method="POST">
+                    @csrf
+                    <button type="submit" class="profile-expand-item">
+                        <img src="{{ global_asset('parent') }}/images/sidebar-icon-12.svg" alt="">
+            <span>Logout</span>
+            </button>
+            </form>
+            </li> --}}
+
+            <li class="{{ Route::is('logout') ? 'active' : '' }}">
+                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <img src="{{ global_asset('parent') }}/images/sidebar-icon-12.svg" alt="">
+                    Logout
+                </a>
+
+                <form id="logout-form" action="/logout" method="POST" style="display: none;">
+                    @csrf
+                </form>
+            </li>
+
+
+        </ul>
+    </div>
+</div>

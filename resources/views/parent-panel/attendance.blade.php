@@ -1,787 +1,368 @@
 @extends('parent-panel.partials.master')
 
-@section('title')
-    {{ ___('common.Online Class Routine 2023') }}
-@endsection
-<style>
-    body {
-        font-family: 'Poppins', sans-serif;
-        font-size: 14px;
-        margin: 0;
-        padding: 0;
-        -webkit-print-color-adjust: exact !important;
-    }
-
-    table {
-        border-collapse: collapse;
-    }
-
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-        margin: 0;
-        color: #000;
-    }
-
-    .routine_wrapper {
-        max-width: 900px;
-        margin: auto;
-        background: #fff;
-        padding: 0px;
-        border-radius: 8px;
-        background: #ECECEC;
-    }
-
-    .routine_wrapper_body {
-        padding: 36px;
-    }
-
-    .table {
-        width: 100%;
-        margin-bottom: 1rem;
-        color: #212529;
-    }
-
-    .border_none {
-        border: 0px solid transparent;
-        border-top: 0px solid transparent !important;
-    }
-
-    .routine_part_iner {
-        background-color: #fff;
-    }
-
-    .routine_part_iner h4 {
-        font-size: 30px;
-        font-weight: 500;
-        margin-bottom: 40px;
-
-    }
-
-    .routine_part_iner h3 {
-        font-size: 25px;
-        font-weight: 500;
-        margin-bottom: 5px;
-
-    }
-
-    .table_border thead {
-        background-color: #F6F8FA;
-    }
-
-    .table td,
-    .table th {
-        padding: 0px 0;
-        vertical-align: top;
-        border-top: 0 solid transparent;
-        color: #000;
-    }
-
-    .table_border tr {
-        border-bottom: 1px solid #000 !important;
-    }
-
-    th p span,
-    td p span {
-        color: #212E40;
-    }
-
-    .table th {
-        color: #000;
-        font-weight: 300;
-        border-bottom: 1px solid #000 !important;
-        background-color: #fff;
-    }
-
-    p {
-        font-size: 14px;
-        color: #000;
-        font-weight: 400;
-    }
-
-    h5 {
-        font-size: 12px;
-        font-weight: 500;
-    }
-
-    h6 {
-        font-size: 10px;
-        font-weight: 300;
-    }
-
-    .mt_40 {
-        margin-top: 40px;
-    }
-
-    .table_style th,
-    .table_style td {
-        padding: 20px;
-    }
-
-    .routine_info_table td {
-        font-size: 10px;
-        padding: 0px;
-    }
-
-    .routine_info_table td h6 {
-        color: #6D6D6D;
-        font-weight: 400;
-    }
-
-    .text_right {
-        text-align: right;
-    }
-
-    .virtical_middle {
-        vertical-align: middle !important;
-    }
-
-    .border_bottom {
-        border-bottom: 1px solid #000;
-    }
-
-    .line_grid {
-        display: grid;
-        grid-template-columns: 100px auto;
-        grid-gap: 10px;
-    }
-
-    .line_grid span {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    p {
-        margin: 0;
-        color: #000;
-    }
-
-    .font_18 {
-        font-size: 18px;
-    }
-
-    .mb-0 {
-        margin-bottom: 0;
-    }
-
-    .mb_30 {
-        margin-bottom: 30px !important;
-    }
-
-    .mb_40 {
-        margin-bottom: 40px !important;
-    }
-
-    .mb_10 {
-        margin-bottom: 10px !important;
-    }
-
-    .mb_20 {
-        margin-bottom: 20px !important;
-    }
-
-    .bold_text {
-        font-weight: 600;
-    }
-
-    .border_table {
-        /* border: 1px solid #000; */
-    }
-
-    .title_header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin: 40px 0 15px 0;
-    }
-
-    .border_table tr:nth-of-type(n) {
-        border: 1px solid #000;
-    }
-
-    .border_table tfoot tr:first-of-type {
-        border: 0;
-    }
-
-    .border_table tfoot tr:first-of-type td {
-        border: 0;
-    }
-
-    .routine_header h3 {
-        font-size: 24px;
-        font-weight: 500;
-    }
-
-    .routine_header p {
-        font-size: 14px;
-        font-weight: 400;
-        margin-bottom: 15px !important;
-    }
-
-    .border_table thead tr th {
-        border-right: 0;
-        border-color: transparent !important;
-        text-align: left;
-        background: #EAEAEA;
-        white-space: nowrap;
-        background: #E6E6E6 !important;
-        color: #1A1A21 !important;
-        font-size: 16px;
-        font-weight: 500;
-        text-transform: capitalize;
-        padding: 8px 12px;
-    }
-
-    .border_table tbody tr td,
-    .border_table tfoot tr td {
-        border-bottom: 0;
-        text-align: center;
-        font-size: 12px;
-        padding: 5px;
-        border-right: 0;
-    }
-
-    .border_table tr:nth-of-type(n) {
-        border: 0;
-    }
-
-    .border_table tr:nth-of-type(odd) {
-        border: 0;
-        background: #F8F8F8;
-    }
-
-    .border_table tr:nth-of-type(even) {
-        border: 0;
-        background: #EFEFEF;
-    }
-
-    .border_table tbody tr th {
-        background: #EAEAEA;
-        border: 1px solid #FFFFFF;
-        font-weight: 700;
-        font-size: 18px;
-        line-height: 30px;
-        border-color: #fff !important;
-        color: #424242;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 140px;
-        padding: 2px 6px;
-    }
-
-    .classBox_wiz {
-        min-height: 26px;
-        vertical-align: middle;
-        display: flex;
-        align-items: center;
-        padding: 8px 6px;
-    }
-
-    .classBox_wiz h5 {
-        font-weight: 400;
-        font-size: 16px;
-        line-height: 22px;
-        color: #424242;
-        margin: 0 0 5px 0;
-        white-space: nowrap
-    }
-
-    .classBox_wiz p {
-        font-weight: 500;
-        font-size: 14px;
-        line-height: 18px;
-        color: #6B6B6B;
-        margin: 0 0 5px 0;
-    }
-
-    .marked_bg {
-        background: #E6E6E6 !important;
-        color: #1A1A21 !important;
-        font-size: 16px;
-        font-weight: 500;
-        text-transform: capitalize;
-        padding: 8px 12px;
-    }
-
-    .break_text {
-        min-height: 129px;
-        vertical-align: middle;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        padding: 15px;
-    }
-
-    .break_text h5 {
-        font-weight: 600;
-        font-size: 18px;
-        line-height: 22px;
-        color: #424242;
-        transform: rotate(-30deg);
-    }
-
-    .download_print_btns {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        grid-gap: 12px;
-        padding-bottom: 60px;
-    }
-
-    .student_info_wrapper {
-        background: #F5F5F5;
-        border-radius: 8px;
-        padding: 20px;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-    }
-
-    .student_info_single {
-        width: 45%;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        white-space: nowrap;
-        margin-bottom: 8px;
-    }
-
-    .student_info_single span {
-        min-width: 170px;
-        color: #424242;
-        font-size: 16px;
-        line-height: 24px;
-        text-transform: capitalize;
-    }
-
-    .student_info_single h5 {
-        margin: 0;
-        color: #1A1A21;
-        font-weight: 400;
-        font-size: 16px;
-    }
-
-    .routine_wrapper_header {
-        background: #392C7D;
-        padding: 32px 36px;
-        border-radius: 8px 8px 0 0;
-        margin-bottom: 0;
-        flex-wrap: wrap;
-        grid-gap: 20px;
-    }
-
-    .routine_wrapper_header h3 {
-        font-weight: 500;
-        font-size: 36px;
-        line-height: 40px;
-        color: #FFFFFF;
-        margin: 0;
-    }
-
-    .routine_wrapper_header h4 {
-        font-size: 24px;
-        color: #FF5170;
-        font-weight: 500;
-        margin: 7px 0 7px 0;
-    }
-
-    .routine_wrapper_header p {
-        font-weight: 400;
-        font-size: 14px;
-        color: #D6D6D6;
-        margin: 0;
-    }
-
-    .routine_wrapper_header_logo .header_logo {
-        max-width: 193px;
-    }
-
-    .routine_wrapper_header {
-        display: flex;
-        align-items: center;
-    }
-
-    .vertical_seperator {
-        border-right: 1px solid #FFFFFF;
-        height: 93px;
-        margin: 0 30px 0 40px;
-    }
-
-    .markseet_title h5 {
-        color: #242424;
-        font-weight: 600;
-        font-size: 24px;
-        line-height: 36px;
-        margin: 30px 0 30px 0;
-        display: block;
-        padding: 26px 0 12px 0;
-        text-align: center;
-    }
-
-    @media (max-width: 768px) {
-        .student_info_single {
-            width: 100%;
-        }
-
-        .vertical_seperator {
-            display: none !important;
-        }
-
-        .routine_wrapper {
-            width: 100%;
-        }
-
-        .routine_wrapper_body {
-            padding: 0;
-        }
-
-        .student_info_single {
-            flex-wrap: wrap;
-        }
-
-        .download_print_btns {
-            margin-top: 30px;
-        }
-
-        .routine_wrapper_header {
-            padding: 20px 20px;
-        }
-
-        .routine_wrapper_header h3 {
-            font-size: 24px;
-        }
-    }
-
-    /* routine_wrapper_header  */
-    .routine_wrapper_header {
-        background: #392C7D;
-        padding: 32px 36px;
-        border-radius: 16px 16px 0 0;
-        margin-bottom: 0;
-        flex-wrap: wrap;
-        grid-gap: 20px;
-        margin-bottom: 20px;
-        justify-content: center;
-    }
-
-    .routine_wrapper_header h3 {
-        font-weight: 500;
-        font-size: 36px;
-        line-height: 40px;
-        color: #FFFFFF;
-        margin: 0;
-    }
-
-    .routine_wrapper_header h4 {
-        font-size: 24px;
-        color: #FF5170;
-        font-weight: 500;
-        margin: 7px 0 7px 0;
-    }
-
-    .routine_wrapper_header p {
-        font-weight: 500;
-        font-size: 18px;
-        line-height: 30px;
-        color: #FFFFFF;
-        margin: 0;
-    }
-
-    .routine_wrapper_header_logo .header_logo {
-        max-width: 193px;
-    }
-
-    .routine_wrapper_header {
-        display: flex;
-        align-items: center;
-    }
-
-    .routine_wrapper_header {
-        padding: 30px 20px;
-    }
-
-    .routine_wrapper_header h3 {
-        font-size: 24px;
-    }
-
-    .print_copyright_text {
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        grid-gap: 10px;
-        margin: 20px 0;
-
-    }
-
-    .print_copyright_text{
-        display: flex;
-        align-items: center;
-        padding-bottom: 10px;
-    }
-
-    .download_print_btns {
-        display: flex;
-        align-items: center;
-        justify-content: start;
-        grid-gap: 12px;
-        background: #F3F3F3;
-        padding: 20px;
-        flex-wrap: wrap;
-    }
-
-    .vertical_seperator {
-        border-right: 1px solid #FFFFFF;
-        height: 93px;
-        margin: 0 30px 0 40px;
-    }
-    .print_copyright_text{
-        display: flex;
-        align-items: center;
-        padding-bottom: 10px;
-    }
-    @media (max-width: 768px) {
-        .student_info_single {
-            width: 100%;
-        }
-
-        .vertical_seperator {
-            display: none !important;
-        }
-
-        .routine_wrapper {
-            width: 100%;
-        }
-
-        .routine_wrapper_body {
-            padding: 0;
-        }
-
-        .student_info_single {
-            flex-wrap: wrap;
-        }
-
-        .download_print_btns {
-            margin-top: 30px;
-        }
-
-        .routine_wrapper_header {
-            padding: 20px 20px;
-        }
-
-        .routine_wrapper_header h3 {
-            font-size: 24px;
-        }
-    }
-</style>
-
 @section('content')
-    <div class="page-content">
 
-        <div class="col-12 p-0">
-            <form action="{{ route('parent-panel-attendance.search') }}" method="post" id="marksheed" enctype="multipart/form-data">
-                @csrf
-                <div class="card ot-card mb-24 position-relative z_1">
-                    <div class="card-header d-flex align-items-center gap-4 flex-wrap">
-                        <h3 class="mb-0">{{ ___('common.Filtering') }}</h3>
+    <style>
+        .status.holiday {
+            background: #D3D3D3;
+            color: #333;
+            font-weight: 500;
+            display: inline-block;
+            padding: 21px 10px;
+            border-radius: 6px;
+            font-size: 36px;
+            color: gray
+        }
 
-                        <div
-                            class="card_header_right d-flex align-items-center gap-3 flex-fill justify-content-end flex-wrap">
-                            <!-- table_searchBox -->
+        .holiday-row {
+            background-color: #f5f5f5;
+        }
+    </style>
+    @php
+        use Carbon\Carbon;
+    @endphp
+    <!-- Dashboard Begin -->
+    <div class="ds-breadcrumb">
+        <h1>My Attendance</h1>
+        <ul>
+            <li><a href="{{ route('student.dashboard') }}">Dashboard</a> /</li>
+            <li>My Attendances</li>
+        </ul>
+    </div>
+    <div class="ds-pr-body">
 
-                            <div class="single_large_selectBox">
-                                <select class="nice-select niceSelect bordered_style wide @error('student') is-invalid @enderror" name="student">
-                                    <option value="">{{ ___('student_info.select_student') }}</option>
-                                    @foreach ($data['students'] as $item)
-                                    <option {{ old('student', Session::get('student_id')) == $item->id ? 'selected' : '' }} value="{{ $item->id }}">{{ $item->first_name }} {{ $item->last_name }}
-                                        @endforeach
-                                </select>
-                                @error('student')
-                                <div id="validationServer04Feedback" class="invalid-feedback">
-                                    {{ $message }}
+        <div class="atndnc-filter-wrp w-100">
+            <div class="sec-head">
+                <h2>Filters</h2>
+            </div>
+            <div class="atndnc-filter">
+                <form method="GET" action="{{ url('parent-panel-attendance') }}">
+                    <div class="atndnc-filter-form">
+                        <div class="atndnc-filter-options">
+
+                            <!-- Subject Multi-Select Dropdown -->
+                            <div class="dropdown subject-dropdown">
+                                <button type="button" class="dropdown-toggle">
+                                    <span class="label">
+                                        {{ request()->has('subjects') ? 'Filtered Subjects' : 'All Subjects' }}
+                                    </span>
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </button>
+                                <div class="dropdown-menu">
+                                    <label>
+                                        <input type="checkbox" name="subjects[]" value="all"
+                                            {{ in_array('all', request()->get('subjects', [])) ? 'checked' : '' }}>
+                                        All Subjects
+                                    </label>
+
+                                    @foreach ($subjects as $subject)
+                                        <label>
+                                            <input type="checkbox" name="subjects[]" value="{{ $subject->id }}"
+                                                {{ in_array($subject->id, request()->get('subjects', [])) ? 'checked' : '' }}>
+                                            {{ $subject->name }}
+                                        </label>
+                                    @endforeach
                                 </div>
-                                @enderror
-                            </div>
-                            <div class="single_large_selectBox">
-                                <select class="class nice-select niceSelect bordered_style wide" name="view">
-                                    <option {{ old('view', @$data['request']->view) == '0' ? 'selected' : '' }} value="0">{{ ___('report.short_view') }}</option>
-                                    <option {{ old('view', @$data['request']->view) == '1' ? 'selected' : '' }} value="1">{{ ___('report.details_view') }}</option>
-                                </select>
-                            </div>
-                            <div class="single_large_selectBox">
-                                <input value="{{ old('month', @$data['request']->month) }}" name="month" class="form-control ot-input @error('month') is-invalid @enderror" type="month" placeholder="Search month">
 
-                                @error('month')
-                                    <div id="validationServer04Feedback" class="invalid-feedback">
-                                        {{ $message }}
+
+
+                            </div>
+
+                            <!-- Year/Month Picker Dropdown -->
+                            <div class="dropdown date-dropdown">
+                                <button type="button" class="dropdown-toggle">
+                                    <span class="label">
+                                        {{ \Carbon\Carbon::create()->month($month)->format('F') }}, {{ $year }}
+                                    </span>
+                                    <i class="fa-regular fa-calendar"></i>
+                                </button>
+                                <div class="dropdown-menu date-menu">
+                                    <select class="year-select" name="year">
+                                        @for ($y = date('Y') - 15; $y <= date('Y') + 15; $y++)
+                                            <option value="{{ $y }}" {{ $y == $year ? 'selected' : '' }}>
+                                                {{ $y }}
+                                            </option>
+                                        @endfor
+                                    </select>
+
+                                    <select class="month-select" name="month">
+                                        @for ($m = 1; $m <= 12; $m++)
+                                            <option value="{{ $m }}" {{ $m == $month ? 'selected' : '' }}>
+                                                {{ \Carbon\Carbon::create()->month($m)->format('F') }}
+                                            </option>
+                                        @endfor
+                                    </select>
+
+                                    <div class="actions">
+                                        <button type="button" class="btn-cancel">Cancel</button>
+                                        <button type="submit" class="btn-apply">Apply</button>
                                     </div>
-                                @enderror
+                                </div>
                             </div>
-                            <div class="single_large_selectBox">
-                                <input value="{{ old('date', @$data['request']->date) }}" name="date" class="form-control ot-input @error('date') is-invalid @enderror" type="date">
-
-                                @error('date')
-                                    <div id="validationServer04Feedback" class="invalid-feedback">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-
-                            <button class="btn btn-lg ot-btn-primary" type="submit">
-                                {{___('common.Search')}}
-                            </button>
                         </div>
+
+                        <!-- Search Button -->
+                        <button type="submit" class="btn-search">Search</button>
                     </div>
-                </div>
-            </form>
-        </div>
-
-        @if($data['results'] != null)
-
-
-        <!--  table content start -->
-        <div class="table-content table-basic mt-20">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">{{ ___('report.attendance_report') }}</h4>
-                    <div>
-                        <small>
-                            <span class="text-success">{{ ___('attendance.Present') }} = {{ ___('common.P') }}</span>
-                            <span class="text-warning">{{ ___('attendance.Late') }} = {{ ___('common.L') }}</span>
-                            <span class="text-danger">{{ ___('attendance.Absent') }} = {{ ___('common.A') }}</span>
-                            <span class="text-primary">{{ ___('attendance.half_day') }} = {{ ___('common.F') }}</span>
-                            <span >{{ ___('attendance.Holiday') }} = {{ ___('common.H') }}</span>
-                        </small>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        @if ( @$data['request']->view == '0')
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        @for ($i = 1; $i < date('t'); $i++)
-                                            <th>{{ $i }}</th>
-                                        @endfor
-                                        <th class="purchase text-success">{{ ___('common.P') }}</th>
-                                        <th class="purchase text-warning">{{ ___('common.L') }}</th>
-                                        <th class="purchase text-danger">{{ ___('common.A') }}</th>
-                                        <th class="purchase text-primary">{{ ___('common.F') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        @php
-                                            $p = 0; $l = 0; $a = 0; $f = 0;
-                                        @endphp
-                                        @for ($i = 1; $i < date('t'); $i++)
-                                            <td>
-                                                @foreach ($data['results'] as $item)
-                                                    @if ((int)substr($item->date, -2) == $i)
-                                                        @if (@$item->attendance == App\Enums\AttendanceType::PRESENT)
-                                                            <span class="text-success">{{ ___('common.P') }}</span>
-                                                            @php
-                                                                ++$p
-                                                            @endphp
-                                                        @elseif(@$item->attendance == App\Enums\AttendanceType::LATE)
-                                                            <span class="text-warning">{{ ___('common.L') }}</span>
-                                                            @php
-                                                                ++$l
-                                                            @endphp
-                                                        @elseif(@$item->attendance == App\Enums\AttendanceType::ABSENT)
-                                                            <span class="text-danger">{{ ___('common.A') }}</span>
-                                                            @php
-                                                                ++$a
-                                                            @endphp
-                                                        @elseif(@$item->attendance == App\Enums\AttendanceType::HALFDAY)
-                                                            <span class="text-primary">{{ ___('common.F') }}</span>
-                                                            @php
-                                                                ++$f
-                                                            @endphp
-                                                        @else
-                                                            <span>{{ ___('common.H') }}</span>
-                                                        @endif
-                                                    @endif
-                                                @endforeach
-                                            </td>
-                                        @endfor
-                                        <td><span class="text-success">{{ $p }}</span></td>
-                                        <td><span class="text-warning">{{ $l }}</span></td>
-                                        <td><span class="text-danger">{{ $a }}</span></td>
-                                        <td><span class="text-primary">{{ $f }}</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        @else
-                            <table class="table table-bordered role-table" id="students_table">
-                                <thead class="thead">
-                                    <tr>
-                                        <th class="purchase">{{ ___('common.date') }}</th>
-                                        <th class="purchase">{{ ___('attendance.Attendance') }}</th>
-                                        <th class="purchase">{{ ___('attendance.Note') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($data['results'] as $item)
-                                    <tr>
-                                        <td>
-                                            @if (@$item->attendance == App\Enums\AttendanceType::PRESENT)
-                                                <span class="badge-basic-success-text">{{ ___('common.Present') }}</span>
-                                            @elseif(@$item->attendance == App\Enums\AttendanceType::LATE)
-                                                <span class="badge-basic-warning-text">{{ ___('common.Late') }}</span>
-                                            @elseif(@$item->attendance == App\Enums\AttendanceType::ABSENT)
-                                                <span class="badge-basic-danger-text">{{ ___('common.Absent') }}</span>
-                                            @elseif(@$item->attendance == App\Enums\AttendanceType::HALFDAY)
-                                                <span class="badge-basic-primary-text">{{ ___('common.half_day') }}</span>
-                                            @else
-                                                <span class="badge-basic-info-text">{{ ___('common.Holiday') }}</span>
-                                            @endif
-                                        </td>
-                                        <td>{{ dateFormat(@$item->date) }}</td>
-                                        <td>
-                                            {{ old('note',@$item->note) }}
-                                        </td>
-                                    </tr>
-                                    @empty
-                                    <tr>
-                                        <td colspan="100%" class="text-center gray-color">
-                                            <img src="{{ asset('images/no_data.svg') }}" alt="" class="mb-primary" width="100">
-                                            <p class="mb-0 text-center">{{ ___('common.no_data_available') }}</p>
-                                            <p class="mb-0 text-center text-secondary font-size-90">
-                                                {{ ___('common.please_add_new_entity_regarding_this_table') }}</p>
-                                        </td>
-                                    </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        @endif
-                    </div>
-                    <!--  pagination start -->
-
-                    @if ( @$data['request']->view != '0')
-                    <div class="ot-pagination pagination-content d-flex justify-content-end align-content-center py-3">
-                        <nav aria-label="Page navigation example">
-                            <ul class="pagination justify-content-between">
-                                {!!$data['results']->appends(\Request::capture()->except('page'))->links() !!}
-                            </ul>
-                        </nav>
-                    </div>
-                    @endif
-
-                <!--  pagination end -->
-                </div>
-
+                </form>
 
 
             </div>
         </div>
-        <!--  table content end -->
+        <div class="ds-cmn-table-wrp">
+            <div class="attendance-calendar">
+                <div class="sec-head d-flex justify-content-between align-items-center">
+                    <h2>Attendance - {{ \Carbon\Carbon::create()->month($month)->format('F') }} {{ $year }}</h2>
+                    <button class="download-attendance-btn cmn-btn">Download Report</button>
+                </div>
 
-        @endif
+                <div class="ds-cmn-tble pending attendance-pg w1200">
+                    <table id="calendarTable"
+                        style="{{ empty($selectedSubjects) || in_array('all', $selectedSubjects) ? '' : 'display:none;' }}">
+                        {{-- Calendar View --}}
+                        <thead>
+                            <tr>
+                                @foreach ($daysOfWeek as $day)
+                                    <th>{{ $day }}</th>
+                                @endforeach
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php $currentDate = $firstDay->copy()->startOfWeek(Carbon::SUNDAY); @endphp
+                            @while ($currentDate <= $lastDay->copy()->endOfWeek(Carbon::SATURDAY))
+                                <tr>
+                                    @for ($i = 0; $i < 7; $i++)
+                                        @php
+                                            $isOutsideMonth = $currentDate->month !== $firstDay->month;
+                                            $dateKey = $currentDate->format('Y-m-d');
+                                        @endphp
+                                        <td class="{{ $isOutsideMonth ? 'outside' : '' }}">
+                                            <div class="date-cal-box">
+                                                <span class="date-number">{{ $currentDate->format('j') }}</span>
 
+                                                @if (!empty($attendanceData[$dateKey]))
+                                                    @foreach ($attendanceData[$dateKey] as $subjectId => $status)
+                                                        <div class="status {{ $status }}">
+                                                          {{ ucfirst(str_replace('_', ' ', $status)) }}
+
+                                                        </div>
+                                                    @endforeach
+                                                @endif
+                                            </div>
+                                        </td>
+                                        @php $currentDate->addDay(); @endphp
+                                    @endfor
+                                </tr>
+                            @endwhile
+                        </tbody>
+
+                    </table>
+
+                    {{-- Subject-Based View --}}
+                    @php
+
+                        // Get selected subjects
+                        $selectedSubjects = request()->get('subjects', ['all']);
+
+                        // Determine which subjects to display
+                        $displaySubjects = in_array('all', $selectedSubjects)
+                            ? $subjects
+                            : $subjects->whereIn('id', $selectedSubjects);
+
+                        // Month loop setup
+                        $currentDate = $firstDay->copy()->startOfMonth();
+                        $endDate = $firstDay->copy()->endOfMonth();
+                    @endphp
+
+                    <table id="subjectTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                @foreach ($displaySubjects as $subject)
+                                    <th>{{ $subject->name }}</th>
+                                @endforeach
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @while ($currentDate <= $endDate)
+                                @php
+                                    $isSaturday = $currentDate->isSaturday();
+                                    $dateKey = $currentDate->format('Y-m-d');
+                                @endphp
+
+                                {{-- If it's Saturday, show one row spanning all columns --}}
+                                @if ($isSaturday)
+                                    <tr class="holiday-row">
+                                        <td colspan="{{ count($displaySubjects) + 1 }}">
+                                            <div class="date-cal-box" style="text-align:center;">
+                                                <span class="date-number">{{ $currentDate->format('j M') }}</span>
+                                                <div class="status holiday">Holiday</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @else
+                                    {{-- Normal attendance row --}}
+                                    <tr>
+                                        {{-- Date Column --}}
+                                        <td class="date-column">
+                                            <div class="date-cal-box">
+                                                <span class="date-number">{{ $currentDate->format('j M') }}</span>
+                                            </div>
+                                        </td>
+
+                                        {{-- Subject Columns --}}
+                                        @foreach ($displaySubjects as $subject)
+                                            @php
+                                                $status = $attendanceData[$dateKey][$subject->id] ?? null;
+                                            @endphp
+                                            <td>
+                                                <div class="date-cal-box">
+                                                   
+                                                    @if ($status)
+                                                        <div class="status {{ $status }}">  
+                                                            {{-- @if($status=='half_day')
+                                                            Half Day
+                                                            @else --}}
+
+                                                            {!! ucwords(str_replace('_', ' ', $status)) !!}
+                                                            {{-- @endif --}}
+                                                  
+
+                                                        </div>
+                                                    @else
+                                                        <div class="status" style="background: #e0e0e0;">—</div>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                        @endforeach
+                                    </tr>
+                                @endif
+
+                                @php $currentDate->addDay(); @endphp
+                            @endwhile
+                        </tbody>
+                    </table>
+
+
+
+
+
+
+                </div>
+            </div>
+        </div>
     </div>
+    <!-- End Of Dashboard -->
+
 @endsection
+
+@push('script')
+    <!-- Include jsPDF and html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // Select the correct button
+            const downloadBtn = document.querySelector('.download-attendance-btn');
+
+            if (!downloadBtn) {
+                console.error("Download button not found!");
+                return;
+            }
+
+            downloadBtn.addEventListener('click', async function() {
+          
+
+                const {
+                    jsPDF
+                } = window.jspdf;
+                const pdf = new jsPDF('p', 'pt', 'a4');
+
+                const headingText = document.querySelector('.sec-head h2')?.textContent ||
+                    'Attendance Report';
+
+                downloadBtn.style.display = 'none';
+
+                const tableContainer = document.querySelector('.attendance-calendar');
+
+                const canvas = await html2canvas(tableContainer, {
+                    scale: 2,
+                    useCORS: true,
+                    scrollY: 0,
+                    windowWidth: document.documentElement.offsetWidth
+                });
+
+                downloadBtn.style.display = 'inline-block';
+
+                const imgData = canvas.toDataURL('image/png');
+
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                const imgWidth = pdfWidth - 40;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                pdf.setFontSize(16);
+                pdf.text(headingText, 40, 40);
+
+                const yOffset = 60;
+                const availableHeight = pdfHeight - yOffset - 20;
+                const finalHeight = Math.min(imgHeight, availableHeight);
+
+                pdf.addImage(imgData, 'PNG', 20, yOffset, imgWidth, finalHeight);
+
+                pdf.save(`${headingText.replace(/\s+/g, '_')}.pdf`);
+            });
+        });
+
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const allCheckbox = document.querySelector('input[value="all"]');
+            const subjectCheckboxes = document.querySelectorAll('input[name="subjects[]"]:not([value="all"])');
+            const calendarTable = document.getElementById('calendarTable');
+            const subjectTable = document.getElementById('subjectTable');
+
+            function updateTableVisibility() {
+                const checkedSubjects = Array.from(document.querySelectorAll('input[name="subjects[]"]:checked'))
+                    .map(cb => cb.value);
+
+                if (checkedSubjects.length === 0) {
+                    // nothing selected -> show calendar view
+                    calendarTable.style.display = '';
+                    subjectTable.style.display = 'none';
+                } else {
+                    // either all or specific subjects selected -> show subject table
+                    calendarTable.style.display = 'none';
+                    subjectTable.style.display = '';
+                }
+            }
+
+            // Handle "All Subjects" toggle
+            allCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    subjectCheckboxes.forEach(cb => cb.checked = false);
+                }
+                updateTableVisibility();
+                this.closest('form').submit(); // reload page with selected subjects
+            });
+
+            // Handle specific subject selection
+            subjectCheckboxes.forEach(cb => {
+                cb.addEventListener('change', function() {
+                    if (this.checked) {
+                        allCheckbox.checked = false;
+                    }
+                    updateTableVisibility();
+                    this.closest('form').submit();
+                });
+            });
+
+            // On initial page load
+            updateTableVisibility();
+        });
+    </script>
+@endpush

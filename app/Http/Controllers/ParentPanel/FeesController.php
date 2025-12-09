@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Session;
 use Srmklive\PayPal\Services\ExpressCheckout;
 use App\Repositories\Fees\FeesCollectRepository;
 use App\Repositories\ParentPanel\FeesRepository;
+use Illuminate\Support\Facades\Auth;
+use App\Models\StudentInfo\Student;
+use App\Models\SchoolList;
+use DB;
+
 
 class FeesController extends Controller
 {
@@ -16,14 +21,61 @@ class FeesController extends Controller
     private $feesCollectRepository;
 
     function __construct(FeesRepository $repo, FeesCollectRepository $feesCollectRepository)
-    { 
-        $this->repo = $repo; 
-        $this->feesCollectRepository = $feesCollectRepository; 
+    {
+        $this->repo = $repo;
+        $this->feesCollectRepository = $feesCollectRepository;
     }
 
-    public function index(Request $request){
-        $data = $this->repo->index($request);
-        return view('parent-panel.fees', compact('data'));
+    public function index(Request $request)
+    {
+        $student = Student::where('parent_guardian_id', Auth::id())->first();
+
+
+        if (!$student) {
+            return redirect()->back()->withErrors(['error' => 'Student not found.']);
+        }
+        $yearOptions = DB::table('school_years')
+            ->pluck('name', 'id')
+            ->toArray();
+
+        $query = DB::table('fees_assign_childrens as fac')
+            ->leftjoin('fees_masters as fm', 'fm.id', '=', 'fac.fees_master_id')
+            ->leftjoin('fees_types as ft', 'ft.id', '=', 'fm.fees_type_id')
+            ->select(
+                'fac.id as id',
+                'ft.name as type',
+                'fm.due_date',
+                'fm.amount'
+            )
+            ->where('fac.student_id', $student->id);
+
+
+
+        if ($request->filled('year')) {
+            $yearName = DB::table('school_years')->where('id', $request->year)->value('name');
+
+            if ($yearName) {
+                [$yearStart, $yearEnd] = explode('-', $yearName);
+                $startOfYear = \Carbon\Carbon::createFromDate($yearStart, 6, 1)->startOfMonth();
+                $endOfYear   = \Carbon\Carbon::createFromDate($yearEnd, 5, 31)->endOfMonth();
+
+                $query->whereBetween('fm.due_date', [$startOfYear, $endOfYear]);
+            }
+        }
+
+        // $fees = $query->get();
+
+        $perPage = $request->get('perPage', 10);
+        $fees = $query->paginate($perPage);
+
+        $destinations = SchoolList::getDestination();
+        return view('parent-panel.fees',  [
+            'yearOptions' => $yearOptions,
+            'fees' => $fees,
+            'selectedYear' => $request->year,
+            'perPage' => $perPage,
+            'destinations' => $destinations
+        ]);
     }
 
 
@@ -41,16 +93,15 @@ class FeesController extends Controller
     {
         try {
             $this->feesCollectRepository->payWithStripeStore($request);
-        
-            return back()->with('success', ___('alert.Fee has been paid successfully'));
 
+            return back()->with('success', ___('alert.Fee has been paid successfully'));
         } catch (\Throwable $th) {
             return back()->with('danger', ___('alert.something_went_wrong_please_try_again'));
         }
     }
 
 
-    
+
 
 
     public function payWithPaypal(Request $request)
@@ -73,7 +124,7 @@ class FeesController extends Controller
     public function paymentSuccess(Request $request)
     {
         loadPayPalCredentials();
-        
+
         try {
             $provider   = new ExpressCheckout;
             $token      = $request->token;
@@ -93,7 +144,6 @@ class FeesController extends Controller
             session()->forget('FeesAssignChildrenID');
 
             return redirect()->route('parent-panel-fees.index', ['student_id' => $feesAssignChildren->student_id])->with('success', ___('alert.Fee has been paid successfully'));
-
         } catch (\Throwable $th) {
 
             return redirect()->route('parent-panel-fees.index')->with('danger', ___('alert.something_went_wrong_please_try_again'));

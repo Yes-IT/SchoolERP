@@ -1,225 +1,230 @@
 <style>
+    select {
+        background-color: var(--primary-clr);
+        color: white;
 
-    .notification_wrapper .notification_items {
-      -webkit-transition: 0.3s;
-      transition: 0.3s;
-      top: 53px;
-      position: absolute;
-      z-index: 11;
-      -webkit-box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.05);
-              box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.05);
-      width: 300px;
-      top: 50px;
-      right: 0;
-      border-radius: 10px;
-      z-index: 121;
-      background: #f6f8ff;
-      -webkit-transform: translateY(10px) translateX(50%);
-              transform: translateY(10px) translateX(50%);
-      opacity: 0;
-      visibility: hidden;
-      transition: 0.3s;
     }
-    .notification_wrapper .notification_items .notification_header {
-      padding: 20px;
-      background-color: #2B2D35;
-      border-radius: 10px 10px 0 0;
+
+    label.error {
+        color: red;
+        font-size: 14px;
+        margin-top: 5px;
+        display: block;
     }
-    .notification_wrapper .notification_items .notification_header h3 {
-      font-size: 18px;
-      font-weight: 700;
-      color: #fff;
+
+    .search-suggestions-list {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-top: none;
+        max-height: 300px;
+        overflow-y: auto;
+        z-index: 1000;
+        border-radius: 0 0 5px 5px;
     }
-    .notification_wrapper .notification_items .notification_body {
-      padding: 20px 20px 20px 20px;
-      overflow: auto;
-      max-height: 350px;
-      border-radius: 0 0 10px 10px;
+
+    .search-suggestions-list ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
     }
-    .notification_wrapper .notification_items .notification_body .notification_item {
-      grid-gap: 10px;
+
+    .search-suggestions-list ul li a {
+        display: block;
+        padding: 10px 15px;
+        color: #333;
+        text-decoration: none;
     }
-    .notification_wrapper .notification_items .notification_body .notification_item .icon {
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-align: center;
-          -ms-flex-align: center;
-              align-items: center;
-      -webkit-box-pack: center;
-          -ms-flex-pack: center;
-              justify-content: center;
-      font-weight: 500;
-      color: #fff;
-      background-color: #7367f0;
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-size: cover;
-      border-radius: 0.475rem;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
-      width: 35px;
-      height: 35px;
-      color: #fff;
+
+    .search-suggestions-list ul li a:hover {
+        background-color: #f5f5f5;
     }
-    .notification_wrapper .notification_items .notification_body .notification_item .notification_item_content h5 {
-      font-size: 16px;
-      color: #000;
-    }
-    .notification_wrapper .notification_items .notification_body .notification_item .notification_item_content p {
-      font-size: 12px;
-      color: #000
-    }
-    .notification_wrapper .notification_items .notification_body .notification_item .notification_item_content .notification_time {
-      background-color: #f9f9f9;
-      font-size: 12px;
-      padding: 2px 10px;
-      border-radius: 4px;
-    }
-    .notification_wrapper:hover .notification_items {
-      opacity: 1;
-      visibility: visible;
-      -webkit-transform: translateY(0px) translateX(50%);
-              transform: translateY(0px) translateX(50%);
-    }
-    </style>
-<header class="header">
-    <button class="close-toggle sidebar-toggle p-0">
-        <img src="{{ global_asset('backend') }}/assets/images/icons/hammenu-2.svg" alt="" />
-    </button>
-    <div class="spacing-icon">
-        <div class="header-search tab-none">
-            <div class="search-icon">
-                <i class="las la-search"></i>
+</style>
+<div class="dashboard-body-head">
+    <div class="dsbdy-head-left">
+        <form class="dsbdy-search-form">
+            <div class="input-grp search-field" style="position: relative;">
+                <input type="text" id="page-search-input" placeholder="Search Page" autocomplete="off">
+                <input type="submit" value="Search">
+                <div id="search-suggestions" class="search-suggestions-list" style="display: none;">
+                    <ul>
+                        <!-- Suggestions will be populated by JavaScript -->
+                    </ul>
+                </div>
             </div>
-            <input class="search-field ot_input" id="search_field" type="text"
-                placeholder="{{ ___('common.search_page') }}" onkeyup="searchParentMenu()">
-            <div id="autoCompleteData" class="d-none">
-                <ul class="search_suggestion">
+        </form>
+    </div>
 
+    <div class="dsbdy-head-right">
+        <div class="input-grp m-0">
+            <select id="select_student">
+                @foreach ($students as $student)
+                    <option value="{{ $student->id }}" {{ session('selected_student_id') == $student->id ? 'selected' : '' }}>
+                        {{ $student->first_name }} (ID-{{ $student->id }})
+                    </option>
+                @endforeach
+            </select>
+
+
+            <div class="student-info-popup" id="studentInfoPopup">
+                <h3>View Student Information</h3>
+                <p>
+                    Once you've selected a student, use this panel to explore their academic records,
+                    attendance, grades, and more.
+                    Each section gives you detailed insights tailored to the selected student.
+                </p>
+                <button class="gotitbtn">Got it</button>
+            </div>
+        </div>
+        <button class="tgl-flscrn" onclick="toggleFullScreen()" aria-label="Toggle fullscreen">
+            <img src="{{ asset('student/images/fullscreen-toggler-icon.svg') }}" alt="Icon">
+        </button>
+
+        <button id="alertToggler" class="alert-toggler" aria-label="Toggle Alerts" onclick="toggleAlertPopup()">
+            <img src="{{ global_asset('parent') }}/images/parent-panel/bell-icon.svg" alt="Alert Icon">
+        </button>
+
+        <!-- Popup Box -->
+        <div id="alertPopup" class="alert-popup">
+            <div class="alert-popup-content">
+                <div class="alertDiv">
+                    <button class="alert-close" onclick="closeAlertPopup()"><img
+                            src="./{{ global_asset('parent') }}/images/IconBase.svg" /></button>
+                    <div class="headingAlert">
+                        <img src="./{{ global_asset('parent') }}/images/alert.svg" />
+                        <p>Alert: Child Absent Today</p>
+                    </div>
+                </div>
+                <p class="alertTxt">Your child, Edward Thomas, has been marked absent today, 07/12/2025.</p>
+                <p class="alertTxt">Please contact the school if you have any questions or need to provide an excuse.
+                </p>
+            </div>
+        </div>
+        <div class="profile-ctrl">
+            <button class="profile-ctrl-toggler">
+                <div class="pr-pic">
+                    @if (!empty($upload->path))
+                        <img src="{{ asset($upload->path) }}" alt="Profile Photo">
+                    @else
+                        <img src="{{ asset('backend/assets/images/new-version.jpg') }}" alt="Default Profile Image">
+                    @endif
+                </div>
+                <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            <div class="pr-ctrl-menu">
+                <ul>
+                    <li><a href="{{ route('parent-panel.profile') }}">My Profile</a></li>
+                    <li><a href="{{ route('parent-panel.password-update') }}">Change Password</a></li>
                 </ul>
             </div>
         </div>
-
-        <div class="header-controls">
-
-
-            <div class="header-control-item md-none">
-                <div class="item-content language-currceny-container">
-                    <button class="language-currency-btn d-flex align-items-center mt-0" type="button" id="language_change"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="icon-flag">
-                            <i class="{{ @$language['language']->icon_class }} rounded-circle icon"></i>
-                        </div>
-                        <h6>{{ @$language['language']->name }}</h6>
-                    </button>
-
-                    <div class="language-currency-dropdown dropdown-menu dropdown-menu-end top-navbar-dropdown-menu ot-card"
-                        aria-labelledby="language_change">
-
-                        <div class="lanuage-currency-">
-                            <div class="dropdown-item-list language-list mb-20">
-                                <h5>{{ ___('common.language') }}</h5>
-                                <select name="language" id="language_with_flag"
-                                    class="form-select ot-input mb-3 language-change" aria-label="Default select example">
-                                    @foreach ($language['languages'] as $row)
-                                        <option data-icon="{{ $row->icon_class }}" value="{{ $row->code }}"
-                                            {{ $row->code == \Cache::get('locale') ? 'selected' : '' }}>
-                                            {{ $row->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-            <div class="header-control-item">
-                <div class="dropdown theme_dropdown ">
-                    <button id="button" class="btn "><i class="lar la-sun"></i></button>
-                </div>
-            </div>
-            <div class="header-control-item">
-                <div class="item-content dropdown md-none">
-                    <button class="mt-0" onclick="javascript:toggleFullScreen()">
-                        <img class="icon" src="{{ global_asset('backend/assets/images/icons/full-screen.svg') }}" alt="check in" />
-                    </button>
-                </div>
-            </div>
-
-            <div class="header-control-item">
-                <div class="notification_wrapper position-relative d-none d-xl-flex">
-                    <a href="#" class="search-home ">
-                        <i class="las la-bell fs_25"></i>
-                    </a>
-                    <div class="notification_items position-absolute">
-                        <div class="notification_header">
-                            <h3>Notifications</h3>
-                        </div>
-                        <div class="notification_body d-flex flex-column gap-2">
-                            @foreach ($notifications as $notification)
-                                <a href="{{route('viewNotification',$notification->id)}}" class="notification_item d-flex align-items-center">
-                                    <div class="icon">
-                                        <i class="fas fa-bell"></i>
-                                    </div>
-                                    <div class="notification_item_content flex-fill d-flex align-items-center">
-                                        <div class="notification_item_content_left flex-fill">
-                                            <h6>{{$notification->title}}</h6>
-                                            <p>{{$notification->message}}</p>
-                                        </div>
-                                        <span class="notification_time">{{ \Carbon\Carbon::parse($notification->created_at)->format('F j Y') }}</span>
-                                    </div>
-                                </a>
-                            @endforeach
-                            
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>
- 
-
-            <div class="header-control-item">
-                <div class="item-content">
-                    <button class="profile-navigate mt-0 p-0" type="button" id="profile_expand" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <div class="profile-photo user-card">
-                            <img src="{{ @globalAsset(Auth::user()->upload->path, '40X40.webp') }}" alt="{{ Auth::user()->name }}">
-                        </div>
-                        <div class="profile-info md-none">
-                            <h6>{{ Auth::user()->name }}</h6>
-                            <p>{{ @Auth::user()->role->name }}</p>
-                        </div>
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-end profile-expand-dropdown top-navbar-dropdown-menu ot-card"
-                        aria-labelledby="profile_expand">
-                        <div class="profile-expand-container">
-                            <div class="profile-expand-list d-flex flex-column">
-                                <a class="profile-expand-item {{ set_menu(['parent-panel.profile'], 'active') }}"
-                                    href="{{ route('parent-panel.profile') }}">
-                                    <span>{{ ___('common.profile') }}</span>
-                                </a>
-                                <a class="profile-expand-item {{ set_menu(['parent-panel.password-update'], 'active') }}"
-                                    href="{{ route('parent-panel.password-update') }}">
-                                    <span>{{ ___('common.update_password') }}</span>
-                                </a>
-                                <form action="{{ route('logout') }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="profile-expand-item">
-                                        <span>
-                                            {{ ___('common.logout') }}</span>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            
-        </div>
-
     </div>
-</header>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('.js-example-basic-single').select2();
+    });
+</script>
+<script>
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.mozRequestFullScreen) {
+                document.documentElement.mozRequestFullScreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) {
+                document.documentElement.msRequestFullscreen();
+            }
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+    }
+</script>
 
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchForm = document.querySelector('.dsbdy-search-form');
+        const searchInput = document.getElementById('page-search-input');
+        const suggestionsContainer = document.getElementById('search-suggestions');
+        const suggestionsList = suggestionsContainer.querySelector('ul');
+        const sidebarLinks = document.querySelectorAll('.sidebar-body ul li a');
+        let allPages = [];
+
+        // 1. Populate suggestions and store page data
+        sidebarLinks.forEach(link => {
+            const linkText = link.textContent.trim();
+            if (linkText.toLowerCase() !== 'logout') {
+                allPages.push({
+                    text: linkText,
+                    href: link.href
+                });
+                const listItem = document.createElement('li');
+                const anchor = document.createElement('a');
+                anchor.href = link.href;
+                anchor.textContent = linkText;
+                listItem.appendChild(anchor);
+                suggestionsList.appendChild(listItem);
+            }
+        });
+
+        // 2. Show/hide suggestions on focus/blur
+        searchInput.addEventListener('focus', () => {
+            suggestionsContainer.style.display = 'block';
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!searchForm.contains(event.target)) {
+                suggestionsContainer.style.display = 'none';
+            }
+        });
+
+        // 3. Filter suggestions as user types
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.trim().toLowerCase();
+            const listItems = suggestionsList.querySelectorAll('li');
+            listItems.forEach(item => {
+                const itemText = item.textContent.trim().toLowerCase();
+                if (itemText.includes(query)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // 4. Handle form submission (typing and clicking search)
+        searchForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const query = searchInput.value.trim().toLowerCase();
+            if (!query) return;
+
+            let found = false;
+            for (const page of allPages) {
+                if (page.text.toLowerCase().includes(query)) {
+                    window.location.href = page.href;
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                alert('No page found matching your search.');
+            }
+        });
+    });
+</script>
