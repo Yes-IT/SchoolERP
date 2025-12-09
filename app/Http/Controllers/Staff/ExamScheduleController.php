@@ -32,6 +32,8 @@ class ExamScheduleController extends Controller
 
                 $examTypes = ExamType::where('status', 1)->get();
 
+                // dd($examTypes);
+
                 // $subjects = Subject::whereHas('teachers', function($query) use ($teacherId) {
                 //     $query->where('staff.user_id', $teacherId);
                 // })->get();
@@ -51,8 +53,8 @@ class ExamScheduleController extends Controller
                 $upcomingExams = $this->examRequestRepository->getUpcomingExams($teacherId);
                 $requestedExams = $this->examRequestRepository->getRequestedExams($teacherId);
 
-                Log::info('Upcoming exams:', ['count' => $upcomingExams->count()]);
-                Log::info('Requested exams:', ['count' => $requestedExams->count(), 'requested exams' => $requestedExams->toArray()]);
+                // Log::info('Upcoming exams:', ['count' => $upcomingExams->count()]);
+                // Log::info('Requested exams:', ['count' => $requestedExams->count(), 'requested exams' => $requestedExams->toArray()]);
 
                 // dd($requestedExams);
 

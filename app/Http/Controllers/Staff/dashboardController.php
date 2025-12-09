@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
-<<<<<<< HEAD
 use Illuminate\Http\Request;
 use App\Traits\ScheduleTrait; 
 use App\Models\StudentClassMapping;
 use Illuminate\Support\Facades\{Auth,Log,DB};
 use App\Models\Academic\Subject;
+use App\Models\Attendance\Attendance;
+use App\Models\Leave;
+use Carbon\Carbon;
 
 
 class DashboardController extends Controller
@@ -41,7 +43,9 @@ class DashboardController extends Controller
             'monthSchedule' => $monthSchedule, 
             'periods'       => $periods,        
             'selectedDate'  => $selectedDate,
-            'viewType'      => 'dashboard' 
+            'viewType'      => 'dashboard' ,
+            'totalStudent'          => $this->getTotalStudents(),
+            'todayAttendance'       => $this->getTodayStudentAttendance(),
            
         ]);
     }
@@ -56,80 +60,6 @@ class DashboardController extends Controller
             ->count('student_id');
     }
 
-    public function getTeachersubject()
-    {
-        $teacherId = Auth::user()->staff->id;
-        // dd($teacherId);
-
-        $subjects = Subject::whereHas('teachers', function ($query) use ($teacherId) {
-            $query->where('staff.id', $teacherId);
-        })->get();
-
-        // dd($subjects);
-
-        return $subjects;
-    }
-
-    public function getTeacherRooms()
-    {
-        try {
-            $teacherId = Auth::user()->staff->id;
-            
-            $rooms = DB::table('class_schedules as cs')
-                    ->join('classes as c', 'cs.class_id', '=', 'c.id')
-                    ->join('class_rooms as r', 'cs.room_id', '=', 'r.id') 
-                    ->where('c.teacher_id', $teacherId)
-                    ->whereNull('cs.deleted_at')
-                    ->select(
-                        'r.id as room_id',
-                        'r.room_no as room_number',
-                        'r.capacity',
-                        DB::raw("'schedule' as source")
-                    )
-                    ->distinct()
-                    ->get();
-
-            // dd($rooms);
-                
-            return $rooms;
-            
-        } catch (\Exception $e) {
-            Log::error('Error fetching teacher rooms: ' . $e->getMessage());
-            return collect([]);
-        }
-    }
-   
-
-    
-  
-}
-=======
-use App\Models\Attendance\Attendance;
-use App\Models\Leave;
-use App\Models\StudentClassMapping;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-
-class DashboardController extends Controller
-{
-    public function index()
-    {
-        return view('staff.dashboard', [
-            'totalStudent'          => $this->getTotalStudents(),
-            'todayAttendance'       => $this->getTodayStudentAttendance(), // static for now
-        ]);
-    }
-
-
-    private function getTotalStudents()
-    {
-
-        $teacherId = Auth::id();
-        return StudentClassMapping::where('teacher_id', $teacherId)
-            ->distinct('student_id')
-            ->count('student_id');
-
-    }
 
     private function getTodayStudentAttendance()
     {
@@ -219,6 +149,53 @@ class DashboardController extends Controller
         return $counts;
     }
 
+    public function getTeachersubject()
+    {
+        $teacherId = Auth::user()->staff->id;
+        // dd($teacherId);
 
+        $subjects = Subject::whereHas('teachers', function ($query) use ($teacherId) {
+            $query->where('staff.id', $teacherId);
+        })->get();
+
+        // dd($subjects);
+
+        return $subjects;
+    }
+
+    public function getTeacherRooms()
+    {
+        try {
+            $teacherId = Auth::user()->staff->id;
+            
+            $rooms = DB::table('class_schedules as cs')
+                    ->join('classes as c', 'cs.class_id', '=', 'c.id')
+                    ->join('class_rooms as r', 'cs.room_id', '=', 'r.id') 
+                    ->where('c.teacher_id', $teacherId)
+                    ->whereNull('cs.deleted_at')
+                    ->select(
+                        'r.id as room_id',
+                        'r.room_no as room_number',
+                        'r.capacity',
+                        DB::raw("'schedule' as source")
+                    )
+                    ->distinct()
+                    ->get();
+
+            // dd($rooms);
+                
+            return $rooms;
+            
+        } catch (\Exception $e) {
+            Log::error('Error fetching teacher rooms: ' . $e->getMessage());
+            return collect([]);
+        }
+    }
+   
+
+    
+  
 }
->>>>>>> 9e07ed70b107e1f891c3007672b959588ef6be58
+
+
+

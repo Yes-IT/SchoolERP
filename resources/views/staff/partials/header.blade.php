@@ -21,22 +21,12 @@
 
             <div class="pr-ctrl-menu">
                 <ul>
-                <li><a href="profile.html">My Profile</a></li>
+                <li><a href="{{ route('staff.profile.index') }}">My Profile</a></li>
                 <li><a href="set-password.html">Change Password</a></li>
                 </ul>
             </div>
         
         </div>
-<<<<<<< HEAD
-=======
-        <i class="fa-solid fa-chevron-down"></i>
-    </button>
 
-    <div class="pr-ctrl-menu">
-        <ul>
-        <li><a href="{{ route('staff.profile.index') }}">My Profile</a></li>
-        <li><a href="set-password.html">Change Password</a></li>
-        </ul>
->>>>>>> 9e07ed70b107e1f891c3007672b959588ef6be58
     </div>
 </div>

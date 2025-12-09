@@ -143,8 +143,12 @@
             <div class="input-grp exm-type-dropdown dn-for-non-active">
                 <select>
                     <option value="select">Exam Type</option>
-                    <option value="all">All Subjects</option>
-                    <option value="my-subjects">My Subjects</option>
+                    {{-- <option value="all">All Subjects</option>
+                    <option value="my-subjects">My Subjects</option> --}}
+                    @foreach ($examTypes as $examType) 
+                        <option value="{{ $examType->id }}">{{ $examType->name }}</option>
+                        
+                    @endforeach
                 </select>
             </div>
 
