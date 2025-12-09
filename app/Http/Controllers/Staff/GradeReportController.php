@@ -24,7 +24,7 @@ class GradeReportController extends Controller{
 
     public function allGrade(){
 
-        $teacherId = Auth::id();
+        $teacherId = Auth::user()->staff->id;
         $assignedClassIds = StudentClassMapping::where('teacher_id', $teacherId)->distinct()->pluck('class_id');
         $classes = Classes::whereIn('id', $assignedClassIds)->get();
         $subjects = Subject::get();
@@ -58,7 +58,7 @@ class GradeReportController extends Controller{
         $semesterId    = $request->semester_id;
         $classId       = $request->class_id;
         $yearStatusId  = $request->year_status_id;
-        $teacherId = Auth::id();
+        $teacherId = Auth::user()->staff->id;
 
         // Check if "Full Year" option is selected
         if ($semesterId === 'all') {
@@ -80,7 +80,7 @@ class GradeReportController extends Controller{
 
     private function handleSemesterGrades($yearId, $semesterId, $classId, $yearStatusId, $teacherId)
     {
-        
+        // Step 1: Get active students in this class (status = 1)
         $mappings = DB::table('student_class_mapping')
             ->where('class_id', $classId)
             ->where('status', 1)
@@ -171,7 +171,7 @@ class GradeReportController extends Controller{
             'semester_id'     => 'required|exists:semesters,id',
         ]);
 
-        $teacherId = Auth::id();
+        $teacherId = Auth::user()->staff->id;
 
         // 1. Get all students this teacher teaches
         $teacherStudentIds = StudentClassMapping::where('teacher_id', $teacherId)
@@ -248,7 +248,7 @@ class GradeReportController extends Controller{
             'per_page'       => 'nullable|integer|in:1,2,3,4', // Match options in pagination blade
         ]);
 
-        $teacherId     = Auth::id();
+        $teacherId     = Auth::user()->staff->id;
         $yearId        = $request->year_id;
         $semesterId    = $request->semester_id;
         $yearStatusId  = $request->year_status_id;

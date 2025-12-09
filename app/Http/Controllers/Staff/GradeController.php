@@ -24,7 +24,7 @@ class GradeController extends Controller{
     public function index()
     {
 
-        $teacherId = Auth::id();
+        $teacherId = Auth::user()->staff->id;
         $assignedClassIds = StudentClassMapping::where('teacher_id', $teacherId)->distinct()->pluck('class_id');
         $classes = Classes::whereIn('id', $assignedClassIds)->get();
         $subjects = Subject::get();
@@ -53,7 +53,7 @@ class GradeController extends Controller{
             'class_id'       => 'required',
         ]);
 
-        $teacherId  = Auth::id();
+        $teacherId  = Auth::user()->staff->id;
         $sessionId  = $request->year_id;
         $semesterId = $request->semester_id;
         $classId    = $request->class_id;
@@ -113,7 +113,7 @@ class GradeController extends Controller{
             'semester_id'    => $request->semester_id,
             'classes_id'     => $request->class_id,
             'percentage'     => $request->marks_achieved,
-            'updated_by'     => Auth::id(),
+            'updated_by'     => Auth::user()->staff->id,
             'updated_at'     => now(),
         ];
 
@@ -159,7 +159,7 @@ class GradeController extends Controller{
                 'semester_id'    => $request->semester_id,
                 'classes_id'     => $request->class_id,
                 'percentage'     => $mark['marks_achieved'],
-                'updated_by'     => Auth::id(),
+                'updated_by'     => Auth::user()->staff->id,
                 'updated_at'     => now(),
             ];
 

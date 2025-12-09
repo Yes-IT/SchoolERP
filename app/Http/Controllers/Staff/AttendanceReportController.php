@@ -21,7 +21,7 @@ class AttendanceReportController extends Controller
 {
     public function index()
     {
-        $teacherId = Auth::id();
+        $teacherId = Auth::user()->staff->id;
 
         $assignedClassIds = StudentClassMapping::where('teacher_id', $teacherId)
             ->distinct()
@@ -66,7 +66,7 @@ class AttendanceReportController extends Controller
 
         // 1. Get students assigned to current teacher in selected classes
         $studentIds = DB::table('student_class_mapping')
-            ->where('teacher_id', Auth::id())
+            ->where('teacher_id', Auth::user()->staff->id)
             ->whereIn('class_id', $classIds)
             ->where('status', 1)
             ->distinct()

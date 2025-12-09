@@ -18,7 +18,7 @@ class AttendanceController extends Controller
     
     public function index()
     {
-        $teacherId = Auth::id();
+        $teacherId = Auth::user()->staff->id;
 
         $data['title'] = 'Attendance';
 
@@ -42,7 +42,7 @@ class AttendanceController extends Controller
             'attendance_date' => 'required',
         ]);
 
-        $teacherId = Auth::id();
+        $teacherId = Auth::user()->staff->id;
         $classId   = $request->class_id;
         $subjectId = $request->subject_id;
         $rawDate   = trim($request->attendance_date);
@@ -123,7 +123,7 @@ class AttendanceController extends Controller
             'attendance.*.attendance' => 'required|in:1,2,3', // 1=Present, 2=Late, 3=Absent
         ]);
 
-        $teacherId = Auth::id();
+        $teacherId = Auth::user()->staff->id;
         $classId   = $request->class_id;
 
         // Parse date
