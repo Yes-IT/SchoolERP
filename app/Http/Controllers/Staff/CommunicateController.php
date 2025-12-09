@@ -65,7 +65,7 @@ class CommunicateController extends Controller
             'document'    => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240'
         ]);
 
-        $teacherId = Auth::id();
+        $teacherId = Auth::user()->staff->id;
         $session   = currentSession();
 
         $attachmentId = null;
@@ -116,7 +116,7 @@ class CommunicateController extends Controller
     public function editMessage($id)
     {
         $notice = NoticeBoard::where('id', $id)
-            ->where('teacher_id', Auth::id())
+            ->where('teacher_id', Auth::user()->staff->id)
             ->with('attachmentFile')
             ->firstOrFail();
 
@@ -134,7 +134,7 @@ class CommunicateController extends Controller
         ]);
 
         $notice = NoticeBoard::where('id', $id)
-                    ->where('teacher_id', Auth::id())
+                    ->where('teacher_id', Auth::user()->staff->id)
                     ->firstOrFail();
 
         $notice->title       = $request->title;
@@ -176,7 +176,7 @@ class CommunicateController extends Controller
     public function destroy($id)
     {
         $notice = NoticeBoard::where('id', $id)
-                    ->where('teacher_id', Auth::id())
+                    ->where('teacher_id', Auth::user()->staff->id)
                     ->firstOrFail();
 
         // Delete attachment file if exists
