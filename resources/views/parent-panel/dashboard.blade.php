@@ -37,7 +37,7 @@
                                 <ul>
                                     @foreach ($notices as $notice)
                                         <li>
-                                            <a href="{{ route('student.notice_board', ['notice_id' => $notice->id]) }}">
+                                            <a href="{{ route('parent-panel-notices.index') }}">
                                                 @if ($notice->title == 'Change of Schedule')
                                                     <img src="{{ asset('student/images/notice-icon-2.svg') }}"
                                                         alt="Icon">
@@ -88,18 +88,15 @@
                             </thead>
                             <tbody>
                                 @foreach ($grades as $grade)
-                                    @php
-                                        $percentage = min(max((int)$grade->percentage, 0), 100); // safety clamp
-                                    @endphp
+                            
                                     <tr>
                                         <td>{{ $grade->subject_name }}</td>
                                         <td>
                                             <div class="progress-container">
-                                                <div class="progress-txt">{{ $percentage }}%</div>
+                                                <div class="progress-txt">{{ $grade->percentage }}
+                                                </div>
                                                 <div class="progress-bar-track">
-                                                    <div class="progress-bar-fill"
-                                                       style="width: {{ $percentage }}%;">
-                                                    </div>
+                                                    <div class="progress-bar-fill"></div>
                                                 </div>
                                             </div>
                                         </td>
@@ -126,13 +123,8 @@
                                             <div class="ds-class-card">
                                                 <div class="ds-cls-left">
                                                     <div class="ds-class-img">
-                                                        {{-- <img src="{{ asset('student/images/class-img.png') }}"
-                                                            alt="Image"> --}}
-                                                            <img
-                                                                src="{{ $class->staff_image
-                                                                    ? asset($class->staff_image)
-                                                                    : asset('student/images/class-img.png') }}"
-                                                                alt="Teacher Image">
+                                                        <img src="{{ asset('student/images/class-img.png') }}"
+                                                            alt="Image">
                                                     </div>
                                                     <div class="ds-class-left-content">
                                                         <p>{{ $class->subject_name }} ({{ $class->subject_code }})</p>
@@ -239,30 +231,30 @@
                                                             </div>
 
                                                         </div>
-                                                     </h3>
+                                                    </h3>
                                                     @if (!empty($member->subject_details))
                                                         <p>
                                                             @foreach (explode(',', $member->subject_details) as $subject)
                                                                 {{ trim($subject) }}
-                                                            @endforeach
                                                         </p>
-                                                    @endif
+                                                    @endforeach
+                                @endif
 
-                                                </div>
-                                           </div>
-                                      </td>
-                                  </tr>
-                                  @empty
-                                <tr>
-                                    <td>No teachers found.</td>
-                                </tr>
-                                @endforelse
-                           </tbody>
-                      </table>
-                   </div>
-              </div>
-          </div>
-      </div>
+                    </div>
+                </div>
+                </td>
+                </tr>
+            @empty
+                <tr>
+                    <td>No teachers found.</td>
+                </tr>
+                @endforelse
+                </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    </div>
     </div>
     <!-- End Of Dashboard -->
 @endsection
