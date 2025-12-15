@@ -414,35 +414,7 @@
                                     <div class="file-upld-lg-design">
                                         <div class="fupld-lg-icon">
                                             <img src="https://saserp.tgastaging.com/student/images/upload-white.svg" alt="Icon">
-=======
-                    </div>
 
-                    <div class="ds-cmn-tble pending count-row active" style="display: block;">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>S. No</th>
-                                    <th>Subject</th>
-                                    <th>Assignment Title</th>
-                                    <th>Assignment Description</th>
-                                    <th>Attachment</th>
-                                    <th>Assigned Date</th>
-                                    <th>Due Date</th>
-                                    <th>Upload File</th>
-                                </tr>
-                            </thead>
-                            
-                            <tbody>
-                                
-                                                    <tr data-assignment-id="2" data-subject-id="6">
-                                    <td>1</td>
-
-                                    <td>Hindi</td>
-                                    <td>assignment title 1</td>
-                                    <td>
-                                        <div class="toggle-text-wrapper">
-                                            <div class="toggle-text-content" style="width: 100%; height: 44.8px; overflow: hidden;">thisjfdjdkf… <a href="#" class="read-more">Read more <i class="fa-solid fa-arrow-right" style="transform:rotate(-45deg)"></i></a></div>
->>>>>>> 3cf5ef40cb86cc148ceb402f1540097410ad6a7c
                                         </div>
 
                                     </td>

@@ -62,20 +62,16 @@
     <div class="dsbdy-head-right">
         <div class="input-grp m-0">
             <select id="select_student">
-<<<<<<< HEAD
-                 
-                @foreach ($students as $student)
-                    <option value="{{ $student->id }}" 
-                        {{ session('selected_student_id') == $student->id ? 'selected' : '' }}>
-=======
-                {{-- @forelse ($students as $student)
-                    <option value="{{ $student->id }}" {{ session('selected_student_id') == $student->id ? 'selected' : '' }}>
->>>>>>> 3cf5ef40cb86cc148ceb402f1540097410ad6a7c
-                        {{ $student->first_name }} (ID-{{ $student->id }})
-                    </option>
-                @empty
+                @if($students->isNotEmpty())
+                    @foreach ($students as $student)
+                        <option value="{{ $student->id }}" 
+                            {{ session('selected_student_id') == $student->id ? 'selected' : '' }}>
+                            {{ $student->first_name }} (ID-{{ $student->id }})
+                        </option>
+                    @endforeach
+                @else
                     <option disabled>No student found</option>
-                @endforelse --}}
+                @endif
             </select>
 
 
