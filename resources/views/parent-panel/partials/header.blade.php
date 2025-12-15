@@ -61,8 +61,10 @@
     <div class="dsbdy-head-right">
         <div class="input-grp m-0">
             <select id="select_student">
+                 
                 @foreach ($students as $student)
-                    <option value="{{ $student->id }}" {{ session('selected_student_id') == $student->id ? 'selected' : '' }}>
+                    <option value="{{ $student->id }}" 
+                        {{ session('selected_student_id') == $student->id ? 'selected' : '' }}>
                         {{ $student->first_name }} (ID-{{ $student->id }})
                     </option>
                 @endforeach
@@ -228,3 +230,27 @@
         });
     });
 </script>
+
+<script>
+document.getElementById('select_student').addEventListener('change', function () {
+    const studentId = this.value;
+
+    fetch("{{ route('parent-panel-dashboard.switch-student') }}", {
+        method: "POST",
+        headers: {
+            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            student_id: studentId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload(); // Reload entire panel with new student
+        }
+    });
+});
+</script>
+

@@ -627,39 +627,34 @@ color: white;
             <div class="modal-body">
                 <div class="tab-wrapper">
                     <div class="cmn-pop-head" style="text-align: center;">
-                     <h3>Choose your Student</h3>
-                     <p>Welcome! You have more then student linked to your account
-                     To get started clicked on this dropdown to choose the student whose data you want to view.</p>
-                     
-                     
-                    
-                
+                        <h3>Choose your Student</h3>
+                        <p>Welcome! You have more then student linked to your account
+                        To get started clicked on this dropdown to choose the student whose data you want to view.</p>
                     </div>
 
                     <div class="cmn-pop-inr-content-wrp">
-                      
-                     
-                    <div class="select-wrapper">
-  <div class="custom-select">
-    <div class="selected">Select Student</div>
-    <ul class="options">
-    @foreach ($students as $student )
-     <li>{{ $student-> first_name }}{{ $student-> last_name }} (ID-{{ $student-> student_id }})</li>
-    @endforeach
-       
-     
-    </ul>
-</div>
+                    
+                        <div class="select-wrapper">
+                            <div class="custom-select">
+                                <div class="selected">Select Student</div>
+                                    <ul class="options">
+                                        @foreach ($students as $student )
+                                        {{-- <li>{{ $student->first_name }}{{ $student->last_name }} (ID-{{ $student->student_id }})</li> --}}
 
-</div>
-
-
+                                        <li data-id="{{ $student->id }}">
+                                            {{ $student->first_name }} {{ $student->last_name }} 
+                                            (ID-{{ $student->student_id }})
+                                        </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+               </div>
 
+            </div>
         </div>
-    </div>
 </div>
 
 <!-- End Of Attachments Modal -->
@@ -1071,6 +1066,8 @@ color: white;
 </script>
 
 
+
+
 <style>
         label.error {
             color: red;
@@ -1302,4 +1299,5 @@ document.addEventListener("click", (e) => {
 
 
 
-</body></html>
+</body>
+</html>

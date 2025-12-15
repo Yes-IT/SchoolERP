@@ -40,7 +40,14 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::get('/student_attendance', [StudentController::class, 'studentAttendance'])->name('student.attendance');
                     Route::get('/student_grades', [StudentController::class, 'studentGrades'])->name('student.grades');
                     Route::get('/student_fees', [StudentController::class, 'studentFees'])->name('student.fees');
+                    Route::post('/student/transcripts/store-my-fee',[StudentController::class, 'storePaymentMyFee'])->name('student.my-fees.store');
+
                     Route::get('/student_request_transcript', [StudentController::class, 'studentRequestTranscript'])->name('student.request_transcript');
+                    Route::post('/student/transcripts', [StudentController::class, 'storeTranscript'])->name('student.transcripts.store_fee_pay');
+                    Route::post('/student/transcripts/store',[StudentController::class, 'storePaymentTranscript'])->name('student.transcripts.store');
+                    Route::get('student/transcript/payment-download/{transcript}', [StudentController::class, 'downloadPayment'])->name('student.transcript.payment.download');
+
+
                     Route::get('/student_apply_leave', [StudentController::class, 'studentApplyLeave'])->name('student.apply_leave');
 
                     Route::post('/student_apply_leave', [StudentController::class, 'storeLeave'])->name('student.apply_leave.store');
@@ -50,7 +57,7 @@ Route::middleware(saasMiddleware())->group(function () {
 
                     Route::get('/student_notice_board', [StudentController::class, 'studentNoticeBoard'])->name('student.notice_board');
                     Route::get('/student_study_material', [StudentController::class, 'studentStudyMaterial'])->name('student.study_material');
-
+                    Route::get('/student/notice/{id}/download-pdf', [StudentController::class, 'downloadNoticePDF'])->name('student.notice.download.pdf');
                     Route::get('/student_late_curfew_request', [StudentController::class, 'studentLateCurfewRequest'])->name('student.late_curfew_request');
                     Route::post('/student_late_curfew_request', [StudentController::class, 'storeLateCurfew'])->name('student.late_curfew.store');
                     Route::get('/student_late_curfew_request/{id}/edit', [StudentController::class, 'editLateCurfew'])->name('student.late_curfew.edit');

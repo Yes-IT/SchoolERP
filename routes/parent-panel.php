@@ -35,6 +35,8 @@ Route::middleware(saasMiddleware())->group(function () {
                         Route::post('/search', 'search')->name('parent-panel-student.search');
                         Route::post('/selectStudent', 'selectStudent')->name('parent-panel-student.selectStudent');
                         Route::post('search-parent-menu-data', 'searchParentMenuData')->name('search-parent-menu-data');
+                        Route::post('/parent-switch-student',  'switchStudent')->name('parent-panel-dashboard.switch-student');
+
                     });
 
                     Route::controller(ProfileController::class)->prefix('parent-panel')->group(function () {
@@ -45,9 +47,15 @@ Route::middleware(saasMiddleware())->group(function () {
                         Route::get('/password/update',      'passwordUpdate')->name('parent-panel.password-update');
                         Route::put('/password/update/store', 'passwordUpdateStore')->name('parent-panel.password-update-store')->middleware('DemoCheck');
                     });
-                    Route::controller(AssignmentController::class)->prefix('parent-panel-assignment')->group(function () {
-                        Route::get('/', 'index')->name('parent-panel-assignment.index');
+
+                    //assignment routes
+                    Route::controller(AssignmentController::class)->prefix('parent-panel-assignment')->name('parent-panel-assignment.')->group(function () {
+                        Route::get('/', 'index')->name('index');
+                        Route::get('/assignment_download/{filename}', 'assignment_download')->where('filename', '.*')->name('assignment_download');
+
                     });
+
+
                     Route::group(['middleware' => ['FeatureCheck:academic']], function () {
                         Route::controller(SubjectListController::class)->prefix('parent-panel-subject-list')->group(function () {
                             Route::get('/', 'index')->name('parent-panel-subject-list.index');
@@ -56,11 +64,14 @@ Route::middleware(saasMiddleware())->group(function () {
                     });
 
                     Route::group(['middleware' => ['FeatureCheck:routine']], function () {
-                        Route::controller(ClassRoutineController::class)->prefix('parent-panel-class-routine')->group(function () {
-                            Route::get('/', 'index')->name('parent-panel-class-routine.index');
-                            Route::post('/search', 'search')->name('parent-panel-class-routine.search');
-                            Route::get('/pdf-generate/{student}', 'generatePDF')->name('parent-panel-class-routine.pdf-generate');
+                        Route::controller(ClassRoutineController::class)->prefix('parent-panel-class-routine')->name('parent-panel-class-routine.')->group(function () {
+                            Route::get('/', 'index')->name('index');
+                            Route::post('/search', 'search')->name('search');
+                            // Route::get('/pdf-generate/{student}', 'generatePDF')->name('pdf-generate');
+                            Route::post('/classes-pdf', 'generateSchedulePDF')->name('classes-pdf');
+                            Route::get('/classes-filter',  'viewSchedule')->name('classes-filter');
                         });
+
                         Route::controller(AssignmentController::class)->prefix('parent-panel-assignment')->group(function () {
                             Route::get('/', 'index')->name('parent-panel-assignment.index');
                         });
@@ -78,6 +89,9 @@ Route::middleware(saasMiddleware())->group(function () {
                             Route::post('/search', 'search')->name('parent-panel-exam-routine.search');
                             Route::get('/exam-types', 'getExamTypes');
                             Route::get('/pdf-generate/{student}/{type}', 'generatePDF')->name('parent-panel-exam-routine.pdf-generate');
+                           
+
+
                         });
                     });
 

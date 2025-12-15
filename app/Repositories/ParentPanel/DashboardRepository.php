@@ -19,6 +19,7 @@ class DashboardRepository implements DashboardInterface
     {
         try {
             $parent           = ParentGuardian::where('user_id', Auth::user()->id)->first();
+            // dd($parent);
             $data['students'] = Student::where('parent_guardian_id', $parent->id)->get();
             if(Session::get('student_id'))
                 $student        = Student::where('id', Session::get('student_id'))->first();

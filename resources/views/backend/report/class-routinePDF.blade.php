@@ -1,5 +1,5 @@
 
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html>
 <head>
     <title>Class routine</title>
@@ -141,6 +141,78 @@
                 </div>
             </div>
         </div>
+    </div>
+</body>
+</html> --}}
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Class Schedule Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        .header h1 { color: #333; margin: 0; }
+        .date-range { color: #666; font-size: 16px; margin-top: 5px; }
+        .schedule-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .schedule-table th { background-color: #f5f5f5; padding: 12px; text-align: left; border: 1px solid #ddd; }
+        .schedule-table td { padding: 10px; border: 1px solid #ddd; }
+        .day-header { background-color: #e8f4fd; padding: 15px; margin-top: 20px; font-weight: bold; color: #333; }
+        .class-time { font-weight: bold; color: #2c5282; }
+        .subject { color: #333; font-weight: bold; }
+        .teacher { color: #666; font-size: 14px; }
+        .footer { margin-top: 30px; text-align: right; color: #666; font-size: 12px; }
+        .no-classes { text-align: center; padding: 20px; color: #999; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Class Schedule Report</h1>
+        <div class="date-range">
+            {{ $startDate }} to {{ $endDate }}
+        </div>
+    </div>
+    
+    @foreach($schedules as $date => $daySchedules)
+        <div class="day-header">
+            {{ \Carbon\Carbon::parse($date)->format('l, F d, Y') }}
+        </div>
+        
+        @if($daySchedules->count() > 0)
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Subject</th>
+                        <th>Teacher</th>
+                        <th>Classroom</th>
+                        <th>Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($daySchedules as $schedule)
+                    <tr>
+                        <td class="class-time">
+                            {{ \Carbon\Carbon::parse($schedule->start_time)->format('h:i A') }}
+                        </td>
+                        <td class="subject">{{ $schedule->subject->name ?? 'N/A' }}</td>
+                        <td class="teacher">{{ $schedule->teacher->name ?? 'N/A' }}</td>
+                        <td>{{ $schedule->classroom->name ?? 'N/A' }}</td>
+                        <td>{{ $schedule->duration }} minutes</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <div class="no-classes">No classes scheduled for this day</div>
+        @endif
+    @endforeach
+    
+    <div class="footer">
+        Generated on: {{ $generatedAt }}
     </div>
 </body>
 </html>

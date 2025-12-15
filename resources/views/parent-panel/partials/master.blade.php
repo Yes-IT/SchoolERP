@@ -65,27 +65,52 @@
 
     @stack('script')
     <script>
-        document.getElementById('select_student').addEventListener('change', function() {
+        // document.getElementById('select_student').addEventListener('change', function() {
 
-            let studentId = this.value;
+        //     let studentId = this.value;
 
-            fetch("{{ route('parent-panel-student.selectStudent') }}", {
+        //     fetch("{{ route('parent-panel-student.selectStudent') }}", {
+        //             method: "POST",
+        //             headers: {
+        //                 "Content-Type": "application/json",
+        //                 "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+        //             },
+        //             body: JSON.stringify({
+        //                 student_id: studentId
+        //             })
+        //         })
+        //         .then(res => res.json())
+        //         .then(data => {
+        //             location.reload();
+
+        //         });
+
+        // });
+
+        document.querySelectorAll('.options li').forEach(item => {
+            item.addEventListener('click', function () {
+
+                let studentId = this.getAttribute('data-id');
+
+                fetch("{{ route('parent-panel-student.selectStudent') }}", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
                     },
-                    body: JSON.stringify({
-                        student_id: studentId
-                    })
+                    body: JSON.stringify({ student_id: studentId })
                 })
                 .then(res => res.json())
                 .then(data => {
-                    location.reload();
-
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message || "Error selecting student");
+                    }
                 });
-
+            });
         });
+
     </script>
 
 </body>
