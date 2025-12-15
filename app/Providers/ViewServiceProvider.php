@@ -7,6 +7,8 @@ use App\View\Composers\LanguageComposer;
 use App\View\Composers\SessionComposer;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use App\View\Composers\ParentStudentComposer;
+
 
 class ViewServiceProvider extends ServiceProvider
 {
@@ -36,5 +38,7 @@ class ViewServiceProvider extends ServiceProvider
         View::composer('backend.partials.header', SessionComposer::class);
         
         View::composer('mainapp::layouts.backend.header', LanguageComposer::class);
+        //for students globally in parent panel
+        View::composer('parent-panel.partials.header', ParentStudentComposer::class);
     }
 }

@@ -336,7 +336,7 @@ class DashboardController extends Controller
                 )
                 ->get();
 
-        Log::info("Staff: ", ['staff' => $staff]);
+        // Log::info("Staff: ", ['staff' => $staff]);
 
         // 6️ Get user and upload info for profile 
         $user = User::find($student->user_id);
