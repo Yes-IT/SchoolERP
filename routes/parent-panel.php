@@ -83,7 +83,10 @@ Route::middleware(saasMiddleware())->group(function () {
                         });
                         Route::controller(TranscriptController::class)->prefix('parent-panel-transcript')->group(function () {
                             Route::get('/', 'index')->name('parent-panel-transcript.index');
+                            Route::post('/store', 'store')->name('parent-panel-transcript.store');
+                            Route::post('/store-free', 'storeFree')->name('parent-panel-transcript.store-free');
                         });
+
                         Route::controller(ExamRoutineController::class)->prefix('parent-panel-exam-routine')->group(function () {
                             Route::get('/', 'index')->name('parent-panel-exam-routine.index');
                             Route::post('/search', 'search')->name('parent-panel-exam-routine.search');
@@ -130,6 +133,7 @@ Route::middleware(saasMiddleware())->group(function () {
 
                     Route::controller(DashboardController::class)->group(function () {
                         Route::get('parent-panel-notices/', 'notices')->name('parent-panel-notices.index');
+                        Route::get('parent/notice/{noticeId}/download-pdf', 'downloadNoticePDF')->name('parent.notice.download.pdf');
                     });
 
                     Route::controller(BookController::class)->group(function () {

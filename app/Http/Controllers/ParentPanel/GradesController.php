@@ -19,7 +19,8 @@ class GradesController extends Controller
 
     public function index(Request $request)
     {
-       $perPage = $request->get('perPage', 5);
+
+        $perPage = $request->get('perPage', 5);
         $student = Student::where('parent_guardian_id', Auth::id())->firstOrFail();
         $id = $student->id;
 
@@ -144,8 +145,6 @@ class GradesController extends Controller
 
             $result = $percentage < 59 ? 'Fail' : 'Pass';
 
-
-
             $grade->attendance_summary = [
                 'present' => $attendanceSummary->total_present ?? 0,
                 'late' => $attendanceSummary->total_late ?? 0,
@@ -163,7 +162,7 @@ class GradesController extends Controller
         // dd($grades);
         return view('parent-panel.grades', [
             'grades' => $grades,
-            'yearOptions' => DB::table('school_years')->pluck('name', 'id')->toArray(),
+            'yearOptions' => DB::table('sessions')->pluck('name', 'id')->toArray(),
             'semesterOptions' => DB::table('semesters')->pluck('name', 'id')->toArray(),
             'selectedYear' => $request->school_years_id,
             'selectedSemester' => $request->semester_id,

@@ -14,7 +14,6 @@ use App\Models\StudentInfo\SessionClassStudent;
 use App\Repositories\ParentPanel\DashboardRepository;
 use App\Models\User;
 
-
 class DashboardController extends Controller
 {
     private $repo;
@@ -180,7 +179,7 @@ class DashboardController extends Controller
         if (!$first_student) {
             return redirect()->route('parent-panel-dashboard.indexupload');
         }
-
+  
         //  If session student not set → set default child
         if (!session()->has('selected_student_id')) {
             session(['selected_student_id' => $first_student->id]);
@@ -189,8 +188,8 @@ class DashboardController extends Controller
         //  Always use session child
         $studentId = session('selected_student_id');
         // Log::info('Selected session student ID1: ' . $studentId);
-        $student = Student::find($studentId);
 
+        $student = Student::find($studentId);
         if (!$student) {
             session()->forget('selected_student_id');
             return redirect()->route('parent-panel-dashboard.indexupload');
@@ -205,8 +204,8 @@ class DashboardController extends Controller
                     ->pluck('class_id')
                     ->toArray();
 
-        // Log::info('Class IDs: ' . json_encode($classIds));            
-
+        // Log::info('Class IDs: ' . json_encode($classIds));  
+      
         if (empty($classIds)) {
             Log::info("No class mappings for student {$studentId} — continuing to dashboard with empty class-related data.");
 
@@ -312,9 +311,7 @@ class DashboardController extends Controller
             ));
         }
 
-        // 5️ Get all staff (teachers) details using those teacher_ids
-        // $staff = DB::table('staff')->whereIn('id', $teacherIds)->get();
-
+        // 5️ Get all staff (teachers) details using those teacher_id
         $staff = DB::table('staff')
                 ->join('classes', 'classes.teacher_id', '=', 'staff.id')
                 ->join('subjects', 'subjects.id', '=', 'classes.subject_id')
@@ -433,6 +430,8 @@ class DashboardController extends Controller
         $perPage = $request->get('perPage', 10);
         $fees = $query->paginate($perPage);
         return view('parent-panel.dashboard', compact('upload', 'student','students', 'staff', 'upcomingClasses', 'notices', 'first_student', 'grades', 'fees'));
+
+      
     }
 
 
@@ -453,6 +452,7 @@ class DashboardController extends Controller
         $data = $this->repo->search($request);
         return view('parent-panel.dashboard', compact('data'));
     }
+
 
     public function searchParentMenuData(Request $request)
     {
@@ -513,19 +513,41 @@ class DashboardController extends Controller
         return view('parent-panel.notices', compact('notices', 'selectedNoticeId'));
     }
 
-    // public function selectStudent(Request $request)
-    // {
-        
-    //     // Save to session
-    //     session(['selected_student_id' => $request->student_id]);
+    public function downloadNoticePDF($noticeId)
+    {
+        // 1. Fetch notice
+        $notice = DB::table('notice_boards')->where('id', $noticeId)->first();
 
-    //     return response()->json([
-    //         'success' => true,
-    //         'selected_student_id' => $request->student_id
-    //     ]);
-    // }
+        if (!$notice) {
+            abort(404, 'Notice not found.');
+        }
 
-    //this is for modal selecting student
+        // 2. Check if attachment exists
+        if (empty($notice->attachment)) {
+            return redirect()->back()->with('error', 'No attachment available for this notice.');
+        }
+
+        // 3. Fetch upload record (attachment = upload_table.id)
+        $upload = DB::table('uploads')->where('id', $notice->attachment)->first();
+
+        if (!$upload) {
+            return redirect()->back()->with('error', 'Attachment not found in upload records.');
+        }
+
+        // 4. Generate file path
+        // Upload path stored example: backend/uploads/users/xxxx.png
+        // File is inside storage/app/
+        $filePath = $upload->path;
+
+        // 5. Check if file exists on disk
+        if (!file_exists($filePath)) {
+            return redirect()->back()->with('error', 'Attachment file not found on server.');
+        }
+
+        // 6. Download file
+        return response()->download($filePath, basename($upload->path));
+    }
+
     public function selectStudent(Request $request)
     {
         $request->validate([
@@ -580,6 +602,7 @@ class DashboardController extends Controller
         }
         
     }
+
 
 
 }

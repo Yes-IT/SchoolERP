@@ -15,45 +15,6 @@
         <div class="dsbdycmncd-body">
             <div class="notice-list">
                 <ul>
-                    <!-- <li class="has-info-card"><a href="#url"><img src="{{asset('student/images/envelope.svg')}}" alt="Icon"> Upcoming Assignment (04/01/2025)</a>
-                        <div class="notice-info-wrp">
-                            <div class="overlay"></div>
-                            <div class="notice-info">
-                                <div class="nc-info-head">
-                                    <button type="button" class="btn-back"><i class="fa-solid fa-arrow-left"></i></button>
-                                    <h2>Upcoming Assignment</h2>
-                                    <button type="button" class="notice-btn-close">
-                                        <img src="{{asset('student/images/cross-icon.svg')}}" alt="Close">
-                                    </button>
-                                </div>
-                                <div class="nc-info-body">
-                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                                    <div class="nc-doc-wrap">
-                                        <button type="button" class="doc-download cmn-btn">
-                                            <img src="{{asset('student/images/file-icon.svg')}}" alt="Icon"></i>
-                                            <span>Doc_0481</span>
-                                            <a href="javascript:void(0)" download="./image/download-icon-light.svg"><img src="{{asset('student/images/download-icon-light.svg')}}" alt="Icon"></a>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="nc-info-footer">
-                                    <div class="notice-date">
-                                        <img src="{{asset('student/images/calender-primary.svg')}}" alt="Icon">
-                                        <span>Notice Date: 04/01/2025</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </li>
-                    <li class="active"><a href="#url"><img src="{{asset('student/images/notice-icon-2.svg')}}" alt="Icon"> Change of Schedule (04/01/2025)</a></li>
-                    <li><a href="#url"><img src="{{asset('student/images/envelope.svg')}}" alt="Icon"> Upcoming Activities (04/01/2025)</a></li>
-                    <li><a href="#url"><img src="{{asset('student/images/envelope.svg')}}" alt="Icon"> Miscellaneous (04/01/2025)</a></li>
-                    <li><a href="#url"><img src="{{asset('student/images/envelope.svg')}}" alt="Icon"> Upcoming Assignment (04/01/2025)</a></li>
-                    <li class="active"><a href="#url"><img src="{{asset('student/images/notice-icon-2.svg')}}" alt="Icon"> Change of Schedule (04/01/2025)</a></li>
-                    <li><a href="#url"><img src="{{asset('student/images/envelope.svg')}}" alt="Icon"> Upcoming Activities (04/01/2025)</a></li>
-                    <li><a href="#url"><img src="{{asset('student/images/envelope.svg')}}" alt="Icon"> Miscellaneous (04/01/2025)</a></li> -->
-
                     @foreach($notices as $notice)
                     @php
                     $isActive = isset($selectedNoticeId) && $selectedNoticeId == $notice->id;
@@ -88,7 +49,7 @@
                                 <div class="nc-info-body">
                                     <p>{!! $notice->description !!}</p>
 
-                                    @if($notice->attachment)
+                                    {{-- @if($notice->attachment)
                                     <div class="nc-doc-wrap">
                                         <button type="button" class="doc-download cmn-btn" onclick="downloadNoticePDF({{ $notice->id }})">
                                             <img src="{{ asset('student/images/file-icon.svg') }}" alt="Icon">
@@ -96,6 +57,19 @@
                                             <img src="{{ asset('student/images/download-icon-light.svg') }}" alt="Icon">
                                         </button>
                                     </div>
+                                    @endif --}}
+                                    @if($notice->attachment)
+                                        <div class="nc-doc-wrap">
+                                            <button type="button" class="doc-download cmn-btn" onclick="downloadNoticePDF({{ $notice->id }})">
+                                                <img src="{{ asset('student/images/file-icon.svg') }}" alt="Icon">
+                                                <span>{{ basename($notice->attachment) }}</span>
+                                                <img src="{{ asset('student/images/download-icon-light.svg') }}" alt="Icon">
+                                            </button>
+                                        </div>
+                                    @else
+                                        <div class="nc-doc-wrap no-attachment">
+                                            <p class="text-muted">No attachment available for this notice.</p>
+                                        </div>
                                     @endif
                                 </div>
 
@@ -194,7 +168,7 @@
 
 <script>
     function downloadNoticePDF(noticeId) {
-        window.location.href = `/student/notice/${noticeId}/download-pdf`;
+        window.location.href = `/parent/notice/${noticeId}/download-pdf`;
     }
 </script>
 
