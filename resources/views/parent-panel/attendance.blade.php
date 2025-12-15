@@ -69,8 +69,8 @@
                             </div>
 
                             <!-- Year/Month Picker Dropdown -->
-                            <div class="dropdown date-dropdown">
-                                <button type="button" class="dropdown-toggle">
+                            <div class="dropdown date-dropdown" style="width: 200px !important;">
+                                <button type="button" class="dropdown-toggle" style="width: 200px !important; height: 45px !important;">
                                     <span class="label">
                                         {{ \Carbon\Carbon::create()->month($month)->format('F') }}, {{ $year }}
                                     </span>

@@ -35,7 +35,7 @@ class ProfileController extends Controller
             ->leftjoin('users', 'students.user_id', '=', 'users.id')
             ->leftJoin('uploads', 'users.upload_id', '=', 'uploads.id')
             ->leftJoin('parent_guardians', 'parent_guardians.student_id', '=', 'students.id')
-            ->select('students.*', 'users.name as user_name', 'users.email', 'uploads.path as image_path', 'parent_guardians.*')
+            ->select('students.*', 'students.student_id as s_student_id', 'users.name as user_name', 'users.email', 'uploads.path as image_path', 'parent_guardians.*')
             ->where('students.user_id', $first_student->user_id)
             ->first();
         if (!$data) {

@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\StudentInfo\SessionClassStudent;
 use App\Repositories\ParentPanel\DashboardRepository;
 use App\Models\User;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -32,13 +32,10 @@ class DashboardController extends Controller
         $students = DB::table('students')
             ->join('student_class_mapping', 'students.id', '=', 'student_class_mapping.student_id')
             ->whereNull('students.parent_guardian_id')
+            // ->where('parent_guardian_id', '!=', '')
             ->get();
 
-
-
-
         if (!$student) {
-
 
             return view('parent-panel.dashboard-upload', compact('students'));
         }
@@ -46,12 +43,13 @@ class DashboardController extends Controller
         // 2️ Get student_id
         // $studentId = $student->id;
         $studentId = session('selected_student_id');
-
+        // @dd($studentId);
         // 3️ Get all class_ids for this student
         $classIds = DB::table('student_class_mapping')
             ->where('student_id', $studentId)
             ->pluck('class_id')
             ->toArray();
+
         if (empty($classIds)) {
             return view('parent-panel.dashboard-upload', compact('students'));
         }
@@ -167,10 +165,10 @@ class DashboardController extends Controller
         }
 
         // $fees = $query->get();
-
         $perPage = $request->get('perPage', 10);
         $fees = $query->paginate($perPage);
         return view('parent-panel.dashboard', compact('upload', 'student', 'staff', 'upcomingClasses', 'notices', 'first_student', 'grades', 'fees'));
+
     }
 
     public function indexupload()
@@ -188,6 +186,7 @@ class DashboardController extends Controller
         $data = $this->repo->search($request);
         return view('parent-panel.dashboard', compact('data'));
     }
+
 
     public function searchParentMenuData(Request $request)
     {
@@ -247,6 +246,44 @@ class DashboardController extends Controller
         $selectedNoticeId = $request->query('notice_id');
         return view('parent-panel.notices', compact('notices', 'selectedNoticeId'));
     }
+
+    
+    public function downloadNoticePDF($noticeId)
+    {
+        // 1. Fetch notice
+        $notice = DB::table('notice_boards')->where('id', $noticeId)->first();
+
+        if (!$notice) {
+            abort(404, 'Notice not found.');
+        }
+
+        // 2. Check if attachment exists
+        if (empty($notice->attachment)) {
+            return redirect()->back()->with('error', 'No attachment available for this notice.');
+        }
+
+        // 3. Fetch upload record (attachment = upload_table.id)
+        $upload = DB::table('uploads')->where('id', $notice->attachment)->first();
+
+        if (!$upload) {
+            return redirect()->back()->with('error', 'Attachment not found in upload records.');
+        }
+
+        // 4. Generate file path
+        // Upload path stored example: backend/uploads/users/xxxx.png
+        // File is inside storage/app/
+        $filePath = $upload->path;
+
+        // 5. Check if file exists on disk
+        if (!file_exists($filePath)) {
+            return redirect()->back()->with('error', 'Attachment file not found on server.');
+        }
+
+        // 6. Download file
+        return response()->download($filePath, basename($upload->path));
+    }
+
+
     public function selectStudent(Request $request)
     {
         // Save to session
@@ -257,4 +294,5 @@ class DashboardController extends Controller
             'selected_student_id' => $request->student_id
         ]);
     }
+    
 }

@@ -1,8 +1,9 @@
 @extends('parent-panel.partials.master')
 
 @section('title')
-    {{-- {{ @$data['title'] }} --}}
+    {{$data->first_name}}’s Profile
 @endsection
+
 @section('content')
     <div class="ds-breadcrumb">
         <h1>{{$data->first_name}}’s Profile</h1>
@@ -11,16 +12,20 @@
             <li>{{$data->first_name}}’s Profile</li>
         </ul>
     </div>
+
+    {{-- @dump($data) --}}
+
     <div class="ds-pr-body">
         <div class="ds-pr-profile-card">
             <div class="dspr-profile-cd-upr">
                 <div class="dspr-profile-cd-img">
-                    <img src="{{asset($data->image_path)}}" alt="Profile Image">
+                    <img src="{{ asset($data->image_path) }}" onerror="this.src='{{ asset('student/images/profile-picture.png') }}'" >
                 </div>
+
                 <div class="dspr-profile-cd-info">
                     <h2>{{$data->first_name}} {{$data->last_name}}</h2>
                     <p>{{$data->first_name}} {{$data->last_name}}</p>
-                    <div class="user-id">Student ID {{$data->student_id}}</div>
+                    <div class="user-id">Student ID {{$data->s_student_id}}</div>
                 </div>
             </div>
             <div class="dspr-profile-cd-btm">
@@ -49,15 +54,15 @@
                         <tbody>
                             <tr class="table-tr">
                                 <td class="td-lineremover">Admission Date</td>
-                                <td class="td-lineremover">03/18/2021</td>
+                                <td class="td-lineremover">{{ \Carbon\Carbon::parse($data->admission_date)->format('d-m-Y') }}</td>
                             </tr>
                             <tr class="table-tr">
                                 <td class="td-lineremover">Date of Birth</td>
-                                <td class="td-lineremover">{{ $data->dob }}</td>
+                                <td class="td-lineremover">{{ \Carbon\Carbon::parse($data->dob)->format('d-m-Y') }}</td>
                             </tr>
                             <tr class="table-tr">
                                 <td class="td-lineremover">Hebrew Birthday</td>
-                                <td class="td-lineremover">{{ $data->hebrew_dob }}</td>
+                                <td class="td-lineremover">{{ \Carbon\Carbon::parse($data->hebrew_dob)->format('d-m-Y') }}</td>
                             </tr>
                             <tr class="table-tr">
                                 <td class="td-lineremover">Email</td>
@@ -65,9 +70,8 @@
                             </tr>
                             <tr class="table-tr">
                                 <td class="td-lineremover">High School</td>
-                                <td class="td-lineremover"{{ $data->diploma_name }}</td>
+                                <td class="td-lineremover">{{ $data->diploma_name }}</td>
                             </tr>
-
                             <tr class="table-tr">
                                 <td class="td-lineremover">Passport No.</td>
                                 <td class="td-lineremover">{{ $data->passport_no }}</td>
@@ -166,7 +170,8 @@
                             <tr>
                                 <td class="td-lineremover">Address</td>
                                 <td class="td-lineremover">{{ $data->city }} , {{ $data->state }}
-                                    ,{{ $data->country }} ({{ $data->zip_code }})</td>
+                                    ,{{ $data->country }} ({{ $data->zip_code }})
+                                </td>
                             </tr>
                         </tbody>
                     </table>

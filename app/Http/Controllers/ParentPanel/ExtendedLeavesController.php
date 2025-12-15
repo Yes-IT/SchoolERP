@@ -3,58 +3,58 @@
 namespace App\Http\Controllers\ParentPanel;
 
 use App\Http\Controllers\Controller;
+use App\Models\Academic\Semester;
 use App\Models\StudentInfo\Student;
+use App\Models\Leave;
+use App\Models\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
-use App\Models\Leave;
 use Carbon\Carbon;
-use DB;
-
 
 class ExtendedLeavesController extends Controller
 {
-  
-
+    
     public function index(Request $request)
     {
-        $perPage = $request->get('perPage', 4);
+        $perPage = $request->get('perPage', 10);
+        $sessionId   = $request->get('year');      // year = session_id
+        $semesterId  = $request->get('semester');  // semester_id
 
         $student = Student::where('parent_guardian_id', Auth::id())->first();
-
         if (!$student) {
-            return redirect()->back()->withErrors(['error' => 'Student not found.']);
+            return redirect()->back()->withErrors(['error' => 'No student found for this parent.']);
         }
 
-        $yearOptions = DB::table('school_years')->pluck('name', 'id')->toArray();
-        $semesteroptions = DB::table('semesters')->pluck('name', 'id')->toArray();
+        $years     = Session::orderByDesc('id')->get();
+        $semesters = Semester::get();
 
         $query = Leave::where('student_id', $student->id)
-            ->orderBy('created_at', 'desc');
+                    ->whereRaw('DATEDIFF(to_date, from_date) >= 3');
 
-        if ($request->filled('year')) {
-            $yearName = DB::table('school_years')->where('id', $request->year)->value('name');
-            if ($yearName) {
-                [$yearStart, $yearEnd] = explode('-', $yearName);
-                $startOfYear = \Carbon\Carbon::createFromDate($yearStart, 6, 1)->startOfMonth();
-                $endOfYear   = \Carbon\Carbon::createFromDate($yearEnd, 5, 31)->endOfMonth();
-                $query->whereBetween('from_date', [$startOfYear, $endOfYear]);
-            }
+        // === FILTERS ===
+        if ($sessionId && $sessionId != '') {
+            $query->where('session_id', $sessionId);
         }
 
-        if ($request->filled('semester')) {
-            $query->where('semester_id', $request->semester);
+        if ($semesterId && $semesterId != '') {
+            $query->where('semester_id', $semesterId);
+        }
+        // =================
+
+        $query->orderBy('created_at', 'desc');
+
+        $leaves = $query->paginate($perPage)->appends($request->query());
+
+        // If request is AJAX → return only table + pagination
+        if ($request->ajax()) {
+            return view('parent-panel.extended_leaves_table', compact(
+                'leaves', 'perPage'
+            ))->render();
         }
 
-
-        $leaves = $query->paginate($perPage);
-        return view('parent-panel.extended-leaves', [
-            'leaves' => $leaves,
-            'perPage' => $perPage,
-            'yearOptions' => $yearOptions,
-            'semesteroptions' => $semesteroptions
-        ]);
+        return view('parent-panel.extended-leaves', compact(
+            'leaves', 'perPage', 'years', 'semesters', 'student'
+        ));
     }
 
-   
 }

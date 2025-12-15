@@ -58,14 +58,17 @@
         </form>
     </div>
 
+    {{-- {{ Auth::id() }} --}}
     <div class="dsbdy-head-right">
         <div class="input-grp m-0">
             <select id="select_student">
-                @foreach ($students as $student)
+                {{-- @forelse ($students as $student)
                     <option value="{{ $student->id }}" {{ session('selected_student_id') == $student->id ? 'selected' : '' }}>
                         {{ $student->first_name }} (ID-{{ $student->id }})
                     </option>
-                @endforeach
+                @empty
+                    <option disabled>No student found</option>
+                @endforelse --}}
             </select>
 
 
@@ -91,18 +94,19 @@
         <div id="alertPopup" class="alert-popup">
             <div class="alert-popup-content">
                 <div class="alertDiv">
-                    <button class="alert-close" onclick="closeAlertPopup()"><img
-                            src="./{{ global_asset('parent') }}/images/IconBase.svg" /></button>
+                    <button class="alert-close" onclick="closeAlertPopup()">
+                        <img src="{{ global_asset('parent') }}/images/IconBase.svg" />
+                    </button>
                     <div class="headingAlert">
-                        <img src="./{{ global_asset('parent') }}/images/alert.svg" />
-                        <p>Alert: Child Absent Today</p>
+                        <img src="{{ global_asset('parent') }}/images/alert.svg" />
+                        <p>Alert: Child Absent Today </p>
                     </div>
                 </div>
                 <p class="alertTxt">Your child, Edward Thomas, has been marked absent today, 07/12/2025.</p>
-                <p class="alertTxt">Please contact the school if you have any questions or need to provide an excuse.
-                </p>
+                <p class="alertTxt">Please contact the school if you have any questions or need to provide an excuse.</p>
             </div>
         </div>
+        
         <div class="profile-ctrl">
             <button class="profile-ctrl-toggler">
                 <div class="pr-pic">
