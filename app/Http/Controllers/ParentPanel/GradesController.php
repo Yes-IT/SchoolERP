@@ -9,20 +9,26 @@ use App\Repositories\ParentPanel\ClassRoutineRepository;
 use App\Repositories\Report\ClassRoutineRepository as ReportClassRoutineRepository;
 use Illuminate\Http\Request;
 use PDF;
-use Illuminate\Support\Facades\Auth;
-use DB;
+use Illuminate\Support\Facades\{Log,Auth,DB};
 use Carbon\Carbon;
 
 class GradesController extends Controller
 {
   
-
     public function index(Request $request)
     {
 
-        $perPage = $request->get('perPage', 5);
-        $student = Student::where('parent_guardian_id', Auth::id())->firstOrFail();
+        $student = $request->attributes->get('currentStudent');
+            
+        if (!$student) {
+            return redirect()
+                ->route('parent-panel-dashboard.index')
+                ->with('error', 'Please select a student first');
+        }
+
         $id = $student->id;
+
+        $perPage = $request->get('perPage', 5);
 
         $month = $request->get('month', now()->month);
         $year = $request->get('year', now()->year);
@@ -50,12 +56,12 @@ class GradesController extends Controller
 
         // Subject list for filter
         $subjects = DB::table('student_class_mapping')
-            ->where('student_id', $id)
-            ->leftJoin('classes', 'student_class_mapping.class_id', '=', 'classes.id')
-            ->leftJoin('subjects', 'classes.subject_id', '=', 'subjects.id')
-            ->select('subjects.id', 'subjects.name')
-            ->distinct()
-            ->get();
+                    ->where('student_id', $id)
+                    ->leftJoin('classes', 'student_class_mapping.class_id', '=', 'classes.id')
+                    ->leftJoin('subjects', 'classes.subject_id', '=', 'subjects.id')
+                    ->select('subjects.id', 'subjects.name')
+                    ->distinct()
+                    ->get();
 
         // Map attendance by date + subject_id
         $attendanceData = [];
@@ -72,22 +78,17 @@ class GradesController extends Controller
         $firstDay = Carbon::create($year, $month, 1);
         $lastDay = $firstDay->copy()->endOfMonth();
         $daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Shabbos'];
-        $student = Student::where('parent_guardian_id', Auth::id())->first();
-
-        if (!$student) {
-            return redirect()->back()->withErrors(['error' => 'Student not found.']);
-        }
-
+       
         $query = DB::table('grades')
-            ->leftJoin('classes', 'grades.classes_id', '=', 'classes.id')
-            ->leftJoin('subjects', 'classes.subject_id', '=', 'subjects.id')
-            ->select(
-                'grades.*',
-                'classes.name as class_name',
-                'subjects.name as subject_name'
-            )
-            ->where('grades.student_id', $student->id)
-            ->orderBy('grades.created_at', 'desc');
+                    ->leftJoin('classes', 'grades.classes_id', '=', 'classes.id')
+                    ->leftJoin('subjects', 'classes.subject_id', '=', 'subjects.id')
+                    ->select(
+                        'grades.*',
+                        'classes.name as class_name',
+                        'subjects.name as subject_name'
+                    )
+                    ->where('grades.student_id', $student->id)
+                    ->orderBy('grades.created_at', 'desc');
 
         if ($request->filled('school_years_id')) {
             $query->where('grades.school_years_id', $request->school_years_id);
@@ -134,9 +135,9 @@ class GradesController extends Controller
             // $points += $approvedLeaveDays * 1;
 
             $marksGrade = DB::table('marks_grades')
-                ->where('student_id', $studentId)
-                ->where('classes_id', $classId)
-                ->value('point');
+                    ->where('student_id', $studentId)
+                    ->where('classes_id', $classId)
+                    ->value('point');
 
             $calculatedPoints = ($marksGrade ?? 0) - $points;
 
@@ -170,5 +171,7 @@ class GradesController extends Controller
         ]);
     }
 
+
+   
    
 }

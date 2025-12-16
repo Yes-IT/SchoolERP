@@ -10,8 +10,8 @@
             <div class="dsbdy-cmn-card w55">
                 <div class="dsbdy-student-card">
                     <div class="dsbdy-student-img">
-                        @if (!empty($upload->path))
-                            <img src="{{ asset($upload->path) }}" alt="Profile Photo">
+                        @if (!empty($upload->stdClass->path))
+                            <img src="{{ asset($upload->stdClass->path) }}" alt="Profile Photo">
                         @else
                             <img src="{{ asset('backend/assets/images/new-version.jpg') }}" alt="Default Profile Image">
                         @endif
@@ -61,7 +61,15 @@
             <div class="dsbdy-cmn-card w65">
                 <div class="dsbdycmncd-head">
                     <h2 class="df">
-                        Attendance <span class="green-txt">(90.00%)</span>
+                        @if(isset($attendancePercentage))
+                        Attendance <span class="green-txt">
+                            ({{ number_format($attendancePercentage, 2) }}%)
+                        </span>
+                        @else
+                            <!-- Fallback or default -->
+                            Attendance: N/A
+                        @endif
+                        
                         <div class="ibtn">
                             <button type="button" class="ibtn-icon">
                                 <img src="{{ asset('student/images/i-icon.svg') }}" alt="Icon">

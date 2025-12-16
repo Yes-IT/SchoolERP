@@ -3,27 +3,28 @@
 namespace App\Http\Controllers\ParentPanel;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\{Auth,DB,Log};
 use App\Models\StudentInfo\SessionClassStudent;
 use App\Models\StudentInfo\Student;
-// use App\Repositories\ParentPanel\ClassRoutineRepository;
+use App\Repositories\ParentPanel\ClassRoutineRepository;
 use App\Repositories\Report\ClassRoutineRepository as ReportClassRoutineRepository;
 use Illuminate\Http\Request;
 // use PDF;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 
-use Illuminate\Support\Facades\{Auth,DB,Log};
+
 
 class ClassRoutineController extends Controller
 {
     // private $reportClassRoutineRepo;
     private $repo;
 
-    // function __construct(ClassRoutineRepository $repo)
-    // {
-    //     // $this->reportClassRoutineRepo = $reportClassRoutineRepo;
-    //     $this->repo               = $repo;
-    // }
+    function __construct(ClassRoutineRepository $repo)
+    {
+       
+        $this->repo               = $repo;
+    }
 
     // public function index(Request $request)
     // {
@@ -124,141 +125,46 @@ class ClassRoutineController extends Controller
 
     ///changes by nazmin 11-12-2025
 
-    // public function index()
-    // {
-    //     try {
-    //         $students = DB::table('parent_guardians')
-    //                         ->where('user_id', auth()->id())
-    //                         ->pluck('student_id');
-
-    //         if ($students->isEmpty()) {
-    //             return back()->with('error', 'No student found for this parent');
-    //         }
-
-    //         $classIds = DB::table('class_student')
-    //                     ->whereIn('student_id', $students)
-    //                     ->where('status', '1')
-    //                     ->pluck('class_id');
-
-    //         if ($classIds->isEmpty()) {
-    //             return back()->with('error', 'No class assigned to this student');
-    //         }
-
-    //         $schedules = DB::table('class_schedules')
-    //                     ->select('class_schedules.*', 'classes.subject_id', 'classes.teacher_id')
-    //                     ->join('classes', 'class_schedules.class_id', '=', 'classes.id')
-    //                     ->whereIn('class_schedules.class_id', $classIds)
-    //                     ->whereNull('class_schedules.deleted_at')
-    //                     ->whereNull('classes.deleted_at')
-    //                     ->orderBy('class_schedules.day')
-    //                     ->orderBy('class_schedules.start_time')
-    //                     ->get();
-
-    //         $timeSlots = [];
-    //         for ($h = 0; $h <= 23; $h++) {  
-    //             $start = sprintf("%02d:00:00", $h);
-    //             $end   = sprintf("%02d:59:00", $h);
-    //             $slotKey = $start; 
-
-    //             $timeSlots[$slotKey] = [
-    //                 'label' => date("h:i A", strtotime($start)) . " - " . date("h:i A", strtotime($end))
-    //             ];
-    //         }
-
-    //         $days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Shabbos'];
-
-    //         $formatted = [];
-    //         foreach ($days as $day) {
-    //             foreach ($timeSlots as $startTime => $slot) {
-    //                 $formatted[$day][$startTime] = null;
-    //             }
-    //         }
-
-    //         $subjectIds = $schedules->pluck('subject_id')->filter()->unique()->values();
-    //         $teacherIds = $schedules->pluck('teacher_id')->filter()->unique()->values();
-    //         // dd($teacherIds);
-
-    //         $subjects = DB::table('subjects')
-    //                     ->whereIn('id', $subjectIds)
-    //                     ->pluck('name', 'id');
-            
-    //         $teachers = DB::table('staff')
-    //                     ->whereIn('id', $teacherIds)
-    //                     ->select(DB::raw("id, CONCAT(first_name, ' ', last_name) as full_name"))
-    //                     ->pluck('full_name', 'id');
-
-    //         $roomIds = $schedules->pluck('room_id')->filter()->unique()->values();
-    //         $rooms = DB::table('class_rooms')
-    //                 ->whereIn('id', $roomIds)
-    //                 ->pluck('room_no', 'id');
-
-    //         foreach ($schedules as $schedule) {
-    //             $normalizedStart = date("H:00:00", strtotime($schedule->start_time));
-                
-    //             // TEMPORARILY REMOVE TIME FILTER
-    //             // if ($normalizedStart >= "08:00:00" && $normalizedStart <= "19:00:00") {
-                
-    //             if (!isset($formatted[$schedule->day])) {
-    //                 Log::warning('Day not in array:', ['day' => $schedule->day]);
-    //                 continue;
-    //             }
-                
-    //             if (!array_key_exists($normalizedStart, $formatted[$schedule->day])) {
-    //                 Log::warning('Time slot not in array:', [
-    //                     'day' => $schedule->day,
-    //                     'time' => $normalizedStart,
-    //                     'available_slots' => array_keys($formatted[$schedule->day])
-    //                 ]);
-    //                 continue;
-    //             }
-                
-    //             $subjectName = $subjects[$schedule->subject_id] ?? ('Period ' . $schedule->period);
-    //             $teacherName = $teachers[$schedule->teacher_id] ?? 'Teacher ID: ' . $schedule->teacher_id;
-    //             $room = $rooms[$schedule->room_id] ?? ('Room ID: ' . $schedule->room_id);
-            
-    //             $formatted[$schedule->day][$normalizedStart] = [
-    //                 'subject' => $subjectName,
-    //                 'teacher' => $teacherName,
-    //                 'room' => $room,
-    //                 'period' => $schedule->period,
-    //                 'start_time_raw' => $schedule->start_time,
-    //                 'end_time_raw' => $schedule->end_time,
-    //             ];
-                
-               
-                
-    //         }
-
-           
-
-    //         return view('parent-panel.class-routine', compact('formatted', 'timeSlots', 'days'));
-
-    //     } catch (\Exception $e) {
-    //         Log::error('Error in index method:', [
-    //             'error' => $e->getMessage(), 
-    //             'trace' => $e->getTraceAsString(),
-    //             'line' => $e->getLine()
-    //         ]);
-    //         return redirect()->route('parent-panel-dashboard.index')->with('error', 'Failed to load classes: ' . $e->getMessage());
-    //     }
-    // }
-
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $studentIds = DB::table('parent_guardians')
-                            ->where('user_id', auth()->id())
-                            ->pluck('student_id');
+           
+            // Log::info('ClassRoutineController - Start', [
+            //     'route' => $request->route()->getName(),
+            //     'student_from_request' => request()->get('currentStudent') ? 'exists' : 'null',
+            //     'student_id_session' => session('current_student_id'),
+            //     'auth_id' => Auth::id()
+            // ]);
 
-            if ($studentIds->isEmpty()) {
-                return back()->with('error', 'No student found for this parent');
+            $student = request()->get('currentStudent');
+
+            // If student is not set via middleware, try to get it from session
+            if (!$student) {
+                $studentId = session('current_student_id');
+                if (!$studentId) {
+                    return redirect()->route('parent-panel-dashboard.index')->with('error', 'Please select a student first');
+                }
+                
+                $student = Student::where('id', $studentId)->where('parent_guardian_id', Auth::id())->first();
+                if (!$student) {
+
+                    return redirect()->route('parent-panel-dashboard.index')->with('error', 'Invalid student selected');
+                }
             }
 
-            $classIds = DB::table('class_student')
-                        ->whereIn('student_id', $studentIds)
-                        ->where('status', '1')
-                        ->whereNull('deleted_at')
+           
+            $studentId = $student->id;
+
+            $classIds = DB::table('student_class_mapping')
+                        ->where('student_id', $studentId)
                         ->pluck('class_id');
+                        
+                        
+            Log::info('ClassRoutineController - Class IDs found', [
+                'student_id' => $studentId,
+                'class_ids' => $classIds->toArray(),
+                'count' => $classIds->count()
+            ]);
 
             if ($classIds->isEmpty()) {
                 return back()->with('error', 'No class assigned to this student');
@@ -287,15 +193,11 @@ class ClassRoutineController extends Controller
                                 ->whereIn('cs.class_id', $classIds)
                                 ->whereNull('cs.deleted_at')
                                 ->whereNull('c.deleted_at')
-                                ->where('cs.day', '!=', 'Shabbos') // Exclude Shabbos from query
+                                ->where('cs.day', '!=', 'Shabbos') 
                                 ->orderByRaw("FIELD(cs.day, 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')")
                                 ->orderBy('cs.start_time')
                                 ->get();
-
-            Log::info('Class schedules found:', [
-                'count' => $schedules->count(),
-                'days' => $schedules->pluck('day')->unique()->values()->toArray()
-            ]);                    
+             
 
             // Prepare time slots (school hours: 8 AM to 8 PM)
             $timeSlots = [];
@@ -336,7 +238,6 @@ class ClassRoutineController extends Controller
                     continue;
                 }
                 
-                // Skip Shabbos (shouldn't happen due to query filter, but just in case)
                 if ($schedule->day === 'Shabbos') {
                     continue;
                 }
@@ -355,13 +256,12 @@ class ClassRoutineController extends Controller
                 ];
             }
 
-            // Clean up - remove weekdays with no classes at all
             $weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
             foreach ($weekdays as $day) {
                 if (isset($formatted[$day]) && empty(array_filter($formatted[$day], function($slot) {
                     return $slot !== null && (!isset($slot['is_holiday']) || !$slot['is_holiday']);
                 }))) {
-                    // Keep the day but mark all slots as empty
+                   
                     foreach ($formatted[$day] as $time => $slot) {
                         if ($slot === null) {
                             $formatted[$day][$time] = [
@@ -393,50 +293,50 @@ class ClassRoutineController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error loading class routine:', [
+             Log::error('Error loading class routine:', [
                 'user_id' => auth()->id(),
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'student_id' => optional(request()->get('currentStudent'))->id,
+                'error' => $e->getMessage()
             ]);
-            
+
             return redirect()->route('parent-panel-dashboard.index')->with('error', 'Unable to load class schedule. Please try again later.');
         }
     }
 
-    public function generateSchedulePDF(Request $request)
-    {
-        // Get date range from request
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
+    // public function generateSchedulePDF(Request $request)
+    // {
+    //     // Get date range from request
+    //     $startDate = $request->input('start_date');
+    //     $endDate = $request->input('end_date');
         
-        // Parse dates or use defaults
-        $start = $startDate ? Carbon::parse($startDate) : Carbon::now()->startOfWeek();
-        $end = $endDate ? Carbon::parse($endDate) : Carbon::now()->endOfWeek();
+    //     // Parse dates or use defaults
+    //     $start = $startDate ? Carbon::parse($startDate) : Carbon::now()->startOfWeek();
+    //     $end = $endDate ? Carbon::parse($endDate) : Carbon::now()->endOfWeek();
         
-        // Fetch schedules for the date range
-        $schedules = ClassSchedule::with(['subject', 'teacher', 'classroom'])
-            ->whereBetween('date', [$start, $end])
-            ->orderBy('date')
-            ->orderBy('start_time')
-            ->get()
-            ->groupBy('date');
+    //     // Fetch schedules for the date range
+    //     $schedules = ClassSchedule::with(['subject', 'teacher', 'classroom'])
+    //         ->whereBetween('date', [$start, $end])
+    //         ->orderBy('date')
+    //         ->orderBy('start_time')
+    //         ->get()
+    //         ->groupBy('date');
         
-        $data = [
-            'schedules' => $schedules,
-            'startDate' => $start->format('M d, Y'),
-            'endDate' => $end->format('M d, Y'),
-            'generatedAt' => Carbon::now()->format('M d, Y h:i A'),
-        ];
+    //     $data = [
+    //         'schedules' => $schedules,
+    //         'startDate' => $start->format('M d, Y'),
+    //         'endDate' => $end->format('M d, Y'),
+    //         'generatedAt' => Carbon::now()->format('M d, Y h:i A'),
+    //     ];
         
-        // Generate PDF
-        $pdf = Pdf::loadView('pdf.schedule', $data);
+    //     // Generate PDF
+    //     $pdf = Pdf::loadView('pdf.schedule', $data);
         
-        // Set PDF options
-        $pdf->setPaper('A4', 'landscape');
-        $pdf->setOption('defaultFont', 'Arial');
+    //     // Set PDF options
+    //     $pdf->setPaper('A4', 'landscape');
+    //     $pdf->setOption('defaultFont', 'Arial');
         
-        // Download PDF
-        return $pdf->download('class-schedule-'.$start->format('Y-m-d').'-to-'.$end->format('Y-m-d').'.pdf');
-    }
+    //     // Download PDF
+    //     return $pdf->download('class-schedule-'.$start->format('Y-m-d').'-to-'.$end->format('Y-m-d').'.pdf');
+    // }
     
 }

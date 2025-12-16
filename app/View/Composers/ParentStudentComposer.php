@@ -9,42 +9,21 @@ use App\Models\StudentInfo\Student;
 
 class ParentStudentComposer
 {
-    // public function compose(View $view)
-    // {
-    //     if (!Auth::check()) {
-    //         $view->with('students', collect());
-    //         return;
-    //     }
-
-    //     $user = Auth::user();
-
-    //     //  Parent role check (role_id = 10)
-    //     if ($user->role_id !== 10) {
-    //         $view->with('students', collect());
-    //         return;
-    //     }
-
-    //     $students = Student::where(
-    //         'parent_guardian_id',
-    //         $user->id
-    //     )->get();
-
-    //     $view->with('students', $students);
-    // }
+   
 
     public function compose(View $view)
     {
-        Log::info(' ParentStudentComposer HIT');
+        
         if (!Auth::check()) {
             $view->with('students', collect());
             return;
         }
 
-        Log::info('Auth check', [
-            'logged_in' => Auth::check(),
-            'user_id' => Auth::id(),
-            'role_id' => optional(Auth::user())->role_id,
-        ]);
+        // Log::info('Auth check', [
+        //     'logged_in' => Auth::check(),
+        //     'user_id' => Auth::id(),
+        //     'role_id' => optional(Auth::user())->role_id,
+        // ]);
 
 
         $user = Auth::user();
@@ -57,13 +36,13 @@ class ParentStudentComposer
 
         $students = Student::where('parent_guardian_id', $user->id)->get();
 
-        Log::info('Student query', [
-            'count' => $students->count(),
-            'parent_id' => $user->id
-        ]);
+        // Log::info('Student query', [
+        //     'count' => $students->count(),
+        //     'parent_id' => $user->id
+        // ]);
 
         //  Ensure default selected student is set
-        if (!session()->has('selected_student_id') && $students->isNotEmpty()) {
+        if (!session()->has('current_student_id') && $students->isNotEmpty()) {
             session(['selected_student_id' => $students->first()->id]);
         }
 

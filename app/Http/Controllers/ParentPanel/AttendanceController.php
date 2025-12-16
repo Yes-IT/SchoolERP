@@ -5,11 +5,11 @@ namespace App\Http\Controllers\ParentPanel;
 use App\Http\Controllers\Controller;
 use App\Repositories\ParentPanel\AttendanceRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\{Auth,Log,DB};
 use App\Models\StudentInfo\Student;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
-use Illuminate\Support\Facades\DB;
+
 
 class AttendanceController extends Controller
 {
@@ -24,8 +24,7 @@ class AttendanceController extends Controller
     {
         $data['title'] = ___('common.Attendance');
 
-        // Get logged-in parent's student
-        $student = Student::where('parent_guardian_id', Auth::id())->firstOrFail();
+        $student = request()->get('currentStudent');
         $studentId = $student->id;
 
         $month = $request->get('month', now()->month);
@@ -180,12 +179,37 @@ class AttendanceController extends Controller
         ));
     }
 
+    // public function search(Request $request)
+    // {
+    //     $data            = $this->repo->search($request);
+    //     $data['title']   = ___('common.Attendance');
+    //     $data['request'] = $request;
+
+    //     return view('parent-panel.attendance', compact('data'));
+    // }
+
     public function search(Request $request)
     {
-        $data            = $this->repo->search($request);
-        $data['title']   = ___('common.Attendance');
-        $data['request'] = $request;
+        try {
+            // Get student from middleware
+            $student = $request->attributes->get('currentStudent');
+            
+            if (!$student) {
+                return redirect()
+                    ->route('parent-panel-dashboard.index')
+                    ->with('error', 'Please select a student first');
+            }
+            
+            $request->merge(['student' => $student->id]);
+            
+            $data = $this->repo->search($request, $student->id);
+            $data['title'] = ___('common.Attendance');
+            $data['request'] = $request;
 
-        return view('parent-panel.attendance', compact('data'));
+            return view('parent-panel.attendance', compact('data'));
+        } catch (\Exception $e) {
+            Log::error('Attendance search error: ' . $e->getMessage());
+            return back()->with('error', 'Failed to load attendance data.');
+        }
     }
 }

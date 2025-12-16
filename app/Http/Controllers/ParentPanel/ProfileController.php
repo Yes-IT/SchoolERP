@@ -5,13 +5,12 @@ namespace App\Http\Controllers\ParentPanel;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Interfaces\UserInterface;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\{Auth,DB};
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use App\Http\Requests\ParentPanel\Profile\ProfileUpdateRequest;
 use App\Http\Requests\ParentPanel\Profile\PasswordUpdateRequest;
 use App\Models\StudentInfo\Student;
-use DB;
 
 class ProfileController extends Controller
 {
@@ -26,23 +25,60 @@ class ProfileController extends Controller
         $this->user       = $userInterface;
     }
 
+    // public function profile()
+    // {
+    //     $first_student = Student::where('parent_guardian_id', Auth::id())->first();
+
+    //     $student = Student::where('user_id', $first_student->user_id)->first();
+    //     $data = DB::table('students')
+    //         ->leftjoin('users', 'students.user_id', '=', 'users.id')
+    //         ->leftJoin('uploads', 'users.upload_id', '=', 'uploads.id')
+    //         ->leftJoin('parent_guardians', 'parent_guardians.student_id', '=', 'students.id')
+    //         ->select('students.*', 'students.student_id as s_student_id', 'users.name as user_name', 'users.email', 'uploads.path as image_path', 'parent_guardians.*')
+    //         ->where('students.user_id', $first_student->user_id)
+    //         ->first();
+    //     if (!$data) {
+    //         return redirect()->back()->withErrors(['email' => 'User not found.']);
+    //     }
+    //     return view('parent-panel.profile.profile', compact('data'));
+    // }
+
+    //changes by nazmin
     public function profile()
     {
-        $first_student = Student::where('parent_guardian_id', Auth::id())->first();
+        try{
+            $student = request()->get('currentStudent');
 
-        $student = Student::where('user_id', $first_student->user_id)->first();
-        $data = DB::table('students')
-            ->leftjoin('users', 'students.user_id', '=', 'users.id')
-            ->leftJoin('uploads', 'users.upload_id', '=', 'uploads.id')
-            ->leftJoin('parent_guardians', 'parent_guardians.student_id', '=', 'students.id')
-            ->select('students.*', 'students.student_id as s_student_id', 'users.name as user_name', 'users.email', 'uploads.path as image_path', 'parent_guardians.*')
-            ->where('students.user_id', $first_student->user_id)
-            ->first();
-        if (!$data) {
-            return redirect()->back()->withErrors(['email' => 'User not found.']);
+            if (!$student) {
+                return redirect()->back()->withErrors(['error' => 'Student not found']);
+            }
+
+            $data = DB::table('students')
+                ->leftJoin('users', 'students.user_id', '=', 'users.id')
+                ->leftJoin('uploads', 'users.upload_id', '=', 'uploads.id')
+                ->leftJoin('parent_guardians', 'parent_guardians.student_id', '=', 'students.id')
+                ->select(
+                    'students.*',
+                    'students.student_id as s_student_id',
+                    'users.name as user_name',
+                    'users.email',
+                    'uploads.path as image_path',
+                    'parent_guardians.*'
+                )
+                ->where('students.id', $student->id)
+                ->first();
+
+            if (!$data) {
+                return redirect()->back()->withErrors(['error' => 'Profile data not found.']);
+            }
+
+            return view('parent-panel.profile.profile', compact('data'));
+        }catch(\Exception $e){
+            return redirect()->route('parent-panel.dashboard')->with('error', 'Failed to get students.');
         }
-        return view('parent-panel.profile.profile', compact('data'));
+       
     }
+
 
     public function edit()
     {

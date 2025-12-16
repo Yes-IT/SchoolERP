@@ -168,185 +168,198 @@ class DashboardController extends Controller
     //     return view('parent-panel.dashboard', compact('upload', 'student', 'staff', 'upcomingClasses', 'notices', 'first_student', 'grades', 'fees'));
     // }
 
-
+   //changes by nazmin
     public function index(Request $request)
     {
-        $parentId = Auth::id();
-       
-        $students = Student::where('parent_guardian_id', $parentId)->get();
+        try{
+            $parentId = Auth::id();
 
-        //If parent has no students 
-        if ($students->isEmpty()) {
-            return redirect()->route('parent-panel-dashboard.indexupload');
-        }
+            $students = Student::where('parent_guardian_id', $parentId)->get();
 
-        if (!session()->has('selected_student_id')) {
-            session(['selected_student_id' => $students->first()->id]);
-        }
+            //If parent has no students 
+            if ($students->isEmpty()) {
+                return redirect()->route('parent-panel-dashboard.indexupload');
+            }
 
-        $studentId = session('selected_student_id');
-       
-        $student = $students->where('id', $studentId)->first();
+            if (!session()->has('current_student_id')) {
+                session(['current_student_id' => $students->first()->id]);
+            }
 
-        //Session corrupted or invalid student
-        if (!$student) {
-            session(['selected_student_id' => $students->first()->id]);
-            $student = $students->first();
-            $studentId = $student->id;
-        }
+            $studentId = session('current_student_id');
+            $student = $students->where('id', $studentId)->first();
 
-        //  Get all class_ids for this student
-        $classIds = DB::table('student_class_mapping')
+            //Session corrupted or invalid student
+            if (!$student) {
+                session(['current_student_id' => $students->first()->id]);
+                $student = $students->first();
+                $studentId = $student->id;
+            }
+
+            //  Get all class_ids for this student
+            $classIds = DB::table('student_class_mapping')
+                            ->where('student_id', $studentId)
+                            ->pluck('class_id')
+                            ->toArray();
+
+            $staff = collect([]);
+            $upcomingClasses = collect([]);
+            $notices = collect([]);
+            $grades = collect([]);
+            $fees = collect([]);
+            $attendancePercentage = 0;
+            
+            //Fetch profile upload
+            $user = User::find($student->user_id);
+            $upload = $user
+                ? DB::table('uploads')->where('id', $user->upload_id)->first()
+                : null;
+            // Log::info('Upload: ', ['upload' => $upload]);    
+
+            if (empty($classIds)) {
+                return view('parent-panel.dashboard', compact(
+                    'upload',
+                    'student',
+                    'students',
+                    'staff',
+                    'upcomingClasses',
+                    'notices',
+                    'grades',
+                    'fees',
+                    'attendancePercentage'
+                ));
+            }    
+
+            // Get all teacher_ids from classes table for those classes
+            $teacherIds = DB::table('classes')
+                            ->whereIn('id', $classIds)
+                            ->pluck('teacher_id')
+                            ->filter()
+                            ->unique()
+                            ->toArray();
+
+            //Staff info
+            if (!empty($teacherIds)) {
+                $staff = DB::table('staff')
+                    ->join('classes', 'classes.teacher_id', '=', 'staff.id')
+                    ->join('subjects', 'subjects.id', '=', 'classes.subject_id')
+                    ->leftJoin('uploads', 'uploads.id', '=', 'staff.upload_id')
+                    ->whereIn('staff.id', $teacherIds)
+                    ->select(
+                        'staff.id',
+                        'staff.first_name',
+                        'staff.last_name',
+                        'staff.email',
+                        'staff.phone',
+                        'uploads.path as image',
+                        DB::raw("GROUP_CONCAT(CONCAT(subjects.name,' (',subjects.code,')') SEPARATOR ', ') as subject_details")
+                    )
+                    ->groupBy(
+                        'staff.id',
+                        'staff.first_name',
+                        'staff.last_name',
+                        'staff.email',
+                        'staff.phone',
+                        'uploads.path'
+                    )
+                    ->get();
+            }
+
+            $today = Carbon::now()->format('l');
+            $currentTime = Carbon::now()->format('H:i:s'); 
+
+            // Get Upcoming Classes Info (for today's day only)
+            $upcomingClasses = DB::table('class_schedules')
+                                ->whereIn('class_id', $classIds)
+                                ->where('class_schedules.day', $today) //  Only today's classes
+                                ->where('class_schedules.start_time', '>', $currentTime) //  Only future classes
+                                ->join('classes', 'classes.id', '=', 'class_schedules.class_id')
+                                ->join('staff', 'staff.id', '=', 'classes.teacher_id')
+                                ->leftJoin('uploads', 'uploads.id', '=', 'staff.upload_id')
+                                ->join('subjects', 'subjects.id', '=', 'classes.subject_id')
+                                ->join('class_rooms', 'class_rooms.id', '=', 'class_schedules.room_id')
+                                ->select(
+                                    'subjects.name as subject_name',
+                                    'subjects.code as subject_code',
+                                    'staff.first_name',
+                                    'staff.last_name',
+                                    'class_rooms.room_no',
+                                    'class_schedules.start_time',
+                                    'class_schedules.end_time',
+                                    'uploads.path as staff_image'
+                                )
+                                ->orderBy('class_schedules.start_time', 'asc')
+                                ->get();
+            
+
+            //  Get all session_ids in which this student is enrolled
+            $sessionIds = DB::table('session_class_students')
                         ->where('student_id', $studentId)
-                        ->pluck('class_id')
-                        ->toArray();
+                        ->pluck('session_id')
+                        ->toArray();       
 
-        $staff = collect([]);
-        $upcomingClasses = collect([]);
-        $notices = collect([]);
-        $grades = collect([]);
-        $fees = collect([]);
+            // Fetch all matching notices
+            $notices = DB::table('notice_boards')
+                        ->where(function ($query) use ($studentId, $classIds, $sessionIds) {
+                            $query->where('student_id', $studentId)         
+                                ->orWhereIn('class_id', $classIds)         
+                                ->orWhereIn('session_id', $sessionIds);      
+                        })
+                        ->orderBy('publish_date', 'asc')
+                        ->take(5)
+                        ->get();
+
+            //grades
+            $grades = DB::table('grades')
+                        ->leftJoin('classes', 'grades.classes_id', '=', 'classes.id')
+                        ->leftJoin('subjects', 'classes.subject_id', '=', 'subjects.id')
+                        ->select('grades.*', 'classes.name as class_name', 'subjects.name as subject_name')
+                        ->where('grades.student_id', $studentId)
+                        ->orderBy('grades.created_at', 'desc')
+                        ->get();
+            // fees
+            $fees = DB::table('fees_assign_childrens as fac')
+                    ->leftJoin('fees_masters as fm', 'fm.id', '=', 'fac.fees_master_id')
+                    ->leftJoin('fees_types as ft', 'ft.id', '=', 'fm.fees_type_id')
+                    ->select('fac.id', 'ft.name as type', 'fm.due_date', 'fm.amount')
+                    ->where('fac.student_id', $studentId)
+                    ->paginate($request->get('perPage', 10));
+
+            $attendancePercentage = $this->calculateAttendancePercentage($studentId);
         
-         //Fetch profile upload
-        $user = User::find($student->user_id);
-        $upload = $user
-            ? DB::table('uploads')->where('id', $user->upload_id)->first()
-            : null;
-
-        if (empty($classIds)) {
             return view('parent-panel.dashboard', compact(
-                'upload',
+                'upload', 
                 'student',
-                'students',
+                'students', 
                 'staff',
                 'upcomingClasses',
-                'notices',
-                'grades',
-                'fees'
+                'notices', 
+                'grades', 
+                'fees',
+                'attendancePercentage',
             ));
-        }    
-
-        // Get all teacher_ids from classes table for those classes
-        $teacherIds = DB::table('classes')
-                        ->whereIn('id', $classIds)
-                        ->pluck('teacher_id')
-                        ->filter()
-                        ->unique()
-                        ->toArray();
-
-        //Staff info
-        if (!empty($teacherIds)) {
-            $staff = DB::table('staff')
-                ->join('classes', 'classes.teacher_id', '=', 'staff.id')
-                ->join('subjects', 'subjects.id', '=', 'classes.subject_id')
-                ->leftJoin('uploads', 'uploads.id', '=', 'staff.upload_id')
-                ->whereIn('staff.id', $teacherIds)
-                ->select(
-                    'staff.id',
-                    'staff.first_name',
-                    'staff.last_name',
-                    'staff.email',
-                    'staff.phone',
-                    'uploads.path as image',
-                    DB::raw("GROUP_CONCAT(CONCAT(subjects.name,' (',subjects.code,')') SEPARATOR ', ') as subject_details")
-                )
-                ->groupBy(
-                    'staff.id',
-                    'staff.first_name',
-                    'staff.last_name',
-                    'staff.email',
-                    'staff.phone',
-                    'uploads.path'
-                )
-                ->get();
         }
+        catch(\Exception $e){
+          Log::error('Dashboard error: ' . $e->getMessage());
 
-        $today = Carbon::now()->format('l');
-        $currentTime = Carbon::now()->format('H:i:s'); 
-
-        // Get Upcoming Classes Info (for today's day only)
-        $upcomingClasses = DB::table('class_schedules')
-                            ->whereIn('class_id', $classIds)
-                            ->where('class_schedules.day', $today) //  Only today's classes
-                            ->where('class_schedules.start_time', '>', $currentTime) //  Only future classes
-                            ->join('classes', 'classes.id', '=', 'class_schedules.class_id')
-                            ->join('staff', 'staff.id', '=', 'classes.teacher_id')
-                            ->leftJoin('uploads', 'uploads.id', '=', 'staff.upload_id')
-                            ->join('subjects', 'subjects.id', '=', 'classes.subject_id')
-                            ->join('class_rooms', 'class_rooms.id', '=', 'class_schedules.room_id')
-                            ->select(
-                                'subjects.name as subject_name',
-                                'subjects.code as subject_code',
-                                'staff.first_name',
-                                'staff.last_name',
-                                'class_rooms.room_no',
-                                'class_schedules.start_time',
-                                'class_schedules.end_time',
-                                'uploads.path as staff_image'
-                            )
-                            ->orderBy('class_schedules.start_time', 'asc')
-                            ->get();
-          
-
-        //  Get all session_ids in which this student is enrolled
-        $sessionIds = DB::table('session_class_students')
-                    ->where('student_id', $studentId)
-                    ->pluck('session_id')
-                    ->toArray();       
-
-        // Fetch all matching notices
-        $notices = DB::table('notice_boards')
-                    ->where(function ($query) use ($studentId, $classIds, $sessionIds) {
-                        $query->where('student_id', $studentId)         
-                            ->orWhereIn('class_id', $classIds)         
-                            ->orWhereIn('session_id', $sessionIds);      
-                    })
-                    ->orderBy('publish_date', 'asc')
-                    ->take(5)
-                    ->get();
-
-        //grades
-        $grades = DB::table('grades')
-                    ->leftJoin('classes', 'grades.classes_id', '=', 'classes.id')
-                    ->leftJoin('subjects', 'classes.subject_id', '=', 'subjects.id')
-                    ->select('grades.*', 'classes.name as class_name', 'subjects.name as subject_name')
-                    ->where('grades.student_id', $studentId)
-                    ->orderBy('grades.created_at', 'desc')
-                    ->get();
-        // fees
-        $fees = DB::table('fees_assign_childrens as fac')
-                ->leftJoin('fees_masters as fm', 'fm.id', '=', 'fac.fees_master_id')
-                ->leftJoin('fees_types as ft', 'ft.id', '=', 'fm.fees_type_id')
-                ->select('fac.id', 'ft.name as type', 'fm.due_date', 'fm.amount')
-                ->where('fac.student_id', $studentId)
-                ->paginate($request->get('perPage', 10));
-
-        return view('parent-panel.dashboard', compact(
-            'upload', 
-            'student',
-            'students', 
-            'staff',
-            'upcomingClasses',
-            'notices', 
-            'grades', 
-            'fees'
-        ));
+            return redirect()->route('parent-panel-dashboard.index')->with('error', 'Failed to get dashboard.');
+        }
 
       
     }
 
-
+    //changes by nazmin
     public function indexupload()
     {
-        $students = DB::table('students')
-                    ->whereNull('parent_guardian_id')
-                    ->get();
-        Log::info('All students in indexupload()', ['students' => $students]);            
+        try{
+            $students = DB::table('students')->whereNull('parent_guardian_id')->get();
+            // Log::info('All students in indexupload()', ['students' => $students]);            
 
-        return view('parent-panel.dashboard-upload', compact('students'));
+            return view('parent-panel.dashboard-upload', compact('students'));
+        }catch(\Exception $e){
+            return redirect()->route('parent-panel-dashboard.index')->with('error', 'Failed to get students.');
+        }
+       
     }
-
-   
 
     public function search(Request $request)
     {
@@ -377,41 +390,41 @@ class DashboardController extends Controller
         }
     }
 
+      //changes by nazmin
     public function notices(Request $request)
     {
-        $student = Student::where('parent_guardian_id', Auth::id())->first();
+    
+        try{
+               $student = request()->get('currentStudent');
+                // Log::info('student in notices', ['student' => $student]);
+                $studentId = $student->id;
+
+                $classIds = DB::table('student_class_mapping')
+                            ->where('student_id', $studentId)
+                            ->pluck('class_id')
+                            ->toArray();
+
+                $sessionIds = DB::table('session_class_students')
+                            ->where('student_id', $studentId)
+                            ->pluck('session_id')
+                            ->toArray();
+
+                $notices = DB::table('notice_boards')
+                            ->where(function ($query) use ($studentId, $classIds, $sessionIds) {
+                                $query->where('student_id', $studentId)         
+                                    ->orWhereIn('class_id', $classIds)          
+                                    ->orWhereIn('session_id', $sessionIds);     
+                            })
+                            ->orderBy('publish_date', 'desc')
+                            ->get();
 
 
-        if (!$student) {
-            return redirect()->back()->withErrors(['error' => 'Student not found.']);
+                $selectedNoticeId = $request->query('notice_id');
+                return view('parent-panel.notices', compact('notices', 'selectedNoticeId'));
         }
-
-
-        $studentId = $student->id;
-
-
-        $classIds = DB::table('student_class_mapping')
-            ->where('student_id', $studentId)
-            ->pluck('class_id')
-            ->toArray();
-
-        $sessionIds = DB::table('session_class_students')
-            ->where('student_id', $studentId)
-            ->pluck('session_id')
-            ->toArray();
-
-        $notices = DB::table('notice_boards')
-            ->where(function ($query) use ($studentId, $classIds, $sessionIds) {
-                $query->where('student_id', $studentId)          // specific to student
-                    ->orWhereIn('class_id', $classIds)           // based on class
-                    ->orWhereIn('session_id', $sessionIds);      // based on session
-            })
-            ->orderBy('publish_date', 'desc')
-            ->get();
-
-
-        $selectedNoticeId = $request->query('notice_id');
-        return view('parent-panel.notices', compact('notices', 'selectedNoticeId'));
+        catch(\Exception $e){
+            return redirect()->route('parent-panel-dashboard.index')->with('error', 'Failed to get notices.');
+        }
     }
 
     public function downloadNoticePDF($noticeId)
@@ -449,31 +462,37 @@ class DashboardController extends Controller
         return response()->download($filePath, basename($upload->path));
     }
 
+       //changes by nazmin
     public function selectStudent(Request $request)
     {
-        $request->validate([
-            'student_id' => 'required|exists:students,id',
-        ]);
-
-        $student = Student::find($request->student_id);
-
-         // Assign student ONLY if not already assigned
-        if ($student && $student->parent_guardian_id === null) {
-            $student->update([
-                'parent_guardian_id' => Auth::id()
+       try{
+            $request->validate([
+                'student_id' => 'required|exists:students,id',
             ]);
+
+            $student = Student::find($request->student_id);
+
+            // Assign student ONLY if not already assigned
+            if ($student && $student->parent_guardian_id === null) {
+                $student->update([
+                    'parent_guardian_id' => Auth::id()
+                ]);
+            }
+
+            // Always set session
+            session(['current_student_id' => $student->id]);
+
+            return response()->json([
+                'success' => true,
+                'selected_student_id' => $student->id
+            ]);
+
+       } catch (\Exception $th) {
+            return response()->json(['error' => $th->getMessage()], 500);
         }
-
-        // Always set session
-        session(['selected_student_id' => $student->id]);
-
-        return response()->json([
-            'success' => true,
-            'selected_student_id' => $student->id
-        ]);
     }
 
-    //for setting global student in session
+    // //changes by nazmin ///for setting global student in session   
     public function switchStudent(Request $request)
     {
         // Log::info('request', ['request' => $request->all()]);
@@ -493,7 +512,7 @@ class DashboardController extends Controller
                 ], 403);
             }
 
-            session(['selected_student_id' => $student->id]);
+            session(['current_student_id' => $student->id]);
 
             return response()->json(['success' => true]);
 
@@ -503,6 +522,46 @@ class DashboardController extends Controller
         }
         
     }
+
+     //changes by nazmin
+    private function calculateAttendancePercentage(int $studentId): float
+    {
+        $records = DB::table('attendances')
+                    ->where('student_id', $studentId)
+                    // ->where('is_approved', '1') 
+                    ->select('attendance')
+                    ->get();
+        
+        // Log::info('records', ['records' => $records]);
+        if ($records->isEmpty()) {
+            return 0;
+        }
+
+        $totalDays = $records->count();
+        // Log::info('totalDays', ['totalDays' => $totalDays]);
+        $presentScore = 0;
+
+        foreach ($records as $record) {
+            switch ($record->attendance) {
+                case 1: // present
+                case 2: // late
+                    $presentScore += 1;
+                    break;
+
+                case 4: // half day
+                    $presentScore += 0.5;
+                    break;
+
+                case 3: // absent
+                default:
+                    // no score
+                    break;
+            }
+        }
+
+        return round(($presentScore / $totalDays) * 100, 2);
+    }
+
 
 
 

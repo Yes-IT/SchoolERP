@@ -20,28 +20,39 @@ class TranscriptController extends Controller
     {
         $destinations = SchoolList::getDestination();
         $perPage = $request->get('perPage', 5);
-        $studentId =  Student::where('parent_guardian_id', Auth::id())->first()->id;
+
+        $student = $request->attributes->get('currentStudent');
+            
+        if (!$student) {
+            return redirect()
+                ->route('parent-panel-dashboard.index')
+                ->with('error', 'Please select a student first');
+        }
+
+        $studentId = $student->id;
+        // dd($studentId);
 
         $transcripts = DB::table('transcripts')
-            ->leftJoin('payment_transactions', 'transcripts.payment_transactions_id', '=', 'payment_transactions.id')
-            ->where('transcripts.student_id', $studentId)
-            ->select(
-                'transcripts.*',
-                'payment_transactions.transaction_id',
-                'payment_transactions.amount',
-                'payment_transactions.status as payment_status',
-                'payment_transactions.auth_code',
-                'payment_transactions.card_last4',
-                'payment_transactions.type',
-                'payment_transactions.created_at as payment_date',
-                'transcripts.destination as destination',
-                'transcripts.payment_requirement as payment_requirement',
+                        ->leftJoin('payment_transactions', 'transcripts.payment_transactions_id', '=', 'payment_transactions.id')
+                        ->where('transcripts.student_id', $studentId)
+                        ->select(
+                            'transcripts.*',
+                            'payment_transactions.transaction_id',
+                            'payment_transactions.amount',
+                            'payment_transactions.status as payment_status',
+                            'payment_transactions.auth_code',
+                            'payment_transactions.card_last4',
+                            'payment_transactions.type',
+                            'payment_transactions.created_at as payment_date',
+                            'transcripts.destination as destination',
+                            'transcripts.payment_requirement as payment_requirement',
 
-            )
-            ->orderBy('transcripts.created_at', 'desc')
-            ->paginate($perPage);
+                        )
+                        ->orderBy('transcripts.created_at', 'desc')
+                        ->paginate($perPage);
 
-        $hasTranscripts = $transcripts->count() > 0;
+        // $hasTranscripts = $transcripts->count() > 0;
+        $hasTranscripts = $transcripts->total() > 0;
         return view('parent-panel.transcript',compact('transcripts', 'destinations', 'hasTranscripts', 'perPage'));
     }
 
@@ -112,7 +123,7 @@ class TranscriptController extends Controller
             'destination' => 'required|string|max:255',
         ]);
 
-        $studentId = session('selected_student_id');
+        $studentId = session('current_student_id');
 
         Transcript::create([
             'student_id'               => 2,

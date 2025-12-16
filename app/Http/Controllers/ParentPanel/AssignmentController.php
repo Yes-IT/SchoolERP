@@ -86,8 +86,8 @@ class AssignmentController extends Controller
     {
         try {
 
-            $user = Student::where('parent_guardian_id', Auth::id())->firstOrFail();
-            $studentId = $user->id;
+            $student = request()->get('currentStudent');
+            $studentId = $student->id;
 
             // dd($studentId);
 
@@ -146,11 +146,10 @@ class AssignmentController extends Controller
 
             // Log::info('Completed Assignment IDs:', $completed->pluck('id')->toArray());
 
-
             $assignmentIds = collect($pending->items())
                             ->pluck('id')
                             ->merge(collect($completed->items())->pluck('id'))
-                            ->filter()          // remove nulls
+                            ->filter()        
                             ->unique()
                             ->values();
 
@@ -161,7 +160,6 @@ class AssignmentController extends Controller
                     ->where('student_id', $studentId)
                     ->get()
                     ->map(function ($item) {
-
                         $item->extension = pathinfo($item->path, PATHINFO_EXTENSION);
                         $fullPath = public_path($item->path);
                         $item->size = file_exists($fullPath)

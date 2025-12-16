@@ -86,5 +86,8 @@ class Kernel extends HttpKernel
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
         'guardian' => \App\Http\Middleware\GuardianMiddleware::class,
         'throttleweb' => \App\Http\Middleware\CustomThrottleRequests::class,
+
+        'current.student' => \App\Http\Middleware\CurrentStudent::class,
+
     ];
 }

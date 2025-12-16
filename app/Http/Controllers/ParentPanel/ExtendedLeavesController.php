@@ -20,9 +20,11 @@ class ExtendedLeavesController extends Controller
         $sessionId   = $request->get('year');      // year = session_id
         $semesterId  = $request->get('semester');  // semester_id
 
-        $student = Student::where('parent_guardian_id', Auth::id())->first();
+        // $student = Student::where('parent_guardian_id', Auth::id())->first();
+        $student = $request->attributes->get('currentStudent');
+
         if (!$student) {
-            return redirect()->back()->withErrors(['error' => 'No student found for this parent.']);
+            return redirect()->route('parent-panel-dashboard.index')->with('error', 'Please select a student first');
         }
 
         $years     = Session::orderByDesc('id')->get();

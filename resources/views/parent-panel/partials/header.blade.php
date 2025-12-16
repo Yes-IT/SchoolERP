@@ -61,18 +61,16 @@
     {{-- {{ Auth::id() }} --}}
     <div class="dsbdy-head-right">
         <div class="input-grp m-0">
-            <select id="select_student">
-
-                
+            <select id="select_student" name="student_id">
+  
                 @if($students->isNotEmpty())
                     @foreach ($students as $student)
                         <option value="{{ $student->id }}" 
-                            {{ session('selected_student_id') == $student->id ? 'selected' : '' }}>
+                            {{ session('current_student_id') == $student->id ? 'selected' : '' }}>
                             {{ $student->first_name }} (ID-{{ $student->id }})
                         </option>
                     @endforeach
                 @else
-
                     <option disabled>No student found</option>
                 @endforelse 
             </select>
@@ -253,4 +251,35 @@
             }
         });
     });
+</script>
+
+
+<script>
+document.getElementById('select_student')?.addEventListener('change', function () {
+    let studentId = this.value;
+
+    fetch("{{ route('parent-panel-dashboard.switch-student') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({
+            student_id: studentId
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+           
+            location.reload();
+        } else {
+            alert(data.message || "Unable to switch student");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Something went wrong");
+    });
+});
 </script>
