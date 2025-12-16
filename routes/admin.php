@@ -13,7 +13,7 @@ use App\Http\Controllers\Admin\SmsMailTemplateController;
 use App\Http\Controllers\Admin\LeaveController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\AssignmentController;
-use App\Http\Controllers\Admin\{GradeController,AlumniController,TeacherController,ApplicantController,RoomManagementController};
+use App\Http\Controllers\Admin\{GradeController,AlumniController,TeacherController,ApplicantController, ParentController, RoomManagementController};
 
 
 
@@ -168,6 +168,13 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::post('alumni_flow/recorded-classes/{id}/update', 'update_record')->name('admin.recorded-classes.update');
                     Route::delete('alumni_flow/recorded-classes/{id}', 'destroy_record')->name('admin.recorded-classes.destroy');
                 });
+
+                //Alumni flow routes
+                Route::controller(ParentController::class)->group(function () { // Parent routes 
+                    Route::get('parent_flow/', 'index')->name('parent_flow.index')->middleware('PermissionCheck:parent_flow_read');
+                    Route::get('parent_flow/parent/add', 'addParent')->name('parent_flow.parent.add')->middleware('PermissionCheck:parent_flow_read');
+                });
+                
 
                 //teacher  routes
                 Route::controller(TeacherController::class)->prefix('teacher')->group(function () {
