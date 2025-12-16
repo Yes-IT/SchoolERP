@@ -172,62 +172,61 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $parentId = Auth::id();
-        // Log::info('Parent ID: ' . $parentId);
+       
+        $students = Student::where('parent_guardian_id', $parentId)->get();
 
-        $first_student = Student::where('parent_guardian_id', $parentId)->first();
-
-        if (!$first_student) {
+        //If parent has no students 
+        if ($students->isEmpty()) {
             return redirect()->route('parent-panel-dashboard.indexupload');
         }
-  
-        //  If session student not set → set default child
+
         if (!session()->has('selected_student_id')) {
-            session(['selected_student_id' => $first_student->id]);
+            session(['selected_student_id' => $students->first()->id]);
         }
 
-        //  Always use session child
         $studentId = session('selected_student_id');
-        // Log::info('Selected session student ID1: ' . $studentId);
+       
+        $student = $students->where('id', $studentId)->first();
 
-        $student = Student::find($studentId);
+        //Session corrupted or invalid student
         if (!$student) {
-            session()->forget('selected_student_id');
-            return redirect()->route('parent-panel-dashboard.indexupload');
+            session(['selected_student_id' => $students->first()->id]);
+            $student = $students->first();
+            $studentId = $student->id;
         }
 
-        //all students of currently logged in parent.
-        $students = Student::where('parent_guardian_id', $parentId)->get();            
-
-        // 3️ Get all class_ids for this student
+        //  Get all class_ids for this student
         $classIds = DB::table('student_class_mapping')
-                    ->where('student_id', $studentId)
-                    ->pluck('class_id')
-                    ->toArray();
+                        ->where('student_id', $studentId)
+                        ->pluck('class_id')
+                        ->toArray();
 
-        // Log::info('Class IDs: ' . json_encode($classIds));  
-      
+        $staff = collect([]);
+        $upcomingClasses = collect([]);
+        $notices = collect([]);
+        $grades = collect([]);
+        $fees = collect([]);
+        
+         //Fetch profile upload
+        $user = User::find($student->user_id);
+        $upload = $user
+            ? DB::table('uploads')->where('id', $user->upload_id)->first()
+            : null;
+
         if (empty($classIds)) {
-            Log::info("No class mappings for student {$studentId} — continuing to dashboard with empty class-related data.");
-
-            $staff = collect([]);
-            $upcomingClasses = collect([]);
-            $sessionIds = [];
-            $notices = collect([]);
-            $grades = collect([]);
-            $fees = collect([]);
-            $upload = null;
-
-            // get profile upload if possible
-            $user = User::find($student->user_id);
-            $upload = $user ? DB::table('uploads')->where('id', $user->upload_id)->first() : null;
-
             return view('parent-panel.dashboard', compact(
-                'upload', 'student', 'staff', 'upcomingClasses', 'notices',
-                'first_student', 'grades', 'fees','students'
+                'upload',
+                'student',
+                'students',
+                'staff',
+                'upcomingClasses',
+                'notices',
+                'grades',
+                'fees'
             ));
-        }
+        }    
 
-        // 4️ Get all teacher_ids from classes table for those classes
+        // Get all teacher_ids from classes table for those classes
         $teacherIds = DB::table('classes')
                         ->whereIn('id', $classIds)
                         ->pluck('teacher_id')
@@ -235,84 +234,9 @@ class DashboardController extends Controller
                         ->unique()
                         ->toArray();
 
-        // If no teacher IDs, still continue to dashboard with empty staff/upcomingClasses but allow other data
-        if (empty($teacherIds)) {
-            Log::info("No teacher assigned to student's classes — continuing with empty staff/upcomingClasses.");
-
-            $staff = collect([]);
-
-            // still fetch upload/profile
-            $user = User::find($student->user_id);
-            $upload = $user ? DB::table('uploads')->where('id', $user->upload_id)->first() : null;
-
-            // we can still try to fetch sessionIds, notices, grades, fees below (they rely on classIds/sessionIds)
-            $today = Carbon::now()->format('l');
-            $currTime = Carbon::now()->format('H:i:s');
-
-            // upcomingClasses will be empty because no teacher/class join results
-            $upcomingClasses = collect([]);
-
-            $sessionIds = DB::table('session_class_students')
-                            ->where('student_id', $studentId)
-                            ->pluck('session_id')
-                            ->toArray();
-
-            $notices = DB::table('notice_boards')
-                        ->where(function ($query) use ($studentId, $classIds, $sessionIds) {
-                            $query->where('student_id', $studentId)
-                                ->orWhereIn('class_id', $classIds)
-                                ->orWhereIn('session_id', $sessionIds);
-                        })
-                        ->orderBy('publish_date', 'asc')
-                        ->take(5)
-                        ->get();
-
-            // Grades
-            $gradesQuery = DB::table('grades')
-                ->leftJoin('classes', 'grades.classes_id', '=', 'classes.id')
-                ->leftJoin('subjects', 'classes.subject_id', '=', 'subjects.id')
-                ->select('grades.*', 'classes.name as class_name', 'subjects.name as subject_name')
-                ->where('student_id', $studentId)
-                ->orderBy('grades.created_at', 'desc');
-
-            if ($request->filled('school_years_id')) {
-                $gradesQuery->where('grades.school_years_id', $request->school_years_id);
-            }
-
-            if ($request->filled('semester_id')) {
-                $gradesQuery->where('grades.semester_id', $request->semester_id);
-            }
-
-            $grades = $gradesQuery->get();
-
-            // Fees
-            $feesQuery = DB::table('fees_assign_childrens as fac')
-                ->leftJoin('fees_masters as fm', 'fm.id', '=', 'fac.fees_master_id')
-                ->leftJoin('fees_types as ft', 'ft.id', '=', 'fm.fees_type_id')
-                ->select('fac.id as id', 'ft.name as type', 'fm.due_date', 'fm.amount')
-                ->where('fac.student_id', $studentId);
-
-            if ($request->filled('year')) {
-                $yearName = DB::table('school_years')->where('id', $request->year)->value('name');
-
-                if ($yearName) {
-                    [$yearStart, $yearEnd] = explode('-', $yearName);
-                    $startOfYear = Carbon::createFromDate($yearStart, 6, 1)->startOfMonth();
-                    $endOfYear   = Carbon::createFromDate($yearEnd, 5, 31)->endOfMonth();
-                    $feesQuery->whereBetween('fm.due_date', [$startOfYear, $endOfYear]);
-                }
-            }
-
-            $fees = $feesQuery->paginate($request->get('perPage', 10));
-
-            return view('parent-panel.dashboard', compact(
-                'upload', 'student', 'staff', 'upcomingClasses', 'notices',
-                'first_student', 'grades', 'fees','students'
-            ));
-        }
-
-        // 5️ Get all staff (teachers) details using those teacher_id
-        $staff = DB::table('staff')
+        //Staff info
+        if (!empty($teacherIds)) {
+            $staff = DB::table('staff')
                 ->join('classes', 'classes.teacher_id', '=', 'staff.id')
                 ->join('subjects', 'subjects.id', '=', 'classes.subject_id')
                 ->leftJoin('uploads', 'uploads.id', '=', 'staff.upload_id')
@@ -324,7 +248,7 @@ class DashboardController extends Controller
                     'staff.email',
                     'staff.phone',
                     'uploads.path as image',
-                    DB::raw("GROUP_CONCAT(CONCAT(subjects.name, ' (', subjects.code, ')') SEPARATOR ', ') as subject_details")
+                    DB::raw("GROUP_CONCAT(CONCAT(subjects.name,' (',subjects.code,')') SEPARATOR ', ') as subject_details")
                 )
                 ->groupBy(
                     'staff.id',
@@ -335,12 +259,8 @@ class DashboardController extends Controller
                     'uploads.path'
                 )
                 ->get();
+        }
 
-        // Log::info("Staff: ", ['staff' => $staff]);
-
-        // 6️ Get user and upload info for profile 
-        $user = User::find($student->user_id);
-        $upload = $user ? DB::table('uploads')->where('id', $user->upload_id)->first() : null;
         $today = Carbon::now()->format('l');
         $currentTime = Carbon::now()->format('H:i:s'); 
 
@@ -368,68 +288,49 @@ class DashboardController extends Controller
                             ->get();
           
 
-        //  9️ Get all session_ids in which this student is enrolled
+        //  Get all session_ids in which this student is enrolled
         $sessionIds = DB::table('session_class_students')
                     ->where('student_id', $studentId)
                     ->pluck('session_id')
                     ->toArray();       
 
-        // 10️ Fetch all matching notices
+        // Fetch all matching notices
         $notices = DB::table('notice_boards')
                     ->where(function ($query) use ($studentId, $classIds, $sessionIds) {
-                        $query->where('student_id', $studentId)          // specific to student
-                            ->orWhereIn('class_id', $classIds)           // based on class
-                            ->orWhereIn('session_id', $sessionIds);      // based on session
+                        $query->where('student_id', $studentId)         
+                            ->orWhereIn('class_id', $classIds)         
+                            ->orWhereIn('session_id', $sessionIds);      
                     })
                     ->orderBy('publish_date', 'asc')
                     ->take(5)
                     ->get();
 
-        $query = DB::table('grades')
+        //grades
+        $grades = DB::table('grades')
                     ->leftJoin('classes', 'grades.classes_id', '=', 'classes.id')
                     ->leftJoin('subjects', 'classes.subject_id', '=', 'subjects.id')
-                    ->select(
-                        'grades.*',
-                        'classes.name as class_name',
-                        'subjects.name as subject_name'
-                    )
-                    ->where('grades.student_id', $student->id)
-                    ->orderBy('grades.created_at', 'desc');
+                    ->select('grades.*', 'classes.name as class_name', 'subjects.name as subject_name')
+                    ->where('grades.student_id', $studentId)
+                    ->orderBy('grades.created_at', 'desc')
+                    ->get();
+        // fees
+        $fees = DB::table('fees_assign_childrens as fac')
+                ->leftJoin('fees_masters as fm', 'fm.id', '=', 'fac.fees_master_id')
+                ->leftJoin('fees_types as ft', 'ft.id', '=', 'fm.fees_type_id')
+                ->select('fac.id', 'ft.name as type', 'fm.due_date', 'fm.amount')
+                ->where('fac.student_id', $studentId)
+                ->paginate($request->get('perPage', 10));
 
-        if ($request->filled('school_years_id')) {
-            $query->where('grades.school_years_id', $request->school_years_id);
-        }
-
-        if ($request->filled('semester_id')) {
-            $query->where('grades.semester_id', $request->semester_id);
-        }
-
-        $grades = $query->get();
-        $query = DB::table('fees_assign_childrens as fac')
-                    ->leftjoin('fees_masters as fm', 'fm.id', '=', 'fac.fees_master_id')
-                    ->leftjoin('fees_types as ft', 'ft.id', '=', 'fm.fees_type_id')
-                    ->select(
-                        'fac.id as id',
-                        'ft.name as type',
-                        'fm.due_date',
-                        'fm.amount'
-                    )
-                    ->where('fac.student_id', $student->id);
-
-        if ($request->filled('year')) {
-            $yearName = DB::table('school_years')->where('id', $request->year)->value('name');
-            if ($yearName) {
-                [$yearStart, $yearEnd] = explode('-', $yearName);
-                $startOfYear = \Carbon\Carbon::createFromDate($yearStart, 6, 1)->startOfMonth();
-                $endOfYear   = \Carbon\Carbon::createFromDate($yearEnd, 5, 31)->endOfMonth();
-
-                $query->whereBetween('fm.due_date', [$startOfYear, $endOfYear]);
-            }
-        }
-
-        $perPage = $request->get('perPage', 10);
-        $fees = $query->paginate($perPage);
-        return view('parent-panel.dashboard', compact('upload', 'student','students', 'staff', 'upcomingClasses', 'notices', 'first_student', 'grades', 'fees'));
+        return view('parent-panel.dashboard', compact(
+            'upload', 
+            'student',
+            'students', 
+            'staff',
+            'upcomingClasses',
+            'notices', 
+            'grades', 
+            'fees'
+        ));
 
       
     }
