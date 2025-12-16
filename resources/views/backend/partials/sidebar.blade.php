@@ -21,8 +21,8 @@
                         Student
                     </a>
                 </li>
-                <li class="{{ request()->routeIs('parent.*') ? 'active' : '' }}">
-                    <a href="{{route('parent.index')}}">
+                <li class="{{ request()->routeIs('parent_flow.*') ? 'active' : '' }}">
+                    <a href="{{ route('parent_flow.index') }}">
                         <img src="{{ asset('backend') }}/assets/images/new_images/superadmin-panel/sidebar-icon-2.svg" alt="Sidebar Icon">
                         Parent
                     </a>
