@@ -62,6 +62,7 @@
     <div class="dsbdy-head-right">
         <div class="input-grp m-0">
             <select id="select_student">
+
                 
                 @if($students->isNotEmpty())
                     @foreach ($students as $student)
@@ -71,8 +72,9 @@
                         </option>
                     @endforeach
                 @else
+
                     <option disabled>No student found</option>
-                @endif
+                @endforelse 
             </select>
 
 
@@ -94,22 +96,38 @@
             <img src="{{ global_asset('parent') }}/images/parent-panel/bell-icon.svg" alt="Alert Icon">
         </button>
 
-        <!-- Popup Box -->
+    <!-- Popup Box -->
+    @php
+        $absentChildren = getAbsentChildrenToday();
+    @endphp
+
+    @if(count($absentChildren) > 0)
+
         <div id="alertPopup" class="alert-popup">
             <div class="alert-popup-content">
                 <div class="alertDiv">
                     <button class="alert-close" onclick="closeAlertPopup()">
-                        <img src="{{ global_asset('parent') }}/images/IconBase.svg" />
+                        <img src="{{ global_asset('parent') }}/images/IconBase.svg" alt="Close" />
                     </button>
                     <div class="headingAlert">
-                        <img src="{{ global_asset('parent') }}/images/alert.svg" />
-                        <p>Alert: Child Absent Today </p>
+                        <img src="{{ global_asset('parent') }}/images/alert.svg" alt="Alert" />
+                        <p>Alert: Child{{ count($absentChildren) > 1 ? 'ren' : '' }} Absent Today</p>
                     </div>
                 </div>
-                <p class="alertTxt">Your child, Edward Thomas, has been marked absent today, 07/12/2025.</p>
-                <p class="alertTxt">Please contact the school if you have any questions or need to provide an excuse.</p>
+
+                <p class="alertTxt">
+                    Your child{{ count($absentChildren) > 1 ? 'ren' : '' }},
+                    <strong>{{ implode(', ', $absentChildren) }}</strong>,
+                    {{ count($absentChildren) > 1 ? 'have' : 'has' }} been marked absent today, {{ now()->format('d/m/Y') }}.
+                </p>
+
+                <p class="alertTxt">
+                    Please contact the school if you have any questions or need to provide an excuse.
+                </p>
             </div>
         </div>
+
+    @endif
         
         <div class="profile-ctrl">
             <button class="profile-ctrl-toggler">
@@ -236,27 +254,3 @@
         });
     });
 </script>
-
-<script>
-document.getElementById('select_student').addEventListener('change', function () {
-    const studentId = this.value;
-
-    fetch("{{ route('parent-panel-dashboard.switch-student') }}", {
-        method: "POST",
-        headers: {
-            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            student_id: studentId
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload(); // Reload entire panel with new student
-        }
-    });
-});
-</script>
-

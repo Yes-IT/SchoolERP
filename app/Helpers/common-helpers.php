@@ -17,6 +17,7 @@ use App\Models\WebsiteSetup\OnlineAdmissionSetting;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
@@ -896,3 +897,60 @@ if (!function_exists('current_user_id')) {
     }
 }
 
+
+function getAbsentChildrenToday()
+{
+    $parentId = Auth::id();
+
+    if (!$parentId) {
+        return [];
+    }
+
+    $today = Carbon::today(); // Today is 2025-12-15 as per current date
+
+    // 1. Get all students of this parent with their names
+    $students = DB::table('students')
+        ->where('parent_guardian_id', $parentId)
+        ->select('id', 'first_name')
+        ->get();
+
+    if ($students->isEmpty()) {
+        return [];
+    }
+
+    $studentIds = $students->pluck('id')->toArray();
+
+    // 2. Get students on APPROVED leave today
+    $studentsOnLeaveToday = DB::table('leaves')
+        ->whereIn('student_id', $studentIds)
+        ->where('is_approved', 1)
+        ->where('from_date', '<=', $today)
+        ->where('to_date', '>=', $today)
+        ->pluck('student_id')
+        ->toArray();
+
+    // 3. Get attendance records for today (only student_id and attendance value)
+    $attendanceToday = DB::table('attendances')
+        ->whereIn('student_id', $studentIds)
+        ->whereDate('date', $today)
+        ->pluck('attendance', 'student_id'); // ['37' => '3', ...]
+
+    // 4. Collect absent children
+    $absentChildren = [];
+
+    foreach ($students as $student) {
+        // Skip if on approved leave
+        if (in_array($student->id, $studentsOnLeaveToday)) {
+            continue;
+        }
+
+        $attendanceStatus = $attendanceToday->get($student->id);
+
+        // Absent if: marked as 3 OR no record exists
+        if ($attendanceStatus === null || $attendanceStatus == '3' || $attendanceStatus === 3) {
+            $absentChildren[] = $student->first_name;
+        }
+    }
+
+    return $absentChildren;
+}
