@@ -169,10 +169,13 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::delete('alumni_flow/recorded-classes/{id}', 'destroy_record')->name('admin.recorded-classes.destroy');
                 });
 
-                //Alumni flow routes
+                //Parent flow routes
                 Route::controller(ParentController::class)->group(function () { // Parent routes 
                     Route::get('parent_flow/', 'index')->name('parent_flow.index')->middleware('PermissionCheck:parent_flow_read');
                     Route::get('parent_flow/parent/add', 'addParent')->name('parent_flow.parent.add')->middleware('PermissionCheck:parent_flow_read');
+                    Route::get('parent_flow/parent_info/{id}', 'parent_info')->name('parent_flow.parent_info')->middleware('PermissionCheck:parent_flow_read');
+                    Route::get('parent-flow/student-info/{studentId}', 'getStudentInfo')->name('parent.student.info');
+
                 });
                 
 
