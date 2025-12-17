@@ -169,10 +169,18 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::delete('alumni_flow/recorded-classes/{id}', 'destroy_record')->name('admin.recorded-classes.destroy');
                 });
 
+
+
                 //Parent flow routes
-                Route::controller(ParentController::class)->group(function () { // Parent routes 
+                Route::controller(ParentController::class)->group(function () { 
                     Route::get('parent_flow/', 'index')->name('parent_flow.index')->middleware('PermissionCheck:parent_flow_read');
                     Route::get('parent_flow/parent/add', 'addParent')->name('parent_flow.parent.add')->middleware('PermissionCheck:parent_flow_read');
+                    Route::post('parent_flow/parent/store', 'storeParent')->name('parent_flow.parent.store')->middleware('PermissionCheck:parent_flow_read');
+                    Route::get('parent_flow/parent/edit/{id}', 'editParent')->name('parent_flow.parent.edit')->middleware('PermissionCheck:parent_flow_read');
+                    Route::put('parent_flow/parent/update/{id}', 'updateParent')->name('parent_flow.parent.update')->middleware('PermissionCheck:parent_flow_update');
+                    Route::get('/get-states/{country_id}', 'getStates')->name('get.states');
+                    Route::get('/get-cities/{state_id}', 'getCities')->name('get.cities');
+
                     Route::get('parent_flow/parent_info/{id}', 'parent_info')->name('parent_flow.parent_info')->middleware('PermissionCheck:parent_flow_read');
                     Route::get('parent-flow/student-info/{studentId}', 'getStudentInfo')->name('parent.student.info');
 

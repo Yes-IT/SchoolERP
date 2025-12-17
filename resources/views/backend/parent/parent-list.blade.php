@@ -1,112 +1,110 @@
 <div class="ds-cmn-tble count-row tbl-5_4k">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>S. No</th>
-                            <th>View Details</th>
-                            <th>Last Name</th>
-                            <th>First Name</th>
-                            <th>School Year</th>
-                            <th>Year Status</th>
-                            <th>Hebrew Last Name</th>
-                            <th>Hebrew First Name</th>
-                            <th>Diploma</th>
-                            <th>High School</th>
-                            <th>Parent Name</th>
-                            <th>Birth Date</th>
-                            <th>Hebrew Birth Date</th>
-                            <th>Birth Country</th>
-                            <th>SSN</th>
-                            <th>Country</th>
-                            <th>Passport</th>
-                            <th>Passport Name</th>
-                            <th>Passport Country</th>
-                            <th>Passport Expiry Date</th>
-                            <th>Teudat Zehut</th>
-                            <th>Insurance</th>
-                            <th>Insurance Type</th>
-                            <th>Email ID</th>
-                            <th>Cell USA</th>
-                            <th>Cell Israel</th>
-                            <th>Address</th>
-                            <th>City</th>
-                            <th>State</th>
-                            <th>Zip Code</th>
-                            <th>Country</th>
-                            <th>Home Phone</th>
-                            <th>Hold Transcript</th>
-                            <th>Image File Path</th>
-                            <th>Class</th>
-                            <th>Group</th>
-                            <th>Division</th>
-                            <th>Floor</th>
-                            <th>Room</th>
-                            <th>Waiver</th>
-                            <th>Medical Form</th>
-                            <th>Travel Form</th>
-                            <th>Flight Date</th>
-                            <th>Flight Information</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+    <table>
+        <thead>
+            <tr>
+                <th>S. No</th>
+                <th>View Details</th>
+                <th>Last Name</th>
+                <th>Father Title</th>
+                <th>Father Name</th>
+                <th>Mother Title</th>
+                <th>Mother Name</th>
+                <th>Maiden Name</th>
+                <th>Student's Name</th>
+                <th>Address</th>
+                <th>City</th>
+                <th>State</th>
+                <th>Zip Code</th>
+                <th>Country</th>
+                <th>Home Phone</th>
+                <th>Father Call</th>
+                <th>Mother Call</th>
+                <th>Father Email</th>
+                <th>Mother Email</th>
+                <th>Father Hebrew Name</th>
+                <th>Mother Hebrew Name</th>
+                <th>Father Birth Date</th>
+                <th>Mother Birth Date</th>
+                <th>Father Occupation</th>
+                <th>Mother Occupation</th>
+                <th>Father Information</th>
+                <th>Mother Information</th>
+                <th>Marital Status</th>
+                <th>Marital Comment</th>
+                <th>Relative Name</th>
+                <th>Relative Address</th>
+                <th>Relative Phone</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($parents as $index => $parent)
+                @php
+                    // The $parent is an array containing both users and parent_guardians columns
+                    $user = $parent;
 
-                        <tr>
-                            <td>1</td>
-                            <td><button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal"><img src="../../images/eye-white.svg" alt="Eye Icon"></button></td>
-                            <td>Lorem</td>
-                            <td>Ipsum</td>
-                            <td>2024-2025</td>
-                            <td>Active</td>
-                            <td>לורם</td>
-                            <td>איפסום</td>
-                            <td>High School Diploma</td>
-                            <td>Central HS</td>
-                            <td>Parent One</td>
-                            <td>2006-03-12</td>
-                            <td>א׳ ניסן תשס״ו</td>
-                            <td>USA</td>
-                            <td>000-00-0001</td>
-                            <td>USA</td>
-                            <td>P0000001</td>
-                            <td>IPSUM LOREM</td>
-                            <td>USA</td>
-                            <td>2030-01-01</td>
-                            <td>123456789</td>
-                            <td>Yes</td>
-                            <td>Full</td>
-                            <td>lorem.ipsum1@example.com</td>
-                            <td>+1-555-000-0001</td>
-                            <td>+972-50-000-0001</td>
-                            <td>123 Example St</td>
-                            <td>Newark</td>
-                            <td>NJ</td>
-                            <td>07102</td>
-                            <td>USA</td>
-                            <td>+1-555-111-0001</td>
-                            <td>No</td>
-                            <td>/images/lorem1.jpg</td>
-                            <td>10A</td>
-                            <td>Group 1</td>
-                            <td>Division A</td>
-                            <td>2</td>
-                            <td>201</td>
-                            <td>Signed</td>
-                            <td>Received</td>
-                            <td>Submitted</td>
-                            <td>2025-06-15</td>
-                            <td>Flight XY123, JFK → TLV, 10:00</td>
-                            <td>
-                            <div class="actions-wrp">
-                                <button type="button" data-bs-toggle="modal" data-bs-target="#editLeaveRequest"><img src="../../images/edit-icon-primary.svg" alt="Icon"></button>
-                            </div>
-                            </td>
-                        </tr>
-                    
-                        </tbody>
-                </table>
-            </div>
+                    // Fallback for student's name (if student relation not loaded)
+                    $studentName = $user['student_name'] ?? 'N/A';
 
-            <div class="tablepagination">
-               
-            </div>
+                    // Last Name - assuming it's part of the parent's name or from student
+                    $lastName = $user['last_name'] ?? explode(' ', $user['name'] ?? '')[1] ?? 'N/A';
+                @endphp
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>
+                        <button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal">
+                            <img src="{{ asset('backend/assets/images/new_images/eye-white.svg') }}" alt="Eye Icon">
+                        </button>
+                    </td>
+                    <td>{{ $lastName }}</td>
+                    <td>{{ $user['father_title'] ?? 'N/A' }}</td>
+                    <td>{{ $user['father_name'] ?? 'N/A' }}</td>
+                    <td>{{ $user['mother_title'] ?? 'N/A' }}</td>
+                    <td>{{ $user['mother_name'] ?? 'N/A' }}</td>
+                    <td>{{ $user['maiden_name'] ?? 'N/A' }}</td>
+                    <td>{{ $studentName }}</td>
+                    <td>{{ $user['guardian_address'] ?? $user['address'] ?? 'N/A' }}</td>
+                    <td>{{ $user['city'] ?? 'N/A' }}</td>
+                    <td>{{ $user['state'] ?? 'N/A' }}</td>
+                    <td>{{ $user['zip_code'] ?? 'N/A' }}</td>
+                    <td>{{ $user['country'] ?? 'N/A' }}</td>
+                    <td>{{ $user['guardian_home_phone'] ?? 'N/A' }}</td>
+                    <td>{{ $user['father_mobile'] ?? 'N/A' }}</td>
+                    <td>{{ $user['mother_mobile'] ?? 'N/A' }}</td>
+                    <td>{{ $user['father_email'] ?? 'N/A' }}</td>
+                    <td>{{ $user['mother_email'] ?? 'N/A' }}</td>
+                    <td>{{ $user['father_hebrew_name'] ?? 'N/A' }}</td>
+                    <td>{{ $user['mother_hebrew_name'] ?? 'N/A' }}</td>
+                    <td>{{ $user['father_dob'] ?? 'N/A' }}</td>
+                    <td>{{ $user['mother_dob'] ?? 'N/A' }}</td>
+                    <td>{{ $user['father_profession'] ?? 'N/A' }}</td>
+                    <td>{{ $user['mother_profession'] ?? 'N/A' }}</td>
+                    <td>{{ $user['father_image'] ? 'Has Image' : 'No Image' ?? 'N/A' }}</td>
+                    <td>{{ $user['mother_image'] ? 'Has Image' : 'No Image' ?? 'N/A' }}</td>
+                    <td>{{ $user['marital_status'] ?? 'N/A' }}</td>
+                    <td>{{ $user['marital_comment'] ?? 'N/A' }}</td>
+                    <td>{{ $user['guardian_name'] ?? 'N/A' }}</td>
+                    <td>{{ $user['guardian_address'] ?? 'N/A' }}</td>
+                    <td>{{ $user['guardian_mobile'] ?? $user['guardian_home_phone'] ?? 'N/A' }}</td>
+                    <td>
+                        <div class="actions-wrp">
+                            <button type="button">
+                                <a href="{{ route('parent_flow.parent.edit', $user->id) }}"><img src="{{ asset('backend/assets/images/new_images/edit-icon-primary.svg') }}" alt="Edit"></a> 
+                            </button>
+                            <!-- Add delete or other actions if needed -->
+                        </div>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="33" class="text-center">No parents/guardians found.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+
+<div class="tablepagination">
+    <!-- If you use pagination in controller, uncomment below -->
+    {{-- {{ $parents->links() }} --}}
+</div>
