@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Academic\Classes;
 use App\Models\Academic\YearStatus;
 use App\Models\Session;
+use App\Models\StudentClassMapping;
 use App\Models\StudentInfo\ParentGuardian;
 use App\Models\StudentInfo\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Str,Hash,Validator,Auth,DB,Log};
-
-
-
+use Illuminate\Support\Str as SupportStr;
 
 class ParentController extends Controller
 {
@@ -23,20 +23,24 @@ class ParentController extends Controller
         $yearStatuses = YearStatus::get();
         $students     = Student::get();
 
-        // Fetch parents/guardians: users with role_id = 7, joined with ParentGuardian table
+        // Fetch parents/guardians with joined location names
         $parents = User::where('role_id', 7)
             ->join('parent_guardians', 'users.id', '=', 'parent_guardians.user_id')
+            ->leftJoin('countries', 'parent_guardians.country', '=', 'countries.country_id')
+            ->leftJoin('states', 'parent_guardians.state', '=', 'states.id_state')
+            ->leftJoin('cities', 'parent_guardians.city', '=', 'cities.id')
             ->select(
                 'users.id as user_id',
-                'users.name',
+                'users.name as user_name',
                 'users.email',
                 'parent_guardians.id as parent_guardian_id',
-                'parent_guardians.*'
+                'parent_guardians.*',
+                'countries.country_name as country_name',
+                'states.state as state_name',
+                'cities.city as city_name'
             )
             ->orderBy('users.id', 'desc')
-            ->take(5)
             ->get();
-
 
         return view('backend.parent.index', compact(
             'sessions',
@@ -49,9 +53,9 @@ class ParentController extends Controller
 
     public function addParent(){
 
+        $students = DB::table('students')->get();
         $countries = DB::table('countries')->orderBy('country_id')->get(['country_id', 'country_name']);
-        return view('backend.parent.add-parent', compact('countries'));
-
+        return view('backend.parent.add-parent', compact('countries','students'));
 
     }
 
@@ -102,6 +106,7 @@ class ParentController extends Controller
         }
     }
 
+
     public function getStudentInfo($studentId)
     {
        
@@ -135,6 +140,44 @@ class ParentController extends Controller
         return response()->json($student);
     }
 
+
+
+    public function getStudentDetails($id)
+    {
+        // Get student
+        $student = Student::findOrFail($id);
+
+        // Get class mapping
+        $classMapping = StudentClassMapping::where('student_id', $id)->first();
+
+        $schoolYearName = null;
+        $yearStatusName = null;
+
+        if ($classMapping) {
+
+            // Get class
+            $class = Classes::find($classMapping->class_id);
+
+            if ($class) {
+
+                // Get session name (SAFE)
+                $schoolYearName = Session::where('id', $class->session_id)
+                    ->value('name');
+
+                // Get year status name (SAFE)
+                $yearStatusName = YearStatus::where('id', $class->year_status_id)
+                    ->value('name');
+            }
+        }
+
+        return response()->json([
+            'first_name'     => $student->first_name,
+            'last_name'      => $student->last_name,
+            'school_year'    => $schoolYearName,
+            'year_status'    => $yearStatusName,
+            'date_of_birth'  => $student->dob,
+        ]);
+    }
 
 
     public function storeParent(Request $request)
@@ -184,6 +227,8 @@ class ParentController extends Controller
             'relative_email'        => 'nullable|email|max:255',
             'relative_address'      => 'nullable|string|max:500',
         ];
+
+        $rules['student_id'] = 'nullable|exists:students,id';
 
         // Dynamic required fields based on legal guardian
         switch ($legalGuardian) {
@@ -269,7 +314,7 @@ class ParentController extends Controller
                 'role_id'    => 7, // Parent role
                 'branch_id'  => 1,
                 'status'     => 1,
-                'uuid'       => Str::uuid(),
+                'uuid'       => SupportStr::uuid(),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -346,6 +391,14 @@ class ParentController extends Controller
             // Insert into parent_guardians table
             DB::table('parent_guardians')->insert($data);
 
+            $parentId = DB::table('parent_guardians')->insertGetId($data);
+
+            if ($request->filled('student_id')) {
+                DB::table('students')
+                    ->where('id', $request->student_id)
+                    ->update(['parent_guardian_id' => $parentId]);
+            }
+
             DB::commit();
 
             return response()->json([
@@ -385,77 +438,250 @@ class ParentController extends Controller
             abort(404, 'Parent not found');
         }
 
-        return view('backend.parent.edit-parent', compact('parent'));
+        $students = DB::table('students')->get();
+        $countries = DB::table('countries')->orderBy('country_id')->get(['country_id', 'country_name']);
+
+        return view('backend.parent.edit-parent', compact('parent','countries','students'));
     }
 
 
     public function updateParent(Request $request, $id)
     {
-        $request->validate([
-            'marital_status'         => 'required|in:married,unmarried,divorced,widow',
-            'father_name'            => 'required|string|max:255',
-            'mother_name'            => 'required|string|max:255',
-            'address_line'           => 'required|string|max:500',
-            'city'                   => 'required|string|max:100',
-            'country'                => 'required|string|max:100',
-            // Add others as needed
-        ]);
+        // Normalize legal_guardian to lowercase for consistent comparison
+        $legalGuardian = strtolower($request->legal_guardian);
+
+        // Base validation rules (same as store)
+        $rules = [
+            'marital_status' => 'required|in:married,remarried,widowed,divorced,separated',
+            'legal_guardian' => 'required|in:mother,father,both,legal_guardian',
+
+            'address_line'   => 'required|string|max:500',
+            'city'           => 'required|string|max:100',
+            'state'          => 'nullable|string|max:100',
+            'zip_code'       => 'nullable|string|max:20',
+            'country'        => 'required|string|max:100',
+            'parent_address' => 'nullable|string|max:500',
+
+            // Parent details - nullable by default
+            'father_title'       => 'nullable|string|max:20',
+            'father_name'        => 'nullable|string|max:255',
+            'father_hebrew_name' => 'nullable|string|max:255',
+            'father_phone'       => 'nullable|string|max:20',
+            'father_email'       => 'nullable|email|max:255',
+            'father_dob'         => 'nullable|date',
+            'father_occupation'  => 'nullable|string|max:255',
+
+            'mother_title'       => 'nullable|string|max:20',
+            'mother_name'        => 'nullable|string|max:255',
+            'maiden_name'        => 'nullable|string|max:255',
+            'mother_hebrew_name' => 'nullable|string|max:255',
+            'mother_phone'       => 'nullable|string|max:20',
+            'mother_email'       => 'nullable|email|max:255',
+            'mother_dob'         => 'nullable|date',
+            'mother_occupation'  => 'nullable|string|max:255',
+
+            'additional_phone'   => 'nullable|string|max:50',
+            'additional_email'   => 'nullable|email|max:255',
+            'marital_comment'    => 'nullable|string|max:500',
+
+            // Relative / Emergency contact
+            'relative_name'         => 'nullable|string|max:255',
+            'relative_relationship' => 'nullable|string|max:100',
+            'relative_home_phone'   => 'nullable|string|max:20',
+            'relative_cell_phone'   => 'nullable|string|max:20',
+            'relative_email'        => 'nullable|email|max:255',
+            'relative_address'      => 'nullable|string|max:500',
+        ];
+
+        $rules['student_id'] = 'nullable|exists:students,id';
+
+        // Dynamic required fields based on legal guardian
+        switch ($legalGuardian) {
+            case 'father':
+                $rules['father_name']  = 'required|string|max:255';
+                $rules['father_title'] = 'required|string|max:20';
+                $rules['father_email'] = 'required|email|max:255';
+                break;
+
+            case 'mother':
+                $rules['mother_name']  = 'required|string|max:255';
+                $rules['mother_title'] = 'required|string|max:20';
+                $rules['mother_email'] = 'required|email|max:255';
+                break;
+
+            case 'both':
+                $rules['father_name']  = 'required|string|max:255';
+                $rules['father_title'] = 'required|string|max:20';
+                $rules['mother_name']  = 'required|string|max:255';
+                $rules['mother_title'] = 'required|string|max:20';
+                break;
+
+            case 'legal_guardian':
+                // Optional: add requirements for relative if needed
+                break;
+        }
+
+        $validator = Validator::make($request->all(), $rules);
+
+        // Custom: At least one email must be provided
+        $validator->after(function ($validator) use ($request) {
+            $hasEmail = $request->filled('father_email') ||
+                        $request->filled('mother_email') ||
+                        $request->filled('additional_email') ||
+                        $request->filled('relative_email');
+
+            if (!$hasEmail) {
+                $validator->errors()->add('father_email', 'At least one email address is required for the parent account.');
+            }
+        });
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors'  => $validator->errors()->messages()
+            ], 422);
+        }
 
         DB::beginTransaction();
+
         try {
-            // Update parent_guardians
-            DB::table('parent_guardians')->where('id', $id)->update([
-                'marital_status'            => $request->marital_status,
-                'father_title'              => $request->father_title,
-                'father_name'               => $request->father_name,
-                'father_hebrew_name'        => $request->father_hebrew_name,
-                'father_mobile'             => $request->father_phone,
-                'father_email'              => $request->father_email,
-                'father_dob'                => $request->father_dob,
-                'father_profession'         => $request->father_occupation,
+            // Fetch the existing parent record
+            $parent = DB::table('parent_guardians')->where('id', $id)->first();
 
-                'mother_title'              => $request->mother_title,
-                'mother_name'               => $request->mother_name,
-                'maiden_name'               => $request->maiden_name,
-                'mother_hebrew_name'        => $request->mother_hebrew_name,
-                'mother_mobile'             => $request->mother_phone,
-                'mother_email'              => $request->mother_email,
-                'mother_dob'                => $request->mother_dob,
-                'mother_profession'         => $request->mother_occupation,
+            if (!$parent) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Parent record not found.'
+                ], 404);
+            }
 
-                'additional_mobile_numbers' => $request->additional_phone,
-                'additional_emails'         => $request->additional_email,
+            // Determine primary email and phone (priority order)
+            $primaryEmail = $request->father_email
+                ?? $request->mother_email
+                ?? $request->additional_email
+                ?? $request->relative_email;
 
-                'address_line'              => $request->address_line,
-                'city'                      => $request->city,
-                'state'                     => $request->state,
-                'zip_code'                  => $request->zip_code,
-                'country'                   => $request->country,
+            $primaryPhone = $request->father_phone
+                ?? $request->mother_phone
+                ?? $request->additional_phone
+                ?? $request->relative_cell_phone
+                ?? $request->relative_home_phone;
 
-                'guardian_name'             => $request->relative_name,
-                'guardian_relation'         => $request->relative_relationship,
-                'guardian_mobile'           => $request->relative_cell_phone,
-                'guardian_home_phone'       => $request->relative_home_phone,
-                'guardian_email'            => $request->relative_email,
-                'guardian_address'          => $request->relative_address,
+            // Build parent display name for user account
+            $parentName = match ($legalGuardian) {
+                'both'          => trim(($request->father_name ?? '') . ' & ' . ($request->mother_name ?? '')),
+                'father'        => $request->father_name ?? 'Father',
+                'mother'        => $request->mother_name ?? 'Mother',
+                'legal_guardian'=> $request->relative_name ?? 'Guardian',
+                default         => 'Parent'
+            };
 
-                'updated_at'                => now(),
-            ]);
+            if (empty(trim($parentName))) {
+                $parentName = 'Parent Account';
+            }
 
-            // Optional: Update user table (name, email, phone)
-            DB::table('users')->where('id', $request->user_id)->update([
-                'name'  => $request->father_name . ' & ' . $request->mother_name,
-                'email' => $request->father_email ?? $request->mother_email,
-                'phone' => $request->father_phone ?? $request->mother_phone,
+            // Update the associated User record (for login)
+            DB::table('users')
+                ->where('id', $parent->user_id)
+                ->update([
+                    'name'       => $parentName,
+                    'email'      => $primaryEmail,
+                    'phone'      => $primaryPhone ?: null,
+                    'updated_at' => now(),
+                ]);
+
+            // Collect additional emails (exclude primary)
+            $allEmails = collect([$request->father_email, $request->mother_email, $request->additional_email, $request->relative_email])
+                ->filter()
+                ->unique()
+                ->reject(fn($email) => $email === $primaryEmail)
+                ->values();
+
+            $additionalEmails = $allEmails->isNotEmpty() ? $allEmails->implode(',') : null;
+
+            // Additional phones
+            $additionalPhones = collect([$request->additional_phone, $request->relative_cell_phone, $request->relative_home_phone])
+                ->filter()
+                ->unique()
+                ->implode(',');
+
+            $additionalPhones = $additionalPhones ?: null;
+
+            // Use address_line if provided, else fallback to parent_address
+            $addressLine = $request->filled('address_line') ? $request->address_line : ($request->parent_address ?: $parent->address_line);
+
+            // Prepare data for update
+            $data = [
+                'primary_custodian' => $request->legal_guardian, // Keep original casing if needed
+                'marital_status'    => $request->marital_status,
+                'marital_comment'   => $request->marital_comment ?: null,
+
+                // Father
+                'father_title'         => $request->father_title ?: null,
+                'father_name'          => $request->father_name ?: null,
+                'father_hebrew_name'   => $request->father_hebrew_name ?: null,
+                'father_mobile'        => $request->father_phone ?: null,
+                'father_email'         => $request->father_email ?: null,
+                'father_dob'           => $request->father_dob ?: null,
+                'father_profession'    => $request->father_occupation ?: null,
+
+                // Mother
+                'mother_title'         => $request->mother_title ?: null,
+                'mother_name'          => $request->mother_name ?: null,
+                'maiden_name'          => $request->maiden_name ?: null,
+                'mother_hebrew_name'   => $request->mother_hebrew_name ?: null,
+                'mother_mobile'        => $request->mother_phone ?: null,
+                'mother_email'         => $request->mother_email ?: null,
+                'mother_dob'           => $request->mother_dob ?: null,
+                'mother_profession'    => $request->mother_occupation ?: null,
+
+                'additional_mobile_numbers' => $additionalPhones,
+                'additional_emails'         => $additionalEmails,
+
+                'address_line' => $addressLine,
+                'city'         => $request->city,
+                'state'        => $request->state ?: null,
+                'zip_code'     => $request->zip_code ?: null,
+                'country'      => $request->country,
+
+                // Emergency Contact / Relative
+                'guardian_name'       => $request->relative_name ?: null,
+                'guardian_relation'   => $request->relative_relationship ?: null,
+                'guardian_home_phone' => $request->relative_home_phone ?: null,
+                'guardian_mobile'     => $request->relative_cell_phone ?: null,
+                'guardian_email'      => $request->relative_email ?: null,
+                'guardian_address'    => $request->relative_address ?: null,
+
                 'updated_at' => now(),
-            ]);
+            ];
+
+            // Update the parent_guardians record
+            DB::table('parent_guardians')
+                ->where('id', $id)
+                ->update($data);
+
+
+            if ($request->filled('student_id')) {
+                DB::table('students')
+                    ->where('id', $request->student_id)
+                    ->update(['parent_guardian_id' => $id]);
+            }
 
             DB::commit();
 
-            return response()->json(['success' => true, 'message' => 'Parent updated successfully!']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Parent updated successfully!'
+            ]);
+
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Update failed.'], 500);
+            Log::error('Parent update failed: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update parent information. Please try again.'
+            ], 500);
         }
     }
 

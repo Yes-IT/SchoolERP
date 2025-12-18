@@ -178,6 +178,7 @@ Route::middleware(saasMiddleware())->group(function () {
                     Route::post('parent_flow/parent/store', 'storeParent')->name('parent_flow.parent.store')->middleware('PermissionCheck:parent_flow_read');
                     Route::get('parent_flow/parent/edit/{id}', 'editParent')->name('parent_flow.parent.edit')->middleware('PermissionCheck:parent_flow_read');
                     Route::put('parent_flow/parent/update/{id}', 'updateParent')->name('parent_flow.parent.update')->middleware('PermissionCheck:parent_flow_update');
+                    Route::get('/parent/get-student-details/{id}', 'getStudentDetails')->name('parent_flow.parent_flow.get_student_details');
                     Route::get('/get-states/{country_id}', 'getStates')->name('get.states');
                     Route::get('/get-cities/{state_id}', 'getCities')->name('get.cities');
 
