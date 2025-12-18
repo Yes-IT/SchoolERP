@@ -65,10 +65,10 @@
                     <td>{{ $user['maiden_name'] ?? 'N/A' }}</td>
                     <td>{{ $studentName }}</td>
                     <td>{{ $user['guardian_address'] ?? $user['address'] ?? 'N/A' }}</td>
-                    <td>{{ $user['city'] ?? 'N/A' }}</td>
-                    <td>{{ $user['state'] ?? 'N/A' }}</td>
+                    <td>{{ $user['city_name'] ?? 'N/A' }}</td>
+                    <td>{{ $user['state_name'] ?? 'N/A' }}</td>
                     <td>{{ $user['zip_code'] ?? 'N/A' }}</td>
-                    <td>{{ $user['country'] ?? 'N/A' }}</td>
+                    <td>{{ $user['country_name'] ?? 'N/A' }}</td>
                     <td>{{ $user['guardian_home_phone'] ?? 'N/A' }}</td>
                     <td>{{ $user['father_mobile'] ?? 'N/A' }}</td>
                     <td>{{ $user['mother_mobile'] ?? 'N/A' }}</td>

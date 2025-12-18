@@ -34,6 +34,25 @@
 
                         {{-- ================= Marital Status ================= --}}
                         <div class="new-request-form">
+
+                            <div class="dropdown-year" data-selected="Select Student">
+                                <div class="dropdown-trigger">
+                                    <span class="dropdown-label">Connect Student To Existing Parent</span>
+                                    <i class="dropdown-arrow"></i>
+                                </div>
+                                <div class="dropdown-options">
+                                    @foreach ($students as $student)
+                                        <div 
+                                            class="dropdown-option" 
+                                            data-value="{{ $student->id }}">
+                                            {{ $student->first_name }} {{ $student->last_name }} - {{ $student->student_id }}
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <br><br>
+
                             <h3>Marital Status</h3>
 
                             <div class="multi-input-grp grp-3">
@@ -50,7 +69,7 @@
                                     </select>
                                 </div>
 
-                                <div class="input-grp">
+                                <div class="input-grp w-50">
                                     <label for="legal_guardian">Which parent do you share a primary residence with? *</label>
                                     <select name="legal_guardian" id="legal_guardian">
                                         <option value="">Select Legal Guardian</option>
@@ -225,18 +244,18 @@
                             <div class="multi-input-grp grp-3">
                                 <div class="input-grp">
                                     <label for="daughter_name">Student Name</label>
-                                    <input id="daughter_name" name="daughter_name" type="text" placeholder="Enter daughter's full name">
+                                    <input id="daughter_name" name="daughter_name" type="text" placeholder="Enter daughter's full name" readonly>
                                 </div>
                                 <div class="input-grp">
                                     <label for="school_year">School Year</label>
-                                    <input id="school_year" name="school_year" type="text" placeholder="e.g. 2025-2026">
+                                    <input id="school_year" name="school_year" type="text" placeholder="e.g. 2025-2026" readonly>
                                 </div>
                                 <div class="input-grp">
                                     <label for="year_status">Year Status</label>
-                                    <input id="year_status" name="year_status" type="text" placeholder="e.g. Grade 10">
+                                    <input id="year_status" name="year_status" type="text" placeholder="e.g. Grade 10" readonly>
                                 </div>
                             </div>
-                            <div class="multi-input-grp grp-1">
+                            <div class="multi-input-grp grp-3">
                                 <div class="input-grp">
                                     <label for="daughter_dob">Birth Date</label>
                                     <input id="daughter_dob" name="daughter_dob" type="date">
@@ -339,6 +358,10 @@
 
             let formData = new FormData(this);
 
+            if (selectedStudentId) {
+                formData.append('student_id', selectedStudentId);
+            }
+
             $.ajax({
                 url: '{{ route("parent_flow.parent.store") }}',
                 type: 'POST',
@@ -348,6 +371,7 @@
                 success: function(response) {
                     if (response.success) {
                         alert('Parent added successfully!');
+                        window.location.href = '{{ route("parent_flow.index") }}';
                     }
                 },
                 error: function(xhr) {
@@ -372,71 +396,109 @@
 </script>
 
 
-
 <script>
 
-$(document).ready(function() {
+    $(document).ready(function() {
 
-    $('#country').on('change', function() {
-        var country_id = $(this).val();
+        $('#country').on('change', function() {
+            var country_id = $(this).val();
 
-        // Reset state and city dropdowns
-        $('#state').empty().append('<option value="">Select State</option>').prop('disabled', true);
-        $('#city').empty().append('<option value="">Select City</option>').prop('disabled', true);
+            // Reset state and city dropdowns
+            $('#state').empty().append('<option value="">Select State</option>').prop('disabled', true);
+            $('#city').empty().append('<option value="">Select City</option>').prop('disabled', true);
 
-        if (country_id) {
-            $.ajax({
-                url: '{{ route("get.states", ["country_id" => ":country_id"]) }}'.replace(':country_id', country_id),
-                type: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    if (data.length > 0) {
-                        $.each(data, function(key, value) {
-                            // Use 'id_state' as value and 'state' as display text
-                            $('#state').append('<option value="' + value.id_state + '">' + value.state + '</option>');
-                        });
-                        $('#state').prop('disabled', false);
+            if (country_id) {
+                $.ajax({
+                    url: '{{ route("get.states", ["country_id" => ":country_id"]) }}'.replace(':country_id', country_id),
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.length > 0) {
+                            $.each(data, function(key, value) {
+                                // Use 'id_state' as value and 'state' as display text
+                                $('#state').append('<option value="' + value.id_state + '">' + value.state + '</option>');
+                            });
+                            $('#state').prop('disabled', false);
+                        }
+                    },
+                    error: function(xhr) {
+                        console.log('Error loading states:', xhr.responseText);
+                        alert('Failed to load states.');
                     }
-                },
-                error: function(xhr) {
-                    console.log('Error loading states:', xhr.responseText);
-                    alert('Failed to load states.');
-                }
-            });
-        }
-    });
+                });
+            }
+        });
 
-    $('#state').on('change', function() {
-        var state_id = $(this).val();
+        $('#state').on('change', function() {
+            var state_id = $(this).val();
 
-        // Reset city dropdown
-        $('#city').empty().append('<option value="">Select City</option>').prop('disabled', true);
+            // Reset city dropdown
+            $('#city').empty().append('<option value="">Select City</option>').prop('disabled', true);
 
-        if (state_id) {
-            $.ajax({
-                url: '{{ route("get.cities", ["state_id" => ":state_id"]) }}'.replace(':state_id', state_id),
-                type: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    if (data.length > 0) {
-                        $.each(data, function(key, value) {
-                            // Use 'id' as value and 'city' as display text
-                            $('#city').append('<option value="' + value.id + '">' + value.city + '</option>');
-                        });
-                        $('#city').prop('disabled', false);
+            if (state_id) {
+                $.ajax({
+                    url: '{{ route("get.cities", ["state_id" => ":state_id"]) }}'.replace(':state_id', state_id),
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.length > 0) {
+                            $.each(data, function(key, value) {
+                                // Use 'id' as value and 'city' as display text
+                                $('#city').append('<option value="' + value.id + '">' + value.city + '</option>');
+                            });
+                            $('#city').prop('disabled', false);
+                        }
+                    },
+                    error: function(xhr) {
+                        console.log('Error loading cities:', xhr.responseText);
+                        alert('Failed to load cities.');
                     }
-                },
-                error: function(xhr) {
-                    console.log('Error loading cities:', xhr.responseText);
-                    alert('Failed to load cities.');
-                }
-            });
-        }
-    });
+                });
+            }
+        });
 
-});
+    });
 
 </script>
 
+
+<script>
+        let selectedStudentId = null; // Will hold the selected student ID
+
+        $('.dropdown-trigger').on('click', function() {
+            $(this).parent().toggleClass('open');
+        });
+
+        $('.dropdown-option').on('click', function() {
+            const value = $(this).data('value');
+            const text = $(this).text();
+
+            selectedStudentId = value; // Store the ID
+
+            // === Fetch student details and fill Daughter Info ===
+            if (value) {
+                $.ajax({
+                    url: '{{ route("parent_flow.parent_flow.get_student_details", ["id" => ":id"]) }}'.replace(':id', value),
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(student) {
+                        $('#daughter_name').val(
+                            (student.first_name ?? '') + ' ' + (student.last_name ?? '')
+                        );
+                        $('#school_year').val(student.school_year ?? '');
+                        $('#year_status').val(student.year_status ?? '');
+                        $('#daughter_dob').val(student.date_of_birth ?? '');
+                    },
+                    error: function() {
+                        alert('Failed to load student details.');
+                    }
+                });
+            } else {
+                // Clear fields if deselected (optional)
+                $('#daughter_name, #school_year, #year_status, #daughter_dob').val('');
+            }
+        });
+
+</script>
 
 @endpush
