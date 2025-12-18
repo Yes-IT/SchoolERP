@@ -98,51 +98,51 @@ class AssignmentController extends Controller
             $completedPerPage = $request->input('completed_per_page', 5);
 
             $pending = DB::table('assignments')
-                ->leftJoin('assignment_submissions', function ($join) use ($studentId) {
-                    $join->on('assignments.id', '=', 'assignment_submissions.assignment_id')
-                        ->where('assignment_submissions.student_id', '=', $studentId);
-                })
-                ->leftJoin('subjects', 'assignments.subject_id', '=', 'subjects.id')
-                ->where(function ($q) {
-                    $q->whereNull('assignment_submissions.id')   
-                    ->orWhere('assignment_submissions.status', 0); 
-                })
-                ->select(
-                    'assignments.*',
-                    'subjects.name as subject_name',
-                    'assignment_submissions.status as submit_status'
-                )
-                ->orderBy('assignments.assigned_date', 'desc')
-                ->paginate($pendingPerPage)
-                ->appends([
-                    'tab' => 'pending',
-                    'pending_per_page' => $pendingPerPage
-                ]);
+                        ->leftJoin('assignment_submissions', function ($join) use ($studentId) {
+                            $join->on('assignments.id', '=', 'assignment_submissions.assignment_id')
+                                ->where('assignment_submissions.student_id', '=', $studentId);
+                        })
+                        ->leftJoin('subjects', 'assignments.subject_id', '=', 'subjects.id')
+                        ->where(function ($q) {
+                            $q->whereNull('assignment_submissions.id')   
+                            ->orWhere('assignment_submissions.status', 0); 
+                        })
+                        ->select(
+                            'assignments.*',
+                            'subjects.name as subject_name',
+                            'assignment_submissions.status as submit_status'
+                        )
+                        ->orderBy('assignments.assigned_date', 'desc')
+                        ->paginate($pendingPerPage)
+                        ->appends([
+                            'tab' => 'pending',
+                            'pending_per_page' => $pendingPerPage
+                        ]);
 
             // Log::info('Pending Assignment IDs:', $pending->pluck('id')->toArray());
 
             $completed = DB::table('assignments')
-                ->join('assignment_submissions', function ($join) use ($studentId) {
-                    $join->on('assignments.id', '=', 'assignment_submissions.assignment_id')
-                        ->where('assignment_submissions.student_id', '=', $studentId)
-                        ->whereIn('assignment_submissions.status', [1, 2]); // submitted / evaluated
-                })
-                ->leftJoin('subjects', 'assignments.subject_id', '=', 'subjects.id')
-                ->select(
-                    'assignments.*',
-                    'subjects.name as subject_name',
-                    'assignment_submissions.status as submit_status',
-                    'assignment_submissions.grade',
-                    'assignment_submissions.percentage',
-                    'assignment_submissions.note',
-                    'assignment_submissions.file_path'
-                )
-                ->orderBy('assignments.assigned_date', 'desc')
-                ->paginate($completedPerPage)
-                ->appends([
-                    'tab' => 'completed',
-                    'completed_per_page' => $completedPerPage
-                ]);
+                            ->join('assignment_submissions', function ($join) use ($studentId) {
+                                $join->on('assignments.id', '=', 'assignment_submissions.assignment_id')
+                                    ->where('assignment_submissions.student_id', '=', $studentId)
+                                    ->whereIn('assignment_submissions.status', [1, 2]); // submitted / evaluated
+                            })
+                            ->leftJoin('subjects', 'assignments.subject_id', '=', 'subjects.id')
+                            ->select(
+                                'assignments.*',
+                                'subjects.name as subject_name',
+                                'assignment_submissions.status as submit_status',
+                                'assignment_submissions.grade',
+                                'assignment_submissions.percentage',
+                                'assignment_submissions.note',
+                                'assignment_submissions.file_path'
+                            )
+                            ->orderBy('assignments.assigned_date', 'desc')
+                            ->paginate($completedPerPage)
+                            ->appends([
+                                'tab' => 'completed',
+                                'completed_per_page' => $completedPerPage
+                            ]);
 
             // Log::info('Completed Assignment IDs:', $completed->pluck('id')->toArray());
 
@@ -183,8 +183,7 @@ class AssignmentController extends Controller
                 $item->last_updated = $item->updated_at;
             }
 
-            return view(
-                'parent-panel.assignment',
+            return view('parent-panel.assignment',
                 compact('pending', 'completed', 'tab','activeTab')
             );
 

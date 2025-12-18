@@ -103,228 +103,17 @@
 
                             <div class="boxtbl-outer">
                                 <div class="box-table-container">
-                                    {{-- <table>
-                                      <thead>
-                                        <tr>
-                                          <th>Day/Time</th>
-                                          <th>10:00 AM - 10:59 AM</th>
-                                          <th>11:00 AM - 11:59 AM</th>
-                                          <th>12:00 PM - 12:59 PM</th>
-                                          <th>01:00 AM - 01:59 AM</th>
-                                          <th>02:00 PM - 02:59 PM</th>
-                                          <th>03:00 PM - 03:59 PM</th>
-                                          <th>04:00 PM - 04:59 PM</th>
-                                          <th>05:00 PM - 05:59 PM</th>
-                                          <th>06:00 PM - 06:59 PM</th>
-                                          <th>07:00 PM - 07:59 PM</th>
-                                          <th>08:00 PM - 08:59 PM</th>
-                                          <th>09:00 PM - 09:59 PM</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        <!-- Friday -->
-                                        <tr>
-                                          <th>Friday</th>
-                                          <td>
-                                            <strong>Subject Name</strong><br>
-                                            Teacher Name<br>
-                                            Room No. 12
-                                          </td>
-                                          <td>
-                                            <strong>Subject Name</strong><br>
-                                            Teacher Name<br>
-                                            Room No. 12
-                                          </td>
-                                          <td>
-                                            <strong>Subject Name</strong><br>
-                                            Teacher Name<br>
-                                            Room No. 12
-                                          </td>
-                                          <td>
-                                            <strong>Subject Name</strong><br>
-                                            Teacher Name<br>
-                                            Room No. 12
-                                          </td>
-                                          <td>
-                                            <strong>Subject Name</strong><br>
-                                            Teacher Name<br>
-                                            Room No. 12
-                                          </td>
-                                          <td>
-                                            <strong>Subject Name</strong><br>
-                                            Teacher Name<br>
-                                            Room No. 12
-                                          </td>
-                                          <td>
-                                            <strong>Subject Name</strong><br>
-                                            Teacher Name<br>
-                                            Room No. 12
-                                          </td>
-                                          <td>
-                                            <strong>Subject Name</strong><br>
-                                            Teacher Name<br>
-                                            Room No. 12
-                                          </td>
-                                          <td>
-                                            <strong>Subject Name</strong><br>
-                                            Teacher Name<br>
-                                            Room No. 12
-                                          </td>
-                                          <td>
-                                            <strong>Subject Name</strong><br>
-                                            Teacher Name<br>
-                                            Room No. 12
-                                          </td>
-                                          <td>
-                                            <strong>Subject Name</strong><br>
-                                            Teacher Name<br>
-                                            Room No. 12
-                                          </td>
-                                          <td>
-                                            <strong>Subject Name</strong><br>
-                                            Teacher Name<br>
-                                            Room No. 12
-                                          </td>
-                                        </tr>
-                                  
-                                        <!-- Monday -->
-                                        <tr>
-                                          <th>Monday</th>
-                                          <td>
-                                            <strong>Subject Name</strong><br>
-                                            Teacher Name<br>
-                                            Room No. 12
-                                          </td>
-                                          <!-- repeat the same cell 11 more times -->
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                        </tr>
-                                  
-                                        <!-- Tuesday -->
-                                        <tr>
-                                          <th>Tuesday</th>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                        </tr>
-                                  
-                                        <!-- Wednesday -->
-                                        <tr>
-                                          <th>Wednesday</th>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                        </tr>
-                                  
-                                        <!-- Thursday -->
-                                        <tr>
-                                          <th>Thursday</th>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                        </tr>
-                                  
-                                        <!-- Friday (second row) -->
-                                        <tr>
-                                          <th>Friday</th>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                          <td><strong>Subject Name</strong><br>Teacher Name<br>Room No. 12</td>
-                                        </tr>
-                                  
-                                        <!-- Shabbos -->
-                                        <tr>
-                                          <th>Shabbos</th>
-                                          <td colspan="12" style="background: var(--secondary-clr);"></td>
-                                        </tr>
-                                      </tbody>
-                                    </table> --}}
-
                                     <table>
                                         <thead>
                                             <tr>
                                                 <th>Day / Time</th>
-
-                                                @foreach($timeSlots as $slot)
-                                                    <th>{{ $slot['label'] }}</th>
-                                                @endforeach
-
+                                                    @foreach($timeSlots as $slot)
+                                                        <th>{{ $slot['label'] }}</th>
+                                                    @endforeach
                                             </tr>
                                         </thead>
 
                                         <tbody>
-
-                                            {{-- @foreach($days as $day)
-
-                                            <tr>
-                                                <th>{{ $day }}</th>
-
-                                                @if($day === 'Shabbos')
-                                                    <td colspan="{{ count($timeSlots) }}" style="background: #eee;"></td>
-
-                                                @else
-                                                    @foreach($timeSlots as $startTime => $slot)
-
-                                                        @php  $data = $formatted[$day][$startTime];  @endphp
-
-                                                        <td>
-                                                            @if($data)
-                                                                <strong> Subject Name: {{ $data['subject'] }}</strong><br>
-                                                                Teacher Name: {{ $data['teacher'] }}<br>
-                                                                Room: {{ $data['room'] }}
-                                                            @endif
-                                                        </td>
-
-                                                    @endforeach
-                                                @endif
-                                            </tr>
-
-                                            @endforeach --}}
 
                                               @foreach($days as $day)
                                                     <tr>
@@ -371,68 +160,62 @@
 @push('script')
     <script>
         function printDiv(divId) {
-            // Get print content
+            
             var printContents = document.getElementById(divId).innerHTML;
             var originalContents = document.body.innerHTML;
 
-            // Replace body with print section
             document.body.innerHTML = `
-            <html>
-                <head>
-                    <title>Class Timetable</title>
-                    <style>
-                        body {
-                            font-family: Arial, sans-serif;
-                            padding: 20px;
-                        }
-                        h2 {
-                            text-align: center;
-                            margin-bottom: 20px;
-                        }
-                        table {
-                            border-collapse: collapse;
-                            width: 100%;
-                            font-size: 14px;
-                        }
-                        th, td {
-                            border: 1px solid #000;
-                            padding: 8px;
-                            text-align: center;
-                            vertical-align: top;
-                        }
-                        th {
-                            background-color: #f2f2f2;
-                            font-weight: bold;
-                        }
-                        .text-muted {
-                            color: #888;
-                        }
-                        /* Hide buttons or controls in print */
-                        .print-btn {
-                            display: none !important;
-                        }
- 
-                        @media print {
+                <html>
+                    <head>
+                        <title>Class Timetable</title>
+                        <style>
                             body {
-                                -webkit-print-color-adjust: exact;
+                                font-family: Arial, sans-serif;
+                                padding: 20px;
                             }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <h2>Class Timetable</h2>
-                    ${printContents}
-                </body>
-            </html>
-        `;
+                            h2 {
+                                text-align: center;
+                                margin-bottom: 20px;
+                            }
+                            table {
+                                border-collapse: collapse;
+                                width: 100%;
+                                font-size: 14px;
+                            }
+                            th, td {
+                                border: 1px solid #000;
+                                padding: 8px;
+                                text-align: center;
+                                vertical-align: top;
+                            }
+                            th {
+                                background-color: #f2f2f2;
+                                font-weight: bold;
+                            }
+                            .text-muted {
+                                color: #888;
+                            }
+                            /* Hide buttons or controls in print */
+                            .print-btn {
+                                display: none !important;
+                            }
+    
+                            @media print {
+                                body {
+                                    -webkit-print-color-adjust: exact;
+                                }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <h2>Class Timetable</h2>
+                        ${printContents}
+                    </body>
+                </html>
+            `;
 
-            // Trigger print
             window.print();
-
-            // Restore original content
             document.body.innerHTML = originalContents;
-
-            // Reload so JS rebinds properly
             location.reload();
         }
     </script>
@@ -440,7 +223,6 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
-            // When the user clicks APPLY inside the date picker
             document.addEventListener("click", function(e) {
                 if (e.target.classList.contains("applyBtn")) {
                     document.getElementById("dateFilterForm").submit();
@@ -449,14 +231,132 @@
 
         });
     </script>
-    <script>
-$(function () {
-    $("#dates").datepicker({
-        dateFormat: "yy-mm-dd",   // format you want in GET
-        onSelect: function () {
-            $("#dateFilterForm").submit(); // auto submit
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    function initDateRangePicker() {
+        const yearSelect = document.getElementById('year-select');
+        const monthSelect = document.getElementById('month-select');
+        const weekSelect = document.getElementById('week-select');
+        const rangeDisplay = document.getElementById('range-display');
+        const btnCancel = document.getElementById('btn-cancel');
+        const btnApply = document.getElementById('btn-apply');
+        const pdfStartDate = document.getElementById('pdf-start-date');
+        const pdfEndDate = document.getElementById('pdf-end-date');
+        
+        let startDate, endDate;
+        
+        const currentYear = new Date().getFullYear();
+        for (let i = currentYear; i <= currentYear + 1; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            yearSelect.appendChild(option);
         }
-    });
+        
+        const months = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        months.forEach((month, index) => {
+            const option = document.createElement('option');
+            option.value = index + 1;
+            option.textContent = month;
+            monthSelect.appendChild(option);
+        });
+        
+        
+        function updateWeeks() {
+            weekSelect.innerHTML = '';
+            const year = parseInt(yearSelect.value);
+            const month = parseInt(monthSelect.value);
+            
+            const firstDay = new Date(year, month - 1, 1);
+            const lastDay = new Date(year, month, 0);
+            
+            let weekCount = 1;
+            let currentDate = new Date(firstDay);
+            
+            while (currentDate <= lastDay) {
+                const weekStart = new Date(currentDate);
+                const weekEnd = new Date(currentDate);
+                weekEnd.setDate(weekEnd.getDate() + 6);
+                
+                if (weekEnd > lastDay) {
+                    weekEnd.setDate(lastDay.getDate());
+                }
+                
+                const option = document.createElement('option');
+                option.value = weekCount;
+                option.textContent = `Week ${weekCount}: ${formatDate(weekStart)} - ${formatDate(weekEnd)}`;
+                option.dataset.start = weekStart.toISOString().split('T')[0];
+                option.dataset.end = weekEnd.toISOString().split('T')[0];
+                weekSelect.appendChild(option);
+                
+                weekCount++;
+                currentDate.setDate(currentDate.getDate() + 7);
+            }
+        
+            if (weekSelect.options.length > 0) {
+                weekSelect.selectedIndex = 0;
+                updateDisplay();
+            }
+        }
+        
+        function formatDate(date) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+        }
+        
+        function updateDisplay() {
+            if (weekSelect.selectedOptions.length > 0) {
+                const selectedOption = weekSelect.selectedOptions[0];
+                startDate = selectedOption.dataset.start;
+                endDate = selectedOption.dataset.end;
+                rangeDisplay.textContent = `${formatDate(new Date(startDate))} - ${formatDate(new Date(endDate))}`;
+                
+                if (pdfStartDate && pdfEndDate) {
+                    pdfStartDate.value = startDate;
+                    pdfEndDate.value = endDate;
+                }
+            }
+        }
+        
+        yearSelect.addEventListener('change', updateWeeks);
+        monthSelect.addEventListener('change', updateWeeks);
+        weekSelect.addEventListener('change', updateDisplay);
+        
+        btnCancel.addEventListener('click', function() {
+            document.querySelector('.datepicker-body-wrp').style.display = 'none';
+        });
+        
+        btnApply.addEventListener('click', function() {
+            const form = document.createElement('form');
+            form.method = 'GET';
+            form.action = window.location.pathname;
+            
+            const startInput = document.createElement('input');
+            startInput.type = 'hidden';
+            startInput.name = 'start_date';
+            startInput.value = startDate;
+            form.appendChild(startInput);
+            
+            const endInput = document.createElement('input');
+            endInput.type = 'hidden';
+            endInput.name = 'end_date';
+            endInput.value = endDate;
+            form.appendChild(endInput);
+            
+            document.body.appendChild(form);
+            form.submit();
+        });
+        
+        monthSelect.value = new Date().getMonth() + 1;
+        updateWeeks();
+    }
+    
+    initDateRangePicker();
 });
 </script>
 @endpush

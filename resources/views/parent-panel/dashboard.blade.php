@@ -208,7 +208,7 @@
                                             <div class="ds-class-card">
                                                 <div class="ds-class-img">
                                                     @if (!empty($member->image))
-                                                        <img src="{{ asset($member->image) }}" alt="{{ $member->name }}">
+                                                        <img src="{{ asset($member->image) }}" alt="profile image">
                                                     @else
                                                         <img src="{{ asset('student/images/teacher-img.png') }}"
                                                             alt="Default Image">

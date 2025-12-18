@@ -52,9 +52,10 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>
-                        <button class="view-attachment-btn" data-bs-target="#viewAttachments" data-bs-toggle="modal">
-                            <img src="{{ asset('backend/assets/images/new_images/eye-white.svg') }}" alt="Eye Icon">
-                        </button>
+                       
+                         <a href="{{ route('parent_flow.parent_info', $user['id']) }}" class="view-attachment-btn">
+                                    <img src="{{ asset('backend/assets/images/new_images/eye-white.svg') }}" alt="Eye Icon">
+                        </a>
                     </td>
                     <td>{{ $lastName }}</td>
                     <td>{{ $user['father_title'] ?? 'N/A' }}</td>
@@ -104,7 +105,8 @@
     </table>
 </div>
 
+@if($parents->hasPages())
 <div class="tablepagination">
-    <!-- If you use pagination in controller, uncomment below -->
-    {{-- {{ $parents->links() }} --}}
+    @include('backend.partials.pagination', ['paginator' => $parents, 'routeName' => 'parent_flow.index'])
 </div>
+@endif

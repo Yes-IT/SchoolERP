@@ -122,23 +122,12 @@ class ClassRoutineController extends Controller
     // }
 
 
-
-    ///changes by nazmin 11-12-2025
-
+    //changes by nazmin 11-12-2025
     public function index(Request $request)
     {
         try {
-           
-            // Log::info('ClassRoutineController - Start', [
-            //     'route' => $request->route()->getName(),
-            //     'student_from_request' => request()->get('currentStudent') ? 'exists' : 'null',
-            //     'student_id_session' => session('current_student_id'),
-            //     'auth_id' => Auth::id()
-            // ]);
 
             $student = request()->get('currentStudent');
-
-            // If student is not set via middleware, try to get it from session
             if (!$student) {
                 $studentId = session('current_student_id');
                 if (!$studentId) {
@@ -159,13 +148,6 @@ class ClassRoutineController extends Controller
                         ->where('student_id', $studentId)
                         ->pluck('class_id');
                         
-                        
-            Log::info('ClassRoutineController - Class IDs found', [
-                'student_id' => $studentId,
-                'class_ids' => $classIds->toArray(),
-                'count' => $classIds->count()
-            ]);
-
             if ($classIds->isEmpty()) {
                 return back()->with('error', 'No class assigned to this student');
             }
@@ -199,7 +181,6 @@ class ClassRoutineController extends Controller
                                 ->get();
              
 
-            // Prepare time slots (school hours: 8 AM to 8 PM)
             $timeSlots = [];
             for ($h = 8; $h <= 20; $h++) {  
                 $start = sprintf("%02d:00:00", $h);
@@ -212,7 +193,6 @@ class ClassRoutineController extends Controller
 
             $days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Shabbos'];
 
-            // Initialize formatted array
             $formatted = [];
             foreach ($days as $day) {
                 $formatted[$day] = [];
@@ -221,7 +201,6 @@ class ClassRoutineController extends Controller
                 }
             }
 
-            // Set Shabbos to show "No Classes" for all slots
             foreach ($timeSlots as $startTime => $slot) {
                 $formatted['Shabbos'][$startTime] = [
                     'is_holiday' => true,
@@ -229,11 +208,9 @@ class ClassRoutineController extends Controller
                 ];
             }
 
-            // Process regular schedules (excluding Shabbos)
             foreach ($schedules as $schedule) {
                 $normalizedStart = $schedule->hour_slot ?? date("H:00:00", strtotime($schedule->start_time));
                 
-                // Skip if outside school hours
                 if (!isset($timeSlots[$normalizedStart])) {
                     continue;
                 }
@@ -242,7 +219,6 @@ class ClassRoutineController extends Controller
                     continue;
                 }
                 
-                // Set the data
                 $formatted[$schedule->day][$normalizedStart] = [
                     'subject' => $schedule->subject_name ?? ('Period ' . $schedule->period),
                     'teacher' => $schedule->teacher_name ?? 'Teacher ID: ' . $schedule->teacher_id,
@@ -251,7 +227,7 @@ class ClassRoutineController extends Controller
                     'start_time' => $schedule->start_time,
                     'end_time' => $schedule->end_time,
                     'display_time' => date('h:i A', strtotime($schedule->start_time)) . ' - ' . 
-                                    date('h:i A', strtotime($schedule->end_time)),
+                                      date('h:i A', strtotime($schedule->end_time)),
                     'is_holiday' => false
                 ];
             }
@@ -303,40 +279,141 @@ class ClassRoutineController extends Controller
         }
     }
 
-    // public function generateSchedulePDF(Request $request)
-    // {
-    //     // Get date range from request
-    //     $startDate = $request->input('start_date');
-    //     $endDate = $request->input('end_date');
-        
-    //     // Parse dates or use defaults
-    //     $start = $startDate ? Carbon::parse($startDate) : Carbon::now()->startOfWeek();
-    //     $end = $endDate ? Carbon::parse($endDate) : Carbon::now()->endOfWeek();
-        
-    //     // Fetch schedules for the date range
-    //     $schedules = ClassSchedule::with(['subject', 'teacher', 'classroom'])
-    //         ->whereBetween('date', [$start, $end])
-    //         ->orderBy('date')
-    //         ->orderBy('start_time')
-    //         ->get()
-    //         ->groupBy('date');
-        
-    //     $data = [
-    //         'schedules' => $schedules,
-    //         'startDate' => $start->format('M d, Y'),
-    //         'endDate' => $end->format('M d, Y'),
-    //         'generatedAt' => Carbon::now()->format('M d, Y h:i A'),
-    //     ];
-        
-    //     // Generate PDF
-    //     $pdf = Pdf::loadView('pdf.schedule', $data);
-        
-    //     // Set PDF options
-    //     $pdf->setPaper('A4', 'landscape');
-    //     $pdf->setOption('defaultFont', 'Arial');
-        
-    //     // Download PDF
-    //     return $pdf->download('class-schedule-'.$start->format('Y-m-d').'-to-'.$end->format('Y-m-d').'.pdf');
-    // }
+    public function generateSchedulePDF(Request $request)
+    {
+        try {
+
+            $studentId = session('current_student_id');
+            if (!$studentId) {
+                return redirect()->route('parent-panel-dashboard.index')->with('error', 'Please select a student first');
+            }
+            
+            $student = Student::where('id', $studentId)->where('parent_guardian_id', Auth::id())->first();
+            if (!$student) {
+                return redirect()->route('parent-panel-dashboard.index')->with('error', 'Invalid student selected');
+            }
+            
+            $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date')) : Carbon::now()->startOfWeek();
+            $endDate = $request->input('end_date') ? Carbon::parse($request->input('end_date')) : Carbon::now()->endOfWeek();
+            
+            $classIds = DB::table('student_class_mapping')
+                        ->where('student_id', $studentId)
+                        ->pluck('class_id');
+                
+            if ($classIds->isEmpty()) {
+                return back()->with('error', 'No class assigned to this student');
+            }
+            
+            $schedules = DB::table('class_schedules as cs')
+                ->select([
+                    'cs.id',
+                    'cs.day',
+                    'cs.period',
+                    'cs.start_time',
+                    'cs.end_time',
+                    'cs.room_id',
+                    'c.subject_id',
+                    'c.teacher_id',
+                    's.name as subject_name',
+                    DB::raw("CONCAT(st.first_name, ' ', st.last_name) as teacher_name"),
+                    'cr.room_no',
+                    DB::raw("TIME(cs.start_time) as start_time_only"),
+                    DB::raw("DATE_FORMAT(cs.start_time, '%H:00:00') as hour_slot")
+                ])
+                ->join('classes as c', 'cs.class_id', '=', 'c.id')
+                ->leftJoin('subjects as s', 'c.subject_id', '=', 's.id')
+                ->leftJoin('staff as st', 'c.teacher_id', '=', 'st.id')
+                ->leftJoin('class_rooms as cr', 'cs.room_id', '=', 'cr.id')
+                ->whereIn('cs.class_id', $classIds)
+                ->whereNull('cs.deleted_at')
+                ->whereNull('c.deleted_at')
+                ->where('cs.day', '!=', 'Shabbos')
+                ->orderByRaw("FIELD(cs.day, 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')")
+                ->orderBy('cs.start_time')
+                ->get();
+            
+            $timeSlots = [];
+            for ($h = 8; $h <= 20; $h++) {
+                $start = sprintf("%02d:00:00", $h);
+                $timeSlots[$start] = [
+                    'label' => date("h:i A", strtotime($start)) . " - " . 
+                            date("h:i A", strtotime(sprintf("%02d:59:00", $h))),
+                    'hour' => $h
+                ];
+            }
+            
+            $days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Shabbos'];
+            
+            $formatted = [];
+            foreach ($days as $day) {
+                $formatted[$day] = [];
+                foreach ($timeSlots as $startTime => $slot) {
+                    $formatted[$day][$startTime] = null;
+                }
+            }
+            
+            foreach ($timeSlots as $startTime => $slot) {
+                $formatted['Shabbos'][$startTime] = [
+                    'is_holiday' => true,
+                    'message' => 'No Classes - Shabbos'
+                ];
+            }
+            
+            foreach ($schedules as $schedule) {
+                $normalizedStart = $schedule->hour_slot ?? date("H:00:00", strtotime($schedule->start_time));
+                
+                if (!isset($timeSlots[$normalizedStart])) {
+                    continue;
+                }
+                
+                if ($schedule->day === 'Shabbos') {
+                    continue;
+                }
+                
+                $formatted[$schedule->day][$normalizedStart] = [
+                    'subject' => $schedule->subject_name ?? ('Period ' . $schedule->period),
+                    'teacher' => $schedule->teacher_name ?? 'Teacher ID: ' . $schedule->teacher_id,
+                    'room' => $schedule->room_no ?? ('Room ID: ' . $schedule->room_id),
+                    'period' => $schedule->period,
+                    'start_time' => $schedule->start_time,
+                    'end_time' => $schedule->end_time,
+                    'display_time' => date('h:i A', strtotime($schedule->start_time)) . ' - ' . 
+                                    date('h:i A', strtotime($schedule->end_time)),
+                    'is_holiday' => false
+                ];
+            }
+            
+            $data = [
+                'formatted' => $formatted,
+                'timeSlots' => $timeSlots,
+                'days' => $days,
+                'student' => $student,
+                'startDate' => $startDate->format('M d, Y'),
+                'endDate' => $endDate->format('M d, Y'),
+                'generatedAt' => Carbon::now()->format('M d, Y h:i A'),
+            ];
+            
+            // Generate PDF with landscape orientation
+            $pdf = Pdf::loadView('parent-panel.pdf.class-routine-pdf', $data);
+            
+            // Set PDF options
+            $pdf->setPaper('A4', 'landscape');
+            $pdf->setOption('defaultFont', 'Arial');
+            $pdf->setOption('isHtml5ParserEnabled', true);
+            $pdf->setOption('isRemoteEnabled', true);
+            
+            // Return as download
+            return $pdf->download('class-routine-'.$student->first_name.'-'.$startDate->format('Y-m-d').'-to-'.$endDate->format('Y-m-d').'.pdf');
+            
+        } catch (\Exception $e) {
+            Log::error('PDF Generation Error:', [
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return back()->with('error', 'Failed to generate PDF. Please try again.');
+        }
+    }
     
 }

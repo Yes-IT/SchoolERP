@@ -104,11 +104,11 @@
         </div>
 
         <div class="dspr-bdy-content">
-            @php
-                $maritalStatus = $parent->marital_status ?? '';
-            @endphp
 
-            @if(in_array($maritalStatus, ['married', 'unmarried', 'widowed']))
+          
+
+
+           @if($showCombinedParents)
           
                 <div class="dspr-bdy-content-sec">
                     <h2>Parent Details</h2>
@@ -173,7 +173,7 @@
                                 </tr>
                                 <tr>
                                     <td>Marital Status</td>
-                                    <td>{{ ucfirst($maritalStatus) }}</td>
+                                    <td>{{ ucfirst($parent->marital_status) }}</td>
                                 </tr>
                                 <tr>
                                     <td>Marital Comment</td>
@@ -186,7 +186,9 @@
                                 </tr>
                                 <tr>
                                     <td>Parents Address</td>
-                                    <td>{{ $parent->address_line }} {{ $parent->city }} {{ $parent->state }} {{ $parent->country }} {{ $parent->zip_code }}</td>
+                                    {{-- <td>{{ $parent->address_line }}, {{ $parent->city }} ,{{ $parent->state }}, {{ $parent->country }} - {{ $parent->zip_code }}</td> --}}
+                                   <td>{{ $commonAddress }}</td>
+
                                 </tr>
                             </tbody>
                             </table>
@@ -194,6 +196,104 @@
                 </div>
             @endif
 
+
+            @if($showSeparatedParents)
+
+                {{-- FIRST PARENT --}}
+                <div class="dspr-bdy-content-sec">
+                    <h2>First Parent Details</h2>
+                    <div class="dsbdy-cmn-table table-full-height pr-pg-tbl-wrp">
+                        <table>
+                            <tr>
+                                <td>Parent Name</td>
+                                <td>
+                                    {{ $primaryCustodian === 'father'
+                                        ? $parent->father_name
+                                        : $parent->mother_name }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Home Phone Number</td>
+                                <td>
+                                    {{ $primaryCustodian === 'father'
+                                        ? $parent->father_mobile
+                                        : $parent->mother_mobile }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Cell number</td>
+                                <td>
+                                    {{ $primaryCustodian === 'father'
+                                        ? $parent->father_mobile
+                                        : $parent->mother_mobile }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Email</td>
+                                <td>
+                                    {{ $primaryCustodian === 'father'
+                                        ? $parent->father_email
+                                        : $parent->mother_email }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>Address</td>
+                               <td>{{ $commonAddress }}</td>
+
+                            </tr>
+                        </table>
+                   </div>
+                </div>
+
+                {{-- SECOND PARENT --}}
+                <div class="dspr-bdy-content-sec">
+                    <h2>Second Parent Details</h2>
+                    <div class="dsbdy-cmn-table table-full-height pr-pg-tbl-wrp">
+                        <table>
+                            <tr>
+                                <td>Parent Name</td>
+                                <td>
+                                    {{ $primaryCustodian === 'father'
+                                        ? $parent->mother_name
+                                        : $parent->father_name }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Home Phone Number</td>
+                                <td>
+                                    {{ $primaryCustodian === 'father'
+                                        ? $parent->mother_mobile
+                                        : $parent->father_mobile }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Cell number</td>
+                                <td>
+                                    {{ $primaryCustodian === 'father'
+                                        ? $parent->mother_mobile
+                                        : $parent->father_mobile }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>Email</td>
+                                <td>
+                                    {{ $primaryCustodian === 'father'
+                                        ? $parent->father_email
+                                        : $parent->mother_email }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Address</td>
+                              <td>{{ $commonAddress }}</td>
+
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+            @endif
 
 
          
@@ -224,37 +324,7 @@
                 </div>
             </div>
 
-            {{-- <div class="dspr-bdy-content-sec">
-                <h2>Second Parent Details</h2>
-                <div class="dsbdy-cmn-table table-full-height pr-pg-tbl-wrp">
-                    <table>
-                       <tbody>
-                            <tr>
-                                <td>Parent Name</td>
-                                <td>Caroline Thomas</td>
-                            </tr>
-
-                             <tr>
-                                <td>Home Phone Number</td>
-                                <td>98654646</td>
-                            </tr>
-                            <tr>
-                                <td>Cell number</td>
-                                <td>98654646</td>
-                            </tr>
-                             <tr>
-                                <td>Email</td>
-                                <td>example@gmail.com</td>
-                            </tr>
-                             <tr>
-                                <td>Address</td>
-                                <td>56 Main Street, Suite 3, Brooklyn, NY 11210-0000</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div> --}}
-   
+          
 
             <div class="dspr-bdy-content-sec">
                 <h2>Relative Details</h2>

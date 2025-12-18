@@ -3,46 +3,63 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Academic\YearStatus;
-use App\Models\Session;
-use App\Models\StudentInfo\ParentGuardian;
-use App\Models\StudentInfo\Student;
-use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\Academic\YearStatus;
+use App\Models\StudentInfo\{Student,ParentGuardian};
+use App\Models\{User,Session};
 use Illuminate\Support\Facades\{Str,Hash,Validator,Auth,DB,Log};
-
-
-
 
 class ParentController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
+
         $sessions     = Session::get();
         $yearStatuses = YearStatus::get();
         $students     = Student::get();
 
-        // Fetch parents/guardians: users with role_id = 7, joined with ParentGuardian table
-        $parents = User::where('role_id', 7)
-            ->join('parent_guardians', 'users.id', '=', 'parent_guardians.user_id')
-            ->select(
-                'users.id as user_id',
-                'users.name',
-                'users.email',
-                'parent_guardians.id as parent_guardian_id',
-                'parent_guardians.*'
-            )
-            ->orderBy('users.id', 'desc')
-            ->take(5)
-            ->get();
+        $selectedStudent = null;
+        if ($request->filled('student_id')) {
+            $selectedStudent = Student::find($request->student_id);
+        }
 
+        $parentsQuery = User::where('role_id', 7)
+                        ->join('parent_guardians', 'users.id', '=', 'parent_guardians.user_id')
+                        ->select(
+                            'users.id as user_id',
+                            'users.name',
+                            'users.email',
+                            'parent_guardians.id as parent_guardian_id',
+                            'parent_guardians.*'
+                        )
+                        ->orderBy('users.id', 'desc');
+
+        if ($request->filled('student_id')) {
+            $parentsQuery->where('parent_guardians.student_id', $request->student_id);
+        }
+
+        $perPage = $request->get('per_page', 10);
+        $parents = $parentsQuery->paginate($perPage);
+
+        $parents->appends($request->except('page'));
+
+        if ($request->ajax() || $request->wantsJson()) {
+            $html = view('backend.parent.parent-list', compact('parents'))->render();
+            return response()->json([
+                'html' => $html,
+                'total' => $parents->total(),
+                'per_page' => $parents->perPage(),
+                'current_page' => $parents->currentPage()
+            ]);
+        }              
 
         return view('backend.parent.index', compact(
             'sessions',
             'yearStatuses',
             'students',
-            'parents'
+            'parents',
+            'selectedStudent'
         ));
     }
 
@@ -58,28 +75,45 @@ class ParentController extends Controller
 
     public function parent_info($parentGuardianId)
     {
+       
         try{
-                $parentGuardianId=1;
                 $parent = DB::table('parent_guardians')->where('id', $parentGuardianId)->first();
                 if (!$parent) {
                     abort(404, 'Parent record not found');
                 }
 
+                $commonAddress = "{$parent->address_line}, {$parent->city}, {$parent->state}, {$parent->country} - {$parent->zip_code}";
+
+                Log::info($commonAddress);
+                $maritalStatus = $parent->marital_status;
+                $primaryCustodian = $parent->primary_custodian;
+
+                $showCombinedParents = in_array($maritalStatus, [
+                    'married',
+                    'remarried',
+                    'widowed'
+                ]);
+
+                $showSeparatedParents = in_array($maritalStatus, [
+                    'divorced',
+                    'separated'
+                ]);
+
                 $students = DB::table('students')
                             ->leftJoin('uploads', 'uploads.id', '=', 'students.image_id')
                             ->where('students.parent_guardian_id', $parentGuardianId)
-                           ->select(
-                                'students.id',
-                                'students.first_name',
-                                'students.last_name',
-                                'students.student_id',
-                                'students.hebrew_first_name',
-                                'students.hebrew_last_name',
-                                'students.diploma_name',
-                                'students.dob',
-                                'uploads.path as image_path'
-                            )
-                            ->get();
+                            ->select(
+                                    'students.id',
+                                    'students.first_name',
+                                    'students.last_name',
+                                    'students.student_id',
+                                    'students.hebrew_first_name',
+                                    'students.hebrew_last_name',
+                                    'students.diploma_name',
+                                    'students.dob',
+                                    'uploads.path as image_path'
+                                )
+                                ->get();
 
                 $selectedStudent = $students->first();
 
@@ -91,10 +125,7 @@ class ParentController extends Controller
                                         ->first();
                 }
 
-                return view(
-                    'backend.parent.parent-info',
-                    compact('parent', 'students', 'selectedStudent','schoolDetails')
-                );
+                return view('backend.parent.parent-info',compact('parent','commonAddress', 'students', 'selectedStudent','schoolDetails','showCombinedParents','showSeparatedParents','primaryCustodian'));
         }
         catch(\Exception $e){
             Log::error($e->getMessage());
