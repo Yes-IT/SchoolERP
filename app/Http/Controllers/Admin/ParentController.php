@@ -24,31 +24,36 @@ class ParentController extends Controller
         $yearStatuses = YearStatus::get();
         $students     = Student::get();
 
-
         $selectedStudent = null;
         if ($request->filled('student_id')) {
             $selectedStudent = Student::find($request->student_id);
         }
 
-        $parentsQuery = User::where('role_id', 7)
-                        ->join('parent_guardians', 'users.id', '=', 'parent_guardians.user_id')
-                        ->select(
-                            'users.id as user_id',
-                            'users.name',
-                            'users.email',
-                            'parent_guardians.id as parent_guardian_id',
-                            'parent_guardians.*'
-                        )
-                        ->orderBy('users.id', 'desc');
+       $parentsQuery = User::where('role_id', 7)
+                     ->join('parent_guardians', 'users.id', '=', 'parent_guardians.user_id')
+                    ->leftJoin('countries', 'parent_guardians.country', '=', 'countries.country_id')
+                    ->leftJoin('states', 'parent_guardians.state', '=', 'states.id_state')
+                    ->leftJoin('cities', 'parent_guardians.city', '=', 'cities.id')
+                    ->select(
+                        'users.id as user_id',
+                        'users.name as user_name',
+                        'users.email',
+                        'parent_guardians.id as parent_guardian_id',
+                        'parent_guardians.*',
+                        'countries.country_name as country_name',
+                        'states.state as state_name',
+                        'cities.city as city_name'
+                    )
+                    ->orderBy('users.id', 'desc');
+
 
         if ($request->filled('student_id')) {
             $parentsQuery->where('parent_guardians.student_id', $request->student_id);
         }
 
         $perPage = $request->get('per_page', 10);
-        $parents = $parentsQuery->paginate($perPage);
 
-        $parents->appends($request->except('page'));
+        $parents = $parentsQuery->paginate($perPage);
 
         if ($request->ajax() || $request->wantsJson()) {
             $html = view('backend.parent.parent-list', compact('parents'))->render();
@@ -61,24 +66,6 @@ class ParentController extends Controller
         }              
 
 
-        // Fetch parents/guardians with joined location names
-        $parents = User::where('role_id', 7)
-            ->join('parent_guardians', 'users.id', '=', 'parent_guardians.user_id')
-            ->leftJoin('countries', 'parent_guardians.country', '=', 'countries.country_id')
-            ->leftJoin('states', 'parent_guardians.state', '=', 'states.id_state')
-            ->leftJoin('cities', 'parent_guardians.city', '=', 'cities.id')
-            ->select(
-                'users.id as user_id',
-                'users.name as user_name',
-                'users.email',
-                'parent_guardians.id as parent_guardian_id',
-                'parent_guardians.*',
-                'countries.country_name as country_name',
-                'states.state as state_name',
-                'cities.city as city_name'
-            )
-            ->orderBy('users.id', 'desc')
-            ->get();
 
         return view('backend.parent.index', compact(
             'sessions',
