@@ -9,10 +9,11 @@ use Illuminate\Support\Facades\Session;
 use Srmklive\PayPal\Services\ExpressCheckout;
 use App\Repositories\Fees\FeesCollectRepository;
 use App\Repositories\ParentPanel\FeesRepository;
-use Illuminate\Support\Facades\Auth;
 use App\Models\StudentInfo\Student;
 use App\Models\SchoolList;
-use DB;
+use Illuminate\Support\Facades\{Auth,DB,Log};
+
+
 
 
 class FeesController extends Controller
@@ -26,56 +27,106 @@ class FeesController extends Controller
         $this->feesCollectRepository = $feesCollectRepository;
     }
 
+    // public function index(Request $request)
+    // {
+    //     $student = Student::where('parent_guardian_id', Auth::id())->first();
+
+
+    //     if (!$student) {
+    //         return redirect()->back()->withErrors(['error' => 'Student not found.']);
+    //     }
+    //     $yearOptions = DB::table('school_years')
+    //         ->pluck('name', 'id')
+    //         ->toArray();
+
+    //     $query = DB::table('fees_assign_childrens as fac')
+    //         ->leftjoin('fees_masters as fm', 'fm.id', '=', 'fac.fees_master_id')
+    //         ->leftjoin('fees_types as ft', 'ft.id', '=', 'fm.fees_type_id')
+    //         ->select(
+    //             'fac.id as id',
+    //             'ft.name as type',
+    //             'fm.due_date',
+    //             'fm.amount'
+    //         )
+    //         ->where('fac.student_id', $student->id);
+
+
+
+    //     if ($request->filled('year')) {
+    //         $yearName = DB::table('school_years')->where('id', $request->year)->value('name');
+
+    //         if ($yearName) {
+    //             [$yearStart, $yearEnd] = explode('-', $yearName);
+    //             $startOfYear = \Carbon\Carbon::createFromDate($yearStart, 6, 1)->startOfMonth();
+    //             $endOfYear   = \Carbon\Carbon::createFromDate($yearEnd, 5, 31)->endOfMonth();
+
+    //             $query->whereBetween('fm.due_date', [$startOfYear, $endOfYear]);
+    //         }
+    //     }
+
+    //     // $fees = $query->get();
+
+    //     $perPage = $request->get('perPage', 10);
+    //     $fees = $query->paginate($perPage);
+
+    //     $destinations = SchoolList::getDestination();
+    //     return view('parent-panel.fees',  [
+    //         'yearOptions' => $yearOptions,
+    //         'fees' => $fees,
+    //         'selectedYear' => $request->year,
+    //         'perPage' => $perPage,
+    //         'destinations' => $destinations
+    //     ]);
+    // }
+
     public function index(Request $request)
     {
-        $student = Student::where('parent_guardian_id', Auth::id())->first();
-
-
-        if (!$student) {
-            return redirect()->back()->withErrors(['error' => 'Student not found.']);
-        }
-        $yearOptions = DB::table('school_years')
-            ->pluck('name', 'id')
-            ->toArray();
-
-        $query = DB::table('fees_assign_childrens as fac')
-            ->leftjoin('fees_masters as fm', 'fm.id', '=', 'fac.fees_master_id')
-            ->leftjoin('fees_types as ft', 'ft.id', '=', 'fm.fees_type_id')
-            ->select(
-                'fac.id as id',
-                'ft.name as type',
-                'fm.due_date',
-                'fm.amount'
-            )
-            ->where('fac.student_id', $student->id);
-
-
-
-        if ($request->filled('year')) {
-            $yearName = DB::table('school_years')->where('id', $request->year)->value('name');
-
-            if ($yearName) {
-                [$yearStart, $yearEnd] = explode('-', $yearName);
-                $startOfYear = \Carbon\Carbon::createFromDate($yearStart, 6, 1)->startOfMonth();
-                $endOfYear   = \Carbon\Carbon::createFromDate($yearEnd, 5, 31)->endOfMonth();
-
-                $query->whereBetween('fm.due_date', [$startOfYear, $endOfYear]);
+        try{
+            $student = request()->get('currentStudent');
+            if (!$student) {
+                $studentId = session('current_student_id');
+                if (!$studentId) {
+                    return redirect()->route('parent-panel-dashboard.index')->with('error', 'Please select a student first');
+                }
+                
+                $student = Student::where('id', $studentId)->where('parent_guardian_id', Auth::id())->first();
+                if (!$student) {
+                    return redirect()->route('parent-panel-dashboard.index')->with('error', 'Invalid student selected');
+                }
             }
-        }
 
-        // $fees = $query->get();
+            $studentId = $student->id;
+            Log::info('student id', ['student id' => $studentId]);
 
-        $perPage = $request->get('perPage', 10);
-        $fees = $query->paginate($perPage);
+            $years     = Session::orderByDesc('id')->get();
 
-        $destinations = SchoolList::getDestination();
-        return view('parent-panel.fees',  [
-            'yearOptions' => $yearOptions,
+            $query = DB::table('fees_assign_childrens as fac')
+                        ->leftjoin('fees_masters as fm', 'fm.id', '=', 'fac.fees_master_id')
+                        ->leftjoin('fees_types as ft', 'ft.id', '=', 'fm.fees_type_id')
+                        ->select(
+                            'fac.id as id',
+                            'ft.name as type',
+                            'fm.due_date',
+                            'fm.amount'
+                        )
+                        ->where('fac.student_id', $studentId);
+           
+            $perPage = $request->get('perPage', 10);
+            $fees = $query->get();  
+
+            return view('parent-panel.fees',  [
+            'yearOptions' => $years,
             'fees' => $fees,
             'selectedYear' => $request->year,
             'perPage' => $perPage,
-            'destinations' => $destinations
-        ]);
+           
+        ]);            
+
+
+        }catch(\Exception $e){
+            Log::info(' my tuition fees error', ['error' => $e->getMessage()]);
+            return redirect()->route('parent-panel-dashboard.index')->with('error', 'Invalid student selected');
+        }
     }
 
 

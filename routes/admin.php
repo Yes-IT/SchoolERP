@@ -13,7 +13,7 @@ use App\Http\Controllers\Admin\SmsMailTemplateController;
 use App\Http\Controllers\Admin\LeaveController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\AssignmentController;
-use App\Http\Controllers\Admin\{GradeController,AlumniController,TeacherController,ApplicantController, ParentController, RoomManagementController};
+use App\Http\Controllers\Admin\{GradeController,AlumniController,TeacherController,ApplicantController,ParentController, RoomManagementController};
 
 
 
