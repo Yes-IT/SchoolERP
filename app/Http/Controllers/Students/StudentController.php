@@ -323,12 +323,18 @@ class StudentController extends Controller
             ->select('students.*', 'users.name as user_name', 'users.email', 'uploads.path as image_path', 'parent_guardians.*')
             ->where('students.user_id', Auth::id())
             ->first();
-        // dd($data);
+
+        //samester calulation
+        $studen_id = $data->id;
+        $class_id = DB::table('student_class_mapping')->where('student_id', $studen_id)->pluck('class_id');
+        $semester_id = DB::table('classes')->where('id', $class_id)->pluck('semester_id');
+        $semester_name = DB::table('semesters')->where('id', $semester_id)->pluck('name');
+        // dd($semester_name);
         if (!$data) {
             return redirect()->back()->withErrors(['email' => 'User not found.']);
         }
 
-        return view('student.profile', compact('data'));
+        return view('student.profile', compact('data', 'semester_name'));
     }
 
 
@@ -389,27 +395,20 @@ class StudentController extends Controller
         $student = Student::where('user_id', Auth::user()->id)->first();
         $studentId = $student->id;
 
-        // Get all mappings of this student (class + teachers)
         $classDetails = DB::table('student_class_mapping')
             ->where('student_id', $studentId)
             ->get();
 
-        // Extract class_id (assuming all mappings are for the same class)
         $classId = $classDetails->first()->class_id ?? null;
 
-        // Extract all teacher IDs from mapping
         $teacherIds = $classDetails->pluck('teacher_id')->toArray();
 
-        // Build the base query
         $query = DB::table('daily_class_routines')
             ->join('subjects', 'daily_class_routines.subject_id', '=', 'subjects.id')
             ->join('staff', 'daily_class_routines.teacher_id', '=', 'staff.id')
             ->where('daily_class_routines.class_id', $classId)
             ->whereIn('daily_class_routines.teacher_id', $teacherIds);
 
-        // =========== ADD DATE FILTERING LOGIC ===========
-        // For weekly schedules, we typically don't filter by date in the database
-        // because routines repeat weekly. Instead, we might filter by academic year/term
         $selectedDates = $request->dates ?? '';
 
         if ($request->has('dates') && !empty($request->dates)) {
@@ -418,6 +417,24 @@ class StudentController extends Controller
             if (count($dates) == 2) {
                 $startDate = date('Y-m-d', strtotime($dates[0]));
                 $endDate = date('Y-m-d', strtotime($dates[1]));
+
+                $startYear = date('Y', strtotime($startDate));
+                $endYear   = date('Y', strtotime($endDate));
+
+                // dd([
+                //     'startYear'=>$startYear,
+                //     'endYear' =>$endYear
+                // ]);
+
+                $query->where(function ($q) use ($startYear, $endYear) {
+
+                    $q->whereRaw("SUBSTRING_INDEX(daily_class_routines.school_year, '-', 1) BETWEEN ? AND ?", [$startYear, $endYear]);
+
+                    // ->orWhereRaw("SUBSTRING_INDEX(daily_class_routines.school_year, '-', -1) BETWEEN ? AND ?", [$startYear, $endYear]);
+                });
+
+                // dd($query->get());
+
 
                 // Since this is a weekly routine, we have a few options:
 
@@ -904,7 +921,10 @@ class StudentController extends Controller
                 'fac.id as id',
                 'ft.name as type',
                 'fm.due_date',
-                'fm.amount'
+                'fm.amount',
+                'fac.transaction_date',
+                'fac.payment_status',
+                'fac.payment_method',
             )
             ->where('fac.student_id', $student->id);
 
@@ -924,7 +944,8 @@ class StudentController extends Controller
 
         // $fees = $query->get();
 
-        $perPage = $request->get('perPage', 2);
+        // dd($fees);
+        $perPage = $request->get('perPage', 10);
         $fees = $query->paginate($perPage);
 
         $destinations = SchoolList::getDestination();
@@ -941,6 +962,8 @@ class StudentController extends Controller
 
     public function storePaymentMyFee(Request $request)
     {
+
+        // dd($request->all());
         $request->validate([
             'amount'       => 'required',
             'billing_card'      => 'required',
@@ -949,6 +972,8 @@ class StudentController extends Controller
             'card_holder_name'  => 'required',
             'id'  => 'required'
         ]);
+
+
 
         // dd("AAAAAAAAAA");
 
@@ -992,7 +1017,8 @@ class StudentController extends Controller
             "xSoftwareName" => "School ERP",
             "xSoftwareVersion" => "1.0",
             "xCommand" => "cc:sale",
-            "xAmount" => $request->amount,
+            // "xAmount" => $request->amount,
+            "xAmount" => 1,  //Transaction amount exceeded for test account (4500.00) , so after live uncomment this
             "xInvoice" => "INV-" . time(),
             "xCardNum" => preg_replace('/\s+/', '', $request->billing_card),
             "xExp" => $exp,
@@ -1013,20 +1039,20 @@ class StudentController extends Controller
 
 
         if ($response->failed()) {
-            dd("AAA");
+            // dd("AAA");
             return back()->with('error', 'Payment gateway request failed: ' . $response->body());
         }
 
         parse_str($response->body(), $paymentResult);
 
-        dd($paymentResult['xError']);
+        // dd($paymentResult['xError']);
 
         if (($paymentResult['xStatus'] ?? '') !== 'Approved') {
             return back()->with('error', ($paymentResult['xError'] ?? 'Payment failed.'));
         }
 
 
-        dd($$paymentResult['xStatus']);
+        // dd($paymentResult['xStatus']);
         $payment_trans = DB::table('payment_transactions')->insertGetId([
             'transaction_id' => $paymentResult['xRefNum'] ?? null,
             'amount' => $paymentResult['xAmount'] ?? $paymentData['xAmount'],
@@ -1042,7 +1068,24 @@ class StudentController extends Controller
             'updated_at' => now(),
         ]);
 
-        dd($payment_trans);
+        if (!empty($payment_trans)) {
+            $exists = DB::table('fees_assign_childrens')
+                ->where('id', $request->id)
+                ->exists();
+
+            if (!$exists) {
+                dd("ERROR: ID NOT FOUND");
+            }
+
+            $updatedRows = DB::table('fees_assign_childrens')
+                ->where('id', $request->id)
+                ->update([
+                    'transaction_date' => now(),
+                    'payment_method'   => 'Card',
+                    'payment_status'   => 1,
+                ]);
+            
+        }
 
         // Transcript::create([
         //     'student_id' => Auth::id(),
@@ -1051,7 +1094,7 @@ class StudentController extends Controller
         //     'payment_requirement' => 'Yes',  // default
         // ]);
 
-        return redirect()->route('student.request_transcript');
+        return redirect()->route('student.fees');
     }
 
 

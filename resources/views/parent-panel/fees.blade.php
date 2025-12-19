@@ -53,7 +53,7 @@
                                             </tr>
                                         </thead>
                                         
-                                        <tbody>
+                                        {{-- <tbody>
                                             @forelse ($feesData as $index => $fee)
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
@@ -97,11 +97,15 @@
 
                                                 <td>
                                                     @if ($fee->status_text !== 'Paid')
+                                                       
                                                         <button class="edit-file-btn cmn-tbl-btn pay-btn"
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#payModal"
-                                                                data-amount="{{ number_format($fee->final_amount + $fee->fine_calculated, 2) }}"
-                                                                data-fee-id="{{ $fee->id ?? $index }}"
+                                                                data-amount="{{ $fee->final_amount + $fee->fine_calculated }}"
+                                                                data-installment-id="{{ $fee->installment_id }}"
+                                                                data-base-amount="{{ $fee->installment_amount }}"
+                                                                data-fine="{{ $fee->fine_calculated }}"
+                                                                data-due-date="{{ $fee->installment_due_date }}"
                                                                 data-type="{{ $fee->fees_type_name }}">
                                                             Pay
                                                         </button>
@@ -117,9 +121,90 @@
                                                 </td>
                                             </tr>
                                             @endforelse
+                                        </tbody> --}}
+
+                                        <tbody>
+                                            @if($feesData->isEmpty())
+                                                <tr>
+                                                    <td colspan="10" class="text-center">
+                                                        No fee records found
+                                                    </td>
+                                                </tr>
+                                            @else
+                                                @foreach ($feesData as $index => $fee)
+                                                <tr>
+                                                    <td>{{ ($feesData->currentPage() - 1) * $feesData->perPage() + $loop->iteration }}</td>
+
+                                                    <td>{{ $fee->fees_type_name }}</td>
+
+                                                    <td>{{ \Carbon\Carbon::parse($fee->installment_due_date)->format('d/m/Y') }}</td>
+
+                                                    <td>
+                                                        {{ $fee->payment_date
+                                                            ? \Carbon\Carbon::parse($fee->payment_date)->format('d/m/Y')
+                                                            : '--' }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $fee->payment_date
+                                                            ? \Carbon\Carbon::parse($fee->payment_date)->format('h:i A')
+                                                            : '--' }}
+                                                    </td>
+
+                                                    <td>
+                                                        <div class="upcoming cmn-tbl-btn {{ $fee->status_class }}">
+                                                            {{ $fee->status_text }}
+                                                        </div>
+                                                    </td>
+
+                                                    <td>
+                                                        {{ number_format($fee->final_amount, 2) }}
+
+                                                        @if ($fee->fine_calculated > 0)
+                                                            <br>
+                                                            <small style="color:red;">
+                                                                Fine: {{ number_format($fee->fine_calculated, 2) }}
+                                                            </small>
+                                                        @endif
+                                                    </td>
+
+                                                    <td>{{ $fee->transaction_id ?? '--' }}</td>
+
+                                                    <td>{{ ucfirst($fee->payment_method ?? '--') }}</td>
+
+                                                    <td>
+                                                        @if ($fee->status_text !== 'Paid')
+                                                            <button class="edit-file-btn cmn-tbl-btn pay-btn"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#payModal"
+                                                                    data-amount="{{ $fee->final_amount + $fee->fine_calculated }}"
+                                                                    data-installment-id="{{ $fee->installment_id }}"
+                                                                    data-base-amount="{{ $fee->installment_amount }}"
+                                                                    data-fine="{{ $fee->fine_calculated }}"
+                                                                    data-due-date="{{ $fee->installment_due_date }}"
+                                                                    data-type="{{ $fee->fees_type_name }}">
+                                                                Pay
+                                                            </button>
+                                                        @else
+                                                            --
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                                @endforeach
+                                            @endif
                                         </tbody>
 
                                     </table>
+
+                                     <!-- Pagination Section -->
+                                        @if($feesData->hasPages())
+                                            <div class="pagination-container" style="margin-top: 20px;">
+                                                @include('backend.partials.pagination', [
+                                                    'paginator' => $feesData,
+                                                    'routeName' => 'parent-panel-fees.index'
+                                                ])
+                                            </div>
+                                        @endif
                             </div>
                         </div>
 
@@ -188,21 +273,27 @@
 
                 <div class="modal-body">
                     <div class="cmn-pop-inr-content-wrp">
-                        <h2>New Request</h2>
+                        <h2>Pay Fee</h2>
                         <div class="new-request-form-wrp">
-                            <form>
+                            <form id="parentPaymentForm" method="POST" action="{{ route('parent.my-fees.store') }}">
+                                @csrf
                                 
                                 <div class="new-request-form">
                                     <div class="autocomplete input-grp h48">
 
                                         <div class="row">
 
-                                            <input type="hidden" name="fee_amount" id="modalFeeAmount">
-                                            <input type="hidden" name="fee_id" id="modalFeeId">
+                                            {{-- <input type="hidden" name="fee_amount" id="modalFeeAmount">
+                                            <input type="hidden" name="fee_id" id="modalFeeId"> --}}
+
+                                             <!-- Hidden fields -->
+                                            <input type="hidden" name="installment_id" id="modalInstallmentId">
+                                            <input type="hidden" name="amount" id="modalAmountHidden">
+                        
 
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Amount</label>
-                                                <input type="text" class="form-control" id="modalAmount" readonly required>
+                                                <input type="text" class="form-control" id="modalAmountDisplay" readonly required>
                                             </div>
                                             
                                             <div class="col-md-6 mb-3">
@@ -237,7 +328,7 @@
 
                                     </div>
 
-                                    <button type="button" value="Submit" id="submit-form" class="cmn-btn w-100 py-2 btn-sm">Submit</button>
+                                    <button type="submit" id="submit-form" class="cmn-btn w-100 py-2 btn-sm">Submit</button>
                                 </div>
                             </form>
                         </div>
@@ -253,21 +344,67 @@
 
 @push('script')
 <script>
+    // document.addEventListener('DOMContentLoaded', function () {
+    //     const payModal = document.getElementById('payModal');
+        
+    //     payModal.addEventListener('show.bs.modal', function (event) {
+    //         // Button that triggered the modal
+    //         const button = event.relatedTarget;
+            
+    //         // Extract info from data-* attributes
+    //         const amount = button.getAttribute('data-amount');
+    //         const feeType = button.getAttribute('data-type');
+            
+    //         // Update modal content
+    //         document.getElementById('modalAmount').value = amount;
+    //         document.getElementById('modalFeeAmount').value = amount;
+    //         document.getElementById('modalFeeType').textContent = 'Fee Type: ' + feeType;
+    //     });
+
+      
+    // });
+
+
     document.addEventListener('DOMContentLoaded', function () {
         const payModal = document.getElementById('payModal');
-        
+    
         payModal.addEventListener('show.bs.modal', function (event) {
-            // Button that triggered the modal
             const button = event.relatedTarget;
             
-            // Extract info from data-* attributes
-            const amount = button.getAttribute('data-amount');
+            // Extract all data attributes
+            const totalAmount = button.getAttribute('data-amount');
+            const installmentId = button.getAttribute('data-installment-id');
+            const baseAmount = button.getAttribute('data-base-amount');
+            const fineAmount = button.getAttribute('data-fine');
             const feeType = button.getAttribute('data-type');
+            const dueDate = button.getAttribute('data-due-date');
             
-            // Update modal content
-            document.getElementById('modalAmount').value = amount;
-            document.getElementById('modalFeeAmount').value = amount;
-            document.getElementById('modalFeeType').textContent = 'Fee Type: ' + feeType;
+            // Update modal fields
+            document.getElementById('modalAmountDisplay').value = '$' + parseFloat(totalAmount).toFixed(2);
+            document.getElementById('modalAmountHidden').value = totalAmount;
+            document.getElementById('modalInstallmentId').value = installmentId;
+            
+            // Optional: Show fee breakdown
+            const amountField = document.querySelector('#modalAmountDisplay').parentNode;
+            
+            // Remove any existing breakdown
+            const existingBreakdown = amountField.querySelector('.fee-breakdown');
+            if (existingBreakdown) {
+                existingBreakdown.remove();
+            }
+            
+            const feeBreakdown = document.createElement('div');
+            feeBreakdown.className = 'fee-breakdown mt-1';
+            feeBreakdown.innerHTML = `
+                <small class="text-muted d-block">Fee Type: ${feeType}</small>
+                <small class="text-muted d-block">Due Date: ${new Date(dueDate).toLocaleDateString()}</small>
+                <small class="text-muted d-block">
+                    Breakdown: Base: $${parseFloat(baseAmount).toFixed(2)} | 
+                    Fine: $${parseFloat(fineAmount).toFixed(2)}
+                </small>
+            `;
+            
+            amountField.appendChild(feeBreakdown);
         });
     });
 </script>

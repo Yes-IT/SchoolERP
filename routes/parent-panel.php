@@ -97,8 +97,6 @@ Route::middleware(saasMiddleware())->group(function () {
                             Route::get('/exam-types', 'getExamTypes');
                             Route::get('/pdf-generate/{student}/{type}', 'generatePDF')->name('parent-panel-exam-routine.pdf-generate');
                            
-
-
                         });
                     });
 
@@ -115,12 +113,9 @@ Route::middleware(saasMiddleware())->group(function () {
                         Route::controller(FeesController::class)->prefix('parent-panel-fees')->group(function () {
                             Route::get('/', 'index')->name('parent-panel-fees.index');
                             Route::post('/search', 'search')->name('parent-panel-fees.search');
-                            Route::get('pay-modal', 'payModal');
-                            Route::post('pay-with-stripe', 'payWithStripe')->name('parent-panel-fees.pay-with-stripe');
-                            Route::get('pay-with-paypal', 'payWithPaypal')->name('parent-panel-fees.pay-with-paypal');
-                            Route::get('payment-success', 'paymentSuccess')->name('parent-panel-fees.payment.success');
-                            Route::get('payment-cancel', 'paymentCancel')->name('parent-panel-fees.payment.cancel');
+                            Route::post('/parent-my-fees-store', 'storePaymentParentFee')->name('parent.my-fees.store');
                         });
+
                     });
 
                     Route::group(['middleware' => ['FeatureCheck:attendance']], function () {
