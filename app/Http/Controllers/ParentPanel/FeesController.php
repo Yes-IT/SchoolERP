@@ -12,7 +12,8 @@ use App\Repositories\ParentPanel\FeesRepository;
 use Illuminate\Support\Facades\Auth;
 use App\Models\StudentInfo\Student;
 use App\Models\SchoolList;
-use DB;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 
 class FeesController extends Controller
@@ -26,57 +27,110 @@ class FeesController extends Controller
         $this->feesCollectRepository = $feesCollectRepository;
     }
 
+
+
     public function index(Request $request)
     {
-        $student = Student::where('parent_guardian_id', Auth::id())->first();
+        $studentId = session('current_student_id');
 
-
-        if (!$student) {
-            return redirect()->back()->withErrors(['error' => 'Student not found.']);
-        }
+        // School years
         $yearOptions = DB::table('school_years')
             ->pluck('name', 'id')
             ->toArray();
 
-        $query = DB::table('fees_assign_childrens as fac')
-            ->leftjoin('fees_masters as fm', 'fm.id', '=', 'fac.fees_master_id')
-            ->leftjoin('fees_types as ft', 'ft.id', '=', 'fm.fees_type_id')
-            ->select(
-                'fac.id as id',
-                'ft.name as type',
-                'fm.due_date',
-                'fm.amount'
+        // ================== FETCH DATA ==================
+        $feesData = DB::table('fees_installment_children as fic')
+
+            ->join('fees_assign_childrens as fac', function ($join) {
+                $join->on('fac.id', '=', 'fic.fees_assign_id')
+                    ->on('fac.fees_master_id', '=', 'fic.fees_master_id');
+            })
+
+            ->join('fees_masters as fm', 'fm.id', '=', 'fic.fees_master_id')
+            ->join('fees_groups as fg', 'fg.id', '=', 'fm.fees_group_id')
+            ->join('fees_types as ft', 'ft.id', '=', 'fm.fees_type_id')
+
+            ->leftJoin(
+                'payment_transactions as pt',
+                'pt.fees_assign_childrens_installment_id',
+                '=',
+                'fic.id'
             )
-            ->where('fac.student_id', $student->id);
 
+            ->where('fic.student_id', $studentId)
 
+            ->select([
+                // installment
+                'fic.id as installment_id',
+                'fic.amount as installment_amount',
+                'fic.due_date as installment_due_date',
 
-        if ($request->filled('year')) {
-            $yearName = DB::table('school_years')->where('id', $request->year)->value('name');
+                // assign children
+                'fac.overdue_days',          // 👉 GRACE PERIOD (days)
+                'fac.fine_amount',           // 👉 PER DAY FINE
+                'fac.payment_method',
 
-            if ($yearName) {
-                [$yearStart, $yearEnd] = explode('-', $yearName);
-                $startOfYear = \Carbon\Carbon::createFromDate($yearStart, 6, 1)->startOfMonth();
-                $endOfYear   = \Carbon\Carbon::createFromDate($yearEnd, 5, 31)->endOfMonth();
+                // group & type
+                'fg.name as fees_group_name',
+                'ft.name as fees_type_name',
 
-                $query->whereBetween('fm.due_date', [$startOfYear, $endOfYear]);
+                // payment
+                'pt.id as payment_transaction_id',
+                'pt.transaction_id',
+                'pt.created_at as payment_date',
+            ])
+
+            ->orderBy('fic.due_date', 'asc')
+            ->get();
+
+        // ================== CALCULATION LOGIC ==================
+        $today = Carbon::today();
+
+        $feesData = $feesData->map(function ($fee) use ($today) {
+
+            $dueDate   = Carbon::parse($fee->installment_due_date);
+            $graceDays = (int) ($fee->overdue_days ?? 0); // GRACE PERIOD
+            $finePerDay = (float) ($fee->fine_amount ?? 0);
+
+            $graceEndDate = $dueDate->copy()->addDays($graceDays);
+
+            $isPaid = !empty($fee->payment_transaction_id);
+
+            // Default values
+            $fee->status_text  = 'Upcoming';
+            $fee->status_class = 'red-bg';
+            $fee->fine_calculated = 0;
+            $fee->final_amount = $fee->installment_amount;
+
+            // PAID
+            if ($isPaid) {
+                $fee->status_text  = 'Paid';
+                $fee->status_class = 'green-bg';
+                return $fee;
             }
-        }
 
-        // $fees = $query->get();
+            // AFTER GRACE PERIOD → FINE APPLIES
+            if ($today->gt($graceEndDate)) {
 
-        $perPage = $request->get('perPage', 10);
-        $fees = $query->paginate($perPage);
+                $lateDays = $graceEndDate->diffInDays($today);
+                $fee->fine_calculated = $lateDays * $finePerDay;
 
-        $destinations = SchoolList::getDestination();
-        return view('parent-panel.fees',  [
+                $fee->final_amount =
+                    $fee->installment_amount + $fee->fine_calculated;
+
+                $fee->status_text  = 'Unpaid';
+                $fee->status_class = 'orange-bg';
+            }
+
+            return $fee;
+        });
+
+        return view('parent-panel.fees', [
+            'feesData'    => $feesData,
             'yearOptions' => $yearOptions,
-            'fees' => $fees,
-            'selectedYear' => $request->year,
-            'perPage' => $perPage,
-            'destinations' => $destinations
         ]);
     }
+
 
 
     public function payModal(Request $request)
