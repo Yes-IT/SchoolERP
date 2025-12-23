@@ -46,55 +46,20 @@
                     $user = $parent;
                     $student = \App\Models\StudentInfo\Student::find($user->student_id);
                     $studentName = $student ? $student->first_name . ' ' . $student->last_name : 'N/A';
-                    $lastName = $user->last_name ?? (explode(' ', $user->name)[1] ?? 'N/A');
+                    
+                    $addressParts = array_filter([
+                        $user->address_line ?? null,
+                        $user->city ?? null,
+                        $user->state ?? null,
+                        $user->country ?? null,
+                        $user->zip_code ?? null,
+                    ]);
+
+                    $commonAddress = !empty($addressParts)
+                                    ? implode(', ', $addressParts)
+                                    : 'N/A';
                 @endphp
-                {{-- <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>
-                       
-                         <a href="{{ route('parent_flow.parent_info', $user['id']) }}" class="view-attachment-btn">
-                                    <img src="{{ asset('backend/assets/images/new_images/eye-white.svg') }}" alt="Eye Icon">
-                        </a>
-                    </td>
-                    <td>{{ $lastName }}</td>
-                    <td>{{ $user['father_title'] ?? 'N/A' }}</td>
-                    <td>{{ $user['father_name'] ?? 'N/A' }}</td>
-                    <td>{{ $user['mother_title'] ?? 'N/A' }}</td>
-                    <td>{{ $user['mother_name'] ?? 'N/A' }}</td>
-                    <td>{{ $user['maiden_name'] ?? 'N/A' }}</td>
-                    <td>{{ $studentName }}</td>
-                    <td>{{ $user['guardian_address'] ?? $user['address'] ?? 'N/A' }}</td>
-                    <td>{{ $user['city_name'] ?? 'N/A' }}</td>
-                    <td>{{ $user['state_name'] ?? 'N/A' }}</td>
-                    <td>{{ $user['zip_code'] ?? 'N/A' }}</td>
-                    <td>{{ $user['country_name'] ?? 'N/A' }}</td>
-                    <td>{{ $user['guardian_home_phone'] ?? 'N/A' }}</td>
-                    <td>{{ $user['father_mobile'] ?? 'N/A' }}</td>
-                    <td>{{ $user['mother_mobile'] ?? 'N/A' }}</td>
-                    <td>{{ $user['father_email'] ?? 'N/A' }}</td>
-                    <td>{{ $user['mother_email'] ?? 'N/A' }}</td>
-                    <td>{{ $user['father_hebrew_name'] ?? 'N/A' }}</td>
-                    <td>{{ $user['mother_hebrew_name'] ?? 'N/A' }}</td>
-                    <td>{{ $user['father_dob'] ?? 'N/A' }}</td>
-                    <td>{{ $user['mother_dob'] ?? 'N/A' }}</td>
-                    <td>{{ $user['father_profession'] ?? 'N/A' }}</td>
-                    <td>{{ $user['mother_profession'] ?? 'N/A' }}</td>
-                    <td>{{ $user['father_image'] ? 'Has Image' : 'No Image' ?? 'N/A' }}</td>
-                    <td>{{ $user['mother_image'] ? 'Has Image' : 'No Image' ?? 'N/A' }}</td>
-                    <td>{{ $user['marital_status'] ?? 'N/A' }}</td>
-                    <td>{{ $user['marital_comment'] ?? 'N/A' }}</td>
-                    <td>{{ $user['guardian_name'] ?? 'N/A' }}</td>
-                    <td>{{ $user['guardian_address'] ?? 'N/A' }}</td>
-                    <td>{{ $user['guardian_mobile'] ?? $user['guardian_home_phone'] ?? 'N/A' }}</td>
-                    <td>
-                        <div class="actions-wrp">
-                            <button type="button">
-                                <a href="{{ route('parent_flow.parent.edit', $user->id) }}"><img src="{{ asset('backend/assets/images/new_images/edit-icon-primary.svg') }}" alt="Edit"></a> 
-                            </button>
-                            <!-- Add delete or other actions if needed -->
-                        </div>
-                    </td>
-                </tr> --}}
+              
                    <tr>
                     <td>{{ $serialNumber }}</td>
                     <td>
@@ -102,14 +67,14 @@
                             <img src="{{ asset('backend/assets/images/new_images/eye-white.svg') }}" alt="Eye Icon">
                         </a>
                     </td>
-                    <td>{{ $lastName }}</td>
+                    <td>{{ $user->father_name ?? 'N/A' }}</td>
                     <td>{{ $user->father_title ?? 'N/A' }}</td>
                     <td>{{ $user->father_name ?? 'N/A' }}</td>
                     <td>{{ $user->mother_title ?? 'N/A' }}</td>
                     <td>{{ $user->mother_name ?? 'N/A' }}</td>
                     <td>{{ $user->maiden_name ?? 'N/A' }}</td>
                     <td>{{ $studentName }}</td>
-                    <td>{{ $user->guardian_address ?? $user->address ?? 'N/A' }}</td>
+                    <td>{{ $commonAddress}}</td>
                     <td>{{ $user->city ?? 'N/A' }}</td>
                     <td>{{ $user->state ?? 'N/A' }}</td>
                     <td>{{ $user->zip_code ?? 'N/A' }}</td>

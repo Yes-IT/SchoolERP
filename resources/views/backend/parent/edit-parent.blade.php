@@ -188,7 +188,7 @@
                                 </div>
                                 <div class="input-grp">
                                     <label for="additional_email">Additional Email (Optional)</label>
-                                    <input id="additional_email" name="additional_email" type="email"
+                                    <input id="additional_email" name="additional_email"  type="text"
                                            value="{{ old('additional_email', $parent->additional_emails) }}">
                                 </div>
                             </div>
@@ -430,6 +430,47 @@
             $('#country').trigger('change');
         @endif
 
+
+         // Toastr initialization - MUST be before using toastr
+        toastr.options = {
+            closeButton: true,
+            progressBar: true,
+            newestOnTop: true,
+            timeOut: 3000,
+            extendedTimeOut: 2000,
+            positionClass: "toast-top-right"
+        };
+
+        window.showSuccess = function(message = '') {
+            toastr.success(message || 'Your action was successful.');
+        };
+
+        window.showError = function(err = {}) {
+            console.log('showError received:', err); // Debug
+            
+            let message;
+            
+            // Handle if err is a string
+            if (typeof err === 'string') {
+                message = err;
+            } 
+            // Handle if err is an object
+            else if (err?.responseJSON?.message) {
+                message = err.responseJSON.message;
+            } else if (err?.message) {
+                message = err.message;
+            } else {
+                message = 'Something went wrong. Please try again.';
+            }
+            
+            console.log('Toastr message:', message); // Debug
+            toastr.error(message);
+        };
+
+        window.showWarning = function(message = '') {
+            toastr.warning(message || 'Please try again later.');
+        };
+
         // AJAX Form Submission
         $('#parentForm').on('submit', function(e) {
             e.preventDefault();
@@ -448,13 +489,39 @@
                 data: formData,
                 contentType: false,
                 processData: false,
-                success: function(response) {
-                    if (response.success) {
-                        alert('Parent updated successfully!');
-                        window.location.href = '{{ route("parent_flow.index") }}';
+                  success: function(response) {
+                   
+                    if (response.success === true) {
+                        console.log('✓ SUCCESS detected - showing toast and redirecting');
+                        showSuccess(response.message);
+                        
+                        const redirectUrl = '{{ route("parent_flow.index") }}';
+                        // console.log('Redirect URL will be:', redirectUrl);
+                        
+                        setTimeout(function() {
+                            window.location.href = redirectUrl;
+                        }, 1500);
+                        
+                    } else {
+                        console.log('✗ NOT a success response');
+                        if (response.errors) {
+                            console.log('Showing validation errors');
+                            $.each(response.errors, function(field, messages) {
+                                let inputField = $('[name="' + field + '"]');
+                                let inputGroup = inputField.closest('.input-grp');
+                                inputGroup.addClass('error');
+                                inputGroup.find('.error-message').remove();
+                                let errorHtml = '<span class="error-message" style="color:red; font-size:12px; display:block; margin-top:5px;">' + messages[0] + '</span>';
+                                inputGroup.append(errorHtml);
+                            });
+                        } else {
+                          
+                            showError(response.message);
+                        }
                     }
                 },
-                error: function(xhr) {
+                error: function(xhr, status, error) {
+                   
                     if (xhr.status === 422) {
                         let errors = xhr.responseJSON.errors;
                         $.each(errors, function(field, messages) {
@@ -466,7 +533,7 @@
                             inputGroup.append(errorHtml);
                         });
                     } else {
-                        alert('Something went wrong. Please try again.');
+                        showError('Something went wrong. Please try again.');
                     }
                 }
             });
@@ -474,7 +541,7 @@
     });
 </script>
 
-<script>
+{{-- <script>
         let selectedStudentId = null; // Will hold the selected student ID
 
         $('.dropdown-trigger').on('click', function() {
@@ -502,7 +569,8 @@
                         $('#daughter_dob').val(student.date_of_birth ?? '');
                     },
                     error: function() {
-                        alert('Failed to load student details.');
+                        // alert('Failed to load student details.');
+                        showError('Failed to load student details.');
                     }
                 });
             } else {
@@ -510,6 +578,88 @@
                 $('#daughter_name, #school_year, #year_status, #daughter_dob').val('');
             }
         });
+
+</script> --}}
+
+
+<script>
+   //changes by nazmin dated on 23-12-2025
+    let selectedStudentId = null; 
+
+    $(document).ready(function() {
+        // Toggle dropdown on trigger click
+        $('.dropdown-trigger').on('click', function(e) {
+            e.stopPropagation(); 
+            $(this).closest('.dropdown-year').toggleClass('open');
+        });
+
+        // Handle option selection
+        $('.dropdown-option').on('click', function(e) {
+            e.stopPropagation();
+            
+            const value = $(this).data('value');
+            const text = $(this).text();
+            const $dropdown = $(this).closest('.dropdown-year');
+            const $trigger = $dropdown.find('.dropdown-trigger .dropdown-label');
+            
+            $trigger.text(text);
+            $dropdown.attr('data-selected', text);
+            selectedStudentId = value;
+    
+            $dropdown.removeClass('open');
+            
+            // console.log('Selected student ID:', selectedStudentId, 'Text:', text);
+            
+            // Fetch student details and fill Daughter Info
+            if (value) {
+                $.ajax({
+                    url: '{{ route("parent_flow.parent_flow.get_student_details", ["id" => ":id"]) }}'.replace(':id', value),
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(student) {
+                        $('#daughter_name').val(
+                            (student.first_name ?? '') + ' ' + (student.last_name ?? '')
+                        );
+                        $('#school_year').val(student.school_year ?? '');
+                        $('#year_status').val(student.year_status ?? '');
+                        $('#daughter_dob').val(student.date_of_birth ?? '');
+                        
+                        console.log('Student details loaded:', student);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Failed to load student details:', error);
+                        showError('Failed to load student details.');
+                    }
+                });
+            } else {
+                $('#daughter_name, #school_year, #year_status, #daughter_dob').val('');
+            }
+        });
+
+        // Close dropdown when clicking outside
+        $(document).on('click', function(e) {
+           
+            if (!$(e.target).closest('.dropdown-year').length) {
+                $('.dropdown-year').removeClass('open');
+            }
+        });
+
+        // Pre-select if there's already a connected student
+        @if(isset($connectedStudent) && $connectedStudent)
+            $(function() {
+                selectedStudentId = {{ $connectedStudent->id }};
+                const studentText = '{{ $connectedStudent->first_name }} {{ $connectedStudent->last_name }} - {{ $connectedStudent->student_id }}';
+                
+                $('.dropdown-label').text(studentText);
+                $('.dropdown-year').attr('data-selected', studentText);
+                
+                $('#daughter_name').val('{{ $connectedStudent->first_name }} {{ $connectedStudent->last_name }}');
+                $('#school_year').val('{{ $connectedStudent->school_year ?? '' }}');
+                $('#year_status').val('{{ $connectedStudent->year_status ?? '' }}');
+                $('#daughter_dob').val('{{ $connectedStudent->date_of_birth ?? '' }}');
+            });
+        @endif
+    });
 
 </script>
 

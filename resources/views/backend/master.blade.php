@@ -25,6 +25,10 @@
     <link rel="stylesheet" href="{{ asset('backend/assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('backend/assets/css/superadmin.css') }}">
 
+    <!-- toaster -->
+    <!-- Toastr CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
+
     @stack('styles')
 </head>
 
@@ -63,6 +67,9 @@
     <script src="{{ global_asset('backend/assets/js/custom.js') }}"></script>
     <script src="{{ global_asset('backend/assets/js/common.js') }}"></script>
     <script src="{{ global_asset('backend/assets/js/datepicker.js') }}"></script>
+
+    <!-- Toastr JS (before your script) -->
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 
     <script>
         function changeLoginType(type) {
@@ -1718,7 +1725,12 @@
         integrity="sha512-bE2H3X0bwh9k4EStk1gE5X01gA6Y+/C75OHyJDq4RVlM1aFzDJgcZlcpJKuFVZ0Y99D7eM6nE+EZ0zKfL6+5MA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+
+
    @stack('script')
+
+
+
 </body>
 
 </html>

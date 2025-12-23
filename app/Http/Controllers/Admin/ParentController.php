@@ -11,11 +11,14 @@ use App\Models\Academic\YearStatus;
 use App\Models\StudentInfo\{Student,ParentGuardian};
 use App\Models\{User,Session};
 use Illuminate\Support\Facades\{Hash,Validator,Auth,DB,Log};
+use App\Traits\ReturnFormatTrait;
 
 use Illuminate\Support\Str as SupportStr;
 
 class ParentController extends Controller
 {
+
+    use ReturnFormatTrait;
 
     public function index(Request $request)
     {
@@ -97,7 +100,7 @@ class ParentController extends Controller
 
                 $commonAddress = "{$parent->address_line}, {$parent->city}, {$parent->state}, {$parent->country} - {$parent->zip_code}";
 
-                Log::info($commonAddress);
+                // Log::info($commonAddress);
                 $maritalStatus = $parent->marital_status;
                 $primaryCustodian = $parent->primary_custodian;
 
@@ -292,7 +295,7 @@ class ParentController extends Controller
                 break;
 
             case 'legal_guardian':
-                // You can add requirements here if needed (e.g. relative_name)
+               
                 break;
         }
 
@@ -428,9 +431,7 @@ class ParentController extends Controller
                 'updated_at' => now(),
             ];
 
-            // Insert into parent_guardians table
-            DB::table('parent_guardians')->insert($data);
-
+            //Insert ONLY ONCE and get the ID
             $parentId = DB::table('parent_guardians')->insertGetId($data);
 
             if ($request->filled('student_id')) {
@@ -438,6 +439,12 @@ class ParentController extends Controller
                     ->where('id', $request->student_id)
                     ->update(['parent_guardian_id' => $parentId]);
             }
+
+            Log::info('Parent created successfully', [
+                'parentId' => $parentId, 
+                'studentId' => $request->student_id, 
+                'userId' => $userId
+            ]);
 
             DB::commit();
 
@@ -460,28 +467,46 @@ class ParentController extends Controller
 
     public function editParent($id)
     {
-        // Fetch the specific parent_guardian record by ID, joined with user
-        $parent = DB::table('parent_guardians')
-            ->join('users', 'parent_guardians.user_id', '=', 'users.id')
-            ->where('parent_guardians.id', $id)
-            ->where('users.role_id', 7) // Parent role - change if different
-            ->select(
-                'parent_guardians.*',
-                'users.id as user_id',
-                'users.name as user_name',
-                'users.email as user_email',
-                'users.phone as user_phone'
-            )
-            ->first();
+        // Log::info('editParent called with ID:', ['id' => $id]);
 
-        if (!$parent) {
-            abort(404, 'Parent not found');
+        try{
+             // Fetch the specific parent_guardian record by ID, joined with user
+                $parent = DB::table('parent_guardians')
+                            ->join('users', 'parent_guardians.user_id', '=', 'users.id')
+                            ->where('parent_guardians.user_id', $id)
+                            ->where('users.role_id', 7) // Parent role - change if different
+                            ->select(
+                                'parent_guardians.*',
+                                'users.id as user_id',
+                                'users.name as user_name',
+                                'users.email as user_email',
+                                'users.phone as user_phone'
+                            )
+                            ->first();
+
+                if (!$parent) {
+                    abort(404, 'Parent not found');
+                }
+
+                // Get all students
+                $students = DB::table('students')->get();
+
+                //Get the currently connected student for this parent
+                $parentId = $parent->id;
+                $connectedStudent = DB::table('students')
+                                    ->where('parent_guardian_id', $parentId)
+                                    ->first();
+                                    
+                // Log::info('Connected student:', ['student' => $connectedStudent]);                    
+
+                $countries = DB::table('countries')->orderBy('country_id')->get(['country_id', 'country_name']);
+
+                return view('backend.parent.edit-parent', compact('parent','countries','students','connectedStudent'));
+        } catch (\Exception $e) {
+            Log::error('Parent edit failed: ' . $e->getMessage());
+            return redirect()->route('parent_flow.index')->with('danger', 'Failed to edit parent information. Please try again.');
         }
-
-        $students = DB::table('students')->get();
-        $countries = DB::table('countries')->orderBy('country_id')->get(['country_id', 'country_name']);
-
-        return view('backend.parent.edit-parent', compact('parent','countries','students'));
+       
     }
 
 
@@ -520,8 +545,10 @@ class ParentController extends Controller
             'mother_dob'         => 'nullable|date',
             'mother_occupation'  => 'nullable|string|max:255',
 
-            'additional_phone'   => 'nullable|string|max:50',
-            'additional_email'   => 'nullable|email|max:255',
+            'additional_phone'   => 'nullable|string|max:255',
+            // 'additional_email'   => 'nullable|email|max:255',
+            'additional_email'   => 'nullable|string|max:255',
+
             'marital_comment'    => 'nullable|string|max:500',
 
             // Relative / Emergency contact
@@ -580,20 +607,26 @@ class ParentController extends Controller
                 'success' => false,
                 'errors'  => $validator->errors()->messages()
             ], 422);
+
+          
         }
 
         DB::beginTransaction();
 
         try {
             // Fetch the existing parent record
-            $parent = DB::table('parent_guardians')->where('id', $id)->first();
+            $parent = DB::table('parent_guardians')->where('user_id', $id)->first();
 
             if (!$parent) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Parent record not found.'
                 ], 404);
+               
             }
+
+            // Then use parent_guardians.id for updates
+            $parentId = $parent->id;
 
             // Determine primary email and phone (priority order)
             $primaryEmail = $request->father_email
@@ -630,22 +663,23 @@ class ParentController extends Controller
                     'updated_at' => now(),
                 ]);
 
-            // Collect additional emails (exclude primary)
-            $allEmails = collect([$request->father_email, $request->mother_email, $request->additional_email, $request->relative_email])
+            $additionalEmails = collect(
+                    explode(',', $request->additional_email ?? '')
+                )
+                ->merge([$request->father_email, $request->mother_email, $request->relative_email])
+                ->map(fn ($email) => trim($email))
                 ->filter()
                 ->unique()
-                ->reject(fn($email) => $email === $primaryEmail)
-                ->values();
-
-            $additionalEmails = $allEmails->isNotEmpty() ? $allEmails->implode(',') : null;
-
-            // Additional phones
-            $additionalPhones = collect([$request->additional_phone, $request->relative_cell_phone, $request->relative_home_phone])
-                ->filter()
-                ->unique()
+                ->reject(fn ($email) => $email === $primaryEmail)
+                ->values()
                 ->implode(',');
 
-            $additionalPhones = $additionalPhones ?: null;
+            $additionalEmails = $additionalEmails ?: null;
+
+            $additionalPhones = $request->filled('additional_phone')
+                                ? trim($request->additional_phone)
+                                : null;
+
 
             // Use address_line if provided, else fallback to parent_address
             $addressLine = $request->filled('address_line') ? $request->address_line : ($request->parent_address ?: $parent->address_line);
@@ -695,17 +729,27 @@ class ParentController extends Controller
                 'updated_at' => now(),
             ];
 
+            
+
             // Update the parent_guardians record
             DB::table('parent_guardians')
-                ->where('id', $id)
+                ->where('id', $parentId)
                 ->update($data);
 
 
             if ($request->filled('student_id')) {
                 DB::table('students')
                     ->where('id', $request->student_id)
-                    ->update(['parent_guardian_id' => $id]);
+                    ->update(['parent_guardian_id' => $parentId]);
             }
+
+             Log::info('Parent updated successfully', [
+                'parentId' => $parentId, 
+                'studentId' => $request->student_id, 
+                'data' => $data,
+
+            ]);
+
 
             DB::commit();
 
@@ -713,6 +757,8 @@ class ParentController extends Controller
                 'success' => true,
                 'message' => 'Parent updated successfully!'
             ]);
+
+           
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -722,6 +768,8 @@ class ParentController extends Controller
                 'success' => false,
                 'message' => 'Failed to update parent information. Please try again.'
             ], 500);
+
+          
         }
     }
 

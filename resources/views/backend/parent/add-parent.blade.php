@@ -21,7 +21,7 @@
             <h1>Add Parent</h1>
             <ul>
                 <li><a href="../dashboard">Dashboard</a> /</li>
-                <li><a href="./dashboard">Parent</a> /</li>
+                <li><a href="{{ route('parent_flow.index') }}">Parent</a> /</li>
                 <li>Add Parent</li>
             </ul>
         </div>
@@ -121,11 +121,11 @@
                             <div class="multi-input-grp grp-2">
                                 <div class="input-grp father-field">
                                     <label for="father_hebrew_name">Father Hebrew Name (Optional)</label>
-                                    <input id="father_hebrew_name" name="father_hebrew_name" type="text">
+                                    <input id="father_hebrew_name" name="father_hebrew_name" type="text" dir="rtl" placeholder="הכנס שם בעברית">
                                 </div>
                                 <div class="input-grp mother-field">
                                     <label for="mother_hebrew_name">Mother Hebrew Name (Optional)</label>
-                                    <input id="mother_hebrew_name" name="mother_hebrew_name" type="text">
+                                    <input id="mother_hebrew_name" name="mother_hebrew_name" type="text"  dir="rtl" placeholder="הכנס שם בעברית">
                                 </div>
                             </div>
 
@@ -145,15 +145,15 @@
                             <div class="multi-input-grp grp-3">
                                 <div class="input-grp father-field">
                                     <label for="father_phone">Father Phone</label>
-                                    <input id="father_phone" name="father_phone" type="text" placeholder="e.g. +1 123-456-7890">
+                                    <input id="father_phone" name="father_phone" type="text" placeholder="Enter father's phone number">
                                 </div>
                                 <div class="input-grp mother-field">
                                     <label for="mother_phone">Mother Phone</label>
-                                    <input id="mother_phone" name="mother_phone" type="text" placeholder="e.g. +1 123-456-7890">
+                                    <input id="mother_phone" name="mother_phone" type="text" placeholder="Enter mother's phone number">
                                 </div>
                                 <div class="input-grp">
                                     <label for="additional_phone">Additional Phone (Optional)</label>
-                                    <input id="additional_phone" name="additional_phone" type="text">
+                                    <input id="additional_phone" name="additional_phone" type="text" placeholder="Enter Additional phone number">
                                 </div>
                             </div>
 
@@ -169,7 +169,7 @@
                                 </div>
                                 <div class="input-grp">
                                     <label for="additional_email">Additional Email (Optional)</label>
-                                    <input id="additional_email" name="additional_email" type="email">
+                                    <input id="additional_email" name="additional_email" type="email" placeholder="Enter Addtional email address">
                                 </div>
                             </div>
 
@@ -185,7 +185,7 @@
                                 </div>
                                 <div class="input-grp ">
                                     <label for="marital_comment">Marital Comment</label>
-                                    <input id="marital_comment" name="marital_comment" type="text" placeholder="e.g.">
+                                    <input id="marital_comment" name="marital_comment" type="text" placeholder="Enter marital comment">
                                 </div>
                             </div>
 
@@ -315,6 +315,30 @@
 
     $(document).ready(function() {
 
+         // Initialize toastr
+        toastr.options = {
+            closeButton: true,
+            progressBar: true,
+            newestOnTop: true,
+            timeOut: 3000,
+            extendedTimeOut: 2000,
+            positionClass: "toast-top-right"
+        };
+
+        // Global toastr functions
+        window.showSuccess = function(message = '') {
+            toastr.success(message || 'Your action was successful.');
+        };
+
+        window.showError = function(err = {}) {
+            let message;
+            if (typeof err === 'string') message = err;
+            else if (err?.responseJSON?.message) message = err.responseJSON.message;
+            else if (err?.message) message = err.message;
+            else message = 'Something went wrong. Please try again.';
+            toastr.error(message);
+        };
+
         // Toggle visibility of father/mother fields
         function toggleParentFields() {
             const guardian = $('#legal_guardian').val();
@@ -369,9 +393,13 @@
                 contentType: false,
                 processData: false,
                 success: function(response) {
-                    if (response.success) {
-                        alert('Parent added successfully!');
-                        window.location.href = '{{ route("parent_flow.index") }}';
+                    if (response.success === true) {
+                        // alert('Parent added successfully!');
+                        showSuccess(response.message);
+                        // window.location.href = '{{ route("parent_flow.index") }}';
+                        setTimeout(function() {
+                            window.location.href = '{{ route("parent_flow.index") }}';
+                        }, 1500);
                     }
                 },
                 error: function(xhr) {
@@ -386,7 +414,8 @@
                             inputGroup.append(errorHtml);
                         });
                     } else {
-                        alert('Something went wrong. Please try again.');
+                        // alert('Something went wrong. Please try again.');
+                        showError('Something went wrong. Please try again.');
                     }
                 }
             });
@@ -423,7 +452,8 @@
                     },
                     error: function(xhr) {
                         console.log('Error loading states:', xhr.responseText);
-                        alert('Failed to load states.');
+                        // alert('Failed to load states.');
+                        showError('Failed to load states.');
                     }
                 });
             }
@@ -451,7 +481,8 @@
                     },
                     error: function(xhr) {
                         console.log('Error loading cities:', xhr.responseText);
-                        alert('Failed to load cities.');
+                        // alert('Failed to load cities.');
+                        showError('Failed to load cities.');
                     }
                 });
             }
@@ -462,7 +493,7 @@
 </script>
 
 
-<script>
+{{-- <script>
         let selectedStudentId = null; // Will hold the selected student ID
 
         $('.dropdown-trigger').on('click', function() {
@@ -490,7 +521,8 @@
                         $('#daughter_dob').val(student.date_of_birth ?? '');
                     },
                     error: function() {
-                        alert('Failed to load student details.');
+                        // alert('Failed to load student details.');
+                        showError('Failed to load student details.');
                     }
                 });
             } else {
@@ -498,6 +530,90 @@
                 $('#daughter_name, #school_year, #year_status, #daughter_dob').val('');
             }
         });
+
+</script> --}}
+
+
+ <script>
+    let selectedStudentId = null; // Will hold the selected student ID
+
+    $(document).ready(function() {
+        // Toggle dropdown on trigger click
+        $('.dropdown-trigger').on('click', function(e) {
+            e.stopPropagation(); 
+            $(this).closest('.dropdown-year').toggleClass('open');
+        });
+
+        // Handle option selection
+        $('.dropdown-option').on('click', function(e) {
+            e.stopPropagation();
+            
+            const value = $(this).data('value');
+            const text = $(this).text();
+            const $dropdown = $(this).closest('.dropdown-year');
+            const $trigger = $dropdown.find('.dropdown-trigger .dropdown-label');
+            
+            // Update selected text
+            $trigger.text(text);
+            $dropdown.attr('data-selected', text);
+            selectedStudentId = value;
+            $dropdown.removeClass('open');
+            console.log('Selected student ID:', selectedStudentId, 'Text:', text);
+            
+            if (value) {
+                fetchStudentDetails(value);
+            } else {
+                clearStudentFields();
+            }
+        });
+
+        // Close dropdown when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.dropdown-year').length) {
+                $('.dropdown-year').removeClass('open');
+            }
+        });
+
+        // Function to fetch student details
+        function fetchStudentDetails(studentId) {
+            $.ajax({
+                url: '{{ route("parent_flow.parent_flow.get_student_details", ["id" => ":id"]) }}'.replace(':id', studentId),
+                type: 'GET',
+                dataType: 'json',
+                success: function(student) {
+                    if (student) {
+                        $('#daughter_name').val(
+                            (student.first_name || '') + ' ' + (student.last_name || '')
+                        );
+                        $('#school_year').val(student.school_year || '');
+                        $('#year_status').val(student.year_status || '');
+                        $('#daughter_dob').val(student.date_of_birth || '');
+                        
+                        console.log('Student details loaded:', student);
+                    } else {
+                        console.log('No student data returned');
+                        showError('No student data found.');
+                        clearStudentFields();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Failed to load student details:', error, xhr.responseText);
+                    showError('Failed to load student details.');
+                    clearStudentFields();
+                }
+            });
+        }
+
+        // Function to clear student fields
+        function clearStudentFields() {
+            $('#daughter_name, #school_year, #year_status, #daughter_dob').val('');
+        }
+
+        // Initialize by logging
+        console.log('Student dropdown initialized');
+    });
+
+
 
 </script>
 
