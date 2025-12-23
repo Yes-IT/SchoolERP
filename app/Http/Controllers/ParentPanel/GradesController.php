@@ -28,7 +28,10 @@ class GradesController extends Controller
 
         $id = $student->id;
 
-        $perPage = $request->get('perPage', 5);
+        $perPage = $request->get('perPage', 10);
+
+        // $school_year = $request->get('school_years_id');
+        // $semester_id = $request->get('semester_id');
 
         $month = $request->get('month', now()->month);
         $year = $request->get('year', now()->year);
@@ -91,7 +94,7 @@ class GradesController extends Controller
                     ->orderBy('grades.created_at', 'desc');
 
         if ($request->filled('school_years_id')) {
-            $query->where('grades.school_years_id', $request->school_years_id);
+            $query->where('grades.session_id', $request->school_years_id);
         }
 
         if ($request->filled('semester_id')) {

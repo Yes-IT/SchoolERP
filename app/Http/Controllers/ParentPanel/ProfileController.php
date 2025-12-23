@@ -46,13 +46,49 @@ class ProfileController extends Controller
     //changes by nazmin
     public function profile()
     {
-        try{
+        try {
             $student = request()->get('currentStudent');
 
             if (!$student) {
                 return redirect()->back()->withErrors(['error' => 'Student not found']);
             }
 
+            // Fetch the class_id from student_class_mapping for the current student
+            $mapping = DB::table('student_class_mapping')
+                ->where('student_id', $student->id)
+                ->first();
+
+            $class_id = $mapping?->class_id;
+
+            // Fetch session and year_status from classes -> sessions and year_statuses
+            $session = null;
+            $year_status = null;
+            $semster = null;
+
+            if ($class_id) {
+                $class = DB::table('classes')
+                    ->select('session_id', 'year_status_id', 'semester_id')
+                    ->where('id', $class_id)
+                    ->first();
+
+                // @dd($class);
+
+                if ($class) {
+                    $session = DB::table('sessions')
+                        ->where('id', $class->session_id)
+                        ->first(); // or select specific columns if needed
+
+                    $year_status = DB::table('year_status') // assuming table name is year_statuses
+                        ->where('id', $class->year_status_id)
+                        ->first(); // or select specific columns
+
+                    $semster = DB::table('semesters') // assuming table name is year_statuses
+                        ->where('id', $class->semester_id)
+                        ->first(); // or select specific columns
+                }
+            }
+
+            // Main profile data query
             $data = DB::table('students')
                 ->leftJoin('users', 'students.user_id', '=', 'users.id')
                 ->leftJoin('uploads', 'users.upload_id', '=', 'uploads.id')
@@ -72,11 +108,15 @@ class ProfileController extends Controller
                 return redirect()->back()->withErrors(['error' => 'Profile data not found.']);
             }
 
-            return view('parent-panel.profile.profile', compact('data'));
-        }catch(\Exception $e){
+            // Pass everything to the view
+            return view('parent-panel.profile.profile', compact('data', 'session', 'year_status', 'semster'));
+
+        } catch (\Exception $e) {
+            // Optional: log the error for debugging
+            // \Log::error($e);
+
             return redirect()->route('parent-panel.dashboard')->with('error', 'Failed to get students.');
         }
-       
     }
 
 

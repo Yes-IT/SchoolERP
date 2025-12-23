@@ -2,11 +2,18 @@
 
 @section('content')
 
+<style>
+.count-row table tbody tr td:first-child {
+    position: static !important;
+    color: black;
+}
+</style>
+
 <!-- Dashboard Begin -->
 <div class="ds-breadcrumb">
     <h1>Request Transcript</h1>
     <ul>
-        <li><a href="{{route('student.dashboard')}}">Dashboard</a> /</li>
+        <li><a href="{{ route('parent-panel-dashboard.index') }}">Dashboard</a> /</li>
         <li>Request Transcript</li>
     </ul>
 </div>
@@ -384,7 +391,7 @@
                             @endforeach
                         </select>
                     </div>
-
+                    <br>
                     <button type="submit" class="btn w-100 py-2" style="background-color:#660000;color:white">
                         Submit
                     </button>

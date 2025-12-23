@@ -42,7 +42,8 @@
             </div>
 
         </div>
-        <div class="ds-cmn-tble count-row">
+        
+        <div class="ds-cmn-tble">
             <table>
                 <thead>
                     <tr>
@@ -59,23 +60,32 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($grades as $index => $grade)
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $grade->class_name }}</td>
-                        <td>{{ $grade->attendance_summary['final_points'] }}</td>
-                        <td>{{ $grade->attendance_summary['absent'] }}</td>
-                        <td>{{ $grade->attendance_summary['approved_leave_days'] }}</td>
-                        <td>{{ $grade->attendance_summary['marks_points'] }}</td>
-                        <td>{{ $grade->attendance_summary['attendance_points'] }}</td>
-                        <td>{{ $grade->attendance_summary['percentage'] }} %</td>
-                        <td>{{ $grade->attendance_summary['result'] }}</td>
-                        <td>{{ $grade->transcript }}</td>
-                    </tr>
+                    @forelse($grades as $index => $grade)
+                        <tr>
+                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $grade->class_name ?? 'N/A' }}</td>
 
-                    @endforeach
+                            <td>{{ data_get($grade, 'attendance_summary.final_points', 'N/A') }}</td>
+                            <td>{{ data_get($grade, 'attendance_summary.absent', 0) }}</td>
+                            <td>{{ data_get($grade, 'attendance_summary.approved_leave_days', 0) }}</td>
+                            <td>{{ data_get($grade, 'attendance_summary.marks_points', 'N/A') }}</td>
+                            <td>{{ data_get($grade, 'attendance_summary.attendance_points', 'N/A') }}</td>
+
+                            <td>
+                                {{ data_get($grade, 'attendance_summary.percentage') !== null
+                                    ? data_get($grade, 'attendance_summary.percentage') . ' %'
+                                    : 'N/A' }}
+                            </td>
+
+                            <td>{{ data_get($grade, 'attendance_summary.result', 'N/A') }}</td>
+                            <td>{{ $grade->transcript ?? 'N/A' }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="10" class="text-center">No records found</td>
+                        </tr>
+                    @endforelse
                 </tbody>
-
             </table>
         </div>
 
@@ -92,7 +102,7 @@
                     <div class="formfield">
                         <label>Per page</label>
                         <select name="perPage" onchange="document.getElementById('perPageForm').submit()">
-                            @foreach([1,2,3,4,5,10,15,20,25,50] as $size)
+                            @foreach([5,10,15,20,25,50] as $size)
                             <option value="{{ $size }}" {{ $perPage == $size ? 'selected' : '' }}>
                                 {{ $size }}
                             </option>

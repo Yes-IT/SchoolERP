@@ -8,12 +8,12 @@
     <div class="ds-breadcrumb">
         <h1>{{$data->first_name}}’s Profile</h1>
         <ul>
-            <li><a href="dashboard.html">Dashboard</a> /</li>
+            <li><a href="{{ route('parent-panel-dashboard.index') }}">Dashboard</a> /</li>
             <li>{{$data->first_name}}’s Profile</li>
         </ul>
     </div>
 
-    {{-- @dump($data) --}}
+    {{-- @dd($data) --}}
 
     <div class="ds-pr-body">
         <div class="ds-pr-profile-card">
@@ -37,11 +37,12 @@
                         </tr>
                         <tr>
                             <td class="td-lineremover">Year</td>
-                            <td class="td-lineremover">2025-26</td>
+                            <td class="td-lineremover">{{ $session->name ?? 'N/A' }}</td>
                         </tr>
+
                         <tr>
                             <td class="td-lineremover">Semester</td>
-                            <td class="td-lineremover">1</td>
+                            <td class="td-lineremover">{{ $semster->name ?? 'N/A' }}</td>
                         </tr>
                     </table>
                 </div>
@@ -131,7 +132,23 @@
                         <tbody>
                             <tr>
                                 <td class="td-lineremover">Home Address</td>
-                                <td class="td-lineremover">{{ $data->residance_address }}</td>
+                                <td class="td-lineremover">{{ $data->residance_address ?: 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="td-lineremover">City</td>
+                                <td class="td-lineremover">{{ $data->city ?: 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="td-lineremover">State</td>
+                                <td class="td-lineremover">{{ $data->state ?: 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="td-lineremover">Zip Code</td>
+                                <td class="td-lineremover">{{ $data->zip_code ?: 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="td-lineremover">Country</td>
+                                <td class="td-lineremover">{{ $data->country ?: 'N/A' }}</td>
                             </tr>
                         </tbody>
                     </table>

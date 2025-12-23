@@ -83,29 +83,27 @@
 
                             </td>
                             <td>
-                                <button class="view-attachment-btn"
-                                    data-bs-target="#viewAttachedDocs"
-                                    data-bs-toggle="modal"
-                                    data-id="{{ $assignment->id }}"
-                                    data-title="{{ $assignment->title }}"
-                                    data-subject="{{ $assignment->subject_name }}"
-                                    data-media_type="{{ $firstMedia->media_type ?? '' }}"
-                                    data-file_name="{{ $fileName }}"
-                                    data-download-url="{{ $downloadUrl }}"
-                                    data-grade="{{ $assignment->grade ?? 'Not graded yet' }}"
-                                    data-format="{{ $fileFormat }}"
-                                    @if(!$firstMedia) disabled @endif
-                                >
-                                    <img src="{{ asset('student/images/eye-white.svg') }}" alt="Eye Icon">
-                                </button>
+                                @if($firstMedia)
+                                    <button class="view-attachment-btn"
+                                        data-bs-target="#viewAttachedDocs"
+                                        data-bs-toggle="modal"
+                                        data-id="{{ $assignment->id }}"
+                                        data-title="{{ $assignment->title }}"
+                                        data-subject="{{ $assignment->subject_name }}"
+                                        data-media_type="{{ $firstMedia->media_type }}"
+                                        data-file_name="{{ $fileName }}"
+                                        data-download-url="{{ $downloadUrl }}"
+                                        data-grade="{{ $assignment->grade ?? 'Not graded yet' }}"
+                                        data-format="{{ $fileFormat }}"
+                                    >
+                                        <img src="{{ asset('student/images/eye-white.svg') }}" alt="Eye Icon">
+                                    </button>
+                                @endif
                             </td>
-
-
 
                             <td>{{ \Carbon\Carbon::parse($assignment->assigned_date)->format('d/m/Y') }}</td>
                             <td>{{ \Carbon\Carbon::parse($assignment->due_date)->format('d/m/Y') }}</td>
 
-                        
                         </tr>
                     @empty
                     <tr>

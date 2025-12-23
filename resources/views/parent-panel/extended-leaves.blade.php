@@ -60,7 +60,7 @@
             </div>
         </div>
 
-        <div class="ds-cmn-tble count-row w1200" id="leaves-table-container">
+        <div class="ds-cmn-tble w1200" id="leaves-table-container">
             <!-- Initial table will be loaded here via PHP, AJAX will replace content -->
             @include('parent-panel.extended_leaves_table')
         </div>

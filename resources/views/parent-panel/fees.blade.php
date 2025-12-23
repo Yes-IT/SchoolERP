@@ -26,8 +26,9 @@
                         </div>
                         <div class="select-yr">
                             <select>
-                                <option value="2024-25" selected>2024-25</option>
-                                <option value="2025-26">2025-26</option>
+                                @foreach ($yearOptions as $yearOption)
+                                    <option value="{{ $yearOption->id }}">{{ $yearOption->name }}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -36,7 +37,7 @@
                     <div class="tab-content" id="feesTabContent">
                         <!-- Assignments Table -->
                         <div class="tab-pane fade show active" id="assignments" role="tabpanel">
-                            <div class="ds-cmn-tble count-row">
+                            <div class="ds-cmn-tble">
                                 <table>
                                         <thead>
                                             <tr>
@@ -186,7 +187,7 @@
                                                                 Pay
                                                             </button>
                                                         @else
-                                                            --
+                                                            <button class="print-btn"><img src="{{ asset('student/images/printer-icon.svg') }}" alt="Icon"></button>
                                                         @endif
                                                     </td>
                                                 </tr>

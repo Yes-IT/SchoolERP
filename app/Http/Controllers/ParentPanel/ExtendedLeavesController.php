@@ -30,8 +30,7 @@ class ExtendedLeavesController extends Controller
         $years     = Session::orderByDesc('id')->get();
         $semesters = Semester::get();
 
-        $query = Leave::where('student_id', $student->id)
-                    ->whereRaw('DATEDIFF(to_date, from_date) >= 3');
+        $query = Leave::where('student_id', $student->id)->whereRaw('DATEDIFF(to_date, from_date) >= 3');
 
         // === FILTERS ===
         if ($sessionId && $sessionId != '') {

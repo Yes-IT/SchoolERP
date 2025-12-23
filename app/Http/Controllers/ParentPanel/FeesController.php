@@ -122,9 +122,7 @@ class FeesController extends Controller
         try{
             $studentId = session('current_student_id');
 
-            $yearOptions = DB::table('school_years')
-                            ->pluck('name', 'id')
-                            ->toArray();
+            $yearOptions = DB::table('sessions')->get();
 
             $perPage = $request->get('per_page', 10);
             
