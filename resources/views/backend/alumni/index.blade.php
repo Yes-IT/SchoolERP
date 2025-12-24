@@ -90,7 +90,7 @@
                 </div>
             </div>
 
-            <div class="ds-cmn-tble count-row tbl-5_4k" id="alumniTableContainer">
+            <div class="ds-cmn-tble tbl-5_4k" id="alumniTableContainer">
                 <!-- Table will be loaded here via AJAX -->
             </div>
         </div>
